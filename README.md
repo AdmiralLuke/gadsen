@@ -1,6 +1,5 @@
 # G.A.T.S
 
-
 ### Installation
 
 #### Schritt 1: [Kommandozeile]
