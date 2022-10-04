@@ -91,3 +91,31 @@ git add .
 git commit -m "Changes xyz"
 git push -u origin NeuerBranch
 ```
+
+### Branch-Struktur:
+
+**Main:**
+* Basiert auf keinem Branch
+* Enthält den neuesten Release
+* d.h. sämtlicher Code ist gut getestet, stabil und dokumentiert
+* Vor dem Push von Beta auf Main muss der neue Code mittels Integration und System Tests getestet werden
+
+**Beta:**
+* Basiert auf Main
+* Enthält experimentellen, stabilen Code
+* d.h. sämtlicher Code ist stabil und dokumentiert kann aber noch kleinere Bugs enthalten
+* Vor dem Push von Dev auf Beta muss der Code stabil und dokumentiert sein, sowie von mindestens einem weiteren Teammitglied reviewed werden.
+
+**Dev:**
+* Basiert auf Beta
+* Enthält Code, der Revision erwartet
+* Die Revision wird nur bestanden insofern der Code stabil und dokumentiert ist, sowie ausreichende (automatisierte) Unit-Tests bestehen
+
+**Dev_\[Erweiterung\]:**
+* Basiert auf Beta
+* Kann je nach Bedarf von Teammitgliedern erstellt werden
+* Besitzt standardmäßig keine besonderen Anforderungen an den Code
+
+**Debug:**
+* Basiert auf Main
+* Enthält den Code aus Main, erweitert um verschiedene Debug-Tools, welche die Entwicklung der Bots erleichtern
