@@ -17,6 +17,6 @@ public class MoveAction extends Action{
 
     @Override
     protected void runAction(float oldTime, float current) {
-        target.setRelPos(path.getPath(Math.min(end, current)));
+        target.setRelPos(path.getPos(Math.min(end, current)));
     }
 }
