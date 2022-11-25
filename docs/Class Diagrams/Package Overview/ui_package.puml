@@ -1,0 +1,48 @@
+@startuml
+
+title UI Package - Class Diagram
+
+
+
+
+package com.gads.core.ui{
+
+  class GADS{
+    ~AssetManager assetManager
+    +void create()
+    +void dispose()
+  }
+  
+  class AssetLoader{
+    ~{static} void load(AssetManager manager)
+  }
+  
+  class MenuScreen{
+    - MainMenu: Stage
+  }
+  
+  class InGameScreen{
+    - HUD: Stage
+    - Game: Stage
+  }
+
+}
+
+package com.badlogic.gdx{
+  abstract Game{
+  - setScreen(screen: Screen): void
+  }
+  interface Screen
+}
+
+
+
+Game <|-- GADS
+
+GADS --> AssetLoader: "Laden veranlassen"
+
+Screen <|-- MenuScreen
+
+Screen <|-- InGameScreen
+
+@enduml

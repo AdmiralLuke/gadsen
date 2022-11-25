@@ -1,1 +1,3 @@
-include 'desktop', 'core'
+include 'desktop', 'core', 'pipeline'
+include 'util'
+
