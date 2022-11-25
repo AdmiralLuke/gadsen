@@ -1,0 +1,128 @@
+# This is the Gradle build system for JVM applications
+# https://gradle.org/
+# https://github.com/gradle/gradle
+
+image: gradle:alpine
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+before_script:
+  - GRADLE_USER_HOME="$(pwd)/.gradle"
+  - export GRADLE_USER_HOME
+
+debug:
+  stage: .pre
+  only:
+    - beta
+    - main
+  script:
+    - echo $PWD
+
+debug-file-tree:
+  stage: .pre
+  only:
+    - beta
+    - main
+  script:
+    - ls -R
+
+asset-pipeline:
+  stage: build
+  only:
+    - beta
+    - main
+  script:
+    - gradle --build-cache pipeline:build
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - pipeline/build
+      - .gradle
+
+build-core:
+  stage: build
+  only:
+    - beta
+    - main
+  script:
+    - echo $PWD
+    - gradle --build-cache core:assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+build-desktop:
+  stage: build
+  only:
+    - beta
+    - main
+  script:
+    - gradle --build-cache desktop:assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+test-core:
+  stage: test
+  only:
+    - beta
+    - main
+  script:
+      - gradle core:check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    expire_in: 1 week
+    when: always
+    reports:
+      junit: core/build/test-results/test/TEST-*.xml
+
+test-pipeline:
+  stage: test
+  only:
+    - beta
+    - main
+  script:
+    - gradle pipeline:check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    expire_in: 1 week
+    when: always
+    reports:
+      junit: pipeline/build/test-results/test/TEST-*.xml
+
+test-util:
+  stage: test
+  only:
+    - beta
+    - main
+  script:
+    - gradle util:check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    expire_in: 1 week
+    when: always
+    reports:
+      junit: util/build/test-results/test/TEST-*.xml

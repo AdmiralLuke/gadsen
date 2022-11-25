@@ -1,6 +1,6 @@
-buildscript {
-    
 
+
+buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
@@ -9,8 +9,7 @@ buildscript {
         google()
     }
     dependencies {
-        
-
+        classpath "com.badlogicgames.gdx:gdx-tools:1.11.0"
     }
 }
 
@@ -27,7 +26,6 @@ allprojects {
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
     }
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -37,7 +35,21 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
     }
+
+
+
+
+    dependencies {
+    }
+
+    tasks.withType(Javadoc) {
+        options.encoding = 'UTF-8'
+        exclude("**/test/**")
+
+    }
 }
+
+
 
 project(":desktop") {
     apply plugin: "java-library"
@@ -57,9 +69,34 @@ project(":core") {
 
 
     dependencies {
+        implementation project(":pipeline")
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        
     }
+
 }
+
+
+
+project(":pipeline") {
+    apply plugin: "java-library"
+
+    dependencies {
+        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+        implementation project(":util")
+    }
+
+}
+
+project(":util") {
+    apply plugin: "java-library"
+
+    dependencies {
+
+    }
+
+}
+
+
+
