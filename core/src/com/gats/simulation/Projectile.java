@@ -1,5 +1,6 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -14,6 +15,9 @@ public class Projectile {
     private double livingTime;
     private Vector2 pos;
     private Vector2 dir;
+    private ProjectileAction.ProjectileType projectileType;
+    private Simulation sim;
+    private GameCharacter character;
 
     private Path path;
 
@@ -21,6 +25,9 @@ public class Projectile {
     // ToDo: find the best settings for gravity
     private final static float g = 9.81f;
 
+    /**
+     * Definiert den Projektil-Flug-Typ
+     */
     enum Type {
         LINEAR,
         PARABLE
@@ -28,7 +35,19 @@ public class Projectile {
 
     private Type type;
 
-    Projectile(double damage, double damageLoss, double range, Vector2 pos, Vector2 dir, Type type) {
+    /**
+     * Erstellt ein Projektil
+     * @param damage Ursprungsschaden des Projektils
+     * @param damageLoss Abnahme des Schadens über die Zeit
+     * @param range maximale Reichweite des Projektils
+     * @param pos aktuelle Position
+     * @param dir aktuelle Richtung
+     * @param type Schusslinien-Typ
+     * @param prType (für Animation) welche Art von Projektil
+     * @param sim aktuelle Simulation
+     * @param character Charakter der Projektil verschossen hat
+     */
+    Projectile(double damage, double damageLoss, double range, Vector2 pos, Vector2 dir, Type type, ProjectileAction.ProjectileType prType, Simulation sim, GameCharacter character) {
         this.damage = damage;
         this.damageLoss = damageLoss;
         this.range = range;
@@ -36,14 +55,23 @@ public class Projectile {
         this.pos = pos;
         this.dir = dir;
         this.type = type;
+        this.projectileType = prType;
+        this.sim = sim;
+        this.character = character;
     }
 
-    Projectile(double damage, double range, Vector2 pos, Vector2 dir, Type type) {
-        new Projectile(damage, 0, range, pos, dir, type);
+    /**
+     * Konstruktor ohne DamageLoss
+     */
+    Projectile(double damage, double range, Vector2 pos, Vector2 dir, Type type, ProjectileAction.ProjectileType prType, Simulation sim, GameCharacter character) {
+        new Projectile(damage, 0, range, pos, dir, type, prType, sim, character);
     }
 
-    private ActionLog move() {
-        ActionLog moveLog = new ActionLog();
+    /**
+     * berechnet die Flugbahn des Projektils, erkennt Kollisionen mit Spieler oder Tiles
+     */
+    private void move() {
+        Path path = null; // ToDo:
         if (this.type == Type.LINEAR) {
             // moveLog.addAction();
         } else if (this.type == Type.PARABLE) {
@@ -53,17 +81,16 @@ public class Projectile {
                 dir.y = (float)(dir.y - (g * livingTime));
                 pos.y = (float)((dir.y * livingTime) - ((g / 2) * livingTime * livingTime));
                 livingTime++;
-                moveLog.addAction(new ProjectileMoveAction(this.path, this));
+
             }
         }
-        return moveLog;
+        sim.getActionLog().addAction(new ProjectileMoveAction(this.path, this.projectileType));
+        Vector2 posCharBef = this.character.getPlayerPos();
+        character.move(-1);
+        sim.getActionLog().addAction(new CharacterMoveAction(posCharBef, character.getPlayerPos(), character.getTeam(), character.getTeamPos(), 0));
+        sim.getActionLog().goToNextAction();
+        // ToDo: check for hit
     }
 
-    public static void main(String[] args) {
-        Projectile proj = new Projectile(0, 0, 10, new Vector2(1,1), new Vector2(1,1), Type.PARABLE);
-        for (int i = 0; i < 10; i++) {
-            ActionLog testLog = proj.move();
-            System.out.println(testLog.getNextAction());
-        }
-    }
+
 }

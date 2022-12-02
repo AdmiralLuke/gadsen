@@ -1,5 +1,7 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * Repräsentiert eine Waffe im Spiel, die durch einen {@link GameCharacter Spielfigur} benutzt werden kann.
  */
@@ -7,9 +9,11 @@ abstract class Weapon {
 
     private final double damage;
     private final double damageLoss;
-    private final double projRange;
+    private double projRange;
     private int shoots;
     private final boolean hitThroughBoxes;
+    private GameCharacter character;
+    private Simulation sim;
 
     enum Type {
         LONG_RANGE,
@@ -20,13 +24,16 @@ abstract class Weapon {
 
     private final Type type;
 
-    Weapon(double damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, Type type) {
+
+    Weapon(double damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, GameCharacter character) {
         this.damage = damage;
         this.damageLoss = damageLoss;
         this.projRange = projRange;
         this.hitThroughBoxes = hitThroughBoxes;
         this.shoots = shoots;
         this.type = type;
+        this.sim = sim;
+        this.character = character;
     }
 
 
@@ -54,10 +61,19 @@ abstract class Weapon {
         return shoots;
     }
 
-    public void shoot() {
+    public void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type) {
+        if (strength > projRange) {
+            projRange = strength;
+        }
         if (shoots <= 0) {
             return;
         }
+        sim.getActionLog().goToNextAction();
+        sim.getActionLog().addAction(new CharacterShootAction(character.getTeam(), character.getTeamPos()));
+        Projectile proj = new Projectile(damage, projRange, dir, character.getPlayerPos(), type, AcType, sim, character);
+
         shoots--;
+
+
     }
 }

@@ -8,10 +8,12 @@ import org.junit.Test;
 public class TestGameState {
 
     private GameState state;
+    private Simulation sim;
 
     @Before
     public void init() {
-        state = new GameState(0, "map1");
+        sim = new Simulation(0, "map1", 2, 1);
+        state = sim.getState();
     }
 
     /**

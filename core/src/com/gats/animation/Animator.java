@@ -168,9 +168,9 @@ public class Animator implements Screen{
      */
     public void animate(ActionLog log){
         if(!(log == null)) {
-            com.gats.simulation.Action currentAction = log.getNextAction();
+            com.gats.simulation.Action currentAction = null; // = log.getNextAction();
             while (currentAction != null) {
-                currentAction = log.getNextAction();
+                // currentAction = log.getNextAction();
 
                 Action convertedAction = actionConverters.getOrDefault( currentAction.getClass(), (v, w) -> null)
                         .apply(currentAction, this);

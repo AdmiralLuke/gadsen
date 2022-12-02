@@ -27,7 +27,7 @@ public class GameCharacterController {
      * Veranlasst den Charakter unter aufwendung von Stamina einen Schritt nach Links zu tätigen
      */
     public void moveLeft() {
-        if (valid) gameCharacter.moveLeft(state);
+        // if (valid) gameCharacter.moveLeft(state);
     }
 
 
@@ -35,7 +35,8 @@ public class GameCharacterController {
      * Veranlasst den Charakter unter aufwendung von Stamina einen Schritt nach Rechts zu tätigen
      */
     public void moveRight() {
-        if (valid) gameCharacter.moveLeft(state);
+
+        //if (valid) gameCharacter.moveLeft(state);
     }
 
     /**
