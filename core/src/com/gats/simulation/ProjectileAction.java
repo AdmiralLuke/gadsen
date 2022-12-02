@@ -3,9 +3,9 @@ package com.gats.simulation;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Oberklasse für alle {@link Action Ereignise}, die sich auf ein {@link Projectile Projektil} beziehen
+ * {@link Action Ereignis}, das den Weg während der Lebensdauer eines {@link Projectile Projektils} beschreibt
  */
-abstract class ProjectileAction extends Action{
+public class ProjectileAction extends Action{
 
     enum ProjectileType {
         COOKIE,
@@ -14,8 +14,29 @@ abstract class ProjectileAction extends Action{
 
     private ProjectileType type;
 
-    public ProjectileAction(long delay, ProjectileType type) {
-        super(delay);
+    private Path path;
+
+    private static double v = 0.0001;
+    private float duration;
+
+
+    public ProjectileAction(Path path, ProjectileType type, float duration) {
+        super(0);
         this.type = type;
+        this.path = path;
+        this.duration = duration;
+    }
+
+
+    public Path getPath() {
+        return path;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public ProjectileType getType() {
+        return type;
     }
 }

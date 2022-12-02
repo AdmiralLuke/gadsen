@@ -84,7 +84,8 @@ public class Projectile {
 
             }
         }
-        sim.getActionLog().addAction(new ProjectileMoveAction(this.path, this.projectileType));
+        float duration = 1000; //ToDo calculate duration
+        sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, duration));
         Vector2 posCharBef = this.character.getPlayerPos();
         character.move(-1);
         sim.getActionLog().addAction(new CharacterMoveAction(posCharBef, character.getPlayerPos(), character.getTeam(), character.getTeamPos(), 0));

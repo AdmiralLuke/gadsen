@@ -9,7 +9,7 @@ public class LinearPath implements Path{
 
     private Vector2 s;
     private Vector2 g;
-    private double endTime;
+    private float endTime;
     // start time = 0
     private Vector2 dir;
 
@@ -19,7 +19,7 @@ public class LinearPath implements Path{
      * @param g Ziel-Vektor
      * @param endTime Dauer des Weges von s nach g
      */
-    public LinearPath(Vector2 s, Vector2 g, double endTime) {
+    public LinearPath(Vector2 s, Vector2 g, float endTime) {
         this.s = s;
         this.g = g;
         this.endTime = endTime;
@@ -52,7 +52,7 @@ public class LinearPath implements Path{
         return s.cpy().add(addV);
     }
 
-    public double getEndTime() {
+    public float getEndTime() {
         return endTime;
     }
 

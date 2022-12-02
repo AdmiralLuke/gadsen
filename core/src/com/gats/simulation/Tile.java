@@ -7,6 +7,7 @@ import java.util.ArrayList;
  * Das genaue Verhalten insbesondere von Spezialboxen, wie z.B. Waffendrops wird durch erbende Klassen realisiert.
  */
 public class Tile {
+    protected static final IntVector2 tileSize = new IntVector2(16, 16);
 
     // Box als Ankerpunkt
 
@@ -19,7 +20,7 @@ public class Tile {
     // Haltbarkeit der Box
     private int health = 250;
 
-    private Vector2 position;
+    private IntVector2 position;
     private GameState state;
 
     Tile right;
@@ -32,8 +33,12 @@ public class Tile {
         return isAnchor? 1 : 0;
     }
 
-    public Vector2 getPosition() {
+    public IntVector2 getPosition() {
         return this.position;
+    }
+
+    public Vector2 getFloatPosition() {
+        return this.position.toFloat();
     }
 
 
@@ -62,7 +67,7 @@ public class Tile {
     Tile(int x, int y, boolean isAnchor, GameState state) {
         this.isAnchor = isAnchor;
         this.isAnchored = isAnchor || checkIfAnchored(x, y, state);
-        this.position = new Vector2(x, y);
+        this.position = new IntVector2(x, y);
         this.state = state;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
@@ -79,16 +84,16 @@ public class Tile {
     void sortIntoTree() {
 
         if (this.position.x > 0) {
-            this.left = getTileAtPosition((int)position.x - 1, (int)position.y, state);
+            this.left = getTileAtPosition(position.x - 1, position.y, state);
         }
         if (this.position.y > 0) {
-            this.down = getTileAtPosition((int)position.x, (int)position.y - 1, state);
+            this.down = getTileAtPosition(position.x, position.y - 1, state);
         }
         if (this.position.x < state.getBoardSizeY()) {
-            this.right = getTileAtPosition((int)position.x + 1, (int)position.y, state);
+            this.right = getTileAtPosition(position.x + 1, position.y, state);
         }
         if (this.position.y < state.getBoardSizeY()) {
-            this.up = getTileAtPosition((int)position.x, (int)position.y + 1, state);
+            this.up = getTileAtPosition(position.x, position.y + 1, state);
         }
 
         if (this.left != null) { this.left.right = this; }
@@ -141,7 +146,7 @@ public class Tile {
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;
         ArrayList<Tile> leftList = null;
-        state.getBoard()[(int)this.position.x][(int)this.position.y] = null;
+        state.getBoard()[this.position.x][this.position.y] = null;
         if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), 0);
         if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), 1);
         if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), 2);
@@ -161,25 +166,25 @@ public class Tile {
             }
         }
         for (Tile tile : list) {
-            state.getBoard()[(int)tile.position.x][(int)tile.position.y] = null;
+            state.getBoard()[tile.position.x][tile.position.y] = null;
             tile.destroyTile();
         }
         list.clear();
     }
 
     void destroyTile() {
-        Vector2 posBef = this.position.cpy();
-        while (getTileAtPosition((int)this.position.x, (int)this.position.y, state) == null && this.position.y > 0) {
+        IntVector2 posBef = this.position.cpy();
+        while (getTileAtPosition(this.position.x, this.position.y, state) == null && this.position.y > 0) {
             this.position.add(0, -1);
         }
-
-        Action tmpAction = new TileMoveAction(posBef, this.position);
+        float duration = 2000;
+        Action tmpAction = new TileMoveAction(posBef, this.position, duration);
         Action tmpDestAction = new TileDestroyAction(this.getPosition());
         tmpAction.addChild(tmpDestAction);
         for (GameCharacter[] characters : state.getTeams()) {
             for (GameCharacter character : characters) {
                 if (character.getPlayerPos().equals(this.position)) {
-                    LinearPath path = new LinearPath(posBef, this.position);
+                    LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()));
                     int tmpHealth = character.getHealth();
                     character.setHealth(tmpHealth - ((int)path.getEndTime() * 5));
                     tmpDestAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), tmpHealth, character.getHealth()));
