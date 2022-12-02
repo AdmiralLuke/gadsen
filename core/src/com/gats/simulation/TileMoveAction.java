@@ -7,14 +7,11 @@ import com.badlogic.gdx.math.Vector2;
  * z.B. da sie nicht mehr mit einem Anker verbunden ist.
  */
 public final class TileMoveAction extends TileAction{
-    private Vector2 posBef;
-    private Vector2 posAft;
+    private LinearPath path;
     private Tile tile;
 
-    public TileMoveAction(Vector2 posBef, Vector2 posAft, Tile tile) {
-        super(tile);
-        this.posBef = posBef;
-        this.posAft = posAft;
-        this.tile = tile;
+    public TileMoveAction(Vector2 posBef, Vector2 posAft) {
+        super(posAft, 0);
+        this.path = new LinearPath(posBef, posAft);
     }
 }

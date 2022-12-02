@@ -6,26 +6,33 @@ import java.util.ArrayDeque;
  * die während der Simulation eines einzelnen Spielzuges aufgetreten sind
  */
 public class ActionLog {
-    private ArrayDeque<Action> actions;
+    // alle ActionLogs die übergeben wurden sind abgearbeitet
 
-    ActionLog() {
-        actions = new ArrayDeque<Action>(1024);
+
+    private Action rootAction;
+    Action lastAddedAction;
+
+
+    ActionLog(Action rootAction) {
+        this.rootAction = rootAction;
+        this.lastAddedAction = rootAction;
     }
 
     void addAction(Action action) {
-        this.actions.addLast(action);
+        this.lastAddedAction.getChildren().add(action);
+
+    }
+
+    void goToNextAction() {
+        this.lastAddedAction = lastAddedAction.getChildren().get(0);
     }
 
     void addActions(ActionLog log) {
-        this.actions.addAll(log.actions);
+        this.lastAddedAction.getChildren().add(log.rootAction);
     }
 
-    public Action getNextAction() {
-        return actions.poll();
-    }
-
-    public void removeNextAction() {
-        actions.pop();
+    public Action getRootAction() {
+        return rootAction;
     }
 
 }

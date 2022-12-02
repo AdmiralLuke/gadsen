@@ -7,4 +7,15 @@ import com.badlogic.gdx.math.Vector2;
  */
 abstract class ProjectileAction extends Action{
 
+    enum ProjectileType {
+        COOKIE,
+        CANDY_CANE
+    }
+
+    private ProjectileType type;
+
+    public ProjectileAction(long delay, ProjectileType type) {
+        super(delay);
+        this.type = type;
+    }
 }

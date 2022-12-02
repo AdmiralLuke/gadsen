@@ -2,6 +2,9 @@ package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Klasse für einen Linearen-Weg zum Interpolieren in Abhängigkeit der Zeit. Verwendet das {@link Path} Interface
+ */
 public class LinearPath implements Path{
 
     private Vector2 s;
