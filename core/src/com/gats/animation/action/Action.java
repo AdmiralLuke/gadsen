@@ -1,14 +1,24 @@
 package com.gats.animation.action;
 
 public abstract class Action {
-    protected float start;
+    protected float delay;
     protected float current;
-    protected float end;
+    protected float end = Float.MAX_VALUE/2;
 
-    public Action(float start, float current, float end) {
-        this.start = start;
-        this.current = current;
-        this.end = end;
+    protected boolean hasEnded = false;
+    private Action[] children;
+
+    public Action(float start) {
+        this.delay = start;
+        this.current = 0;
+    }
+
+    public void setChildren(Action[] children) {
+        this.children = children;
+    }
+
+    public Action[] getChildren() {
+        return children;
     }
 
     /**
@@ -16,12 +26,18 @@ public abstract class Action {
      * @param deltaTime The time difference to the last frame in ms
      * @return True, if and only if the action has been completed
      */
-    public boolean step(float deltaTime){
+    public float step(float deltaTime){
         float oldTime = current;
         this.current += deltaTime;
-        if (current < start) return false;
+        if (current < delay) return -1;
         runAction(oldTime, current);
-        return current > end;
+        if (current <= end) return -1;
+        return current - end;
+    }
+
+    protected void endAction(float endTime){
+        end = endTime;
+        hasEnded = true;
     }
 
     /**
@@ -31,8 +47,8 @@ public abstract class Action {
      */
     protected abstract void runAction(float oldTime, float current);
 
-    public float getStart() {
-        return start;
+    public float getDelay() {
+        return delay;
     }
 
     public float getCurrent() {

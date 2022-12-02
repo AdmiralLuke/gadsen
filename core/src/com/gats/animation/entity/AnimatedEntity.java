@@ -1,4 +1,4 @@
-package com.gats.animation;
+package com.gats.animation.entity;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
