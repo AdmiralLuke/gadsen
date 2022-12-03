@@ -106,4 +106,5 @@ public class InGameScreen implements Screen {
     public void setCameraDir(float[] dir){
         animator.setCameraDir(dir);
     }
+
 }

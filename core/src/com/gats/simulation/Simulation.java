@@ -2,6 +2,10 @@ package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
+import com.gats.ui.GADS;
+import com.gats.ui.GameSettings;
+import com.gats.ui.MenuScreen;
+
 /**
  * Enthält die Logik, welche die Spielmechaniken bestimmt.
  * Während die Simulation läuft werden alle Ereignisse in ActionLogs festgehalten, die anschließend durch das animation package dargestellt werden können.
@@ -17,6 +21,7 @@ public class Simulation {
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction((int)turnChar.x,(int)turnChar.y,0));
     }
+
     public GameState getState() {
         return gameState;
     }
