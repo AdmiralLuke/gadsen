@@ -275,7 +275,7 @@ public class Animator implements Screen {
             for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                 com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                 GameCharacter animGameCharacter = new GameCharacter(idleAnimation);
-                animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().add(new Vector2(45 * 12, 45 * 12)));
+                animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
                 root.add(animGameCharacter);
             }
