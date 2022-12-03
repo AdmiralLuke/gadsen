@@ -32,7 +32,9 @@ public class GameCharacter {
      * @param sim zugehörige Simulation
      */
     GameCharacter(int x, int y, GameState state, int team, int teamPos, Simulation sim) {
-        new GameCharacter(x, y, state);
+        this.posX = x;
+        this.posY = y;
+        this.state = state;
         this.team = team;
         this.teamPos = teamPos;
         this.state = state;
@@ -47,6 +49,7 @@ public class GameCharacter {
     GameCharacter(int x, int y, GameState state) {
         this.posX = x;
         this.posY = y;
+        this.state = state;
     }
 
     /**
