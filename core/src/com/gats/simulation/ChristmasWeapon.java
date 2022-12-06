@@ -4,16 +4,11 @@ import com.badlogic.gdx.math.Vector2;
 
 public class ChristmasWeapon extends Weapon{
 
-    enum ChristmasWeaponType {
-        COOKIE,
-        SUGAR_CANE
-    }
 
-    private ChristmasWeaponType chrType;
 
-    ChristmasWeapon(double damage, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, ChristmasWeaponType chrType, GameCharacter character) {
+
+    ChristmasWeapon(int damage, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, GameCharacter character) {
         super(damage, 0, projRange, shoots, hitThroughBoxes, type, sim, character);
-        this.chrType = chrType;
     }
 
     @Override
@@ -27,7 +22,7 @@ public class ChristmasWeapon extends Weapon{
     }
 
     @Override
-    public double getStartDamage() {
+    public int getStartDamage() {
         return super.getStartDamage();
     }
 
@@ -46,15 +41,13 @@ public class ChristmasWeapon extends Weapon{
         return super.getShootsLeft();
     }
 
-    public ChristmasWeaponType getChrType() {
-        return chrType;
-    }
+
 
     public void shoot(Vector2 dir, double strength) {
-        if (chrType == ChristmasWeaponType.COOKIE) {
-            super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.LINEAR);
+        if (this.getType() == Type.COOKIE) {
+            super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
         } else {
-            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.PARABLE);
+            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LIN_LASER);
         }
     }
 }

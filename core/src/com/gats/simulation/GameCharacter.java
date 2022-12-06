@@ -72,8 +72,8 @@ public class GameCharacter {
      */
     protected void initInventory() {
         weapons = new Weapon[2];
-        weapons[0] = new ChristmasWeapon(10, 40, 50, false, Weapon.Type.LONG_RANGE, this.sim, ChristmasWeapon.ChristmasWeaponType.COOKIE, this);
-        weapons[1] = new ChristmasWeapon(20, 40, 50, false, Weapon.Type.LONG_RANGE, this.sim, ChristmasWeapon.ChristmasWeaponType.SUGAR_CANE, this);
+        weapons[0] = new ChristmasWeapon(10, 40, 50, false, Weapon.Type.COOKIE,this.sim, this);
+        weapons[1] = new ChristmasWeapon(20, 40, 50, false, Weapon.Type.SUGAR_CANE, this.sim, this);
     }
 
     /**
@@ -84,7 +84,7 @@ public class GameCharacter {
     public Weapon getWeapon(int n) {
         ChristmasWeapon wp =  (ChristmasWeapon)weapons[n];
         this.sim.getActionLog().goToNextAction();
-        this.sim.getActionLog().addAction(new CharacterSwitchWeaponAction(this.team, this.teamPos, wp.getChrType()));
+        this.sim.getActionLog().addAction(new CharacterSwitchWeaponAction(this.team, this.teamPos, wp.getType()));
         return wp;
     }
 
