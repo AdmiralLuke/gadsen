@@ -28,8 +28,8 @@ public class Manager {
      * @param config The execution-parameters of the simulation
      */
     public Manager(RunConfiguration config) {
-
-        simulation = new Simulation(config.gameMode, config.mapName);
+        // ToDo: add Team-Stuff
+        simulation = new Simulation(config.gameMode, config.mapName, 0, 0);
         state = simulation.getState();
 
         //ToDo: Load Players from configuration
@@ -83,7 +83,7 @@ public class Manager {
      * Controls Player Execution
      */
     private void run() {
-        while (true) { //ToDo: check for win, depends on GameState
+        while (true) { // ToDo: state.isActive()
             int currentPlayerIndex = 0;//ToDo: Get Player whose turn it is
             int currentCharacterIndex = 0;//ToDo: Get Character whose turn it is
             Player currentPlayer = players[currentPlayerIndex];

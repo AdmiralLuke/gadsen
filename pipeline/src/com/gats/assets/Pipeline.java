@@ -35,6 +35,7 @@ public class Pipeline {
     static File output;
 
     public static void main(String[] args) {
+        System.out.println(Arrays.toString(args));
         fileRoot = new File(args[0]);
         tmp = new File(args[1]);
         output = new File(args[2]);
@@ -84,7 +85,10 @@ public class Pipeline {
         exclusionList.add(EXCLUSIONS_NAME);
         if (exclusions.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(exclusions))) {
-                exclusionList.add(reader.readLine());
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    exclusionList.add(line);
+                }
             } catch (IOException e) {
                 throw new RuntimeException("Couldn't read list of exclusions at: " + exclusions.getAbsolutePath() +
                         "\nStacktrace: " + e.getMessage());

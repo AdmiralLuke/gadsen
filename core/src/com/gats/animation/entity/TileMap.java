@@ -5,13 +5,14 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
+import com.gats.simulation.IntVector2;
 import com.gats.simulation.Tile;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class TileMap extends Entity{
 
-    private static final int TYLE_TYPE_NONE = -1;
+    public static final int TYLE_TYPE_NONE = -1;
 
     private TextureRegion[] tileTextures;
     private int[][] tiles;
@@ -45,5 +46,24 @@ public class TileMap extends Entity{
                     batch.draw(tileTextures[type],pos.x + i * tileSize, pos.y + j * tileSize);
                 }
             }
+    }
+
+
+    public int getTile(IntVector2 pos){
+        return getTile(pos.x, pos.y);
+    }
+    public int getTile(int x, int y){
+        return tiles[x][y];
+    }
+
+    public void setTile(IntVector2 pos, int value){
+        setTile(pos.x, pos.y, value);
+    }
+    public void setTile(int x, int y, int value){
+        tiles[x][y] = value;
+    }
+
+    public int getTileSize() {
+        return tileSize;
     }
 }

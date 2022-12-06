@@ -24,19 +24,14 @@ public class GameCharacterController {
     }
 
     /**
-     * Veranlasst den Charakter unter aufwendung von Stamina einen Schritt nach Links zu tätigen
+     * Veranlasst den Charakter unter Aufwendung von Stamina einen dx Schritt zu tätigen.
+     * Positive Werte bewegen den Charakter nach rechts, Negative nach links.
      */
-    public void moveLeft() {
-        if (valid) gameCharacter.moveLeft(state);
+    public void move(int dx) {
+        if (valid) gameCharacter.move(dx);
     }
 
 
-    /**
-     * Veranlasst den Charakter unter aufwendung von Stamina einen Schritt nach Rechts zu tätigen
-     */
-    public void moveRight() {
-        if (valid) gameCharacter.moveLeft(state);
-    }
 
     /**
      * Used to Invalidate this controller.

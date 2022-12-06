@@ -9,14 +9,22 @@ public class MoveAction extends Action{
 
     private Path path;
 
-    public MoveAction(float start, float end, float current, Entity target, Path path) {
-        super(start, current, end);
+    private float end;
+
+    public MoveAction(float delay, Entity target, float duration, Path path) {
+        super(delay);
         this.target = target;
         this.path = path;
+        this.end = delay + duration;
     }
 
     @Override
     protected void runAction(float oldTime, float current) {
-        target.setRelPos(path.getPos(Math.min(end, current)));
+        if(target!= null) target.setRelPos(path.getPos(Math.min(end, current)));
+        if(current > end) endAction(end);
+    }
+
+    public void setTarget(Entity target) {
+        this.target = target;
     }
 }
