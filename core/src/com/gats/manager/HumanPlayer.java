@@ -17,7 +17,7 @@ public class HumanPlayer extends Player{
     // to make sure everything is calculated and no GameState inconsistency is created
    private int turnDuration = 60;
    private long nanoTurnDuration = turnDuration *1000000000;
-   private int turnEndWaitTime;
+   private int turnEndWaitTime = 5;
 
    private long nanoStartTime;
    private long elapsedTime;
