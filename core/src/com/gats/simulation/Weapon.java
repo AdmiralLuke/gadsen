@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
  */
 abstract class Weapon {
 
-    private final double damage;
+    private final int damage;
     private final double damageLoss;
     private double projRange;
     private int shoots;
@@ -19,13 +19,15 @@ abstract class Weapon {
         LONG_RANGE,
         SHORT_RANGE,
         CLOSE_COMBAT,
-        BOMB
+        BOMB,
+        COOKIE,
+        SUGAR_CANE
     }
 
     private final Type type;
 
 
-    Weapon(double damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, GameCharacter character) {
+    Weapon(int damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, GameCharacter character) {
         this.damage = damage;
         this.damageLoss = damageLoss;
         this.projRange = projRange;
@@ -45,7 +47,7 @@ abstract class Weapon {
         return hitThroughBoxes;
     }
 
-    public double getStartDamage() {
+    public int getStartDamage() {
         return damage;
     }
 
@@ -70,8 +72,8 @@ abstract class Weapon {
         }
         sim.getActionLog().goToNextAction();
         sim.getActionLog().addAction(new CharacterShootAction(character.getTeam(), character.getTeamPos()));
-        Projectile proj = new Projectile(damage, projRange, dir, character.getPlayerPos(), type, AcType, sim, character);
-
+        Projectile proj = new Projectile(damage, projRange, dir, character.getPlayerPos(), type, AcType, sim, character, strength);
+        proj.move();
         shoots--;
 
 
