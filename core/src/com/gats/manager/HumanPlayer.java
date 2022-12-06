@@ -24,7 +24,7 @@ public class HumanPlayer extends Player{
    private boolean turnInProgress;
     @Override
     protected String getName() {
-        return null;
+        return "";
     }
 
     @Override

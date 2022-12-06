@@ -33,7 +33,7 @@ public class GameState {
 
     private int teamCount;
     private int charactersPerTeam;
-    private ArrayDeque<Vector2> turn;
+    private ArrayDeque<Vector2> turn = new ArrayDeque<>();
     private boolean active;
     private Simulation sim;
 
@@ -70,8 +70,8 @@ public class GameState {
             }
         }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
-        for (int i = 0; i < this.teams[0].length; i++) {
-            for (int j = 0; j < this.teams.length; j++) {
+        for (int i = 0; i < this.teams.length; i++) {
+            for (int j = 0; j < this.teams[0].length; j++) {
                 turn.add(new Vector2(this.teams[i][j].getTeam(), this.teams[i][j].getTeamPos()));
             }
         }
