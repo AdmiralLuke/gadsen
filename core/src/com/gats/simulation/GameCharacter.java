@@ -96,7 +96,11 @@ public class GameCharacter {
         return new Vector2(posX, posY);
     }
 
-
+    void fall() {
+        while (this.posY > 0 && this.state.getTile(posX, posY - 1) == null) {
+            this.posY -= 1;
+        }
+    }
 
     /**
      * bewegt den Charakter in eine bestimmte Richtung
@@ -119,6 +123,18 @@ public class GameCharacter {
 
         if (dx < 0) {
             for (int i = 0; i > dx; i--) {
+                if (state.getTile(posX, posY - 1) == null) {
+                    dx = i;
+                    if (this.stamina < abs(dx)) {
+                        return;
+                    }
+                    this.posX += dx;
+                    Vector2 posAf = new Vector2(posX, posY);
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
+                    this.fall();
+                    this.sim.getActionLog().addAction(new CharacterFallAction(bef, this.getPlayerPos(), team, teamPos, 10));
+                    return;
+                }
                 if (state.getTile(posX + i, posY) != null) {
                     dx = i;
                     break;
@@ -127,6 +143,19 @@ public class GameCharacter {
 
         } else {
             for (int i = 0; i < dx; i++) {
+                if (state.getTile(posX, posY - 1) == null) {
+                    dx = i;
+                    if (this.stamina < abs(dx)) {
+                        return;
+                    }
+                    this.posX += dx;
+                    Vector2 posAf = new Vector2(posX, posY);
+
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
+                    this.fall();
+                    this.sim.getActionLog().addAction(new CharacterFallAction(bef, this.getPlayerPos(), team, teamPos, 10));
+                    return;
+                }
                 if (state.getTile(posX + i, posY) != null) {
                     dx = i;
                     break;
