@@ -11,6 +11,12 @@ public class HumanPlayer extends Player{
    private boolean characterAimLeftPressed = false;
    private boolean characterAimRightPressed = false;
    private boolean characterCycleWeapon = false;
+
+   //amount of time in seconds, the turn of the human player will take
+    //if the time limit is reached, the execute turn will wait for turnOverhead seconds
+    // to make sure everything is calculated and no GameState inconsistency is created
+   private int turnDuration;
+   private int turnOverhead;
     @Override
     protected String getName() {
         return null;
@@ -36,12 +42,15 @@ public class HumanPlayer extends Player{
     protected void moveCharacter(GameCharacterController characterController){
         if(characterMoveLeftPressed){
             characterController.moveLeft();
+            characterMoveLeftPressed = false;
 
         } else if (characterMoveRightPressed) {
             characterController.moveRight();
+            characterMoveRightPressed = false;
 
         } else if (characterShootPressed) {
           //  characterController.shoot();
+            characterShootPressed = false;
 
         }
 
