@@ -24,7 +24,7 @@ public final class CharacterMoveAction extends CharacterAction{
         super(team, character, delay);
         LinearPath linPath = new LinearPath(posBef, posAft);
         this.path = linPath;
-        this.duration = linPath.getEndTime();
+        this.duration = (float)(linPath.getEndTime() / 0.001);
     }
 
 
