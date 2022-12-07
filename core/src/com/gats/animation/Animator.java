@@ -247,7 +247,7 @@ public class Animator implements Screen {
 
         background = new SpriteEntity(
                 textureAtlas.findRegion("tile/GADSBG"),
-                new Vector2(0, 0),
+                new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()),
                 new Vector2(259 * 4, 128 * 4));
         ////root.add(background);
 
