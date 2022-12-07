@@ -54,6 +54,14 @@ abstract class Weapon {
         return shoots;
     }
 
+    public void shoot(Vector2 dir, double strength) {
+        if (this.getType() == WeaponType.COOKIE) {
+            this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
+        } else {
+            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LIN_LASER);
+        }
+    }
+
     public void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type) {
         if (strength > projRange) {
             projRange = strength;
@@ -63,7 +71,7 @@ abstract class Weapon {
         }
         sim.getActionLog().goToNextAction();
         sim.getActionLog().addAction(new CharacterShootAction(character.getTeam(), character.getTeamPos()));
-        Projectile proj = new Projectile(damage, projRange, dir, character.getPlayerPos(), type, AcType, sim, character, strength);
+        Projectile proj = new Projectile(damage, projRange, character.getPlayerPos(), dir, type, AcType, sim, character, strength);
         proj.move();
         shoots--;
 

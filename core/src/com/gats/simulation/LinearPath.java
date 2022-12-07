@@ -32,7 +32,10 @@ public class LinearPath implements Path{
      * @param g Ziel-Vektor
      */
     public LinearPath(Vector2 s, Vector2 g) {
-        new LinearPath(s, g, 0);
+        this.s = s;
+        this.g = g;
+        this.endTime = 0;
+        this.dir = g.cpy().sub(s);
         try {
             endTime = dir.len();
         } catch (NullPointerException e) {
