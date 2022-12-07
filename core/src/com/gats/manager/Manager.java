@@ -3,22 +3,13 @@ package com.gats.manager;
 import com.gats.manager.command.Command;
 import com.gats.manager.command.EndTurnCommand;
 import com.gats.simulation.*;
+import com.gats.ui.GameSettings;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Queue;
 import java.util.concurrent.*;
 
 public class Manager {
-    public class RunConfiguration {
-
-        public int gameMode = 0;
-
-        public boolean gui = false;
-
-        public AnimationLogProcessor animationLogProcessor = (log) -> {};
-
-        public String mapName;
-    }
 
     private static final int AI_EXECUTION_TIMEOUT = 500;
     private static final int AI_INIT_TIMEOUT = 1000;
@@ -43,7 +34,7 @@ public class Manager {
      */
     public Manager(RunConfiguration config) {
         // ToDo: add Team-Stuff
-        simulation = new Simulation(config.gameMode, config.mapName, 0, 0);
+        simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;

@@ -2,27 +2,22 @@ package com.gats.ui;
 
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.manager.AnimationLogProcessor;
+import com.gats.manager.Manager;
+import com.gats.manager.RunConfiguration;
 import com.gats.simulation.ActionLog;
-
-import static com.badlogic.gdx.Input.Keys;
 
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
  */
 public class InGameScreen implements Screen, AnimationLogProcessor {
 
+    private final Manager manager;
     private Viewport gameViewport;
     private Viewport hudViewport;
 
@@ -37,7 +32,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     // adjust pipeline, so it provides a different directory for ingame assets
     // and menu assets? or we code importing into AssetManager?
     private TextureAtlas ingameAtlas;
-    public InGameScreen(GADS instance, GADSAssetManager aM){
+    public InGameScreen(GADS instance, GADSAssetManager aM, GameSettings gameSettings){
 
         gameManager = instance;
         assetManager = aM;
@@ -47,8 +42,14 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         hudViewport = new FitViewport(worldWidth,worldHeight);
         animator = new Animator(gameManager.simulation.getState(), gameViewport, ingameAtlas);
 
+
         hudStage = new HudStage(hudViewport,this, assetManager);
         setupInput();
+
+        RunConfiguration runConfiguration = gameSettings.toRunConfiguration();
+        runConfiguration.gui = true;
+        runConfiguration.animationLogProcessor = this;
+        manager = new Manager(runConfiguration);
 
     }
 
