@@ -17,16 +17,16 @@ import com.gats.simulation.WeaponType;
  */
 public class Controller {
 
-    private boolean active;
+    private boolean active = true;
     private Manager manager;
     private GameCharacterController gcController;
     private GameCharacter gameCharacter;
 
-    protected Controller(Manager manager, GameCharacterController gcController, GameCharacter gameCharacter) {
+    protected Controller(Manager manager, GameCharacterController gcController) {
 
         this.manager = manager;
         this.gcController = gcController;
-        this.gameCharacter = gameCharacter;
+        this.gameCharacter = gcController.getGameCharacter();
     }
 
     /**
@@ -74,11 +74,11 @@ public class Controller {
         if (active) manager.queueCommand(new ShootCommand(gcController));
     }
 
-    private void activate() {
+    protected void activate() {
         active = true;
     }
 
-    private void deactivate() {
+    protected void deactivate() {
         active = false;
     }
 

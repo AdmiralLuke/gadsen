@@ -33,7 +33,7 @@ public class GameState {
 
     private int teamCount;
     private int charactersPerTeam;
-    private ArrayDeque<Vector2> turn;
+    private ArrayDeque<Vector2> turn = new ArrayDeque<>();
     private boolean active;
     private Simulation sim;
 

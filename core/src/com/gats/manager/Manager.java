@@ -6,6 +6,9 @@ import com.gats.simulation.*;
 import com.gats.ui.GameSettings;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
 
@@ -23,6 +26,7 @@ public class Manager {
     private GameState state;
     private Player[] players;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private List<HumanPlayer> humanList = new ArrayList<>();
 
     private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
 
@@ -39,22 +43,30 @@ public class Manager {
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;
 
-        //ToDo: Load Players from configuration
+        players = new Player[config.teamCount];
 
-        //Initialize players
-        int i = 0;
-        for (Player player : players
-        ) {
-
-            switch (player.getType()) {
+        for (int i = 0; i<config.teamCount; i++) {
+            final Player curPlayer;
+            try {
+                players[i] = (Player) config.players[i].getDeclaredConstructors()[0].newInstance();
+                curPlayer = players[i];
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            switch (curPlayer.getType()) {
                 case Human:
+                    humanList.add((HumanPlayer) curPlayer);
                     break;
                 case AI:
 
                     Future<?> future = executor.submit(new Runnable() {
                         @Override
                         public void run() {
-                            player.init(state);
+                            curPlayer.init(state);
                         }
                     });
 
@@ -67,17 +79,18 @@ public class Manager {
                     } catch (TimeoutException e) {
                         future.cancel(true);
 
-                        System.out.println("bot" + i + "(" + player.getName()
+                        System.out.println("bot" + i + "(" + curPlayer.getName()
                                 + ") initialization surpassed timeout");
                     }
                     break;
             }
-            i++;
         }
+    }
+
+    public void start() {
         //Run the Game
         new Thread(this::run).start();
     }
-
     /**
      * @return The state of the underlying simulation
      */
@@ -91,12 +104,12 @@ public class Manager {
     private void run() {
         Thread thread = new Thread(() -> {
             while (true) { // ToDo: state.isActive()
-                GameCharacterController controller = simulation.getController();
-                int currentPlayerIndex = controller.getGameCharacter().getTeam();
-                int currentCharacterIndex = controller.getGameCharacter().getTeamPos();
+                GameCharacterController gcController = simulation.getController();
+                int currentPlayerIndex = gcController.getGameCharacter().getTeam();
+                int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
 
                 Player currentPlayer = players[currentPlayerIndex];
-
+                Controller controller = new Controller(this, gcController);
                 Thread futureExecutor;
                 Future<?> future;
                 switch (currentPlayer.getType()) {
@@ -150,6 +163,7 @@ public class Manager {
                         animationLogProcessor.animate(simulation.clearReturnActionLog());
                     }
                 }
+                controller.deactivate();
                 ActionLog finalLog = simulation.endTurn();
                 if (gui) animationLogProcessor.animate(finalLog);
             }
@@ -157,7 +171,12 @@ public class Manager {
         thread.start();
     }
 
+    public List<HumanPlayer> getHumanList() {
+        return humanList;
+    }
+
     protected void queueCommand(Command cmd) {
         commandQueue.add(cmd);
     }
+
 }
