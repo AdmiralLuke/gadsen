@@ -1,6 +1,4 @@
 package com.gats.simulation;
-import com.badlogic.gdx.Game;
-import com.gats.simulation.ActionLog;
 
 import com.badlogic.gdx.math.Vector2;
 

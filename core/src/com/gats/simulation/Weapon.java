@@ -15,19 +15,10 @@ abstract class Weapon {
     private GameCharacter character;
     private Simulation sim;
 
-    enum Type {
-        LONG_RANGE,
-        SHORT_RANGE,
-        CLOSE_COMBAT,
-        BOMB,
-        COOKIE,
-        SUGAR_CANE
-    }
-
-    private final Type type;
+    private final WeaponType type;
 
 
-    Weapon(int damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, GameCharacter character) {
+    Weapon(int damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, WeaponType type, Simulation sim, GameCharacter character) {
         this.damage = damage;
         this.damageLoss = damageLoss;
         this.projRange = projRange;
@@ -39,7 +30,7 @@ abstract class Weapon {
     }
 
 
-    public Type getType() {
+    public WeaponType getType() {
         return type;
     }
 
