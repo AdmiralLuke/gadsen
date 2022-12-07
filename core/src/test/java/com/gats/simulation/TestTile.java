@@ -75,6 +75,7 @@ public class TestTile {
     @Test
     public void testIfDestroyed() {
         clearMap();
+        state.getCharacterFromTeams(0, 0).move(3);
         Tile testTile = new Tile(10, 10, true, state);
         for (int i = 0; i < 9; i++) {
             Tile tmpTile = new Tile(10 - i, 9, state);

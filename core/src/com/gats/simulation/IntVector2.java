@@ -313,7 +313,7 @@ public class IntVector2 implements Serializable, Vector<IntVector2> {
         return new Vector2(x, y);
     }
 
-    public IntVector2 add(int x, int z) {
+    public IntVector2 add(int x, int y) {
         this.x += x;
         this.y += y;
         return this;
