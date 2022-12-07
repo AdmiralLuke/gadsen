@@ -43,6 +43,11 @@ public class Simulation {
         // ToDo: check for dead character
         return clearAndReturnActionLog();
     }
+    public ActionLog clearReturnActionLog() {
+        ActionLog tmp = this.actionLog;
+        this.actionLog = new ActionLog(new InitAction());
+        return tmp;
+    }
 
     public ActionLog clearAndReturnActionLog() {
         Vector2 turnChar = gameState.getTurn().peek();

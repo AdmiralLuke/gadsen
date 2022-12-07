@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
+import com.gats.manager.AnimationLogProcessor;
 import com.gats.simulation.ActionLog;
 
 import static com.badlogic.gdx.Input.Keys;
@@ -20,7 +21,7 @@ import static com.badlogic.gdx.Input.Keys;
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
  */
-public class InGameScreen implements Screen {
+public class InGameScreen implements Screen, AnimationLogProcessor {
 
     private Viewport gameViewport;
     private Viewport hudViewport;

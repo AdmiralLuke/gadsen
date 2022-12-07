@@ -2,9 +2,7 @@ package com.gats.manager;
 
 import com.gats.manager.command.Command;
 import com.gats.manager.command.EndTurnCommand;
-import com.gats.simulation.GameCharacterController;
-import com.gats.simulation.GameState;
-import com.gats.simulation.Simulation;
+import com.gats.simulation.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Queue;
@@ -15,6 +13,10 @@ public class Manager {
 
         public int gameMode = 0;
 
+        public boolean gui = false;
+
+        public AnimationLogProcessor animationLogProcessor = (log) -> {};
+
         public String mapName;
     }
 
@@ -24,6 +26,8 @@ public class Manager {
     private static final int HUMAN_EXECUTION_TIMEOUT = 30000;
     private static final int HUMAN_INIT_TIMEOUT = 30000;
 
+    private AnimationLogProcessor animationLogProcessor;
+    private boolean gui = false;
     private Simulation simulation;
     private GameState state;
     private Player[] players;
@@ -41,6 +45,8 @@ public class Manager {
         // ToDo: add Team-Stuff
         simulation = new Simulation(config.gameMode, config.mapName, 0, 0);
         state = simulation.getState();
+        gui = config.gui;
+        animationLogProcessor = config.animationLogProcessor;
 
         //ToDo: Load Players from configuration
 
@@ -51,7 +57,6 @@ public class Manager {
 
             switch (player.getType()) {
                 case Human:
-                    //ToDo
                     break;
                 case AI:
 
@@ -95,10 +100,12 @@ public class Manager {
     private void run() {
         Thread thread = new Thread(() -> {
             while (true) { // ToDo: state.isActive()
-                int currentPlayerIndex = 0;//ToDo: Get Player whose turn it is
-                int currentCharacterIndex = 0;//ToDo: Get Character whose turn it is
+                GameCharacterController controller = simulation.getController();
+                int currentPlayerIndex = controller.getGameCharacter().getTeam();
+                int currentCharacterIndex = controller.getGameCharacter().getTeamPos();
+
                 Player currentPlayer = players[currentPlayerIndex];
-                GameCharacterController controller = null; //ToDo get Controller from Simulation
+
                 Thread futureExecutor;
                 Future<?> future;
                 switch (currentPlayer.getType()) {
@@ -148,12 +155,12 @@ public class Manager {
                     if (nextCmd.isEndTurn()) break;
                     nextCmd.run();
 
-                    if (currentPlayer.getType() == Player.PlayerType.AI) {
-                        //ToDo: Animate Action Logs in real time
+                    if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
+                        animationLogProcessor.animate(simulation.clearReturnActionLog());
                     }
                 }
-                //ToDo: Animate Action Logs if required
-                //ToDo: End Turn
+                ActionLog finalLog = simulation.endTurn();
+                if (gui) animationLogProcessor.animate(finalLog);
             }
         });
         thread.start();
