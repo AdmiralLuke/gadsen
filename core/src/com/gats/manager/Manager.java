@@ -1,36 +1,43 @@
 package com.gats.manager;
 
-import com.gats.simulation.GameCharacterController;
-import com.gats.simulation.GameState;
-import com.gats.simulation.Simulation;
+import com.gats.manager.command.Command;
+import com.gats.manager.command.EndTurnCommand;
+import com.gats.simulation.*;
+import com.gats.ui.GameSettings;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.Queue;
 import java.util.concurrent.*;
 
 public class Manager {
-    public class RunConfiguration {
-
-        public int gameMode = 0;
-
-        public String mapName;
-    }
 
     private static final int AI_EXECUTION_TIMEOUT = 500;
     private static final int AI_INIT_TIMEOUT = 1000;
 
+    private static final int HUMAN_EXECUTION_TIMEOUT = 30000;
+    private static final int HUMAN_INIT_TIMEOUT = 30000;
+
+    private AnimationLogProcessor animationLogProcessor;
+    private boolean gui = false;
     private Simulation simulation;
     private GameState state;
     private Player[] players;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
+
     /**
      * Initializes simulation and players before
      * starting the asynchronous execution
+     *
      * @param config The execution-parameters of the simulation
      */
     public Manager(RunConfiguration config) {
         // ToDo: add Team-Stuff
-        simulation = new Simulation(config.gameMode, config.mapName, 0, 0);
+        simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
+        gui = config.gui;
+        animationLogProcessor = config.animationLogProcessor;
 
         //ToDo: Load Players from configuration
 
@@ -41,7 +48,6 @@ public class Manager {
 
             switch (player.getType()) {
                 case Human:
-                    //ToDo
                     break;
                 case AI:
 
@@ -83,44 +89,75 @@ public class Manager {
      * Controls Player Execution
      */
     private void run() {
-        while (true) { // ToDo: state.isActive()
-            int currentPlayerIndex = 0;//ToDo: Get Player whose turn it is
-            int currentCharacterIndex = 0;//ToDo: Get Character whose turn it is
-            Player currentPlayer = players[currentPlayerIndex];
-            GameCharacterController controller = null; //ToDo get Controller from Simulation
-            switch (currentPlayer.getType()) {
-                case Human:
-                    //ToDo Run Human player
-                    //ToDo Pause thread until human player finishes
-                    //ToDo: Animate Action Logs in real time
+        Thread thread = new Thread(() -> {
+            while (true) { // ToDo: state.isActive()
+                GameCharacterController controller = simulation.getController();
+                int currentPlayerIndex = controller.getGameCharacter().getTeam();
+                int currentCharacterIndex = controller.getGameCharacter().getTeamPos();
 
-                    break;
-                case AI:
+                Player currentPlayer = players[currentPlayerIndex];
 
-                    Future<?> future = executor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            currentPlayer.executeTurn(state, controller);
-                        }
-                    });
+                Thread futureExecutor;
+                Future<?> future;
+                switch (currentPlayer.getType()) {
+                    case Human:
+                        future = executor.submit(() -> currentPlayer.executeTurn(state, controller));
+                        futureExecutor = new Thread(() -> {
+                            try {
+                                future.get(HUMAN_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
+                            } catch (InterruptedException e) {    //     <-- possible error cases
+                                System.out.println("bot was interrupted");
+                            } catch (ExecutionException e) {
+                                System.out.println("human player failed with exception: " + e.getCause());
+                            } catch (TimeoutException e) {
+                                future.cancel(true);
 
-                    try {
-                        future.get(AI_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {    //     <-- possible error cases
-                        System.out.println("bot was interrupted");
-                    } catch (ExecutionException e) {
-                        System.out.println("bot failed with exception: " + e.getCause());
-                    } catch (TimeoutException e) {
-                        future.cancel(true);
+                                System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
+                                        + ") computation surpassed timeout");
+                            }
+                        });
+                        break;
+                    case AI:
+                        future = executor.submit(() -> currentPlayer.executeTurn(state, controller));
+                        futureExecutor = new Thread(() -> {
+                            try {
+                                future.get(AI_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
+                            } catch (InterruptedException e) {    //     <-- possible error cases
+                                System.out.println("bot was interrupted");
+                            } catch (ExecutionException e) {
+                                System.out.println("bot failed with exception: " + e.getCause());
+                            } catch (TimeoutException e) {
+                                future.cancel(true);
 
-                        System.out.println("bot" + currentPlayerIndex + "(" + currentPlayer.getName()
-                                + ") computation surpassed timeout");
+                                System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
+                                        + ") computation surpassed timeout");
+                            }
+                            //Add Empty command to
+                            commandQueue.add(new EndTurnCommand());
+                        });
+                        break;
+                    default:
+                        throw new IllegalStateException("Player of type: " + currentPlayer.getType() + " can not be executed by the Manager");
+                }
+
+                futureExecutor.start();
+                while (futureExecutor.isAlive() && !commandQueue.isEmpty()) {
+                    Command nextCmd = commandQueue.poll();
+                    if (nextCmd.isEndTurn()) break;
+                    nextCmd.run();
+
+                    if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
+                        animationLogProcessor.animate(simulation.clearReturnActionLog());
                     }
-                    //ToDo: Animate Action Logs if required
-                    break;
+                }
+                ActionLog finalLog = simulation.endTurn();
+                if (gui) animationLogProcessor.animate(finalLog);
             }
-            //ToDo: End Turn
-            controller.invalidate();
-        }
+        });
+        thread.start();
+    }
+
+    protected void queueCommand(Command cmd) {
+        commandQueue.add(cmd);
     }
 }
