@@ -38,6 +38,7 @@ public class GameCharacter {
         this.team = team;
         this.teamPos = teamPos;
         this.sim = sim;
+        initInventory();
     }
 
 
@@ -63,7 +64,7 @@ public class GameCharacter {
      * @Weihnachtsaufgabe Initilisiert mit Keks und Zuckerstange (jeweils 50 Schuss)
      */
     protected void initInventory() {
-        weapons = new Weapon[2];
+        this.weapons = new Weapon[2];
         weapons[0] = new ChristmasWeapon(10, 40, 50, false, Weapon.Type.COOKIE,this.sim, this);
         weapons[1] = new ChristmasWeapon(20, 40, 50, false, Weapon.Type.SUGAR_CANE, this.sim, this);
     }
