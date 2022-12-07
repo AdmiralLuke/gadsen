@@ -1,6 +1,4 @@
 package com.gats.simulation;
-import com.badlogic.gdx.Game;
-import com.gats.simulation.ActionLog;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -72,8 +70,8 @@ public class GameCharacter {
      */
     protected void initInventory() {
         weapons = new Weapon[2];
-        weapons[0] = new ChristmasWeapon(10, 40, 50, false, Weapon.Type.COOKIE,this.sim, this);
-        weapons[1] = new ChristmasWeapon(20, 40, 50, false, Weapon.Type.SUGAR_CANE, this.sim, this);
+        weapons[0] = new ChristmasWeapon(10, 40, 50, false, WeaponType.COOKIE,this.sim, this);
+        weapons[1] = new ChristmasWeapon(20, 40, 50, false, WeaponType.SUGAR_CANE, this.sim, this);
     }
 
     /**
