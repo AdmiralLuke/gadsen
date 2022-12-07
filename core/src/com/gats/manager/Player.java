@@ -32,7 +32,7 @@ public abstract class Player {
      * @param state Der {@link GameState Spielzustand} während des Zuges
      * @param characterController Der {@link GameCharacterController Controller}, Charakter gehört
      */
-    protected abstract void executeTurn(GameState state, GameCharacterController characterController);
+    protected abstract void executeTurn(GameState state, Controller controller);
 
     /**
      * Wird für interne Zwecke verwendet und besitzt keine Relevanz für die Bot-Entwicklung.

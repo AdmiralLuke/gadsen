@@ -1,9 +1,22 @@
 package com.gats.manager;
 
+import com.badlogic.gdx.Input;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 
 public class HumanPlayer extends Player{
+
+    final  int KEY_CHARACTER_MOVE_LEFT = Input.Keys.A;
+    final  int KEY_CHARACTER_MOVE_RIGHT = Input.Keys.D;
+    final  int KEY_CHARACTER_SHOOT_ACTION = Input.Keys.SPACE;
+    final  int KEY_CHARACTER_AIM_LEFT = Input.Keys.Q;
+    final  int KEY_CHARACTER_AIM_RIGHT = Input.Keys.E;
+    final  int KEY_CHARACTER_INCREASE_STRENGTH = Input.Keys.W;
+    final  int KEY_CHARACTER_DECREASE_STRENGTH = Input.Keys.S;
+    final int KEY_CHARACTER_CYCLE_WEAPON = Input.Keys.TAB;
+
+    final int characterIncreaseStrength = Input.Keys.R;
+    final int characterDecreaseStrength = Input.Keys.F;
 
    private boolean characterMoveLeftPressed = false;
    private boolean characterMoveRightPressed = false;
@@ -37,20 +50,68 @@ public class HumanPlayer extends Player{
      *  Der Zug dauert {@link HumanPlayer#turnDuration} Sekunden, danach wird für
      *  {@link HumanPlayer#turnEndWaitTime} gewartet und dann die Methode beendet.
      * @param state Der {@link GameState Spielzustand} während des Zuges
-     * @param characterController Der {@link GameCharacterController Controller}, Charakter gehört
+     * @param controller Der {@link Controller Controller}, der zum Charakter gehört
      */
 
     @Override
-    protected void executeTurn(GameState state, GameCharacterController characterController) {
+    protected void executeTurn(GameState state, Controller controller) {
         turnInProgress =true;
         nanoStartTime = System.nanoTime();
         elapsedTime = 0;
         while(elapsedTime<nanoTurnDuration&& turnInProgress) {
-           moveCharacter(characterController);
+           moveCharacter(controller);
 
            elapsedTime = System.nanoTime() - nanoStartTime;
        }
         endTurn();
+    }
+
+    public void processKeyDown(int keycode){
+
+        switch(keycode){
+            // Qund E für rotieren/zielen mit den Waffen
+            case KEY_CHARACTER_AIM_LEFT:
+                //currentPlayer.toggleAimLeft();
+                break;
+            case KEY_CHARACTER_AIM_RIGHT:
+                break;
+            case KEY_CHARACTER_MOVE_LEFT:
+                break;
+            case KEY_CHARACTER_MOVE_RIGHT:
+                break;
+            case KEY_CHARACTER_SHOOT_ACTION:
+                break;
+            case KEY_CHARACTER_CYCLE_WEAPON:
+                break;
+            case KEY_CHARACTER_INCREASE_STRENGTH:
+                break;
+            case KEY_CHARACTER_DECREASE_STRENGTH:
+                break;
+        }
+    }
+    public void processKeyUp(int keycode){
+
+
+        switch(keycode){
+            // Qund E für rotieren/zielen mit den Waffen
+            case KEY_CHARACTER_AIM_LEFT:
+                //currentPlayer.toggleAimLeft();
+                break;
+            case KEY_CHARACTER_AIM_RIGHT:
+                break;
+            case KEY_CHARACTER_MOVE_LEFT:
+                break;
+            case KEY_CHARACTER_MOVE_RIGHT:
+                break;
+            case KEY_CHARACTER_SHOOT_ACTION:
+                break;
+            case KEY_CHARACTER_CYCLE_WEAPON:
+                break;
+            case KEY_CHARACTER_INCREASE_STRENGTH:
+                break;
+            case KEY_CHARACTER_DECREASE_STRENGTH:
+                break;
+        }
     }
 
     /**
@@ -72,9 +133,9 @@ public class HumanPlayer extends Player{
     /**
      * Benutzt einen {@link GameCharacterController} um den dazugehörigen {@link com.gats.simulation.GameCharacter},
      * mithilfe der Eingaben durch {@link com.gats.ui.HudStage} zu bewegen.
-     * @param characterController {@link com.gats.simulation.GameCharacterController} für den Charakter, welcher am Zug ist.
+     * @param controller {@link com.gats.manager.Controller Controller} für den Charakter, welcher am Zug ist.
      */
-    protected void moveCharacter(GameCharacterController characterController){
+    protected void moveCharacter(Controller controller){
         //temporäre variable, Speed sollte woanders festgelegt werden
         int characterSpeed = 5;
 

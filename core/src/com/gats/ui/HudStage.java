@@ -17,6 +17,9 @@ import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.Simulation;
 import org.junit.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HudStage extends Stage {
 
     SpriteBatch batch;
@@ -31,19 +34,10 @@ public class HudStage extends Stage {
   final  int cameraLeft = Keys.LEFT;
   final  int cameraRight = Keys.RIGHT;
 
-  final  int characterMoveLeft = Keys.A;
-  final  int characterMoveRight = Keys.D;
-  final  int characterShootAction = Keys.SPACE;
-  final  int characterAimLeft = Keys.Q;
-  final  int characterAimRight = Keys.E;
-  final int characterCycleWeapon = Keys.TAB;
-
-  final int characterIncreaseStrength = Keys.R;
-  final int characterDecreaseStrength = Keys.F;
-
   private HumanPlayer currentPlayer;
 
   private boolean turnInProgress = false;
+    private List<HumanPlayer> humanList = new ArrayList<>();
 
 
     public HudStage(Viewport hudViewport, InGameScreen ingameScreen, GADSAssetManager assetManager) {
@@ -89,27 +83,10 @@ public class HudStage extends Stage {
         ingameScreen.setCameraDir(directions);
 
         if(turnInProgress&&currentPlayer!=null){
-
-       switch(keycode){
-           // Qund E für rotieren/zielen mit den Waffen
-           case characterAimLeft:
-               //currentPlayer.toggleAimLeft();
-               break;
-           case characterAimRight:
-               break;
-           case characterMoveLeft:
-               break;
-           case characterMoveRight:
-               break;
-           case characterShootAction:
-               break;
-           case characterCycleWeapon:
-              break;
-           case characterIncreaseStrength:
-               break;
-           case characterDecreaseStrength:
-               break;
-       }
+            for (HumanPlayer cur: humanList
+                 ) {
+                cur.processKeyDown(keycode);
+            }
         }
 
 
@@ -142,6 +119,13 @@ switch (keycode){
                 break;
         }
         ingameScreen.setCameraDir(directions);
+
+        if(turnInProgress&&currentPlayer!=null){
+            for (HumanPlayer cur: humanList
+            ) {
+                cur.processKeyUp(keycode);
+            }
+        }
         return true;
     }
 
@@ -153,5 +137,9 @@ switch (keycode){
 
     void setCurrentPlayer(HumanPlayer currentHumanPlayer){
         this.currentPlayer = currentHumanPlayer;
+    }
+
+    public void setHumanPlayers(List<HumanPlayer> humanList) {
+        this.humanList = humanList;
     }
 }

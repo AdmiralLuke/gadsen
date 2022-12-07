@@ -8,9 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.manager.AnimationLogProcessor;
+import com.gats.manager.HumanPlayer;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.ActionLog;
+
+import java.util.List;
 
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
@@ -18,6 +21,7 @@ import com.gats.simulation.ActionLog;
 public class InGameScreen implements Screen, AnimationLogProcessor {
 
     private final Manager manager;
+    private final List<HumanPlayer> humanList;
     private Viewport gameViewport;
     private Viewport hudViewport;
 
@@ -25,7 +29,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private float worldHeight = 80*12;
 
     //should HUD be handled by GADS
-    private Stage hudStage;
+    private HudStage hudStage;
     private Animator animator;
     private final GADS gameManager;
     private final GADSAssetManager assetManager;
@@ -50,6 +54,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         runConfiguration.gui = true;
         runConfiguration.animationLogProcessor = this;
         manager = new Manager(runConfiguration);
+        humanList = manager.getHumanList();
 
     }
 
@@ -108,7 +113,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         //animator als actor?
          //       simulation als actor?
         Gdx.input.setInputProcessor(hudStage);
-
+        hudStage.setHumanPlayers(humanList);
 
     }
 

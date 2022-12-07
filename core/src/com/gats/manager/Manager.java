@@ -6,6 +6,8 @@ import com.gats.simulation.*;
 import com.gats.ui.GameSettings;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
 
@@ -23,6 +25,7 @@ public class Manager {
     private GameState state;
     private Player[] players;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private List<HumanPlayer> humanList = new ArrayList<>();
 
     private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
 
@@ -40,7 +43,6 @@ public class Manager {
         animationLogProcessor = config.animationLogProcessor;
 
         //ToDo: Load Players from configuration
-
         //Initialize players
         int i = 0;
         for (Player player : players
@@ -48,6 +50,7 @@ public class Manager {
 
             switch (player.getType()) {
                 case Human:
+                    humanList.add((HumanPlayer) player);
                     break;
                 case AI:
 
@@ -91,12 +94,12 @@ public class Manager {
     private void run() {
         Thread thread = new Thread(() -> {
             while (true) { // ToDo: state.isActive()
-                GameCharacterController controller = simulation.getController();
-                int currentPlayerIndex = controller.getGameCharacter().getTeam();
-                int currentCharacterIndex = controller.getGameCharacter().getTeamPos();
+                GameCharacterController gcController = simulation.getController();
+                int currentPlayerIndex = gcController.getGameCharacter().getTeam();
+                int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
 
                 Player currentPlayer = players[currentPlayerIndex];
-
+                Controller controller = new Controller(this, gcController);
                 Thread futureExecutor;
                 Future<?> future;
                 switch (currentPlayer.getType()) {
@@ -150,11 +153,16 @@ public class Manager {
                         animationLogProcessor.animate(simulation.clearReturnActionLog());
                     }
                 }
+                controller.deactivate();
                 ActionLog finalLog = simulation.endTurn();
                 if (gui) animationLogProcessor.animate(finalLog);
             }
         });
         thread.start();
+    }
+
+    public List<HumanPlayer> getHumanList() {
+        return humanList;
     }
 
     protected void queueCommand(Command cmd) {
