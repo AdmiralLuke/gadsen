@@ -29,14 +29,14 @@ public class HudStage extends Stage {
 
     InGameScreen ingameScreen;
     Simulation gameSimulation;
-  final  int cameraUp = Keys.UP;
-  final  int cameraDown = Keys.DOWN;
-  final  int cameraLeft = Keys.LEFT;
-  final  int cameraRight = Keys.RIGHT;
+    final int cameraUp = Keys.UP;
+    final int cameraDown = Keys.DOWN;
+    final int cameraLeft = Keys.LEFT;
+    final int cameraRight = Keys.RIGHT;
 
-  private HumanPlayer currentPlayer;
+    private HumanPlayer currentPlayer;
 
-  private boolean turnInProgress = false;
+    private boolean turnInProgress = false;
     private List<HumanPlayer> humanList = new ArrayList<>();
 
 
@@ -59,16 +59,18 @@ public class HudStage extends Stage {
      * Called whenever a button is just pressed.
      * For now it handles input from the Arrow Keys, used for the camera Movement.
      * This is done by storing the direction in {@link HudStage#directions}.
+     *
      * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
      * @return was the input handled
      */
 
-    @Override public boolean keyDown(int keycode){
+    @Override
+    public boolean keyDown(int keycode) {
 
         //input handling for the camera
-        switch (keycode){
+        switch (keycode) {
             case cameraUp:
-                directions[1] +=  1;
+                directions[1] += 1;
                 break;
             case cameraDown:
                 directions[1] -= 1;
@@ -82,13 +84,12 @@ public class HudStage extends Stage {
         }
         ingameScreen.setCameraDir(directions);
 
-        if(turnInProgress&&currentPlayer!=null){
-            for (HumanPlayer cur: humanList
-                 ) {
+        if (turnInProgress && currentPlayer != null) {
+            for (HumanPlayer cur : humanList
+            ) {
                 cur.processKeyDown(keycode);
             }
         }
-
 
 
         return true;
@@ -99,12 +100,14 @@ public class HudStage extends Stage {
     /**
      * Called whenever a button stops getting pressed/is lifted up.
      * Resets the values to some Keypresses, changed in {@link HudStage#keyDown(int)}
+     *
      * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
      * @return
      */
-    @Override public boolean keyUp(int keycode){
+    @Override
+    public boolean keyUp(int keycode) {
 
-switch (keycode){
+        switch (keycode) {
             case Keys.UP:
                 directions[1] -= 1;
                 break;
@@ -120,8 +123,8 @@ switch (keycode){
         }
         ingameScreen.setCameraDir(directions);
 
-        if(turnInProgress&&currentPlayer!=null){
-            for (HumanPlayer cur: humanList
+        if (turnInProgress && currentPlayer != null) {
+            for (HumanPlayer cur : humanList
             ) {
                 cur.processKeyUp(keycode);
             }
@@ -135,7 +138,7 @@ switch (keycode){
     }
 
 
-    void setCurrentPlayer(HumanPlayer currentHumanPlayer){
+    void setCurrentPlayer(HumanPlayer currentHumanPlayer) {
         this.currentPlayer = currentHumanPlayer;
     }
 
