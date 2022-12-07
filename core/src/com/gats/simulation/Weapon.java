@@ -55,7 +55,7 @@ abstract class Weapon {
     }
 
     public void shoot(Vector2 dir, double strength) {
-        if (this.getType() == Type.COOKIE) {
+        if (this.getType() == WeaponType.COOKIE) {
             this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
         } else {
             this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LIN_LASER);
