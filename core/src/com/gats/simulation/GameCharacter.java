@@ -32,22 +32,14 @@ public class GameCharacter {
      * @param sim zugehörige Simulation
      */
     GameCharacter(int x, int y, GameState state, int team, int teamPos, Simulation sim) {
-        new GameCharacter(x, y, state);
+        this.posX = x;
+        this.posY = y;
+        this.state = state;
         this.team = team;
         this.teamPos = teamPos;
-        this.state = state;
         this.sim = sim;
     }
 
-    /**
-     * spawnt Charakter an einer bestimmten Position
-     * @param x X-Koordinate
-     * @param y Y-Koordinate
-     */
-    GameCharacter(int x, int y, GameState state) {
-        this.posX = x;
-        this.posY = y;
-    }
 
     /**
      * Gibt die Lebensanzahl eines Spielers zurück (maximal 100)
@@ -96,9 +88,32 @@ public class GameCharacter {
         return new Vector2(posX, posY);
     }
 
+    void setPosX(int posX) {
+        this.posX = posX;
+    }
+
+    void setPosY(int posY) {
+        this.posY = posY;
+    }
+
     void fall() {
+        Vector2 posBef = this.getPlayerPos().cpy();
+        int fallen = 0;
         while (this.posY > 0 && this.state.getTile(posX, posY - 1) == null) {
             this.posY -= 1;
+            fallen++;
+        }
+        int health = this.getHealth();
+        if (this.posY == 0) {
+            this.setHealth(0);
+        } else {
+            this.setHealth(fallen * 5);
+        }
+        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 10));
+        this.sim.getActionLog().goToNextAction();
+        this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
+        if (this.getHealth() == 0) {
+            sim.endTurn();
         }
     }
 
@@ -122,41 +137,39 @@ public class GameCharacter {
         }
 
         if (dx < 0) {
-            for (int i = 0; i > dx; i--) {
-                if (state.getTile(posX, posY - 1) == null) {
+            for (int i = 0; i >= dx; i--) {
+                if (state.getTile(posX + i , posY - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
-                        return;
+                        dx = dx > 0 ? stamina : -stamina;
                     }
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
                     this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
                     this.fall();
-                    this.sim.getActionLog().addAction(new CharacterFallAction(bef, this.getPlayerPos(), team, teamPos, 10));
                     return;
                 }
-                if (state.getTile(posX + i, posY) != null) {
+                if (state.getTile(posX + i + 1, posY) != null) {
                     dx = i;
                     break;
                 }
             }
 
         } else {
-            for (int i = 0; i < dx; i++) {
-                if (state.getTile(posX, posY - 1) == null) {
+            for (int i = 0; i <= dx; i++) {
+                if (state.getTile(posX + i, posY - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
-                        return;
+                        dx = dx > 0 ? stamina : -stamina;
                     }
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
 
                     this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
                     this.fall();
-                    this.sim.getActionLog().addAction(new CharacterFallAction(bef, this.getPlayerPos(), team, teamPos, 10));
                     return;
                 }
-                if (state.getTile(posX + i, posY) != null) {
+                if (state.getTile(posX + i + 1, posY) != null) {
                     dx = i;
                     break;
                 }
@@ -186,7 +199,9 @@ public class GameCharacter {
      * verbraucht Stamina
      */
     protected void moveDX(int dx) {
-        this.sim.getActionLog().goToNextAction();
+        if (this.sim.getActionLog().getRootAction() != this.sim.getActionLog().lastAddedAction) {
+            this.sim.getActionLog().goToNextAction();
+        }
         move(dx);
     }
 
