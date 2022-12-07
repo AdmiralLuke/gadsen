@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.gats.manager.HumanPlayer;
 import com.gats.manager.RunConfiguration;
 
 import java.util.LinkedList;
@@ -18,8 +19,10 @@ public class GameSettings {
     private String[] availableGameMode = {"no Modes loaded"};
     //Todo bots von der einbindung entnehmen
     private String[] availableBots = {"Human", "TestBot", "Christmas Bot"};
+    private Class[] availableBotClasses = {HumanPlayer.class, HumanPlayer.class, HumanPlayer.class};
     //Todo change map name for christmasTask
     private String weihnachtsmap = "map1";
+    private Class[] bots = {};
 
     public GameSettings() {
     }
@@ -45,13 +48,24 @@ public class GameSettings {
             setMapName(weihnachtsmap);
             setTeamSize(4);
             setAmountTeams(1);
-            //ToDo handle Bots
         } else {
             setMapName(mapButton.getSelected());
             //might need to be adjusted,could be that the buttons are switched
             setTeamSize((int) playerButton.getValue());
             setAmountTeams((int) teamButton.getValue());
+            Class[] bots = new Class[getTeamSize()];
+            int i =0;
+            for (SelectBox<String> curBox: botSelection
+            ) {
+                bots[i] =availableBotClasses[curBox.getSelectedIndex()];
+                i++;
+            }
+            setBots(bots);
         }
+    }
+
+    private void setBots(Class[] bots) {
+        this.bots = bots;
     }
 
     private void setGameMode(int gameMode) {
@@ -99,6 +113,10 @@ public class GameSettings {
         return teamSize;
     }
 
+    public Class[] getBots() {
+        return bots;
+    }
+
     public Table getChristmasMenuButtons(Skin skin) {
         //Todo implement to return a table with the necessary buttons for the christmas task
         Table christmasMenu = new Table(skin);
@@ -123,9 +141,11 @@ public class GameSettings {
     public RunConfiguration toRunConfiguration() {
         RunConfiguration config = new RunConfiguration();
         config.gameMode = getGameMode();
+        config.mapName = getMapName();
         config.teamCount = getAmountTeams();
         config.teamSize = getTeamSize();
         config.teamSize = getTeamSize();
+        config.players = getBots();
         return config;
     }
 }

@@ -44,7 +44,6 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         ingameAtlas = assetManager.getAtlas();
         gameViewport = new FillViewport(worldWidth,worldHeight);
         hudViewport = new FitViewport(worldWidth,worldHeight);
-        animator = new Animator(gameManager.simulation.getState(), gameViewport, ingameAtlas);
 
 
         hudStage = new HudStage(hudViewport,this, assetManager);
@@ -54,6 +53,9 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         runConfiguration.gui = true;
         runConfiguration.animationLogProcessor = this;
         manager = new Manager(runConfiguration);
+        animator = new Animator(manager.getState(), gameViewport, ingameAtlas);
+        manager.start();
+
         humanList = manager.getHumanList();
 
     }

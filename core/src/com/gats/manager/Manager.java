@@ -6,6 +6,7 @@ import com.gats.simulation.*;
 import com.gats.ui.GameSettings;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -42,22 +43,30 @@ public class Manager {
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;
 
-        //ToDo: Load Players from configuration
-        //Initialize players
-        int i = 0;
-        for (Player player : players
-        ) {
+        players = new Player[config.teamCount];
 
-            switch (player.getType()) {
+        for (int i = 0; i<config.teamCount; i++) {
+            final Player curPlayer;
+            try {
+                players[i] = (Player) config.players[i].getDeclaredConstructors()[0].newInstance();
+                curPlayer = players[i];
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            switch (curPlayer.getType()) {
                 case Human:
-                    humanList.add((HumanPlayer) player);
+                    humanList.add((HumanPlayer) curPlayer);
                     break;
                 case AI:
 
                     Future<?> future = executor.submit(new Runnable() {
                         @Override
                         public void run() {
-                            player.init(state);
+                            curPlayer.init(state);
                         }
                     });
 
@@ -70,17 +79,18 @@ public class Manager {
                     } catch (TimeoutException e) {
                         future.cancel(true);
 
-                        System.out.println("bot" + i + "(" + player.getName()
+                        System.out.println("bot" + i + "(" + curPlayer.getName()
                                 + ") initialization surpassed timeout");
                     }
                     break;
             }
-            i++;
         }
+    }
+
+    public void start() {
         //Run the Game
         new Thread(this::run).start();
     }
-
     /**
      * @return The state of the underlying simulation
      */
@@ -168,4 +178,5 @@ public class Manager {
     protected void queueCommand(Command cmd) {
         commandQueue.add(cmd);
     }
+
 }
