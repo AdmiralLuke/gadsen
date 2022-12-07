@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
-import com.gats.simulation.GameState;
+import com.gats.simulation.ActionLog;
 
 import static com.badlogic.gdx.Input.Keys;
 
@@ -65,7 +65,15 @@ public class InGameScreen implements Screen {
         //animator.animate(gameManager.simulation.getActionLog());
     }
 
-    @Override
+    /**
+     * Forwards the ActionLog to the Animator for processing
+     *
+     * @param log Queue of all {@link com.gats.simulation.Action animation-related Actions}
+     */
+    public void animate(ActionLog log) {animator.animate(log);}
+
+
+        @Override
     public void resize(int width, int height) {
         animator.resize(width, height);
         hudStage.getViewport().update(width, height);
