@@ -147,6 +147,7 @@ public class Manager {
                     Command nextCmd = commandQueue.poll();
                     if (nextCmd.isEndTurn()) break;
                     nextCmd.run();
+
                     if (currentPlayer.getType() == Player.PlayerType.AI) {
                         //ToDo: Animate Action Logs in real time
                     }
