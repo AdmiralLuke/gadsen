@@ -59,7 +59,7 @@ public class GADS extends Game {
 		if (screen != null) this.screen.dispose();
 	}
 
-	public void setScreenIngame() {
+	public void startGame() {
 
 		simulation = new Simulation(gameSettings.getGameMode(), gameSettings.getMapName(),gameSettings.getAmountTeams(),gameSettings.getTeamSize());
 		setScreen(new InGameScreen(this, assetManager));

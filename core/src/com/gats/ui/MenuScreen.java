@@ -22,6 +22,7 @@ import java.util.ListIterator;
  */
 public class MenuScreen implements Screen {
     private Viewport menuViewport;
+    private GameSettings gameSettings;
     private GADS gameInstance;
     private GADSAssetManager gadsAssetManager;
     private Stage mainMenu;
@@ -46,9 +47,10 @@ public class MenuScreen implements Screen {
 
 
         mainMenu = new Stage(menuViewport);
+        gameSettings = gameInstance.gameSettings;
 
         //create a table, holds ui widgets like buttons and textfields
-        setupTable(mainMenu);
+        setupMenuScreen(mainMenu);
     }
 
     @Override
@@ -64,10 +66,11 @@ public class MenuScreen implements Screen {
      *
      * @param menu Stage that is supposed to receive the buttons.
      */
-    public void setupTable(Stage menu) {
+    public void setupMenuScreen(Stage menu) {
     //ToDo Add slider for Character per team selection
 
         Skin skin = new Skin(Gdx.files.internal("core/resources/ui/skin.json"));
+
         table = new Table(skin);
         Table botTable = new Table(skin);
         // Label title = new Label("GADS",new Label.LabelStyle().font = new BitmapFont(Gdx.files.internal("build/res/texture/font/default.fnt")));
@@ -77,9 +80,9 @@ public class MenuScreen implements Screen {
         //Creates the title Image to be usable in the table
         title = new Image(atlas.findRegion("ui/gadsTitleTemporary"));
         //Gamemodemenu to choose the desired Mode
-        SelectBox<String> modesButton = new GameModeButton(skin);
-        SelectBox<String> mapButton = new SelectBox<String>(skin);
-        mapButton.setItems(gameInstance.getMaps());
+      //  SelectBox<String> modesButton = new GameModeButton(skin);
+       // SelectBox<String> mapButton = new SelectBox<String>(skin);
+       // mapButton.setItems(gameInstance.getMaps());
 
 
         //maybe change to other type later
@@ -89,16 +92,16 @@ public class MenuScreen implements Screen {
         //create sliders for team and bot amount
         //botslider will become teamamount
         //teamslider will be player
-        Slider teamSelectionSlider = new Slider(1, 8, 1, false, skin);
+       // Slider teamSelectionSlider = new Slider(1, 8, 1, false, skin);
 
         //add a change Listener to the teamSelectionSlider so the amount of bot selections is dynamically updated
-        teamSelectionSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                rebuildBotTable(teamSelectionSlider.getValue(),botTable,currentBotSelectors);
-            }
-        });
-        Slider amountOfCharactersPerTeamSlider = new Slider(1, 8, 1, false, skin);
+       // teamSelectionSlider.addListener(new ChangeListener() {
+       //     @Override
+       //     public void changed(ChangeEvent event, Actor actor) {
+       //         rebuildBotTable(teamSelectionSlider.getValue(),botTable,currentBotSelectors);
+       //     }
+       // });
+        //Slider amountOfCharactersPerTeamSlider = new Slider(1, 8, 1, false, skin);
         //to dynamically adjust the amountOfCharactersPerTeamSlider Range, a change Listener is used to update the teamSelectionSlider everytime the TeamButton is changed
         /*amountOfCharactersPerTeamSlider.addListener(new ChangeListener() {*/
         /*    @Override*/
@@ -112,24 +115,23 @@ public class MenuScreen implements Screen {
         SliderLabel playerText = new SliderLabel("Anzahl der Teams: ", skin,teamSelectionSlider);
         SliderLabel teamText = new SliderLabel("Gadsen pro Team: ", skin, amountOfCharactersPerTeamSlider);
 
-        Actor startButton = new ImageButton(new SpriteDrawable(gadsAssetManager.getAtlas().createSprite("ui/cat_lowRes")));
-        TextButton textButtonExit = new TextButton("Exit", skin);
+       // TextButton textButtonExit = new TextButton("Exit", skin);
 
         //The change event for the button gets called, when it is pressed
         //Calls startGame() to initiate changing the screen;
-        startButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                startGame(modesButton,mapButton, amountOfCharactersPerTeamSlider, teamSelectionSlider);
-            }
-        });
+       // startButton.addListener(new ChangeListener() {
+       //     @Override
+       //     public void changed(ChangeEvent event, Actor actor) {
+       //         startGame(modesButton,mapButton, amountOfCharactersPerTeamSlider, teamSelectionSlider);
+       //     }
+       // });
 
-        textButtonExit.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.exit();
-            }
-        });
+       // textButtonExit.addListener(new ChangeListener() {
+       //     @Override
+       //     public void changed(ChangeEvent event, Actor actor) {
+       //         Gdx.app.exit();
+       //     }
+       // });
 
         //temporary christmas spaghetti
 modesButton.addListener(new ChangeListener() {
@@ -150,6 +152,11 @@ modesButton.addListener(new ChangeListener() {
             }
         });
 
+setupTable(menu,table);
+
+    }
+
+    private void setupTable(Stage menu,Table table){
 
         menu.addActor(table);
         table.setDebug(false); // This is optional, but enables debug lines for tables.
@@ -157,22 +164,22 @@ modesButton.addListener(new ChangeListener() {
         //add the table to the menu stage
         table.setFillParent(true);
         //locates the table at the top of the screen
-       buildTopOfTable(table,startButton,modesButton,mapButton);
-       table.add(playerText);
-       table.add(teamSelectionSlider).pad(10);
-       table.row();
-       table.add(teamText);
-       table.add(amountOfCharactersPerTeamSlider).pad(10);
-       table.row();
-       //table.add(botSelectioin);
+        buildTopOfTable(table,gameSettings.createStartButton(new SpriteDrawable(gadsAssetManager.getAtlas().createSprite("ui/cat_lowRes"))),modesButton,mapButton);
+        table.add(playerText);
+        table.add(teamSelectionSlider).pad(10);
+        table.row();
+        table.add(teamText);
+        table.add(amountOfCharactersPerTeamSlider).pad(10);
+        table.row();
+        //table.add(botSelectioin);
         table.row();
         table.add(botTable).colspan(4);
         table.row();
         table.add(textButtonExit).width(80).pad(10).colspan(4);
 
         rebuildBotTable(teamSelectionSlider.getValue(),botTable,currentBotSelectors);
-
     }
+
 
     @Override
     public void render(float delta) {
@@ -190,9 +197,12 @@ modesButton.addListener(new ChangeListener() {
      *
      * To change the screen it calls {@link GADS#setScreenIngame()}
      */
-    public void startGame(SelectBox<String> mode, SelectBox<String> map, Slider team, Slider player) {
-        gameInstance.gameSettings.evaluateButtonSettings(mode,map,team,player,currentBotSelectors);
-        gameInstance.setScreenIngame();
+  //  public void startGame(SelectBox<String> mode, SelectBox<String> map, Slider team, Slider player) {
+  //      gameInstance.gameSettings.evaluateButtonSettings(mode,map,team,player,currentBotSelectors);
+  //      gameInstance.setScreenIngame();
+  //  }
+    public void startGame(){
+        gameSettings.evaluateButtonSettings();
     }
 
     @Override
@@ -235,32 +245,7 @@ modesButton.addListener(new ChangeListener() {
      *
      * Not very efficient solution, yey we only have to handle a small number of buttons.
      */
-    void rebuildBotTable(float botAmount,Table botTable, LinkedList<BotSelectionBox> currentBots){
-        int columns = 3;
-       LinkedList<BotSelectionBox> newBotSelectors = new LinkedList<>();
-       botTable.clear();
-       ListIterator<BotSelectionBox> iterator = currentBots.listIterator();
-        for(int i=0;i<botAmount;i++){
-            //add a new row to the bottable to create another column
-            if(i%columns==0&&i!=0){
-                botTable.row();
-            }
-           if(iterator.hasNext()) {
-                BotSelectionBox current = iterator.next();
-                botTable.add(current).pad(5);
-                newBotSelectors.add(current);
-            }
-            else {
-                BotSelectionBox newBotSelection = new BotSelectionBox(table.getSkin());
-                botTable.add(newBotSelection).pad(5);
-                newBotSelectors.add(newBotSelection);
-            }
 
-        }
-        currentBotSelectors = newBotSelectors;
-
-
-    }
     void buildTopOfTable(Table table,Actor startButton,Actor modesButton, Actor mapButton){
         table.top().pad(10);
         table.add(title).colspan(4);
@@ -298,6 +283,7 @@ modesButton.addListener(new ChangeListener() {
 
    class SliderLabel extends Label {
         Slider sliderInstance;
+
         String name;
 
         public SliderLabel(String name, Skin skin, Slider slider) {
