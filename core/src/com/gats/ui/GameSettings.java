@@ -176,7 +176,7 @@ public class GameSettings {
 
     void setChristmasSpecialSettings(Skin skin) {
 
-        int christmasBotAmount = 4;
+        int christmasBotAmount = 3;
         int christmasTeamSize = 1;
 
         // MapSelection not really needed
