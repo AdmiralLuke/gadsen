@@ -33,7 +33,7 @@ public class GameState {
 
     private int teamCount;
     private int charactersPerTeam;
-    private ArrayDeque<Vector2> turn;
+    private ArrayDeque<Vector2> turn = new ArrayDeque<>();
     private boolean active;
     private Simulation sim;
 
@@ -51,28 +51,24 @@ public class GameState {
      */
     GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
+        this.active = true;
+        this.sim = sim;
         loadMap(mapName);
         this.teamCount = teamCount;
         this.charactersPerTeam = charactersPerTeam;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
-        this.initTeam();
-        this.active = true;
-        this.sim = sim;
     }
 
     /**
      * spawns player
      */
     void initTeam() {
+        this.turn = new ArrayDeque<>(this.teams.length * this.teams[0].length);
+        this.teams = spawnCharacter(this.teams.length, this.teams[0].length);
+        // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
         for (int i = 0; i < this.teams.length; i++) {
             for (int j = 0; j < this.teams[0].length; j++) {
-                this.teams[i][j] = new GameCharacter(i, j, this);
-            }
-        }
-        // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
-        for (int i = 0; i < this.teams[0].length; i++) {
-            for (int j = 0; j < this.teams.length; j++) {
-                turn.add(new Vector2(this.teams[i][j].getTeam(), this.teams[i][j].getTeamPos()));
+                turn.push(new Vector2(this.teams[i][j].getTeam(), this.teams[i][j].getTeamPos()));
             }
         }
     }
@@ -161,7 +157,7 @@ public class GameState {
      * @return Kopie eines Tiles an einer bestimmten Stelle
      */
     public Tile getTile(int x, int y) {
-        if (x < 0 || y < 0 || x > 249 || y > 249) return null;
+        if (x < 0 || y < 0 || x > getBoardSizeX() || y > getBoardSizeY()) return null;
         return board[x][y];
     }
 
@@ -189,12 +185,12 @@ public class GameState {
         GameCharacter[][] characters = new GameCharacter[amountTeams][amountPlayers];
         for (int i = 0; i < amountTeams; i++) {
             for (int j = 0; j < amountPlayers; j++) {
-                int randX = (int)(Math.random() * 250);
-                int randY = (int)(Math.random() * 250);
+                int randX = (int)(Math.random() * getBoardSizeX());
+                int randY = (int)(Math.random() * getBoardSizeY());
                 if (getTile(randX, randY) != null) {
                     j--;
                 } else {
-                    characters[i][j] = new GameCharacter(randX, randY, this);
+                    characters[i][j] = new GameCharacter(randX, randY, this, i, j, sim);
                 }
             }
         }

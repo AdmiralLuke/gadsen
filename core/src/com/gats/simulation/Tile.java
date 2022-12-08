@@ -176,21 +176,25 @@ public class Tile {
         IntVector2 posBef = this.position.cpy();
         while (getTileAtPosition(this.position.x, this.position.y, state) == null && this.position.y > 0) {
             this.position.add(0, -1);
+            for (GameCharacter[] characters : state.getTeams()) {
+                for (GameCharacter character : characters) {
+                    if (character.getPlayerPos().x == this.position.x && character.getPlayerPos().y == this.position.y) {
+                        LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()));
+                        int tmpHealth = character.getHealth();
+                        character.setHealth(tmpHealth - ((int)path.getEndTime() * 5));
+                        Action tmpAction = new TileMoveAction(posBef, this.position, 2000);
+                        Action tmpDestAction = new TileDestroyAction(this.getPosition());
+                        tmpDestAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), tmpHealth, character.getHealth()));
+                        return;
+                    }
+                }
+            }
         }
         float duration = 2000;
         Action tmpAction = new TileMoveAction(posBef, this.position, duration);
         Action tmpDestAction = new TileDestroyAction(this.getPosition());
         tmpAction.addChild(tmpDestAction);
-        for (GameCharacter[] characters : state.getTeams()) {
-            for (GameCharacter character : characters) {
-                if (character.getPlayerPos().equals(this.position)) {
-                    LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()));
-                    int tmpHealth = character.getHealth();
-                    character.setHealth(tmpHealth - ((int)path.getEndTime() * 5));
-                    tmpDestAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), tmpHealth, character.getHealth()));
-                }
-            }
-        }
+
         this.state.getSim().getActionLog().addAction(tmpAction);
     }
 

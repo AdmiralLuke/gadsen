@@ -8,7 +8,7 @@ import java.util.Iterator;
  */
 public abstract class Action {
     private long delay = 0;
-    private ArrayList<Action> arrayList;
+    private ArrayList<Action> arrayList = new ArrayList<>();
 
     public Action(long delay) {
         this.delay = delay;

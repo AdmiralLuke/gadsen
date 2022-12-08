@@ -7,12 +7,12 @@ public class ChristmasWeapon extends Weapon{
 
 
 
-    ChristmasWeapon(int damage, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, GameCharacter character) {
+    ChristmasWeapon(int damage, double projRange, int shoots, boolean hitThroughBoxes, WeaponType type, Simulation sim, GameCharacter character) {
         super(damage, 0, projRange, shoots, hitThroughBoxes, type, sim, character);
     }
 
     @Override
-    public Type getType() {
+    public WeaponType getType() {
         return super.getType();
     }
 
@@ -44,7 +44,7 @@ public class ChristmasWeapon extends Weapon{
 
 
     public void shoot(Vector2 dir, double strength) {
-        if (this.getType() == Type.COOKIE) {
+        if (this.getType() == WeaponType.COOKIE) {
             super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
         } else {
             super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LIN_LASER);

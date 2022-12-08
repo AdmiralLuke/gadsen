@@ -3,8 +3,12 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.gats.simulation.Simulation;
+
+import java.util.LinkedList;
 
 /**
  * GADS ist die verantwortliche Klasse im LifeCycle der Anwendung.
@@ -33,7 +37,7 @@ public class GADS extends Game {
 	int gameMode = 0;
 	@Override
 	public void create() {
-		gameSettings = new GameSettings(this);
+		gameSettings = new GameSettings();
 		//subject to change
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
@@ -55,10 +59,10 @@ public class GADS extends Game {
 		if (screen != null) this.screen.dispose();
 	}
 
-	public void startGame() {
+	public void setScreenIngame() {
 
-		simulation = new Simulation(gameSettings.getGameMode(), gameSettings.getMapName(),gameSettings.getTeamAmount(),gameSettings.getTeamSize());
-		setScreen(new InGameScreen(this, assetManager));
+		//simulation = new Simulation(gameSettings.getGameMode(), gameSettings.getMapName(),gameSettings.getAmountTeams(),gameSettings.getTeamSize());
+		setScreen(new InGameScreen(this, assetManager, gameSettings));
 		menuScreen.dispose();
 	}
 

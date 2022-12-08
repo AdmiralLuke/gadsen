@@ -20,10 +20,12 @@ public class ActionLog {
 
     void addAction(Action action) {
         this.lastAddedAction.getChildren().add(action);
-
     }
 
     void goToNextAction() {
+        if (lastAddedAction == rootAction) {
+            return;
+        }
         this.lastAddedAction = lastAddedAction.getChildren().get(0);
     }
 
