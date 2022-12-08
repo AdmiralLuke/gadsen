@@ -9,11 +9,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gats.animation.action.DestroyAction;
-import com.gats.animation.action.MoveAction;
-import com.gats.animation.action.SummonAction;
-import com.gats.animation.entity.*;
+import com.gats.animation.action.*;
 import com.gats.animation.action.Action;
+import com.gats.animation.entity.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -120,7 +118,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
 
         public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
-            ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> new ExpandedAction(null))
+            ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> new ExpandedAction(new IdleAction(0, 0)))
                     .apply(simAction, animator);
             expandedAction.tail.setChildren(extractChildren(simAction, animator));
 
@@ -252,7 +250,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         background = new SpriteEntity(
                 textureAtlas.findRegion("tile/GADSBG"),
-                new Vector2(0, 0),
+                new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()),
                 new Vector2(259 * 4, 128 * 4));
         ////root.add(background);
 

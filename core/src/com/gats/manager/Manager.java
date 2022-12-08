@@ -5,11 +5,23 @@ import com.gats.manager.command.EndTurnCommand;
 import com.gats.simulation.*;
 import com.gats.ui.GameSettings;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import com.gats.simulation.GameCharacterController;
+import com.gats.simulation.GameState;
+import com.gats.simulation.Simulation;
+import jdk.internal.loader.ClassLoaders;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.*;
 
 public class Manager {
@@ -37,7 +49,6 @@ public class Manager {
      * @param config The execution-parameters of the simulation
      */
     public Manager(RunConfiguration config) {
-        // ToDo: add Team-Stuff
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
         gui = config.gui;
@@ -48,13 +59,9 @@ public class Manager {
         for (int i = 0; i<config.teamCount; i++) {
             final Player curPlayer;
             try {
-                players[i] = (Player) config.players[i].getDeclaredConstructors()[0].newInstance();
+                players[i] = (Player) config.players.get(i).getDeclaredConstructors()[0].newInstance();
                 curPlayer = players[i];
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
             switch (curPlayer.getType()) {
@@ -91,6 +98,69 @@ public class Manager {
         //Run the Game
         new Thread(this::run).start();
     }
+
+    public static class NamedPlayerClass{
+        private String name;
+        private Class<? extends Player> classRef;
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        public NamedPlayerClass(Class<? extends Player> classRef) {
+            try {
+
+                Method method = classRef.getMethod("getName");
+
+                name = (String) method.invoke(null);
+
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Insufficient Privileges for instantiating bots", e);
+            } catch (InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            this.classRef = classRef;
+
+
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<? extends Player> getClassRef() {
+            return classRef;
+        }
+    }
+
+    public static NamedPlayerClass[] getPossiblePlayers(){
+        List<NamedPlayerClass> players = new ArrayList<NamedPlayerClass>();
+        players.add(new NamedPlayerClass(HumanPlayer.class));
+        File botDir = new File("bots");
+        if (botDir.exists()){
+            try {
+                URL url = botDir.toURI().toURL();
+                URL[] urls = new URL[] {url};
+                ClassLoader loader = new URLClassLoader(urls);
+                for (File botFile: Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))
+                     ) {
+                    try {
+                        players.add(new NamedPlayerClass((Class<? extends Player>) loader.loadClass("bots." + botFile.getName())));
+                    } catch (ClassNotFoundException e) {
+                        System.err.println("Could not find class for " + botFile.getName());
+                    }
+                }
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        NamedPlayerClass[] array = new NamedPlayerClass[players.size()];
+        players.toArray(array);
+        return array;
+    }
+
     /**
      * @return The state of the underlying simulation
      */
