@@ -72,7 +72,7 @@ public class HumanPlayer extends Player {
     private Controller controller;
 
     public static String getName() {
-        return "";
+        return "Human";
     }
 
     @Override

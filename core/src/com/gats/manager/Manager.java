@@ -140,7 +140,7 @@ public class Manager {
 
     public static List<NamedPlayerClass> getPossiblePlayers(){
         List<NamedPlayerClass> players = new ArrayList<>();
-        players.add(new NamedPlayerClass(TestPlayer.class));
+        players.add(new NamedPlayerClass(HumanPlayer.class));
         File botDir = new File("bots");
         if (botDir.exists()){
             try {
