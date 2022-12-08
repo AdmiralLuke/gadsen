@@ -24,7 +24,7 @@ import java.util.ListIterator;
 public class GameSettings {
 
     Actor[] buttons;
-    ImageButton startGameButton;
+    Button startGameButton;
     SelectBox<String> gameModeButton;
     SelectBox<String> mapSelectionBox;
     Slider teamAmountSlider;
@@ -248,15 +248,24 @@ public class GameSettings {
     private ImageButton createStartButton(TextureRegion startButtonImage) {
 
         ImageButton startGameButton = new ImageButton(new TextureRegionDrawable(startButtonImage));
-        startGameButton.addListener(new ChangeListener() {
+        addStartGameChangeListener(startGameButton);
+        return startGameButton;
+    }
+    private TextButton createTextStartButton(String label, Skin skin){
+        TextButton startGameButton = new TextButton(label,skin);
+        addStartGameChangeListener(startGameButton);
+        return startGameButton;
+    }
+
+    private void addStartGameChangeListener(Button startButton){
+        startButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 evaluateSettings();
                 game.setScreenIngame();
             }
         });
-        this.startGameButton = startGameButton;
-        return startGameButton;
+        return;
     }
 
 
@@ -357,17 +366,18 @@ public class GameSettings {
         //platziert den Table an der oberen Kante des Bildschirms
         table.top();
         //Spieltitel wird in der ersten Zeile hinzugefügt und hat eine breite von 4 Spalten
-        table.add(new Image(titleImage)).colspan(4).pad(20);
+        table.add(new Image(titleImage)).colspan(4).pad(15).height(80);
 
         //table.row(); erzeugt eine neue Zeile in der Tabelle
         table.row();
 
         //Startknopf wird platziert
-        table.add(createStartButton(StartButtonImage)).colspan(4);
+        //table.add(createStartButton(StartButtonImage)).colspan(4);
+        table.add(createTextStartButton("Spiel Starten",skin)).colspan(4);
         table.row();
 
         gameModeButton = createGameModeButton(skin, availableGameMode);
-        table.add(gameModeButton).pad(10).width(200).colspan(4);
+        table.add(gameModeButton).pad(10).colspan(4);
         table.row();
 
         //gamemodespecific table enthält während der Laufzeit das menü für den ausgewählten Spielmodus

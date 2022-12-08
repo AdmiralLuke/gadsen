@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,7 +23,8 @@ public class MenuScreen implements Screen {
     private Stage mainMenu;
     private Camera camera;
     private TextureAtlas atlas;
-
+private TextureRegion background;
+private SpriteBatch menuBatch;
 
     public MenuScreen(GADS gameInstance, GADSAssetManager gadsAssetManager) {
 
@@ -39,6 +41,7 @@ public class MenuScreen implements Screen {
         mainMenu = new Stage(menuViewport);
         gameSettings = gameInstance.gameSettings;
 
+        menuBatch = new SpriteBatch();
         //create a table, holds ui widgets like buttons and textfields
         setupMenuScreen(mainMenu);
     }
@@ -62,17 +65,21 @@ public class MenuScreen implements Screen {
 
         Table menuTable = gameSettings.buildMainLayoutTable(skin, new TextureRegion(atlas.findRegion("ui/cat_lowRes")), new TextureRegion(atlas.findRegion("ui/titleTileset")));
         menu.addActor(menuTable);
-        menuTable.setDebug(true); // This is optional, but enables debug lines for tables.
+        menuTable.setDebug(false); // This is optional, but enables debug lines for tables.
         menuTable.setFillParent(true);
+       this.background = atlas.findRegion("tile/GADSBG");
     }
 
 
     @Override
     public void render(float delta) {
         camera.update();
+        menuBatch.begin();
+        this.menuBatch.draw(background,0,0,background.getRegionWidth()*4,background.getRegionHeight()*4);
+
+        menuBatch.end();
         mainMenu.act(delta);
         mainMenu.draw();
-
     }
 
     @Override
