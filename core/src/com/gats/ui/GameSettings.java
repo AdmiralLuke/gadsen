@@ -164,14 +164,12 @@ public class GameSettings {
      * @return Table welcher alle wichtigen Buttons für den Christmas Spielmodi enthält.
      */
     private void makeChristmasMenuButtons(Skin skin) {
-        //Todo implement to return a table with the necessary buttons for the christmas task
         Table christmasMenu = new Table(skin);
         christmasBotSelectorBox = createBotButton(skin, availableBots);
 
 //      christmasMenu.add(createBotButton(skin,availableBots));
         christmasMenu.add(christmasBotSelectorBox);
         this.christmasTable = christmasMenu;
-        //Todo BotSelection
 
 
     }
@@ -194,6 +192,7 @@ public class GameSettings {
         botSelectors.add(christmasBotSelectorBox);
         for (int i = 0; i < christmasBotAmount; i++) {
             //forcing other bot selectors, that are hidden from the player to be christmas bots
+            //Todo get Christmas bot
             botSelectors.add(createBotButton(skin, Manager.getPossiblePlayers()));
         }
         //add buttons to the table that are meant to be adjusted
