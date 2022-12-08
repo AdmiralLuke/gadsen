@@ -250,8 +250,8 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         background = new SpriteEntity(
                 textureAtlas.findRegion("tile/GADSBG"),
-                new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()),
-                new Vector2(259 * 4, 128 * 4));
+                new Vector2(-backgroundViewport.getWorldWidth()/2, -backgroundViewport.getWorldHeight()/2),
+                new Vector2(259, 128));
         ////root.add(background);
 
         backgroundTexture = textureAtlas.findRegion("tile/GADSBG").getTexture();
@@ -311,6 +311,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         camera.position.set(new float[]{0, 0, 0});
         this.backgroundViewport.update(width, height);
         this.viewport.update(width, height, true);
+        camera.update();
     }
 
     /**
