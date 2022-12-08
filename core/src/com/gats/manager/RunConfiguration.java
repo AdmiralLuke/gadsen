@@ -1,5 +1,7 @@
 package com.gats.manager;
 
+import java.util.ArrayList;
+
 public class RunConfiguration {
 
     public int gameMode = 0;
@@ -14,5 +16,5 @@ public class RunConfiguration {
     public int teamCount;
     public int teamSize;
 
-    public Class[] players;
+    public ArrayList<Class<? extends Player>> players;
 }

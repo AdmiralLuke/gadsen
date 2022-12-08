@@ -12,6 +12,7 @@ import com.gats.manager.Player;
 import com.gats.manager.RunConfiguration;
 import com.sun.tools.javac.code.Attribute;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -38,7 +39,7 @@ public class GameSettings {
     private String mapName = "default";
     private int gameMode = 0;
 
-    private Class<? extends Player>[] selectedBots;
+    private ArrayList<Class<? extends Player>> selectedBots;
     private String[] availableMaps = {"no Maps loaded"};
     private String[] availableGameMode = {"no Modes loaded"};
     private final String christmasBotName = "Christmas Bot";    //Todo bots aus der einbindung entnehmen, wenn sie erfolgt ist
@@ -99,12 +100,10 @@ public class GameSettings {
 
     private void setSelectedBots(LinkedList<SelectBox<Manager.NamedPlayerClass>> selectedBotValues) {
         int amountOfBots = selectedBotValues.size();
-        this.selectedBots =new Class[amountOfBots];
-        int i = 0;
+        this.selectedBots =new ArrayList<Class<? extends Player>>();
         for (SelectBox<Manager.NamedPlayerClass> selectedBot : selectedBotValues
         ) {
-            this.selectedBots[i] = selectedBot.getSelected().getClassRef();
-            i++;
+            this.selectedBots.add(selectedBot.getSelected().getClassRef());
         }
     }
 
@@ -153,7 +152,7 @@ public class GameSettings {
         return teamSize;
     }
 
-    private Class[] getPlayers() {
+    private ArrayList<Class<? extends Player>> getPlayers() {
 
         return this.selectedBots;
     }

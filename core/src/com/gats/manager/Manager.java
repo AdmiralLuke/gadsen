@@ -59,7 +59,7 @@ public class Manager {
         for (int i = 0; i<config.teamCount; i++) {
             final Player curPlayer;
             try {
-                players[i] = (Player) config.players[i].getDeclaredConstructors()[0].newInstance();
+                players[i] = (Player) config.players.get(i).getDeclaredConstructors()[0].newInstance();
                 curPlayer = players[i];
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
