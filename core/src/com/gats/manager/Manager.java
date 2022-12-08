@@ -106,6 +106,11 @@ public class Manager {
         private String name;
         private Class<? extends Player> classRef;
 
+        @Override
+        public String toString() {
+            return name;
+        }
+
         public NamedPlayerClass(Class<? extends Player> classRef) {
             try {
 
@@ -120,6 +125,8 @@ public class Manager {
             }
 
             this.classRef = classRef;
+
+
         }
 
         public String getName() {
