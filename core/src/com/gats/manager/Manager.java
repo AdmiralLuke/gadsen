@@ -52,7 +52,6 @@ public class Manager {
      * @param config The execution-parameters of the simulation
      */
     public Manager(RunConfiguration config) {
-        // ToDo: add Team-Stuff
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
         gui = config.gui;
@@ -65,11 +64,7 @@ public class Manager {
             try {
                 players[i] = (Player) config.players[i].getDeclaredConstructors()[0].newInstance();
                 curPlayer = players[i];
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
             switch (curPlayer.getType()) {
