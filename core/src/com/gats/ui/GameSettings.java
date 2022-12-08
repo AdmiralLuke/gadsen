@@ -6,7 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
+import com.gats.manager.Manager;
+import com.gats.manager.Player;
 import com.gats.manager.RunConfiguration;
+import com.sun.tools.javac.code.Attribute;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -25,7 +29,7 @@ public class GameSettings {
     Slider teamAmountSlider;
     Slider teamSizeSlider;
 
-    LinkedList<SelectBox<String>> botSelectors = new LinkedList<>();
+    LinkedList<SelectBox<Manager.NamedPlayerClass>> botSelectors = new LinkedList<>();
     Table botTable;
 
     TextButton exitButton;
@@ -42,11 +46,12 @@ public class GameSettings {
 
     //cheatyspaghetti cuz stuff is not working as intended :(
     //for some reason an actor can only be inside one table at a time
-    private SelectBox<String> christmasBotSelectorBox;
-    private String[] availableBots = {"Human", "TestBot", christmasBotName};
+    private SelectBox<Manager.NamedPlayerClass> christmasBotSelectorBox;
+    private Manager.NamedPlayerClass[] availableBots;
+    private String[] availableBotsStrings = {"Human", "TestBot", christmasBotName};
     //Todo change map name for christmasTask
     private String weihnachtsmap = "map1";
-
+    private LinkedList<Manager.NamedPlayerClass> possibleBotClasses;
     private GADS game;
     private Table gameModeSpecificTable;
     Table normalMenuTable;
@@ -56,6 +61,7 @@ public class GameSettings {
         this.game = gameInstance;
         this.availableMaps = new MapRetriever().listMaps();
         this.availableGameMode = new String[]{"Normal", "Weihnachtsaufgabe"};
+        this.availableBots =  Manager.getPossiblePlayers();
     }
 
     public GameSettings(int gameMode, String mapName, int teamAmount, int teamSize, GADS gameInstance) {
@@ -77,30 +83,7 @@ public class GameSettings {
     /**
      * Wertet die vorgenommenen Einstellungen an den übergebenen Knöpfen aus und speichert diese.
      *
-     * @param modeButton            Auswahl des Spielmodi
-     * @param mapButton             Auswahl der Karte
-     * @param teamButton            Anzahl der Teams
-     * @param characterAmountButton Anzahl der Charaktere pro Team
-     * @param botSelection          Ausgewählte Bots
      */
-    void evaluateButtonSettings(SelectBox<String> modeButton, SelectBox<String> mapButton, Slider teamButton, Slider characterAmountButton, LinkedList<SelectBox<String>> botSelection) {
-        //Todo make mode selection work without getSelectedIndex (use Map)
-        setGameMode(modeButton.getSelected());
-        //spaghetti solution
-
-        //gameMode 1 == Weihnachtsaufgabe
-        if (gameMode == 1) {
-            setMapName(weihnachtsmap);
-            setTeamSize(4);
-            setTeamAmount(1);
-            //ToDo handle Bots
-        } else {
-            setMapName(mapButton.getSelected());
-            //might need to be adjusted,could be that the buttons are switched
-            setTeamSize((int) characterAmountButton.getValue());
-            setTeamAmount((int) teamButton.getValue());
-        }
-    }
 
     void evaluateSettings() {
         String gameModeName = gameModeButton.getSelected();
@@ -116,14 +99,13 @@ public class GameSettings {
 
     }
 
-    private void setSelectedBots(LinkedList<SelectBox<String>> selectedBots) {
-        int amountOfBots = selectedBots.size();
-        this.selectedBotNames = new String[amountOfBots];
-
+    private void setSelectedBots(LinkedList<SelectBox<Manager.NamedPlayerClass>> selectedBotValues) {
+        int amountOfBots = selectedBotValues.size();
+        this.selectedBots =new Class[amountOfBots];
         int i = 0;
-        for (SelectBox<String> selectedBot : selectedBots
+        for (SelectBox<Manager.NamedPlayerClass> selectedBot : selectedBotValues
         ) {
-            selectedBotNames[i] = selectedBot.getSelected();
+            this.selectedBots[i] = selectedBot.getSelected().getClassRef();
             i++;
         }
     }
@@ -174,7 +156,8 @@ public class GameSettings {
     }
 
     private Class[] getPlayers() {
-        return null; //ToDo: return array of players
+
+        return this.selectedBots;
     }
 
     /**
@@ -322,9 +305,9 @@ public class GameSettings {
         return new Slider(min, max, 1, false, skin);
     }
 
-    private SelectBox<String> createBotButton(Skin skin, String[] availableBots) {
+    private SelectBox<Manager.NamedPlayerClass> createBotButton(Skin skin, Manager.NamedPlayerClass[] availableBots) {
 
-        SelectBox<String> botButton = new SelectBox<String>(skin);
+        SelectBox<Manager.NamedPlayerClass> botButton = new SelectBox<>(skin);
         botButton.setItems(availableBots);
         return botButton;
     }
@@ -344,10 +327,10 @@ public class GameSettings {
      * Recreates the botTable. Used for adjusting the amount of Botselections.
      * Not very efficient solution, yey we only have to handle a small number of buttons.
      */
-    void rebuildBotTable(float botAmount, Table botTable, LinkedList<SelectBox<String>> currentBots) {
+    void rebuildBotTable(float botAmount, Table botTable, LinkedList<SelectBox<Manager.NamedPlayerClass>> currentBots) {
         int columns = 3;
-        LinkedList<SelectBox<String>> newBotSelectors = new LinkedList<>();
-        ListIterator<SelectBox<String>> iterator = currentBots.listIterator();
+        LinkedList<SelectBox<Manager.NamedPlayerClass>> newBotSelectors = new LinkedList<>();
+        ListIterator<SelectBox<Manager.NamedPlayerClass>> iterator = currentBots.listIterator();
         botTable.clear();
         for (int i = 0; i < botAmount; i++) {
             //add a new row to the bottable to create another column
@@ -355,11 +338,11 @@ public class GameSettings {
                 botTable.row();
             }
             if (iterator.hasNext()) {
-                SelectBox<String> current = iterator.next();
+                SelectBox<Manager.NamedPlayerClass> current = iterator.next();
                 botTable.add(current).pad(5);
                 newBotSelectors.add(current);
             } else {
-                SelectBox<String> newBotButton = createBotButton(botTable.getSkin(), availableBots);
+                SelectBox<Manager.NamedPlayerClass> newBotButton = createBotButton(botTable.getSkin(), availableBots);
                 botTable.add(newBotButton).pad(5);
                 newBotSelectors.add(newBotButton);
             }
