@@ -38,7 +38,7 @@ public class GameSettings {
     private String mapName = "default";
     private int gameMode = 0;
 
-    private String[] selectedBotNames;
+    private Class<? extends Player>[] selectedBots;
     private String[] availableMaps = {"no Maps loaded"};
     private String[] availableGameMode = {"no Modes loaded"};
     private final String christmasBotName = "Christmas Bot";    //Todo bots aus der einbindung entnehmen, wenn sie erfolgt ist
@@ -75,8 +75,6 @@ public class GameSettings {
         this.availableMaps = new MapRetriever().listMaps();
 
         this.availableGameMode = new String[]{"Weihnachtsaufgabe", "Normal"};
-        //ToDo: Implement Bots
-
 
     }
 
@@ -196,7 +194,8 @@ public class GameSettings {
         botSelectors.clear();
         botSelectors.add(christmasBotSelectorBox);
         for (int i = 0; i < christmasBotAmount; i++) {
-            botSelectors.add(createBotButton(skin, new String[]{christmasBotName}));
+            //forcing other bot selectors, that are hidden from the player to be christmas bots
+            botSelectors.add(createBotButton(skin, Manager.getPossiblePlayers()));
         }
         //add buttons to the table that are meant to be adjusted
 

@@ -11,9 +11,7 @@ import com.gats.simulation.Simulation;
 import jdk.internal.loader.ClassLoaders;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.Constructor;
@@ -24,7 +22,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.*;
 
 public class Manager {
@@ -138,8 +135,8 @@ public class Manager {
         }
     }
 
-    public static List<NamedPlayerClass> getPossiblePlayers(){
-        List<NamedPlayerClass> players = new ArrayList<>();
+    public static NamedPlayerClass[] getPossiblePlayers(){
+        List<NamedPlayerClass> players = new ArrayList<NamedPlayerClass>();
         players.add(new NamedPlayerClass(HumanPlayer.class));
         File botDir = new File("bots");
         if (botDir.exists()){
@@ -159,7 +156,9 @@ public class Manager {
                 throw new RuntimeException(e);
             }
         }
-        return players;
+        NamedPlayerClass[] array = new NamedPlayerClass[players.size()];
+        players.toArray(array);
+        return array;
     }
 
     /**
