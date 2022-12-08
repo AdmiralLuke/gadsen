@@ -184,7 +184,7 @@ public class GameSettings {
         christmasBotSelectorBox = createBotButton(skin, availableBots);
 
 //      christmasMenu.add(createBotButton(skin,availableBots));
-
+        christmasMenu.add(christmasBotSelectorBox);
         this.christmasTable = christmasMenu;
         //Todo BotSelection
 
@@ -372,7 +372,7 @@ public class GameSettings {
         //platziert den Table an der oberen Kante des Bildschirms
         table.top();
         //Spieltitel wird in der ersten Zeile hinzugefügt und hat eine breite von 4 Spalten
-        table.add(new Image(titleImage)).colspan(4);
+        table.add(new Image(titleImage)).colspan(4).pad(20);
 
         //table.row(); erzeugt eine neue Zeile in der Tabelle
         table.row();
@@ -398,7 +398,7 @@ public class GameSettings {
         //ganz unten im Menü ist der Exit button
         table.row();
 
-        table.add(createExitButton(skin)).colspan(4);
+        table.add(createExitButton(skin)).colspan(4).pad(10);
 
         return table;
     }

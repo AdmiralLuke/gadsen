@@ -60,7 +60,7 @@ public class MenuScreen implements Screen {
         Skin skin = new Skin(Gdx.files.internal("core/resources/ui/skin.json"));
 
 
-        Table menuTable = gameSettings.buildMainLayoutTable(skin, new TextureRegion(atlas.findRegion("ui/cat_lowRes")), new TextureRegion(atlas.findRegion("ui/gadsTitleTemporary")));
+        Table menuTable = gameSettings.buildMainLayoutTable(skin, new TextureRegion(atlas.findRegion("ui/cat_lowRes")), new TextureRegion(atlas.findRegion("ui/titleTileset")));
         menu.addActor(menuTable);
         menuTable.setDebug(true); // This is optional, but enables debug lines for tables.
         menuTable.setFillParent(true);
