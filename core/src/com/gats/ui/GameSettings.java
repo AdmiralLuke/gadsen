@@ -105,7 +105,7 @@ public class GameSettings {
         String gameModeName = gameModeButton.getSelected();
         if (gameModeName.equals(christmasGameModeName)) {
             this.gameMode = 1;
-            setChristmasSpecialSettings(new Skin());
+            setChristmasSpecialSettings(christmasTable.getSkin());
         }
         setMapName(mapSelectionBox.getSelected());
         setTeamAmount((int) teamAmountSlider.getValue());
