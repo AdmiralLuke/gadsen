@@ -13,4 +13,6 @@ public class RunConfiguration {
 
     public int teamCount;
     public int teamSize;
+
+    public Class[] players;
 }
