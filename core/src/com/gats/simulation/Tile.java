@@ -147,6 +147,7 @@ public class Tile {
         ArrayList<Tile> lowerList = null;
         ArrayList<Tile> leftList = null;
         state.getBoard()[this.position.x][this.position.y] = null;
+        this.state.getSim().getActionLog().addAction(new TileDestroyAction(this.position));
         if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), 0);
         if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), 1);
         if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), 2);

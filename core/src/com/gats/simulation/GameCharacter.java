@@ -36,6 +36,7 @@ public class GameCharacter {
         this.team = team;
         this.teamPos = teamPos;
         this.sim = sim;
+        this.stamina = 60;
         initInventory();
     }
 
@@ -56,6 +57,8 @@ public class GameCharacter {
     public int getTeamPos() {
         return teamPos;
     }
+
+
 
     /**
      * initialisiert das Inventar mit grundlegenden Waffen
@@ -87,12 +90,24 @@ public class GameCharacter {
         return new Vector2(posX, posY);
     }
 
+    /**
+     * Gibt die Anzahl an Verfügbaren Waffen aus
+     * @return Anzahl verfügbarer Waffen (unabhängig der Munition)
+     */
+    public int getWeaponAmount() {
+        return weapons.length;
+    }
+
     void setPosX(int posX) {
         this.posX = posX;
     }
 
     void setPosY(int posY) {
         this.posY = posY;
+    }
+
+    void resetStamina() {
+        this.stamina = 60;
     }
 
     void fall() {

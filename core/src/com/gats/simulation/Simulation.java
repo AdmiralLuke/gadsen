@@ -58,6 +58,7 @@ public class Simulation {
 
             nextChar = gameState.getTurn().peek();
         }
+        gameState.getCharacterFromTeams((int)nextChar.x, (int)nextChar.y).resetStamina();
         return clearAndReturnActionLog();
     }
 
