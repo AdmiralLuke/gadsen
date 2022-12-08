@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.gats.manager.RunConfiguration;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -172,6 +173,10 @@ public class GameSettings {
         return teamSize;
     }
 
+    private Class[] getPlayers() {
+        return null; //ToDo: return array of players
+    }
+
     /**
      * Erstellt {@link Table} für den Weihnachtsaufgabe modi.
      *
@@ -267,7 +272,7 @@ public class GameSettings {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 evaluateSettings();
-                game.startGame();
+                game.setScreenIngame();
             }
         });
         this.startGameButton = startGameButton;
@@ -403,6 +408,17 @@ public class GameSettings {
         return table;
     }
 
+    public RunConfiguration toRunConfiguration() {
+        RunConfiguration config = new RunConfiguration();
+        config.gameMode = getGameMode();
+        config.mapName = getMapName();
+        config.teamCount = getTeamAmount();
+        config.teamSize = getTeamSize();
+        config.teamSize = getTeamSize();
+        config.players = getPlayers();
+        return config;
+    }
+
     class SliderLabel extends Label {
         Slider sliderInstance;
 
@@ -421,4 +437,6 @@ public class GameSettings {
 
         }
     }
+
+
 }

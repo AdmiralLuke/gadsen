@@ -5,11 +5,26 @@ import com.gats.manager.command.EndTurnCommand;
 import com.gats.simulation.*;
 import com.gats.ui.GameSettings;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import com.gats.simulation.GameCharacterController;
+import com.gats.simulation.GameState;
+import com.gats.simulation.Simulation;
+import jdk.internal.loader.ClassLoaders;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.io.File;
+import java.io.FileFilter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public class Manager {
@@ -91,6 +106,60 @@ public class Manager {
         //Run the Game
         new Thread(this::run).start();
     }
+
+    public static class NamedPlayerClass{
+        private String name;
+        private Class<? extends Player> classRef;
+
+        public NamedPlayerClass(Class<? extends Player> classRef) {
+            try {
+
+                Method method = classRef.getMethod("getName");
+
+                name = (String) method.invoke(null);
+
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Insufficient Privileges for instantiating bots", e);
+            } catch (InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            this.classRef = classRef;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<? extends Player> getClassRef() {
+            return classRef;
+        }
+    }
+
+    public static List<NamedPlayerClass> getPossiblePlayers(){
+        List<NamedPlayerClass> players = new ArrayList<>();
+        players.add(new NamedPlayerClass(TestPlayer.class));
+        File botDir = new File("bots");
+        if (botDir.exists()){
+            try {
+                URL url = botDir.toURI().toURL();
+                URL[] urls = new URL[] {url};
+                ClassLoader loader = new URLClassLoader(urls);
+                for (File botFile: Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))
+                     ) {
+                    try {
+                        players.add(new NamedPlayerClass((Class<? extends Player>) loader.loadClass("bots." + botFile.getName())));
+                    } catch (ClassNotFoundException e) {
+                        System.err.println("Could not find class for " + botFile.getName());
+                    }
+                }
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return players;
+    }
+
     /**
      * @return The state of the underlying simulation
      */

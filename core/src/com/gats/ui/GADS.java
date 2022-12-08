@@ -37,7 +37,7 @@ public class GADS extends Game {
 	int gameMode = 0;
 	@Override
 	public void create() {
-		gameSettings = new GameSettings();
+		gameSettings = new GameSettings(this);
 		//subject to change
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();

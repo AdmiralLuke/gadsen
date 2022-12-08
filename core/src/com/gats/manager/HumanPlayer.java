@@ -71,8 +71,7 @@ public class HumanPlayer extends Player {
     private GameState state;
     private Controller controller;
 
-    @Override
-    protected String getName() {
+    public static String getName() {
         return "";
     }
 
