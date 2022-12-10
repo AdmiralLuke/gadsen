@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
-import java.util.ArrayDeque;
+import java.util.*;
 
 
 /**
@@ -51,24 +51,36 @@ public class GameState {
      */
     GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
-        this.active = true;
-        this.sim = sim;
-        loadMap(mapName);
+        List<IntVector2> spawnpoints = loadMap(mapName);
         this.teamCount = teamCount;
         this.charactersPerTeam = charactersPerTeam;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
+        this.initTeam(spawnpoints);
+        this.active = true;
+        this.sim = sim;
     }
 
     /**
      * spawns player
      */
-    void initTeam() {
-        this.turn = new ArrayDeque<>(this.teams.length * this.teams[0].length);
-        this.teams = spawnCharacter(this.teams.length, this.teams[0].length);
+    void initTeam(List<IntVector2> spawnpoints) {
+        int pointCount = spawnpoints.size();
+        if (pointCount<teamCount * charactersPerTeam)
+            throw new RuntimeException(String.format(
+                    "Requested %d x %d Characters, but the selected map has only %d spawning locations",
+                    teamCount, charactersPerTeam, pointCount));
+        Random rnd = new Random();
+        for (int i = 0; i < teamCount; i++) {
+            for (int j = 0; j < charactersPerTeam; j++) {
+                int index = rnd.nextInt(pointCount--);
+                IntVector2 pos = spawnpoints.remove(index).scl(Tile.tileSize);
+                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, sim);
+            }
+        }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
-        for (int i = 0; i < this.teams.length; i++) {
-            for (int j = 0; j < this.teams[0].length; j++) {
-                turn.push(new Vector2(this.teams[i][j].getTeam(), this.teams[i][j].getTeamPos()));
+        for (int i = 0; i < teamCount; i++) {
+            for (int j = 0; j < charactersPerTeam; j++) {
+                turn.add(new Vector2(this.teams[i][j].getTeam(), this.teams[i][j].getTeamPos()));
             }
         }
     }
@@ -98,7 +110,7 @@ public class GameState {
      * Annahme: Alle Tiles auf der Map sind verankert
      * @param mapName Map im Json Format aus dem Assets Ordner
      */
-    private void loadMap(String mapName) {
+    private List<IntVector2> loadMap(String mapName) {
         JsonReader reader = new JsonReader();
         JsonValue map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
         width = map.get("width").asInt();
@@ -106,6 +118,8 @@ public class GameState {
         board = new Tile[width][height];
 
         JsonValue tileData = map.get("layers").get(0).get("data");
+
+        List<IntVector2> spawnpoints = new LinkedList<>();
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -117,9 +131,12 @@ public class GameState {
                     case 2:
                         board[i][j] = new Tile(i, j, this, true);
                         break;
+                    case 3:
+                        spawnpoints.add(new IntVector2(i,j));
                 }
             }
         }
+        return spawnpoints;
     }
 
     /**
