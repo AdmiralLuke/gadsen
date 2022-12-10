@@ -2,11 +2,14 @@ package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Klasse für einen Linearen-Weg zum Interpolieren in Abhängigkeit der Zeit. Verwendet das {@link Path} Interface
+ */
 public class LinearPath implements Path{
 
     private Vector2 s;
     private Vector2 g;
-    private double endTime;
+    private float endTime;
     // start time = 0
     private Vector2 dir;
 
@@ -16,7 +19,7 @@ public class LinearPath implements Path{
      * @param g Ziel-Vektor
      * @param endTime Dauer des Weges von s nach g
      */
-    public LinearPath(Vector2 s, Vector2 g, double endTime) {
+    public LinearPath(Vector2 s, Vector2 g, float endTime) {
         this.s = s;
         this.g = g;
         this.endTime = endTime;
@@ -29,7 +32,10 @@ public class LinearPath implements Path{
      * @param g Ziel-Vektor
      */
     public LinearPath(Vector2 s, Vector2 g) {
-        new LinearPath(s, g, 0);
+        this.s = s;
+        this.g = g;
+        this.endTime = 0;
+        this.dir = g.cpy().sub(s);
         try {
             endTime = dir.len();
         } catch (NullPointerException e) {
@@ -49,7 +55,7 @@ public class LinearPath implements Path{
         return s.cpy().add(addV);
     }
 
-    public double getEndTime() {
+    public float getEndTime() {
         return endTime;
     }
 

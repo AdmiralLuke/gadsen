@@ -2,21 +2,13 @@ package com.gats.ui;
 
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.simulation.Simulation;
+
+import java.util.LinkedList;
 
 /**
  * GADS ist die verantwortliche Klasse im LifeCycle der Anwendung.
@@ -39,52 +31,13 @@ public class GADS extends Game {
 	//-> necessary for gameState
 
 
-	class Settings{
 
-		int amountTeams = 2;
-		int amountPlayers = 2;
-		String mapName = "default";
-		int gameMode = 0;
-
-		public Settings(){}
-
-		public Settings(int gameMode,String mapName,int amountTeams,int amountPlayers){
-			this.gameMode = gameMode;
-			this.mapName = mapName;
-			this.amountTeams = amountTeams;
-			this.amountPlayers = amountPlayers;
-		}
-
-		void evaluateButtonSettings(SelectBox<String> modeButton, SelectBox<String> mapButton, Slider teamButton, Slider playerButton){
-			setGameMode(modeButton.getSelectedIndex());
-			setMapName(mapButton.getSelected());
-			setAmountPlayers((int) playerButton.getValue());
-			setAmountTeams((int) teamButton.getValue());
-
-		}
-
-		public void setGameMode(int gameMode) {
-			this.gameMode = gameMode;
-		}
-
-		public void setMapName(String mapName) {
-			this.mapName = mapName;
-		}
-
-		public void setAmountTeams(int amountTeams) {
-			this.amountTeams = amountTeams;
-		}
-
-		public void setAmountPlayers(int amountPlayers) {
-			this.amountPlayers = amountPlayers;
-		}
-	}
-	Settings gameSettings;
+	GameSettings gameSettings;
 
 	int gameMode = 0;
 	@Override
 	public void create() {
-		gameSettings = new Settings();
+		gameSettings = new GameSettings(this);
 		//subject to change
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
@@ -108,8 +61,8 @@ public class GADS extends Game {
 
 	public void setScreenIngame() {
 
-		simulation = new Simulation(gameMode, gameSettings.mapName);
-		setScreen(new InGameScreen(this, assetManager));
+		//simulation = new Simulation(gameSettings.getGameMode(), gameSettings.getMapName(),gameSettings.getAmountTeams(),gameSettings.getTeamSize());
+		setScreen(new InGameScreen(this, assetManager, gameSettings));
 		menuScreen.dispose();
 	}
 
@@ -118,18 +71,16 @@ public class GADS extends Game {
 		setScreen(menuScreen);
 	}
 
-	public Array<String> getMaps(){
-		String[] maps = {"no Maps Loaded"};
-		//ToDo: get list of maps from directory? or another place and return it here
-		return new Array<String>(maps);
+	public String[] getMaps(){
+		return new MapRetriever().listMaps();
 
 
 	}
 
-	public Array<String> getBots(){
-		String[] bots = {"no BotsLoaded"};
+	public String[] getBots(){
+		String[] bots = {"Human","testerino","MIO","IsThisTheCrustyCrab?","NOOOTHISISPATRICK"};
 		//ToDo: implement the selection correctly, when Bots are implemente
 
-		return new Array<String>(bots);
+		return bots;
 	}
 }

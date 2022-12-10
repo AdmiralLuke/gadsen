@@ -1,5 +1,7 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * Provides an access-controlled interface to send commands to players
  *
@@ -9,7 +11,6 @@ package com.gats.simulation;
 public class GameCharacterController {
     private GameCharacter gameCharacter;
     private GameState state;
-    private boolean valid = true;
 
     protected GameCharacterController(GameCharacter gameCharacter, GameState state) {
         this.gameCharacter = gameCharacter;
@@ -24,25 +25,23 @@ public class GameCharacterController {
     }
 
     /**
-     * Veranlasst den Charakter unter aufwendung von Stamina einen Schritt nach Links zu tätigen
+     * Veranlasst den Charakter unter Aufwendung von Stamina einen dx Schritt zu tätigen.
+     * Positive Werte bewegen den Charakter nach rechts, Negative nach links.
      */
-    public void moveLeft() {
-        if (valid) gameCharacter.moveLeft(state);
+    public void move(int dx) {
+        gameCharacter.move(dx);
     }
 
-
-    /**
-     * Veranlasst den Charakter unter aufwendung von Stamina einen Schritt nach Rechts zu tätigen
-     */
-    public void moveRight() {
-        if (valid) gameCharacter.moveLeft(state);
+    public void aim(Vector2 angle, float strength) {
+        //Todo use aim
     }
 
-    /**
-     * Used to Invalidate this controller.
-     * Ein Aufruf deaktiviert diesen Controller permanent.
-     */
-    public void invalidate(){
-        valid = false;
+    public void selectWeapon(WeaponType type) {
+        //Todo use select
     }
+
+    public void shoot() {
+        //Todo use shoot
+    }
+
 }

@@ -122,3 +122,6 @@ Thumbs.db
 /pipeline/src/test/tmp/
 /util/src/test/tmp/
 /util/build/
+
+### Exclude tiled tmp files
+*.tiled-session

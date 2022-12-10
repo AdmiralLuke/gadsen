@@ -1,7 +1,10 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+
+import java.util.ArrayDeque;
 
 
 /**
@@ -19,7 +22,7 @@ public class GameState {
     private int width;
     private int height;
     private static final int GAME_MODE_NORMAL = 0;
-
+    private static final int GAME_MODE_CHRISTMAS = 1;
 
     private int gameMode = GAME_MODE_NORMAL;
 
@@ -30,37 +33,71 @@ public class GameState {
 
     private int teamCount;
     private int charactersPerTeam;
+    private ArrayDeque<Vector2> turn = new ArrayDeque<>();
+    private boolean active;
+    private Simulation sim;
 
-
-    GameState(int gameMode, String mapName) {
-        this.gameMode = gameMode;
-        this.teamCount = 2;
-        this.charactersPerTeam = 1;
-        loadMap(mapName);
-        this.teams = new GameCharacter[teamCount][charactersPerTeam];
-        this.initTeam();
+    GameState(int gameMode, String mapName, Simulation sim) {
+        new GameState(gameMode, mapName, 2, 1, sim);
     }
 
-    GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam) {
+    /**
+     * Erstellt einen GameState
+     * @param gameMode
+     * @param mapName
+     * @param teamCount
+     * @param charactersPerTeam
+     * @param sim
+     */
+    GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
+        this.active = true;
+        this.sim = sim;
         loadMap(mapName);
         this.teamCount = teamCount;
         this.charactersPerTeam = charactersPerTeam;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
-        this.initTeam();
     }
 
     /**
      * spawns player
      */
     void initTeam() {
+        this.turn = new ArrayDeque<>(this.teams.length * this.teams[0].length);
+        this.teams = spawnCharacter(this.teams.length, this.teams[0].length);
+        // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
         for (int i = 0; i < this.teams.length; i++) {
             for (int j = 0; j < this.teams[0].length; j++) {
-                this.teams[i][j] = new GameCharacter(i, j, this);
+                turn.push(new Vector2(this.teams[i][j].getTeam(), this.teams[i][j].getTeamPos()));
             }
         }
     }
 
+    protected boolean isActive() {
+        return active;
+    }
+
+    protected void setActive(boolean active) {
+        this.active = active;
+    }
+
+    protected ArrayDeque<Vector2> getTurn() {
+        return turn;
+    }
+
+    protected Simulation getSim() {
+        return sim;
+    }
+
+    protected GameCharacter[][] getTeams() {
+        return teams;
+    }
+
+    /**
+     * Lädt eine Map aus dem Assets Ordner
+     * Annahme: Alle Tiles auf der Map sind verankert
+     * @param mapName Map im Json Format aus dem Assets Ordner
+     */
     private void loadMap(String mapName) {
         JsonReader reader = new JsonReader();
         JsonValue map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
@@ -120,7 +157,7 @@ public class GameState {
      * @return Kopie eines Tiles an einer bestimmten Stelle
      */
     public Tile getTile(int x, int y) {
-        if (x < 0 || y < 0 || x > 249 || y > 249) return null;
+        if (x < 0 || y < 0 || x > getBoardSizeX() || y > getBoardSizeY()) return null;
         return board[x][y];
     }
 
@@ -138,16 +175,22 @@ public class GameState {
         return board.length == 0 ? 0 : board[0].length;
     }
 
+    /**
+     * Spawnt Spieler an zufälligen Positionen
+     * @param amountTeams Anzahl an Teams
+     * @param amountPlayers Anzahl Spieler pro Team
+     * @return Team Array
+     */
     GameCharacter[][] spawnCharacter(int amountTeams, int amountPlayers) {
         GameCharacter[][] characters = new GameCharacter[amountTeams][amountPlayers];
         for (int i = 0; i < amountTeams; i++) {
             for (int j = 0; j < amountPlayers; j++) {
-                int randX = (int)(Math.random() * 250);
-                int randY = (int)(Math.random() * 250);
+                int randX = (int)(Math.random() * getBoardSizeX());
+                int randY = (int)(Math.random() * getBoardSizeY());
                 if (getTile(randX, randY) != null) {
                     j--;
                 } else {
-                    characters[i][j] = new GameCharacter(randX, randY, this);
+                    characters[i][j] = new GameCharacter(randX, randY, this, i, j, sim);
                 }
             }
         }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
  * Das genaue Verhalten insbesondere von Spezialboxen, wie z.B. Waffendrops wird durch erbende Klassen realisiert.
  */
 public class Tile {
+    protected static final IntVector2 tileSize = new IntVector2(16, 16);
 
     // Box als Ankerpunkt
 
@@ -19,7 +20,8 @@ public class Tile {
     // Haltbarkeit der Box
     private int health = 250;
 
-    private Vector2 position;
+    private IntVector2 position;
+    private GameState state;
 
     Tile right;
     Tile up;
@@ -31,8 +33,12 @@ public class Tile {
         return isAnchor? 1 : 0;
     }
 
-    public Vector2 getPosition() {
+    public IntVector2 getPosition() {
         return this.position;
+    }
+
+    public Vector2 getFloatPosition() {
+        return this.position.toFloat();
     }
 
 
@@ -61,10 +67,11 @@ public class Tile {
     Tile(int x, int y, boolean isAnchor, GameState state) {
         this.isAnchor = isAnchor;
         this.isAnchored = isAnchor || checkIfAnchored(x, y, state);
-        this.position = new Vector2(x, y);
+        this.position = new IntVector2(x, y);
+        this.state = state;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
-            sortIntoTree(state);
+            sortIntoTree();
         } else {
             // Die Garbage Collection wird das schon löschen
             state.getBoard()[x][y] = null;
@@ -73,21 +80,20 @@ public class Tile {
 
     /**
      * fügt eine Tile in die Graphenstruktur aus Tiles an
-     * @param state aktueller GameState
      */
-    void sortIntoTree(GameState state) {
+    void sortIntoTree() {
 
         if (this.position.x > 0) {
-            this.left = getTileAtPosition((int)position.x - 1, (int)position.y, state);
+            this.left = getTileAtPosition(position.x - 1, position.y, state);
         }
         if (this.position.y > 0) {
-            this.down = getTileAtPosition((int)position.x, (int)position.y - 1, state);
+            this.down = getTileAtPosition(position.x, position.y - 1, state);
         }
         if (this.position.x < state.getBoardSizeY()) {
-            this.right = getTileAtPosition((int)position.x + 1, (int)position.y, state);
+            this.right = getTileAtPosition(position.x + 1, position.y, state);
         }
         if (this.position.y < state.getBoardSizeY()) {
-            this.up = getTileAtPosition((int)position.x, (int)position.y + 1, state);
+            this.up = getTileAtPosition(position.x, position.y + 1, state);
         }
 
         if (this.left != null) { this.left.right = this; }
@@ -116,7 +122,6 @@ public class Tile {
      * x = kann angehangen werden
      */
     private boolean checkIfAnchored(int x, int y, GameState state) {
-        Tile[][] board = state.getBoard();
         boolean isAnchor = false;
         if (x > 0) {
             isAnchor = state.getTile(x - 1,y) != null || state.getTile(x + 1,y) != null;
@@ -135,51 +140,63 @@ public class Tile {
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
      * oder auf anderer Box landet
      */
-    ActionLog onDestroy(GameState state) {
+    void onDestroy() {
+        this.state.getSim().getActionLog().goToNextAction();
         ArrayList<Tile> rightList = null;
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;
         ArrayList<Tile> leftList = null;
-        state.getBoard()[(int)this.position.x][(int)this.position.y] = null;
+        state.getBoard()[this.position.x][this.position.y] = null;
+        this.state.getSim().getActionLog().addAction(new TileDestroyAction(this.position));
         if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), 0);
         if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), 1);
         if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), 2);
         if (hasLeft()) leftList = left.convertGraphToList(new ArrayList<Tile>(), 3);
 
-        ActionLog log = new ActionLog();
-        if (rightList != null) log.addActions(checkForAnchor(rightList, state));
-        if (leftList != null) log.addActions(checkForAnchor(leftList, state));
-        if (upperList != null) log.addActions(checkForAnchor(upperList, state));
-        if (lowerList != null) log.addActions(checkForAnchor(lowerList, state));
 
-        return log;
+        if (rightList != null) checkForAnchor(rightList);
+        if (leftList != null) checkForAnchor(leftList);
+        if (upperList != null) checkForAnchor(upperList);
+        if (lowerList != null) checkForAnchor(lowerList);
     }
 
-    ActionLog checkForAnchor(ArrayList<Tile> list, GameState state) {
-        ActionLog log = new ActionLog();
+    void checkForAnchor(ArrayList<Tile> list) {
         for (Tile tile : list) {
             if (tile.isAnchor) {
-                return null;
+                return;
             }
         }
         for (Tile tile : list) {
-            state.getBoard()[(int)tile.position.x][(int)tile.position.y] = null;
-            log.addActions(tile.destroyTile(state));
-            tile = null;
+            state.getBoard()[tile.position.x][tile.position.y] = null;
+            tile.destroyTile();
         }
         list.clear();
-        return log;
     }
 
-    ActionLog destroyTile(GameState state) {
-        ActionLog actionLog = new ActionLog();
-        Vector2 pos = this.position;
-        while (getTileAtPosition((int)pos.x, (int)pos.y, state) == null && pos.y > 0) {
-            pos = pos.add(0, -1);
-            actionLog.addAction(new TileMoveAction(pos.cpy().add(0,1),pos, this));
+    void destroyTile() {
+        IntVector2 posBef = this.position.cpy();
+        while (getTileAtPosition(this.position.x, this.position.y, state) == null && this.position.y > 0) {
+            this.position.add(0, -1);
+            for (GameCharacter[] characters : state.getTeams()) {
+                for (GameCharacter character : characters) {
+                    if (character.getPlayerPos().x == this.position.x && character.getPlayerPos().y == this.position.y) {
+                        LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()));
+                        int tmpHealth = character.getHealth();
+                        character.setHealth(tmpHealth - ((int)path.getEndTime() * 5));
+                        Action tmpAction = new TileMoveAction(posBef, this.position, 2000);
+                        Action tmpDestAction = new TileDestroyAction(this.getPosition());
+                        tmpDestAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), tmpHealth, character.getHealth()));
+                        return;
+                    }
+                }
+            }
         }
-        actionLog.addAction(new TileDestroyAction(this));
-        return actionLog;
+        float duration = 2000;
+        Action tmpAction = new TileMoveAction(posBef, this.position, duration);
+        Action tmpDestAction = new TileDestroyAction(this.getPosition());
+        tmpAction.addChild(tmpDestAction);
+
+        this.state.getSim().getActionLog().addAction(tmpAction);
     }
 
     /**
@@ -194,7 +211,6 @@ public class Tile {
      */
     public ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, int direction) {
         tiles.add(this);
-        int size = tiles.size();
         if (this.hasUp() && !(direction == 2)) {
             up.convertGraphToList(tiles, 1);
         }
@@ -207,7 +223,6 @@ public class Tile {
         if (this.hasRight() && !(direction == 3)) {
             right.convertGraphToList(tiles, 0);
         }
-
         return tiles;
     }
 
@@ -231,10 +246,7 @@ public class Tile {
     }
 
     /**
-     * nur aus Testzwecken
-     * ToDo: entfernen
-     *
-     * @return neuen Clon
+     * @return neuen Clon einer Tile
      */
     public Tile returnClone() {
         try {

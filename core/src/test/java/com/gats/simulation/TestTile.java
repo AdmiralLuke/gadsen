@@ -9,11 +9,12 @@ import org.junit.Test;
 public class TestTile {
 
     private GameState state;
+    private Simulation sim;
 
     @Before
     public void init() {
-        // Frischen GameState
-        state = new GameState(0, "map1");
+        sim = new Simulation(0, "map1", 2, 1);
+        state = sim.getState();
         clearMap();
     }
 
@@ -74,12 +75,13 @@ public class TestTile {
     @Test
     public void testIfDestroyed() {
         clearMap();
+        state.getCharacterFromTeams(0, 0).move(3);
         Tile testTile = new Tile(10, 10, true, state);
         for (int i = 0; i < 9; i++) {
             Tile tmpTile = new Tile(10 - i, 9, state);
             tmpTile = new Tile(10, 9-i, state);
         }
-        testTile.onDestroy(state);
+        testTile.onDestroy();
         for (int i = 0; i < state.getBoardSizeX(); i++) {
             for (int j = 0; j < state.getBoardSizeY(); j++) {
                 Assert.assertNull("Alle Objekte in Map sollten null sein", state.getTile(i, j));

@@ -2,26 +2,26 @@ package com.gats.ui;
 
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
-import com.gats.simulation.GameState;
+import com.gats.manager.AnimationLogProcessor;
+import com.gats.manager.HumanPlayer;
+import com.gats.manager.Manager;
+import com.gats.manager.RunConfiguration;
+import com.gats.simulation.ActionLog;
 
-import static com.badlogic.gdx.Input.Keys;
+import java.util.List;
 
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
  */
-public class InGameScreen implements Screen {
+public class InGameScreen implements Screen, AnimationLogProcessor {
 
+    private final Manager manager;
+    private final List<HumanPlayer> humanList;
     private Viewport gameViewport;
     private Viewport hudViewport;
 
@@ -29,14 +29,14 @@ public class InGameScreen implements Screen {
     private float worldHeight = 80*12;
 
     //should HUD be handled by GADS
-    private Stage hudStage;
+    private HudStage hudStage;
     private Animator animator;
     private final GADS gameManager;
     private final GADSAssetManager assetManager;
     // adjust pipeline, so it provides a different directory for ingame assets
     // and menu assets? or we code importing into AssetManager?
     private TextureAtlas ingameAtlas;
-    public InGameScreen(GADS instance, GADSAssetManager aM){
+    public InGameScreen(GADS instance, GADSAssetManager aM, GameSettings gameSettings){
 
         gameManager = instance;
         assetManager = aM;
@@ -44,10 +44,19 @@ public class InGameScreen implements Screen {
         ingameAtlas = assetManager.getAtlas();
         gameViewport = new FillViewport(worldWidth,worldHeight);
         hudViewport = new FitViewport(worldWidth,worldHeight);
-        animator = new Animator(gameManager.simulation.getState(), gameViewport, ingameAtlas);
+
 
         hudStage = new HudStage(hudViewport,this, assetManager);
         setupInput();
+
+        RunConfiguration runConfiguration = gameSettings.toRunConfiguration();
+        runConfiguration.gui = true;
+        runConfiguration.animationLogProcessor = this;
+        manager = new Manager(runConfiguration);
+        animator = new Animator(manager.getState(), gameViewport, ingameAtlas);
+        manager.start();
+
+        humanList = manager.getHumanList();
 
     }
 
@@ -65,7 +74,15 @@ public class InGameScreen implements Screen {
         //animator.animate(gameManager.simulation.getActionLog());
     }
 
-    @Override
+    /**
+     * Forwards the ActionLog to the Animator for processing
+     *
+     * @param log Queue of all {@link com.gats.simulation.Action animation-related Actions}
+     */
+    public void animate(ActionLog log) {animator.animate(log);}
+
+
+        @Override
     public void resize(int width, int height) {
         animator.resize(width, height);
         hudStage.getViewport().update(width, height);
@@ -98,7 +115,7 @@ public class InGameScreen implements Screen {
         //animator als actor?
          //       simulation als actor?
         Gdx.input.setInputProcessor(hudStage);
-
+        hudStage.setHumanPlayers(humanList);
 
     }
 
@@ -106,4 +123,5 @@ public class InGameScreen implements Screen {
     public void setCameraDir(float[] dir){
         animator.setCameraDir(dir);
     }
+
 }
