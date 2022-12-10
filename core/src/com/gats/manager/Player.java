@@ -15,7 +15,7 @@ public abstract class Player {
     /**
      * @return Der (Anzeige-) Name des Spielers
      */
-    public static String getName() {
+    public String getName() {
         throw new NotImplementedException();
     }
 

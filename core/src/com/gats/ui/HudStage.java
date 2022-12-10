@@ -81,20 +81,28 @@ public class HudStage extends Stage {
             case cameraRight:
                 directions[0] += 1;
                 break;
+            default:
+                if (turnInProgress && currentPlayer != null) {
+                    currentPlayer.processKeyDown(keycode);
+                }
+                break;
         }
         ingameScreen.setCameraDir(directions);
 
-        if (turnInProgress && currentPlayer != null) {
-            for (HumanPlayer cur : humanList
-            ) {
-                cur.processKeyDown(keycode);
-            }
-        }
 
 
         return true;
 
 
+    }
+
+    public void activateTurn(HumanPlayer humanPlayer){
+        currentPlayer = humanPlayer;
+        turnInProgress = true;
+    }
+
+    public void endTurn(){
+        turnInProgress = false;
     }
 
     /**
@@ -120,15 +128,14 @@ public class HudStage extends Stage {
             case Keys.RIGHT:
                 directions[0] -= 1;
                 break;
+            default:
+                if (turnInProgress && currentPlayer != null) {
+                    currentPlayer.processKeyUp(keycode);
+                }
+                break;
         }
         ingameScreen.setCameraDir(directions);
 
-        if (turnInProgress && currentPlayer != null) {
-            for (HumanPlayer cur : humanList
-            ) {
-                cur.processKeyUp(keycode);
-            }
-        }
         return true;
     }
 

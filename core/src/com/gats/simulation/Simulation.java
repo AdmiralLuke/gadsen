@@ -17,7 +17,6 @@ public class Simulation {
     //hud stage übergeben für die inputs?
     public Simulation(int gameMode,String mapName, int teamAm, int teamSize){
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
-        gameState.initTeam();
         Vector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction((int)turnChar.x,(int)turnChar.y,0));

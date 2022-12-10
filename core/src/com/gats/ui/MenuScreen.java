@@ -67,7 +67,8 @@ private SpriteBatch menuBatch;
         menu.addActor(menuTable);
         menuTable.setDebug(false); // This is optional, but enables debug lines for tables.
         menuTable.setFillParent(true);
-       this.background = atlas.findRegion("tile/GADSBG");
+       this.background = atlas.findRegion("background/WeihnachtsBG");
+       int i = 1;
     }
 
 
@@ -75,7 +76,7 @@ private SpriteBatch menuBatch;
     public void render(float delta) {
         camera.update();
         menuBatch.begin();
-        this.menuBatch.draw(background,0,0,background.getRegionWidth()*4,background.getRegionHeight()*4);
+        this.menuBatch.draw(background,0,0,background.getRegionWidth()*2,background.getRegionHeight()*2);
 
         menuBatch.end();
         mainMenu.act(delta);

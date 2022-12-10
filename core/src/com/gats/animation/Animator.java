@@ -51,6 +51,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private EntityGroup root;
 
     private TileMap map;
+    private LinkedBlockingQueue<Object> waitingForCompletion = new LinkedBlockingQueue<>();
 
     private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
@@ -63,6 +64,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private List<Action> actionList = new LinkedList<>();
 
     private Map<Class<?>, ActionConverter> actionConverters = ActionConverters.map;
+    private EntityGroup characterGroup;
 
     interface ActionConverter {
         public ExpandedAction apply(com.gats.simulation.Action simAction, Animator animator);
@@ -113,6 +115,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(ProjectileAction.class, ActionConverters::convertProjectileMoveAction);
                         put(TileMoveAction.class, ActionConverters::convertTileMoveAction);
                         put(TileDestroyAction.class, ActionConverters::convertTileDestroyAction);
+                        put(CharacterFallAction.class, ActionConverters::convertCharacterFallAction);
                     }
                 };
 
@@ -143,6 +146,14 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.Action action, Animator animator) {
             CharacterMoveAction moveAction = (CharacterMoveAction) action;
+            Entity target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+
+            return new ExpandedAction(new MoveAction(action.getDelay(), target, moveAction.getDuration(), moveAction.getPath()));
+        }
+
+        private static ExpandedAction convertCharacterFallAction(com.gats.simulation.Action action, Animator animator) {
+            CharacterFallAction moveAction = (CharacterFallAction) action;
+            //ToDo insert Fall animation
             Entity target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
 
             return new ExpandedAction(new MoveAction(action.getDelay(), target, moveAction.getDuration(), moveAction.getPath()));
@@ -273,14 +284,16 @@ public class Animator implements Screen, AnimationLogProcessor {
         Animation<TextureRegion> idleAnimation = new Animation<TextureRegion>(0.5f,
                 textureAtlas.findRegions("tile/coolCat"));
 
-
+        characterGroup = new EntityGroup();
+        characterGroup.setRelPos(new Vector2(45 * 12, 45 * 12));
+        root.add(characterGroup);
         for (int curTeam = 0; curTeam < teamCount; curTeam++)
             for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                 com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                 GameCharacter animGameCharacter = new GameCharacter(idleAnimation);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
-                root.add(animGameCharacter);
+                characterGroup.add(animGameCharacter);
             }
 
     }
@@ -342,8 +355,11 @@ public class Animator implements Screen, AnimationLogProcessor {
         if (actionList.isEmpty()){
             if(!pendingLogs.isEmpty()){
                 actionList.add(convertAction(pendingLogs.poll().getRootAction()));
+            }else{
+                waitingForCompletion.forEach(Object::notify);
             }
         }
+
 
         ListIterator<Action> iter = actionList.listIterator();
         Stack<Remainder> remainders = new Stack<>();
@@ -456,5 +472,8 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     }
 
-
+    @Override
+    public void notifyWhenComplete(Object toNotify) {
+        waitingForCompletion.add(toNotify);
+    }
 }

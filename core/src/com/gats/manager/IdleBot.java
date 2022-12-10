@@ -15,7 +15,7 @@ public class IdleBot extends Bot{
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "Idle";
     }
 
@@ -25,7 +25,8 @@ public class IdleBot extends Bot{
     }
 
     @Override
-    protected void executeTurn(GameState state, GameCharacterController characterController) {
+    protected void executeTurn(GameState state, Controller controller) {
 
     }
+
 }

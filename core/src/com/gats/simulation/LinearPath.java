@@ -50,6 +50,7 @@ public class LinearPath implements Path{
      */
     @Override
     public Vector2 getPos(double t) {
+        if (endTime == 0) return g.cpy();
         double step = t / endTime;
         Vector2 addV = new Vector2((float)(dir.x *  step), (float)(dir.y *  step));
         return s.cpy().add(addV);

@@ -137,12 +137,14 @@ public class GameCharacter {
      * @param dx Anzahl Schritte in x Richtung
      */
     void move(int dx) {
+        System.out.println("moving "+ dx);
         if (dx == 0) {
             return;
         }
         Vector2 bef = new Vector2(posX, posY);
         // this.posX += this.posX + dx >= 0 ? (this.posX + dx < state.getBoardSizeX() ? dx : state.getBoardSizeX() - 1 - this.posX) : -this.posX;
 
+        System.out.println("moved from "+ bef);
         if (this.posX + dx < 0) {
             dx = -posX;
         }
@@ -159,6 +161,8 @@ public class GameCharacter {
                     }
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
+
+                    System.out.println("moved to "+ posAf);
                     this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
                     this.fall();
                     return;
@@ -179,6 +183,7 @@ public class GameCharacter {
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
 
+                    System.out.println("moved to "+ posAf);
                     this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
                     this.fall();
                     return;
@@ -195,6 +200,7 @@ public class GameCharacter {
         this.posX += dx;
         Vector2 posAf = new Vector2(posX, posY);
 
+        System.out.println("moved to "+ posAf);
         this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 10));
     }
 

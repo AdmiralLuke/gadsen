@@ -1,5 +1,7 @@
 package com.gats.manager;
 
+import com.gats.ui.HudStage;
+
 import java.util.ArrayList;
 
 public class RunConfiguration {
@@ -8,8 +10,10 @@ public class RunConfiguration {
 
     public boolean gui = false;
 
-    public AnimationLogProcessor animationLogProcessor = (log) -> {
-    };
+    public AnimationLogProcessor animationLogProcessor = null;
+
+    //Generalize to Interface
+    public HudStage hud = null;
 
     public String mapName;
 
