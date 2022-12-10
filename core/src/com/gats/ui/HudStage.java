@@ -6,11 +6,19 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.animation.Animator;
+import com.gats.manager.HumanPlayer;
+import com.gats.simulation.CharacterMoveAction;
+import com.gats.simulation.GameCharacter;
+import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.Simulation;
 import org.junit.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HudStage extends Stage {
 
@@ -20,6 +28,18 @@ public class HudStage extends Stage {
     GADSAssetManager assetManager;
 
     InGameScreen ingameScreen;
+    Simulation gameSimulation;
+    final int cameraUp = Keys.UP;
+    final int cameraDown = Keys.DOWN;
+    final int cameraLeft = Keys.LEFT;
+    final int cameraRight = Keys.RIGHT;
+
+    private HumanPlayer currentPlayer;
+
+    private boolean turnInProgress = false;
+    private List<HumanPlayer> humanList = new ArrayList<>();
+
+
     public HudStage(Viewport hudViewport, InGameScreen ingameScreen, GADSAssetManager assetManager) {
         super(hudViewport);
         this.ingameScreen = ingameScreen;
@@ -29,43 +49,65 @@ public class HudStage extends Stage {
     }
 
 
-    int left, right, up, down;
     //used for storing arrow key input -> for now used for camera
     //first index for x Axis, second for y
     //length 3 because the cameraposition is 3d
     float[] directions = new float[3];
 
+
     /**
-     * Called whenever a button stops being pressed.
+     * Called whenever a button is just pressed.
      * For now it handles input from the Arrow Keys, used for the camera Movement.
      * This is done by storing the direction in {@link HudStage#directions}.
+     *
      * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
      * @return was the input handled
      */
-    @Override public boolean keyDown(int keycode){
 
+    @Override
+    public boolean keyDown(int keycode) {
 
-        switch (keycode){
-            case Keys.UP:
-                directions[1] +=  1;
+        //input handling for the camera
+        switch (keycode) {
+            case cameraUp:
+                directions[1] += 1;
                 break;
-            case Keys.DOWN:
+            case cameraDown:
                 directions[1] -= 1;
                 break;
-            case Keys.LEFT:
+            case cameraLeft:
                 directions[0] -= 1;
                 break;
-            case Keys.RIGHT:
+            case cameraRight:
                 directions[0] += 1;
                 break;
         }
         ingameScreen.setCameraDir(directions);
+
+        if (turnInProgress && currentPlayer != null) {
+            for (HumanPlayer cur : humanList
+            ) {
+                cur.processKeyDown(keycode);
+            }
+        }
+
+
         return true;
+
+
     }
 
-    @Override public boolean keyUp(int keycode){
+    /**
+     * Called whenever a button stops getting pressed/is lifted up.
+     * Resets the values to some Keypresses, changed in {@link HudStage#keyDown(int)}
+     *
+     * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
+     * @return
+     */
+    @Override
+    public boolean keyUp(int keycode) {
 
-switch (keycode){
+        switch (keycode) {
             case Keys.UP:
                 directions[1] -= 1;
                 break;
@@ -80,11 +122,27 @@ switch (keycode){
                 break;
         }
         ingameScreen.setCameraDir(directions);
+
+        if (turnInProgress && currentPlayer != null) {
+            for (HumanPlayer cur : humanList
+            ) {
+                cur.processKeyUp(keycode);
+            }
+        }
         return true;
     }
 
     @Override
     public void draw() {
         super.draw();
+    }
+
+
+    void setCurrentPlayer(HumanPlayer currentHumanPlayer) {
+        this.currentPlayer = currentHumanPlayer;
+    }
+
+    public void setHumanPlayers(List<HumanPlayer> humanList) {
+        this.humanList = humanList;
     }
 }

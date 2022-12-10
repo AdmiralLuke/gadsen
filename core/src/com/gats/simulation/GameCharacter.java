@@ -1,6 +1,4 @@
 package com.gats.simulation;
-import com.badlogic.gdx.Game;
-import com.gats.simulation.ActionLog;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -37,20 +35,11 @@ public class GameCharacter {
         this.state = state;
         this.team = team;
         this.teamPos = teamPos;
-        this.state = state;
         this.sim = sim;
+        this.stamina = 60;
+        initInventory();
     }
 
-    /**
-     * spawnt Charakter an einer bestimmten Position
-     * @param x X-Koordinate
-     * @param y Y-Koordinate
-     */
-    GameCharacter(int x, int y, GameState state) {
-        this.posX = x;
-        this.posY = y;
-        this.state = state;
-    }
 
     /**
      * Gibt die Lebensanzahl eines Spielers zurück (maximal 100)
@@ -69,14 +58,16 @@ public class GameCharacter {
         return teamPos;
     }
 
+
+
     /**
      * initialisiert das Inventar mit grundlegenden Waffen
      * @Weihnachtsaufgabe Initilisiert mit Keks und Zuckerstange (jeweils 50 Schuss)
      */
     protected void initInventory() {
-        weapons = new Weapon[2];
-        weapons[0] = new ChristmasWeapon(10, 40, 50, false, Weapon.Type.LONG_RANGE, this.sim, ChristmasWeapon.ChristmasWeaponType.COOKIE, this);
-        weapons[1] = new ChristmasWeapon(20, 40, 50, false, Weapon.Type.LONG_RANGE, this.sim, ChristmasWeapon.ChristmasWeaponType.SUGAR_CANE, this);
+        this.weapons = new Weapon[2];
+        weapons[0] = new ChristmasWeapon(10, 40, 50, false, WeaponType.COOKIE,this.sim, this);
+        weapons[1] = new ChristmasWeapon(20, 40, 50, false, WeaponType.SUGAR_CANE, this.sim, this);
     }
 
     /**
@@ -87,7 +78,7 @@ public class GameCharacter {
     public Weapon getWeapon(int n) {
         ChristmasWeapon wp =  (ChristmasWeapon)weapons[n];
         this.sim.getActionLog().goToNextAction();
-        this.sim.getActionLog().addAction(new CharacterSwitchWeaponAction(this.team, this.teamPos, wp.getChrType()));
+        this.sim.getActionLog().addAction(new CharacterSwitchWeaponAction(this.team, this.teamPos, wp.getType()));
         return wp;
     }
 
@@ -99,7 +90,46 @@ public class GameCharacter {
         return new Vector2(posX, posY);
     }
 
+    /**
+     * Gibt die Anzahl an Verfügbaren Waffen aus
+     * @return Anzahl verfügbarer Waffen (unabhängig der Munition)
+     */
+    public int getWeaponAmount() {
+        return weapons.length;
+    }
 
+    void setPosX(int posX) {
+        this.posX = posX;
+    }
+
+    void setPosY(int posY) {
+        this.posY = posY;
+    }
+
+    void resetStamina() {
+        this.stamina = 60;
+    }
+
+    void fall() {
+        Vector2 posBef = this.getPlayerPos().cpy();
+        int fallen = 0;
+        while (this.posY > 0 && this.state.getTile(posX, posY - 1) == null) {
+            this.posY -= 1;
+            fallen++;
+        }
+        int health = this.getHealth();
+        if (this.posY == 0) {
+            this.setHealth(0);
+        } else {
+            this.setHealth(fallen * 5);
+        }
+        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 10));
+        this.sim.getActionLog().goToNextAction();
+        this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
+        if (this.getHealth() == 0) {
+            sim.endTurn();
+        }
+    }
 
     /**
      * bewegt den Charakter in eine bestimmte Richtung
@@ -121,16 +151,39 @@ public class GameCharacter {
         }
 
         if (dx < 0) {
-            for (int i = 0; i > dx; i--) {
-                if (state.getTile(posX + i, posY) != null) {
+            for (int i = 0; i >= dx; i--) {
+                if (state.getTile(posX + i , posY - 1) == null) {
+                    dx = i;
+                    if (this.stamina < abs(dx)) {
+                        dx = dx > 0 ? stamina : -stamina;
+                    }
+                    this.posX += dx;
+                    Vector2 posAf = new Vector2(posX, posY);
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
+                    this.fall();
+                    return;
+                }
+                if (state.getTile(posX + i + 1, posY) != null) {
                     dx = i;
                     break;
                 }
             }
 
         } else {
-            for (int i = 0; i < dx; i++) {
-                if (state.getTile(posX + i, posY) != null) {
+            for (int i = 0; i <= dx; i++) {
+                if (state.getTile(posX + i, posY - 1) == null) {
+                    dx = i;
+                    if (this.stamina < abs(dx)) {
+                        dx = dx > 0 ? stamina : -stamina;
+                    }
+                    this.posX += dx;
+                    Vector2 posAf = new Vector2(posX, posY);
+
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
+                    this.fall();
+                    return;
+                }
+                if (state.getTile(posX + i + 1, posY) != null) {
                     dx = i;
                     break;
                 }
@@ -160,7 +213,9 @@ public class GameCharacter {
      * verbraucht Stamina
      */
     protected void moveDX(int dx) {
-        this.sim.getActionLog().goToNextAction();
+        if (this.sim.getActionLog().getRootAction() != this.sim.getActionLog().lastAddedAction) {
+            this.sim.getActionLog().goToNextAction();
+        }
         move(dx);
     }
 

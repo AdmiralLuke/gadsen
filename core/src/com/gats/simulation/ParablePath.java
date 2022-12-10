@@ -7,13 +7,20 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class ParablePath implements Path {
 
-    public ParablePath() {
-        // ToDo
+    private final Vector2 s;
+    private final static double g = 9.81;
+    private final Vector2 v;
+
+    public ParablePath(Vector2 s, Vector2 v) {
+        this.s = s;
+        this.v = v;
     }
 
     @Override
     public Vector2 getPos(double t) {
-        return null;
+        double x = (v.x * t) + s.x;
+        double y = ((v.y * t) - ((g / 2) * t * t)) + s.y;
+        return new Vector2((float)x, (float)y);
     }
 
 }

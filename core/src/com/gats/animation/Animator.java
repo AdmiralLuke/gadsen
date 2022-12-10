@@ -9,19 +9,20 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gats.animation.action.DestroyAction;
-import com.gats.animation.action.MoveAction;
-import com.gats.animation.action.SummonAction;
-import com.gats.animation.entity.*;
+import com.gats.animation.action.*;
 import com.gats.animation.action.Action;
+import com.gats.animation.entity.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gats.manager.AnimationLogProcessor;
 import com.gats.simulation.*;
 
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Übersetzt {@link com.gats.simulation.GameState GameState} und {@link com.gats.simulation.ActionLog ActionLog}
  * des {@link com.gats.simulation Simulation-Package} in für libGDX renderbare Objekte
  */
-public class Animator implements Screen {
+public class Animator implements Screen, AnimationLogProcessor {
 
     //ToDo organize Assets in seperate class
     private final Animation<TextureRegion> destroyTileAnimation; //ToDo replace placeholder
@@ -50,6 +51,8 @@ public class Animator implements Screen {
     private EntityGroup root;
 
     private TileMap map;
+
+    private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
 
 
@@ -115,7 +118,7 @@ public class Animator implements Screen {
 
 
         public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
-            ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> new ExpandedAction(null))
+            ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> new ExpandedAction(new IdleAction(0, 0)))
                     .apply(simAction, animator);
             expandedAction.tail.setChildren(extractChildren(simAction, animator));
 
@@ -247,8 +250,8 @@ public class Animator implements Screen {
 
         background = new SpriteEntity(
                 textureAtlas.findRegion("tile/GADSBG"),
-                new Vector2(0, 0),
-                new Vector2(259 * 4, 128 * 4));
+                new Vector2(-backgroundViewport.getWorldWidth()/2, -backgroundViewport.getWorldHeight()/2),
+                new Vector2(259, 128));
         ////root.add(background);
 
         backgroundTexture = textureAtlas.findRegion("tile/GADSBG").getTexture();
@@ -308,6 +311,7 @@ public class Animator implements Screen {
         camera.position.set(new float[]{0, 0, 0});
         this.backgroundViewport.update(width, height);
         this.viewport.update(width, height, true);
+        camera.update();
     }
 
     /**
@@ -316,7 +320,7 @@ public class Animator implements Screen {
      * @param log Queue aller {@link com.gats.simulation.Action animations-relevanten Ereignisse}
      */
     public void animate(ActionLog log) {
-        actionList.add(convertAction(log.getRootAction()));
+        pendingLogs.add(log);
     }
 
     private Action convertAction(com.gats.simulation.Action action) {
@@ -334,6 +338,12 @@ public class Animator implements Screen {
 
     @Override
     public void render(float delta) {
+
+        if (actionList.isEmpty()){
+            if(!pendingLogs.isEmpty()){
+                actionList.add(convertAction(pendingLogs.poll().getRootAction()));
+            }
+        }
 
         ListIterator<Action> iter = actionList.listIterator();
         Stack<Remainder> remainders = new Stack<>();

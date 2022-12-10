@@ -22,7 +22,7 @@ public class GameState {
     private int width;
     private int height;
     private static final int GAME_MODE_NORMAL = 0;
-
+    private static final int GAME_MODE_CHRISTMAS = 1;
 
     private int gameMode = GAME_MODE_NORMAL;
 
@@ -33,7 +33,7 @@ public class GameState {
 
     private int teamCount;
     private int charactersPerTeam;
-    private final ArrayDeque<Vector2> turn = new ArrayDeque<>();
+    private ArrayDeque<Vector2> turn = new ArrayDeque<>();
     private boolean active;
     private Simulation sim;
 
@@ -174,7 +174,7 @@ public class GameState {
      * @return Kopie eines Tiles an einer bestimmten Stelle
      */
     public Tile getTile(int x, int y) {
-        if (x < 0 || y < 0 || x > 249 || y > 249) return null;
+        if (x < 0 || y < 0 || x > getBoardSizeX() || y > getBoardSizeY()) return null;
         return board[x][y];
     }
 
@@ -202,12 +202,12 @@ public class GameState {
         GameCharacter[][] characters = new GameCharacter[amountTeams][amountPlayers];
         for (int i = 0; i < amountTeams; i++) {
             for (int j = 0; j < amountPlayers; j++) {
-                int randX = (int)(Math.random() * 250);
-                int randY = (int)(Math.random() * 250);
+                int randX = (int)(Math.random() * getBoardSizeX());
+                int randY = (int)(Math.random() * getBoardSizeY());
                 if (getTile(randX, randY) != null) {
                     j--;
                 } else {
-                    characters[i][j] = new GameCharacter(randX, randY, this);
+                    characters[i][j] = new GameCharacter(randX, randY, this, i, j, sim);
                 }
             }
         }

@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
  */
 abstract class Weapon {
 
-    private final double damage;
+    private final int damage;
     private final double damageLoss;
     private double projRange;
     private int shoots;
@@ -15,17 +15,10 @@ abstract class Weapon {
     private GameCharacter character;
     private Simulation sim;
 
-    enum Type {
-        LONG_RANGE,
-        SHORT_RANGE,
-        CLOSE_COMBAT,
-        BOMB
-    }
-
-    private final Type type;
+    private final WeaponType type;
 
 
-    Weapon(double damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, Type type, Simulation sim, GameCharacter character) {
+    Weapon(int damage, double damageLoss, double projRange, int shoots, boolean hitThroughBoxes, WeaponType type, Simulation sim, GameCharacter character) {
         this.damage = damage;
         this.damageLoss = damageLoss;
         this.projRange = projRange;
@@ -37,7 +30,7 @@ abstract class Weapon {
     }
 
 
-    public Type getType() {
+    public WeaponType getType() {
         return type;
     }
 
@@ -45,7 +38,7 @@ abstract class Weapon {
         return hitThroughBoxes;
     }
 
-    public double getStartDamage() {
+    public int getStartDamage() {
         return damage;
     }
 
@@ -61,6 +54,14 @@ abstract class Weapon {
         return shoots;
     }
 
+    public void shoot(Vector2 dir, double strength) {
+        if (this.getType() == WeaponType.COOKIE) {
+            this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
+        } else {
+            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LIN_LASER);
+        }
+    }
+
     public void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type) {
         if (strength > projRange) {
             projRange = strength;
@@ -70,8 +71,8 @@ abstract class Weapon {
         }
         sim.getActionLog().goToNextAction();
         sim.getActionLog().addAction(new CharacterShootAction(character.getTeam(), character.getTeamPos()));
-        Projectile proj = new Projectile(damage, projRange, dir, character.getPlayerPos(), type, AcType, sim, character);
-
+        Projectile proj = new Projectile(damage, projRange, character.getPlayerPos(), dir, type, AcType, sim, character, strength);
+        proj.move();
         shoots--;
 
 
