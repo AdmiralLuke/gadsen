@@ -60,9 +60,9 @@ public class GADS extends Game {
 	}
 
 	public void setScreenIngame() {
-
-		//simulation = new Simulation(gameSettings.getGameMode(), gameSettings.getMapName(),gameSettings.getAmountTeams(),gameSettings.getTeamSize());
-		setScreen(new InGameScreen(this, assetManager, gameSettings));
+		// ToDo: add Team Information from Sliders
+		simulation = new Simulation(gameMode, gameSettings.mapName, 2, 1);
+		setScreen(new InGameScreen(this, assetManager));
 		menuScreen.dispose();
 	}
 
