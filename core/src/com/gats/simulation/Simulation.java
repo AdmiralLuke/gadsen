@@ -44,7 +44,7 @@ public class Simulation {
         }
         Vector2 lastChar = gameState.getTurn().pop();
         if (gameState.getCharacterFromTeams((int)lastChar.x, (int)lastChar.y).getHealth() > 0) {
-            gameState.getTurn().push(lastChar);
+            gameState.getTurn().add(lastChar);
         } else {
             gameState.getTeams()[(int)lastChar.x][(int)lastChar.y] = null;
         }
