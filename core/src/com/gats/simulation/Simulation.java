@@ -17,9 +17,9 @@ public class Simulation {
     //hud stage übergeben für die inputs?
     public Simulation(int gameMode,String mapName, int teamAm, int teamSize){
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
-        Vector2 turnChar = gameState.getTurn().peek();
+        IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
-        actionLog = new ActionLog(new TurnStartAction((int)turnChar.x,(int)turnChar.y,0));
+        actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y,0));
     }
 
     public GameState getState() {
@@ -31,9 +31,9 @@ public class Simulation {
 
 
     public GameCharacterController getController() {
-        Vector2 turnChar = gameState.getTurn().peek();
+        IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
-        return new GameCharacterController(gameState.getCharacterFromTeams((int)turnChar.x,(int)turnChar.y), gameState);
+        return new GameCharacterController(gameState.getCharacterFromTeams(turnChar.x,turnChar.y), gameState);
     }
 
 
@@ -42,30 +42,30 @@ public class Simulation {
             gameState.setActive(false);
             return this.actionLog;
         }
-        Vector2 lastChar = gameState.getTurn().pop();
-        if (gameState.getCharacterFromTeams((int)lastChar.x, (int)lastChar.y).getHealth() > 0) {
+        IntVector2 lastChar = gameState.getTurn().pop();
+        if (gameState.getCharacterFromTeams(lastChar.x, lastChar.y).getHealth() > 0) {
             gameState.getTurn().add(lastChar);
         } else {
-            gameState.getTeams()[(int)lastChar.x][(int)lastChar.y] = null;
+            gameState.getTeams()[lastChar.x][lastChar.y] = null;
         }
-        Vector2 nextChar = gameState.getTurn().peek();
+        IntVector2 nextChar = gameState.getTurn().peek();
 
-        while (gameState.getCharacterFromTeams((int)nextChar.x, (int)nextChar.y).getHealth() <= 0) {
+        while (gameState.getCharacterFromTeams(nextChar.x, nextChar.y).getHealth() <= 0) {
             gameState.getTurn().pop();
 
-            gameState.getTeams()[(int) nextChar.x][(int) nextChar.y] = null;
+            gameState.getTeams()[ nextChar.x][ nextChar.y] = null;
 
             nextChar = gameState.getTurn().peek();
         }
-        gameState.getCharacterFromTeams((int)nextChar.x, (int)nextChar.y).resetStamina();
+        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetStamina();
         return clearAndReturnActionLog();
     }
 
     public ActionLog clearAndReturnActionLog() {
-        Vector2 turnChar = gameState.getTurn().peek();
+        IntVector2 turnChar = gameState.getTurn().peek();
         ActionLog tmp = this.actionLog;
         assert turnChar != null;
-        this.actionLog = new ActionLog(new TurnStartAction((int)turnChar.x, (int)turnChar.y, 0));
+        this.actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y, 0));
         return tmp;
     }
 

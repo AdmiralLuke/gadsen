@@ -33,7 +33,7 @@ public class GameState {
 
     private int teamCount;
     private int charactersPerTeam;
-    private ArrayDeque<Vector2> turn = new ArrayDeque<>();
+    private ArrayDeque<IntVector2> turn = new ArrayDeque<>();
     private boolean active;
     private Simulation sim;
 
@@ -43,6 +43,7 @@ public class GameState {
 
     /**
      * Erstellt einen GameState
+     *
      * @param gameMode
      * @param mapName
      * @param teamCount
@@ -65,8 +66,17 @@ public class GameState {
      * spawns player
      */
     void initTeam(List<IntVector2> spawnpoints) {
+        if (gameMode == GAME_MODE_CHRISTMAS) {
+            spawnpoints.sort(Comparator.comparingInt(v -> v.x));
+            for (int i = 0; i < 4; i++) {
+                IntVector2 pos = spawnpoints.get(i).scl(Tile.tileSize);
+                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, sim);
+                turn.add(new IntVector2(i, 0));
+            }
+            return;
+        }
         int pointCount = spawnpoints.size();
-        if (pointCount<teamCount * charactersPerTeam)
+        if (pointCount < teamCount * charactersPerTeam)
             throw new RuntimeException(String.format(
                     "Requested %d x %d Characters, but the selected map has only %d spawning locations",
                     teamCount, charactersPerTeam, pointCount));
@@ -79,9 +89,9 @@ public class GameState {
             }
         }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
-        for (int i = 0; i < teamCount; i++) {
-            for (int j = 0; j < charactersPerTeam; j++) {
-                turn.add(new Vector2(this.teams[i][j].getTeam(), this.teams[i][j].getTeamPos()));
+        for (int j = 0; j < charactersPerTeam; j++) {
+            for (int i = 0; i < teamCount; i++) {
+                turn.add(new IntVector2(i, j));
             }
         }
     }
@@ -94,7 +104,7 @@ public class GameState {
         this.active = active;
     }
 
-    protected ArrayDeque<Vector2> getTurn() {
+    protected ArrayDeque<IntVector2> getTurn() {
         return turn;
     }
 
@@ -109,6 +119,7 @@ public class GameState {
     /**
      * Lädt eine Map aus dem Assets Ordner
      * Annahme: Alle Tiles auf der Map sind verankert
+     *
      * @param mapName Map im Json Format aus dem Assets Ordner
      */
     private List<IntVector2> loadMap(String mapName) {
@@ -124,7 +135,7 @@ public class GameState {
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                int type = tileData.get(i + (height-j -1) * width).asInt();
+                int type = tileData.get(i + (height - j - 1) * width).asInt();
                 switch (type) {
                     case 1:
                         board[i][j] = new Tile(i, j, true, this);
@@ -133,7 +144,7 @@ public class GameState {
                         board[i][j] = new Tile(i, j, this, true);
                         break;
                     case 3:
-                        spawnpoints.add(new IntVector2(i,j));
+                        spawnpoints.add(new IntVector2(i, j));
                 }
             }
         }
@@ -160,9 +171,9 @@ public class GameState {
     }
 
 
-
     /**
      * Board for devs (changes are permanent)
+     *
      * @return board
      */
     Tile[][] getBoard() {
@@ -195,7 +206,8 @@ public class GameState {
 
     /**
      * Spawnt Spieler an zufälligen Positionen
-     * @param amountTeams Anzahl an Teams
+     *
+     * @param amountTeams   Anzahl an Teams
      * @param amountPlayers Anzahl Spieler pro Team
      * @return Team Array
      */
@@ -203,8 +215,8 @@ public class GameState {
         GameCharacter[][] characters = new GameCharacter[amountTeams][amountPlayers];
         for (int i = 0; i < amountTeams; i++) {
             for (int j = 0; j < amountPlayers; j++) {
-                int randX = (int)(Math.random() * getBoardSizeX());
-                int randY = (int)(Math.random() * getBoardSizeY());
+                int randX = (int) (Math.random() * getBoardSizeX());
+                int randY = (int) (Math.random() * getBoardSizeY());
                 if (getTile(randX, randY) != null) {
                     j--;
                 } else {
