@@ -16,6 +16,7 @@ import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.Simulation;
 import org.junit.Assert;
+import org.lwjgl.Sys;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,7 @@ public class HudStage extends Stage {
 
     public void activateTurn(HumanPlayer humanPlayer){
         currentPlayer = humanPlayer;
+//        System.out.printf("Activating turn for player %s\n", humanPlayer.toString());
         turnInProgress = true;
     }
 
