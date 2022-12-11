@@ -18,6 +18,7 @@ public class GameCharacter {
     private Simulation sim;
 
     private Weapon[] weapons;
+    private int selectedWeapon = -1;
 
 
     /**
@@ -40,6 +41,35 @@ public class GameCharacter {
         initInventory();
     }
 
+    public WeaponType getSelectedWeapon() {
+        if (selectedWeapon != -1) {
+            return weapons[selectedWeapon].getType();
+        } else {
+            return WeaponType.NOT_SELECTED;
+        }
+    }
+
+    public void selectWeapon(WeaponType type) {
+        switch (type) {
+            case COOKIE:
+                selectedWeapon = 0;
+                break;
+            case SUGAR_CANE:
+                selectedWeapon = 1;
+                break;
+            default:
+                selectedWeapon = -1;
+        }
+    }
+
+    public boolean shoot(Vector2 dir, float strength) {
+        if (selectedWeapon != -1) {
+            weapons[selectedWeapon].shoot(dir, strength);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Gibt die Lebensanzahl eines Spielers zurück (maximal 100)
@@ -113,7 +143,7 @@ public class GameCharacter {
     void fall() {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
-        while (this.posY > 0 && this.state.getTile(posX, posY - 1) == null) {
+        while (this.posY / 16 > 0 && this.state.getTile(posX / 16, (posY / 16) - 1) == null) {
             this.posY -= 1;
             fallen++;
         }
@@ -121,9 +151,9 @@ public class GameCharacter {
         if (this.posY == 0) {
             this.setHealth(0);
         } else {
-            this.setHealth(fallen * 5);
+            this.setHealth(fallen / 10);
         }
-        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 10));
+        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 1));
         this.sim.getActionLog().goToNextAction();
         this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
         if (this.getHealth() == 0) {
@@ -145,16 +175,16 @@ public class GameCharacter {
         // this.posX += this.posX + dx >= 0 ? (this.posX + dx < state.getBoardSizeX() ? dx : state.getBoardSizeX() - 1 - this.posX) : -this.posX;
 
         System.out.println("moved from "+ bef);
-        if (this.posX + dx < 0) {
+        if ((this.posX + dx) / 16 < 0) {
             dx = -posX;
         }
-        if (this.posX + dx > state.getBoardSizeX()) {
+        if ((this.posX + dx) / 16 > state.getBoardSizeX()) {
             dx = state.getBoardSizeX() - posX;
         }
 
         if (dx < 0) {
             for (int i = 0; i >= dx; i--) {
-                if (state.getTile(posX + i , posY - 1) == null) {
+                if (state.getTile((posX  + i) / 16 , ((posY) / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -162,12 +192,12 @@ public class GameCharacter {
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
 
-                    System.out.println("moved to "+ posAf);
-                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
+                    System.out.println("moved to because there was hole"+ posAf);
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 1));
                     this.fall();
                     return;
                 }
-                if (state.getTile(posX + i + 1, posY) != null) {
+                if (state.getTile(((posX + i) / 16) - 1, posY / 16) != null) {
                     dx = i;
                     break;
                 }
@@ -175,7 +205,7 @@ public class GameCharacter {
 
         } else {
             for (int i = 0; i <= dx; i++) {
-                if (state.getTile(posX + i, posY - 1) == null) {
+                if (state.getTile((posX + i) / 16, ((posY) / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -183,12 +213,12 @@ public class GameCharacter {
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
 
-                    System.out.println("moved to "+ posAf);
-                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0));
+                    System.out.println("moved to because there was hole"+ posAf);
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 1));
                     this.fall();
                     return;
                 }
-                if (state.getTile(posX + i + 1, posY) != null) {
+                if (state.getTile((posX + i + 1) / 16, posY / 16) != null) {
                     dx = i;
                     break;
                 }
@@ -201,7 +231,7 @@ public class GameCharacter {
         Vector2 posAf = new Vector2(posX, posY);
 
         System.out.println("moved to "+ posAf);
-        this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 10));
+        this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 1));
     }
 
 

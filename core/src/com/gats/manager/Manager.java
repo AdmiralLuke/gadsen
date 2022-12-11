@@ -145,6 +145,7 @@ public class Manager {
         List<NamedPlayerClass> players = new ArrayList<NamedPlayerClass>();
         players.add(new NamedPlayerClass(HumanPlayer.class));
         players.add(new NamedPlayerClass(IdleBot.class));
+        players.add(new NamedPlayerClass(TestBot.class));
         File botDir = new File("bots");
         if (botDir.exists()) {
             try {
@@ -180,7 +181,7 @@ public class Manager {
      */
     private void run() {
         Thread thread = new Thread(() -> {
-            while (true) { // ToDo: state.isActive()
+            while (state.isActive()) {
                 GameCharacterController gcController = simulation.getController();
                 int currentPlayerIndex = gcController.getGameCharacter().getTeam();
                 int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();

@@ -89,16 +89,16 @@ public class Projectile {
         Vector2 startPos = this.pos.cpy();
         if (this.type == Type.LINEAR || this.type == Type.LIN_LASER) {
             while (livingTime < range) {
-                if (this.pos.x >= this.sim.getState().getBoardSizeX() ||this.pos.y >= this.sim.getState().getBoardSizeY()
-                    || this.pos.x <= 0 ||this.pos.y <= 0) {
+                if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
+                    || this.pos.x / 16<= 0 ||this.pos.y / 16 <= 0) {
                     this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos) : new LaserPath(startPos, pos);
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, (float)(this.pos.cpy().sub(startPos).len() / 0.0001)));
                     return;
                 }
-                if (this.sim.getState().getTile((int)pos.x, (int)pos.y) != null) {
+                if (this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
                     this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos) : new LaserPath(startPos, pos);
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, (float)(this.pos.cpy().sub(startPos).len() / 0.0001)));
-                    this.sim.getState().getTile((int)pos.x, (int)pos.y).destroyTile();
+                    this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).destroyTile();
                     return;
                 }
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {
@@ -129,14 +129,14 @@ public class Projectile {
             v.set((float)(v.x * strength * 0.01), (float)(v.y * strength * 0.01));
             this.path = new ParablePath(s, v);
             while (livingTime < range) {
-                if (this.pos.x >= this.sim.getState().getBoardSizeX() ||this.pos.y >= this.sim.getState().getBoardSizeY()
+                if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
                         || this.pos.x <= 0 ||this.pos.y <= 0) {
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, (float)(this.pos.cpy().sub(startPos).len() / 0.0001)));
                     return;
                 }
-                if (this.sim.getState().getTile((int)pos.x, (int)pos.y) != null) {
+                if (this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, (float)(this.pos.cpy().sub(startPos).len() / 0.0001)));
-                    this.sim.getState().getTile((int)pos.x, (int)pos.y).destroyTile();
+                    this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).destroyTile();
                     return;
                 }
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {

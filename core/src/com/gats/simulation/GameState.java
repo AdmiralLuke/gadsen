@@ -54,10 +54,11 @@ public class GameState {
         List<IntVector2> spawnpoints = loadMap(mapName);
         this.teamCount = teamCount;
         this.charactersPerTeam = charactersPerTeam;
-        this.teams = new GameCharacter[teamCount][charactersPerTeam];
-        this.initTeam(spawnpoints);
         this.active = true;
         this.sim = sim;
+        this.teams = new GameCharacter[teamCount][charactersPerTeam];
+        this.initTeam(spawnpoints);
+
     }
 
     /**
@@ -85,7 +86,7 @@ public class GameState {
         }
     }
 
-    protected boolean isActive() {
+    public boolean isActive() {
         return active;
     }
 

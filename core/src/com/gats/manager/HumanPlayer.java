@@ -107,7 +107,7 @@ public class HumanPlayer extends Player {
     public void processKeyDown(int keycode) {
         System.out.println("Received Key: " + keycode);
         switch (keycode) {
-            // Qund E für rotieren/zielen mit den Waffen
+            // Q und E für rotieren/zielen mit den Waffen
             case KEY_CHARACTER_AIM_LEFT:
                 isDown[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_AIM_LEFT);
