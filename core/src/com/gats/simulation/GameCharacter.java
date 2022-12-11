@@ -156,9 +156,6 @@ public class GameCharacter {
         this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f));
         this.sim.getActionLog().goToNextAction();
         this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
-        if (this.getHealth() == 0) {
-            sim.endTurn();
-        }
     }
 
     /**
@@ -227,6 +224,7 @@ public class GameCharacter {
         if (this.stamina < abs(dx)) {
             return;
         }
+        stamina -= abs(dx);
         this.posX += dx;
         Vector2 posAf = new Vector2(posX, posY);
 
