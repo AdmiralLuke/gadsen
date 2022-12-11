@@ -51,13 +51,13 @@ public class Animator implements Screen, AnimationLogProcessor {
     private EntityGroup root;
 
     private TileMap map;
-    private LinkedBlockingQueue<Object> waitingForCompletion = new LinkedBlockingQueue<>();
 
     private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
 
-
     private GameCharacter[][] teams;
+
+    private final Object notificationObject = new Object();
 
     private int teamCount;
     private int charactersPerTeam;
@@ -215,11 +215,12 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             return new ExpandedAction(summonTileEntity, destroyTileEntity);
         }
+
         private static ExpandedAction convertTileDestroyAction(com.gats.simulation.Action action, Animator animator) {
 
             TileDestroyAction destroyAction = (TileDestroyAction) action;
 
-            DestroyAction destroyProjectile = new DestroyAction(animator.destroyTileAnimation.getAnimationDuration()*1000, null, null, animator.root::remove);
+            DestroyAction destroyProjectile = new DestroyAction(animator.destroyTileAnimation.getAnimationDuration() * 1000, null, null, animator.root::remove);
 
             SummonAction summonProjectile = new SummonAction(action.getDelay(), destroyProjectile::setTarget, () -> {
                 animator.map.setTile(destroyAction.getPos(), TileMap.TYLE_TYPE_NONE);
@@ -261,7 +262,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         background = new SpriteEntity(
                 textureAtlas.findRegion("background/WeihnachtsBG"),
-                new Vector2(-backgroundViewport.getWorldWidth()/2, -backgroundViewport.getWorldHeight()/2),
+                new Vector2(-backgroundViewport.getWorldWidth() / 2, -backgroundViewport.getWorldHeight() / 2),
                 new Vector2(259, 128));
         ////root.add(background);
 
@@ -352,11 +353,14 @@ public class Animator implements Screen, AnimationLogProcessor {
     @Override
     public void render(float delta) {
 
-        if (actionList.isEmpty()){
-            if(!pendingLogs.isEmpty()){
+
+        if (actionList.isEmpty()) {
+            if (!pendingLogs.isEmpty()) {
                 actionList.add(convertAction(pendingLogs.poll().getRootAction()));
-            }else{
-                waitingForCompletion.forEach(Object::notify);
+            } else {
+                synchronized (notificationObject) {
+                    notificationObject.notifyAll();
+                }
             }
         }
 
@@ -395,8 +399,6 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         cameraMove(delta);
         camera.update();
-
-
 
 
         backgroundViewport.apply();
@@ -473,7 +475,12 @@ public class Animator implements Screen, AnimationLogProcessor {
     }
 
     @Override
-    public void notifyWhenComplete(Object toNotify) {
-        waitingForCompletion.add(toNotify);
+    public void awaitNotification() {
+        synchronized (notificationObject) {
+            try {
+                notificationObject.wait();
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 }

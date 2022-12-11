@@ -82,9 +82,10 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
      */
     public void animate(ActionLog log) {animator.animate(log);}
 
+
     @Override
-    public void notifyWhenComplete(Object toNotify) {
-        animator.notifyWhenComplete(toNotify);
+    public void awaitNotification() {
+        animator.awaitNotification();
     }
 
     @Override

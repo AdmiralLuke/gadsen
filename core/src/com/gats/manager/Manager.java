@@ -267,14 +267,7 @@ public class Manager {
                 if (gui) {
                     animationLogProcessor.animate(finalLog);
                     Thread thisThread = Thread.currentThread();
-                    synchronized (thisThread) {
-                        animationLogProcessor.notifyWhenComplete(thisThread);
-                        try {
-                            thisThread.wait();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+                    animationLogProcessor.awaitNotification();
                 }
             }
         });

@@ -7,7 +7,7 @@ public class CharacterFallAction extends CharacterAction {
     private Vector2 posAft;
     private LinearPath path;
     private float duration;
-    public CharacterFallAction(Vector2 posBef, Vector2 posAft, int team, int character, long delay) {
+    public CharacterFallAction(Vector2 posBef, Vector2 posAft, int team, int character, float delay) {
         super(team, character, delay);
         this.posBef = posBef;
         this.posAft = posAft;

@@ -6,5 +6,5 @@ public interface AnimationLogProcessor {
 
     void animate(ActionLog log);
 
-    void notifyWhenComplete(Object toNotify);
+    void awaitNotification();
 }

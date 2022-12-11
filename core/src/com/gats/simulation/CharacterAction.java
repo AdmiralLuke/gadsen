@@ -15,7 +15,7 @@ abstract class CharacterAction extends Action{
      * @param character Nummer im Team
      * @param delay Wartezeit nach Aktion
      */
-    public CharacterAction(int team, int character, long delay) {
+    public CharacterAction(int team, int character, float delay) {
         super(delay);
         this.team = team;
         this.character = character;

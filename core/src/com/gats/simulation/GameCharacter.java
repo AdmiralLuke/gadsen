@@ -153,7 +153,7 @@ public class GameCharacter {
         } else {
             this.setHealth(fallen / 10);
         }
-        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 1));
+        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f));
         this.sim.getActionLog().goToNextAction();
         this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
         if (this.getHealth() == 0) {
@@ -167,14 +167,14 @@ public class GameCharacter {
      * @param dx Anzahl Schritte in x Richtung
      */
     void move(int dx) {
-        System.out.println("moving "+ dx);
+//        System.out.println("moving "+ dx);
         if (dx == 0) {
             return;
         }
         Vector2 bef = new Vector2(posX, posY);
         // this.posX += this.posX + dx >= 0 ? (this.posX + dx < state.getBoardSizeX() ? dx : state.getBoardSizeX() - 1 - this.posX) : -this.posX;
 
-        System.out.println("moved from "+ bef);
+//        System.out.println("moved from "+ bef);
         if ((this.posX + dx) / 16 < 0) {
             dx = -posX;
         }
@@ -193,7 +193,7 @@ public class GameCharacter {
                     Vector2 posAf = new Vector2(posX, posY);
 
                     System.out.println("moved to because there was hole"+ posAf);
-                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 1));
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
                     this.fall();
                     return;
                 }
@@ -214,7 +214,7 @@ public class GameCharacter {
                     Vector2 posAf = new Vector2(posX, posY);
 
                     System.out.println("moved to because there was hole"+ posAf);
-                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 1));
+                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
                     this.fall();
                     return;
                 }
@@ -231,7 +231,7 @@ public class GameCharacter {
         Vector2 posAf = new Vector2(posX, posY);
 
         System.out.println("moved to "+ posAf);
-        this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 1));
+        this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
     }
 
 

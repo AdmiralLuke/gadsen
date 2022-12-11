@@ -114,6 +114,7 @@ public class HumanPlayer extends Player {
                 //currentPlayer.toggleAimLeft();
                 break;
             case KEY_CHARACTER_AIM_RIGHT:
+                System.out.printf("pressing key at %s ms\n", System.currentTimeMillis());
                 isDown[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_AIM_RIGHT);
                 break;
