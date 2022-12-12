@@ -51,7 +51,7 @@ public class GameSettings {
     private Manager.NamedPlayerClass[] availableBots;
     private String[] availableBotsStrings = {"Human", "TestBot", christmasBotName};
     //Todo change map name for christmasTask
-    private String weihnachtsmap = "chistmasMap";
+    private String weihnachtsmap = "christmasMap";
     private LinkedList<Manager.NamedPlayerClass> possibleBotClasses;
     private GADS game;
     private Table gameModeSpecificTable;

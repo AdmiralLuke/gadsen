@@ -37,6 +37,7 @@ public class GameCharacterController {
     public void aim(Vector2 angle, float strength) {
         this.aim_angle = angle;
         this.aim_strength = strength;
+        gameCharacter.aim(angle,strength);
     }
 
     public void selectWeapon(WeaponType type) {
