@@ -451,6 +451,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     public void dispose() {
         batch.dispose();
         textureAtlas.dispose();
+
     }
 
     //animator movement

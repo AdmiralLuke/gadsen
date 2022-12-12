@@ -5,6 +5,7 @@ import com.gats.manager.command.EndTurnCommand;
 import com.gats.simulation.*;
 import com.gats.ui.GameSettings;
 import com.gats.ui.HudStage;
+import org.lwjgl.Sys;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
@@ -46,6 +47,8 @@ public class Manager {
     private List<HumanPlayer> humanList = new ArrayList<>();
 
     private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
+    private Thread simulationThread;
+    private boolean pendingShutdown = false;
 
     /**
      * Initializes simulation and players before
@@ -79,6 +82,7 @@ public class Manager {
                     Future<?> future = executor.submit(new Runnable() {
                         @Override
                         public void run() {
+                            Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
                             curPlayer.init(state);
                         }
                     });
@@ -102,7 +106,9 @@ public class Manager {
 
     public void start() {
         //Run the Game
-        new Thread(this::run).start();
+        simulationThread = new Thread(this::run);
+        simulationThread.setName("Manager_Simulation_Thread");
+        simulationThread.start();
     }
 
     public static class NamedPlayerClass {
@@ -180,98 +186,122 @@ public class Manager {
      * Controls Player Execution
      */
     private void run() {
-        Thread thread = new Thread(() -> {
-            while (state.isActive()) {
-                GameCharacterController gcController = simulation.getController();
-                int currentPlayerIndex = gcController.getGameCharacter().getTeam();
-                int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
+        while (!pendingShutdown && state.isActive()) {
+            GameCharacterController gcController = simulation.getController();
+            int currentPlayerIndex = gcController.getGameCharacter().getTeam();
+            int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
 
-                Player currentPlayer = players[currentPlayerIndex];
-                Controller controller = new Controller(this, gcController);
-                Thread futureExecutor;
-                Future<?> future;
-                switch (currentPlayer.getType()) {
-                    case Human:
-                        future = executor.submit(() -> currentPlayer.executeTurn(state, controller));
-                        futureExecutor = new Thread(() -> {
-                            inputGenerator.activateTurn((HumanPlayer) currentPlayer);
-                            try {
-                                future.get(HUMAN_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
-                            } catch (InterruptedException e) {    //     <-- possible error cases
-                                System.out.println("bot was interrupted");
-                            } catch (ExecutionException e) {
-                                System.out.println("human player failed with exception: " + e.getCause());
-                                e.printStackTrace();
-                            } catch (TimeoutException e) {
-                                future.cancel(true);
+            Player currentPlayer = players[currentPlayerIndex];
+            Controller controller = new Controller(this, gcController);
+            Thread futureExecutor;
+            Future<?> future;
+            switch (currentPlayer.getType()) {
+                case Human:
+                    future = executor.submit(() -> currentPlayer.executeTurn(state, controller));
+                    futureExecutor = new Thread(() -> {
+                        inputGenerator.activateTurn((HumanPlayer) currentPlayer);
+                        try {
+                            Thread.currentThread().setName("Run_Thread_Player_Human");
+                            future.get(HUMAN_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            future.cancel(true);//Executor was interrupted: Interrupt Player
+                            System.out.println("bot was interrupted");
+                        } catch (ExecutionException e) {
+                            System.out.println("human player failed with exception: " + e.getCause());
+                            e.printStackTrace();
+                        } catch (TimeoutException e) {
+                            future.cancel(true);
 
-                                System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
-                                        + ") computation surpassed timeout");
-                            }
-                            inputGenerator.endTurn();
-                            //Add Empty command to break command Execution
-                            try {
-                                commandQueue.put(new EndTurnCommand());
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                        break;
-                    case AI:
-                        future = executor.submit(() -> currentPlayer.executeTurn(state, controller));
-                        futureExecutor = new Thread(() -> {
-                            try {
-                                future.get(AI_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
-                            } catch (InterruptedException e) {    //     <-- possible error cases
-                                System.out.println("bot was interrupted");
-                            } catch (ExecutionException e) {
-                                System.out.println("bot failed with exception: " + e.getCause());
-                                e.printStackTrace();
-                            } catch (TimeoutException e) {
-                                future.cancel(true);
-
-                                System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
-                                        + ") computation surpassed timeout");
-                            }
-                            //Add Empty command to break command Execution
-                            try {
-                                commandQueue.put(new EndTurnCommand());
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                        break;
-                    default:
-                        throw new IllegalStateException("Player of type: " + currentPlayer.getType() + " can not be executed by the Manager");
-                }
-
-                futureExecutor.start();
-                try {
-                    while (futureExecutor.isAlive()) {
-                        System.out.println("waiting for commands");
-                        Command nextCmd = commandQueue.take();
-                        if (nextCmd.isEndTurn()) break;
-                        System.out.println("processing command");
-                        nextCmd.run();
-                        System.out.println("finished processing");
-
-                        if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
-                            animationLogProcessor.animate(simulation.clearReturnActionLog());
+                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
+                                    + ") computation surpassed timeout");
                         }
+                        inputGenerator.endTurn();
+                        //Add Empty command to break command Execution
+                        try {
+                            commandQueue.put(new EndTurnCommand());
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    break;
+                case AI:
+                    future = executor.submit(() -> {
+                        Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
+                        currentPlayer.executeTurn(state, controller);
+                    });
+                    futureExecutor = new Thread(() -> {
+                        Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
+                        try {
+                            future.get(AI_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            future.cancel(true);//Executor was interrupted: Interrupt Bot
+                            System.out.println("bot was interrupted");
+                        } catch (ExecutionException e) {
+                            System.out.println("bot failed with exception: " + e.getCause());
+                            e.printStackTrace();
+                        } catch (TimeoutException e) {
+                            future.cancel(true);
+
+                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
+                                    + ") computation surpassed timeout");
+                        }
+                        //Add Empty command to break command Execution
+                        try {
+                            commandQueue.put(new EndTurnCommand());
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    break;
+                default:
+                    throw new IllegalStateException("Player of type: " + currentPlayer.getType() + " can not be executed by the Manager");
+            }
+
+            futureExecutor.start();
+            try {
+                while (futureExecutor.isAlive()) {
+                    System.out.println("waiting for commands");
+                    Command nextCmd = commandQueue.take();
+                    if (nextCmd.isEndTurn()) break;
+                    System.out.println("processing command");
+                    nextCmd.run();
+                    System.out.println("finished processing");
+
+                    if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
+                        animationLogProcessor.animate(simulation.clearReturnActionLog());
                     }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
-                controller.deactivate();
-                ActionLog finalLog = simulation.endTurn();
-                if (gui) {
-                    animationLogProcessor.animate(finalLog);
-                    Thread thisThread = Thread.currentThread();
-                    animationLogProcessor.awaitNotification();
+            } catch (InterruptedException e) {
+                System.out.printf("Interrupted while processing cmds\n");
+                if (pendingShutdown) {
+                    futureExecutor.interrupt();
+                    break;
+                }
+                throw new RuntimeException(e);
+            }
+            controller.deactivate();
+            ActionLog finalLog = simulation.endTurn();
+            if (gui) {
+                animationLogProcessor.animate(finalLog);
+                animationLogProcessor.awaitNotification();
+                if (pendingShutdown) {
+                    executor.shutdown();
+                    futureExecutor.interrupt();
+                    break;
                 }
             }
-        });
-        thread.start();
+        }
+        System.out.println("Shutdown complete");
+    }
+
+    public void dispose() {
+        //Shutdown all running threads
+        pendingShutdown = true;
+        if (simulationThread != null) {
+            System.out.println("Interrupting simulation thread");
+            simulationThread.interrupt();
+            executor.shutdown();
+        }
     }
 
     public List<HumanPlayer> getHumanList() {

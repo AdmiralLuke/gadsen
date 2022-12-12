@@ -114,7 +114,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     public void dispose() {
         animator.dispose();
         hudStage.dispose();
-
+        manager.dispose();
     }
     public void setupInput(){
 
