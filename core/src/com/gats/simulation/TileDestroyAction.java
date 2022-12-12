@@ -7,6 +7,6 @@ import com.badlogic.gdx.math.Vector2;
  */
 public final class TileDestroyAction extends TileAction{
     public TileDestroyAction(IntVector2 position) {
-        super(position, 5);
+        super(position, 0.005f);
     }
 }

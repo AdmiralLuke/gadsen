@@ -7,14 +7,14 @@ import java.util.Iterator;
  * Repräsentiert ein einzelnes UI-relevantes Ereignis, das während der Simulation aufgetreten ist
  */
 public abstract class Action {
-    private long delay = 0;
+    private float delay = 0;
     private ArrayList<Action> arrayList = new ArrayList<>();
 
-    public Action(long delay) {
+    public Action(float delay) {
         this.delay = delay;
     }
 
-    public long getDelay() {
+    public float getDelay() {
         return this.delay;
     }
 

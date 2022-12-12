@@ -55,14 +55,16 @@ public class Animator implements Screen, AnimationLogProcessor {
     private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
 
-
     private GameCharacter[][] teams;
+
+    private final Object notificationObject = new Object();
 
     private int teamCount;
     private int charactersPerTeam;
     private List<Action> actionList = new LinkedList<>();
 
     private Map<Class<?>, ActionConverter> actionConverters = ActionConverters.map;
+    private EntityGroup characterGroup;
 
     interface ActionConverter {
         public ExpandedAction apply(com.gats.simulation.Action simAction, Animator animator);
@@ -113,9 +115,10 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(ProjectileAction.class, ActionConverters::convertProjectileMoveAction);
                         put(TileMoveAction.class, ActionConverters::convertTileMoveAction);
                         put(TileDestroyAction.class, ActionConverters::convertTileDestroyAction);
+                        put(CharacterFallAction.class, ActionConverters::convertCharacterFallAction);
+                        put(CharacterAimAction.class,ActionConverters::convertCharacterAimAction);
                     }
                 };
-
 
         public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
             ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> new ExpandedAction(new IdleAction(0, 0)))
@@ -143,6 +146,14 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.Action action, Animator animator) {
             CharacterMoveAction moveAction = (CharacterMoveAction) action;
+            Entity target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+
+            return new ExpandedAction(new MoveAction(action.getDelay(), target, moveAction.getDuration(), moveAction.getPath()));
+        }
+
+        private static ExpandedAction convertCharacterFallAction(com.gats.simulation.Action action, Animator animator) {
+            CharacterFallAction moveAction = (CharacterFallAction) action;
+            //ToDo insert Fall animation
             Entity target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
 
             return new ExpandedAction(new MoveAction(action.getDelay(), target, moveAction.getDuration(), moveAction.getPath()));
@@ -204,11 +215,12 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             return new ExpandedAction(summonTileEntity, destroyTileEntity);
         }
+
         private static ExpandedAction convertTileDestroyAction(com.gats.simulation.Action action, Animator animator) {
 
             TileDestroyAction destroyAction = (TileDestroyAction) action;
 
-            DestroyAction destroyProjectile = new DestroyAction(animator.destroyTileAnimation.getAnimationDuration()*1000, null, null, animator.root::remove);
+            DestroyAction destroyProjectile = new DestroyAction(animator.destroyTileAnimation.getAnimationDuration() * 1000, null, null, animator.root::remove);
 
             SummonAction summonProjectile = new SummonAction(action.getDelay(), destroyProjectile::setTarget, () -> {
                 animator.map.setTile(destroyAction.getPos(), TileMap.TYLE_TYPE_NONE);
@@ -220,7 +232,15 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             return new ExpandedAction(summonProjectile, destroyProjectile);
         }
+    private static ExpandedAction convertCharacterAimAction(com.gats.simulation.Action action, Animator animator) {
+            CharacterAimAction aimAction = (CharacterAimAction) action;
+            AimIndicator currentAimIndicator = animator.teams[aimAction.getTeam()][aimAction.getCharacter()].getAimingIndicator();
+        RotateAction rotateAction = new RotateAction(0,currentAimIndicator,aimAction.getAngle());
+        ScaleAction scaleAction = new ScaleAction(0,currentAimIndicator,new Vector2(aimAction.getStrength(),1));
+        return new ExpandedAction(rotateAction,scaleAction);
     }
+  }
+
 
     /**
      * Setzt eine Welt basierend auf den Daten in state auf und bereitet diese für nachfolgende Animationen vor
@@ -250,7 +270,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         background = new SpriteEntity(
                 textureAtlas.findRegion("background/WeihnachtsBG"),
-                new Vector2(-backgroundViewport.getWorldWidth()/2, -backgroundViewport.getWorldHeight()/2),
+                new Vector2(-backgroundViewport.getWorldWidth() / 2, -backgroundViewport.getWorldHeight() / 2),
                 new Vector2(259, 128));
         ////root.add(background);
 
@@ -272,15 +292,21 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         Animation<TextureRegion> idleAnimation = new Animation<TextureRegion>(0.5f,
                 textureAtlas.findRegions("tile/coolCat"));
-
-
+        TextureRegion aimingIndicatorSprite = textureAtlas.findRegion("tile/testIndicator");
+        TextureRegion animationFrame = idleAnimation.getKeyFrame(0);
+        //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
+        Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth()/2f,animationFrame.getRegionHeight()/2f);
+        characterGroup = new EntityGroup();
+        characterGroup.setRelPos(new Vector2(45 * 12, 45 * 12));
+        root.add(characterGroup);
         for (int curTeam = 0; curTeam < teamCount; curTeam++)
             for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                 com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                 GameCharacter animGameCharacter = new GameCharacter(idleAnimation);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
-                root.add(animGameCharacter);
+                animGameCharacter.setAimingIndicator(new AimIndicator(aimingIndicatorSprite,centerOfCharacterSprite,animGameCharacter));
+                characterGroup.add(animGameCharacter);
             }
 
     }
@@ -339,11 +365,17 @@ public class Animator implements Screen, AnimationLogProcessor {
     @Override
     public void render(float delta) {
 
-        if (actionList.isEmpty()){
-            if(!pendingLogs.isEmpty()){
+
+        if (actionList.isEmpty()) {
+            if (!pendingLogs.isEmpty()) {
                 actionList.add(convertAction(pendingLogs.poll().getRootAction()));
+            } else {
+                synchronized (notificationObject) {
+                    notificationObject.notifyAll();
+                }
             }
         }
+
 
         ListIterator<Action> iter = actionList.listIterator();
         Stack<Remainder> remainders = new Stack<>();
@@ -379,8 +411,6 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         cameraMove(delta);
         camera.update();
-
-
 
 
         backgroundViewport.apply();
@@ -433,6 +463,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     public void dispose() {
         batch.dispose();
         textureAtlas.dispose();
+
     }
 
     //animator movement
@@ -456,5 +487,13 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     }
 
-
+    @Override
+    public void awaitNotification() {
+        synchronized (notificationObject) {
+            try {
+                notificationObject.wait();
+            } catch (InterruptedException ignored) {
+            }
+        }
+    }
 }

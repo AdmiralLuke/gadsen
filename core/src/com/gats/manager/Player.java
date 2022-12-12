@@ -15,9 +15,7 @@ public abstract class Player {
     /**
      * @return Der (Anzeige-) Name des Spielers
      */
-    public static String getName() {
-        throw new NotImplementedException();
-    }
+    public abstract String getName();
 
     /**
      * Wird vor Beginn des Spiels aufgerufen. Besitzt eine sehr hohe maximale Berechnungszeit von TBA ms.

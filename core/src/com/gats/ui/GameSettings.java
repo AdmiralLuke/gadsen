@@ -51,7 +51,7 @@ public class GameSettings {
     private Manager.NamedPlayerClass[] availableBots;
     private String[] availableBotsStrings = {"Human", "TestBot", christmasBotName};
     //Todo change map name for christmasTask
-    private String weihnachtsmap = "map1";
+    private String weihnachtsmap = "christmasMap";
     private LinkedList<Manager.NamedPlayerClass> possibleBotClasses;
     private GADS game;
     private Table gameModeSpecificTable;
@@ -182,10 +182,10 @@ public class GameSettings {
         // MapSelection not really needed
         //GameModeselection should be in menutable
         //set value to that required by the game mode, buttons wont be visible
-        mapSelectionBox.setSelected("Weihnachtsmap");
+        mapSelectionBox.setSelected(weihnachtsmap);
         rebuildBotTable(1, botTable, botSelectors);
 
-        teamAmountSlider.setValue(christmasBotAmount);
+        teamAmountSlider.setValue(christmasBotAmount + 1);
         teamSizeSlider.setValue(christmasTeamSize);
         //erstellt BotAuswahlButtons mit dem Weihnachtsbot als auswahl
         botSelectors.clear();
@@ -394,7 +394,7 @@ public class GameSettings {
         table.row();
 
         table.add(createExitButton(skin)).colspan(4).pad(10);
-
+        gameModeButton.setSelected("Weihnachtsaufgabe");
         return table;
     }
 

@@ -13,6 +13,8 @@ public class LinearPath implements Path{
     // start time = 0
     private Vector2 dir;
 
+    public static final float V = 10; // px/s
+
     /**
      * Erstellt einen Linearen Pfad anhand 2 Vektoren und einer Dauer des Weges
      * @param s Start-Vektor
@@ -37,7 +39,7 @@ public class LinearPath implements Path{
         this.endTime = 0;
         this.dir = g.cpy().sub(s);
         try {
-            endTime = dir.len();
+            endTime = dir.len() / V;
         } catch (NullPointerException e) {
             System.err.println("Fehler beim bestimmen der Länge eines Vektors -> LinearPath");
         }
@@ -50,6 +52,7 @@ public class LinearPath implements Path{
      */
     @Override
     public Vector2 getPos(double t) {
+        if (endTime == 0) return g.cpy();
         double step = t / endTime;
         Vector2 addV = new Vector2((float)(dir.x *  step), (float)(dir.y *  step));
         return s.cpy().add(addV);

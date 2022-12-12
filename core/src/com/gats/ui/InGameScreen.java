@@ -52,6 +52,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         RunConfiguration runConfiguration = gameSettings.toRunConfiguration();
         runConfiguration.gui = true;
         runConfiguration.animationLogProcessor = this;
+        runConfiguration.hud = hudStage;
         manager = new Manager(runConfiguration);
         animator = new Animator(manager.getState(), gameViewport, ingameAtlas);
         manager.start();
@@ -82,7 +83,12 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     public void animate(ActionLog log) {animator.animate(log);}
 
 
-        @Override
+    @Override
+    public void awaitNotification() {
+        animator.awaitNotification();
+    }
+
+    @Override
     public void resize(int width, int height) {
         animator.resize(width, height);
         hudStage.getViewport().update(width, height);
@@ -108,7 +114,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     public void dispose() {
         animator.dispose();
         hudStage.dispose();
-
+        manager.dispose();
     }
     public void setupInput(){
 
