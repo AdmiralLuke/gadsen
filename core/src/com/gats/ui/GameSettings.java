@@ -394,7 +394,7 @@ public class GameSettings {
         table.row();
 
         table.add(createExitButton(skin)).colspan(4).pad(10);
-
+        gameModeButton.setSelected("Weihnachtsaufgabe");
         return table;
     }
 
