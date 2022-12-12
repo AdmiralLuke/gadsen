@@ -5,6 +5,7 @@ import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 import com.sun.jmx.remote.internal.ArrayQueue;
+import org.lwjgl.Sys;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -71,7 +72,8 @@ public class HumanPlayer extends Player {
     private GameState state;
     private Controller controller;
 
-    public static String getName() {
+    @Override
+    public String getName() {
         return "Human";
     }
 
@@ -93,18 +95,26 @@ public class HumanPlayer extends Player {
     protected void executeTurn(GameState state, Controller controller) {
         this.state = state;
         this.controller = controller;
+        synchronized (this){
+            try {
+                wait(5000);
+            } catch (InterruptedException ignored) {
+                //Turn has been ended preemptively
+            }
+        }
     }
 
     public void processKeyDown(int keycode) {
-
+        System.out.println("Received Key: " + keycode);
         switch (keycode) {
-            // Qund E für rotieren/zielen mit den Waffen
+            // Q und E für rotieren/zielen mit den Waffen
             case KEY_CHARACTER_AIM_LEFT:
                 isDown[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_AIM_LEFT);
                 //currentPlayer.toggleAimLeft();
                 break;
             case KEY_CHARACTER_AIM_RIGHT:
+                System.out.printf("pressing key at %s ms\n", System.currentTimeMillis());
                 isDown[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_AIM_RIGHT);
                 break;

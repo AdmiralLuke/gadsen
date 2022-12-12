@@ -1,7 +1,5 @@
 package com.gats.simulation;
 
-import com.badlogic.gdx.math.Vector2;
-
 /**
  * {@link Action Ereignis}, das den Weg während der Lebensdauer eines {@link Projectile Projektils} beschreibt
  */

@@ -6,6 +6,7 @@ public enum WeaponType {
     CLOSE_COMBAT,
     BOMB,
     COOKIE,
-    SUGAR_CANE
+    SUGAR_CANE,
+    NOT_SELECTED
 }
 

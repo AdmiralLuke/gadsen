@@ -16,6 +16,7 @@ import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.Simulation;
 import org.junit.Assert;
+import org.lwjgl.Sys;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,20 +82,30 @@ public class HudStage extends Stage {
             case cameraRight:
                 directions[0] += 1;
                 break;
+               //ToDO cameraZoom
+            default:
+                if (turnInProgress && currentPlayer != null) {
+                    currentPlayer.processKeyDown(keycode);
+                }
+                break;
         }
         ingameScreen.setCameraDir(directions);
 
-        if (turnInProgress && currentPlayer != null) {
-            for (HumanPlayer cur : humanList
-            ) {
-                cur.processKeyDown(keycode);
-            }
-        }
 
 
         return true;
 
 
+    }
+
+    public void activateTurn(HumanPlayer humanPlayer){
+        currentPlayer = humanPlayer;
+//        System.out.printf("Activating turn for player %s\n", humanPlayer.toString());
+        turnInProgress = true;
+    }
+
+    public void endTurn(){
+        turnInProgress = false;
     }
 
     /**
@@ -120,15 +131,14 @@ public class HudStage extends Stage {
             case Keys.RIGHT:
                 directions[0] -= 1;
                 break;
+            default:
+                if (turnInProgress && currentPlayer != null) {
+                    currentPlayer.processKeyUp(keycode);
+                }
+                break;
         }
         ingameScreen.setCameraDir(directions);
 
-        if (turnInProgress && currentPlayer != null) {
-            for (HumanPlayer cur : humanList
-            ) {
-                cur.processKeyUp(keycode);
-            }
-        }
         return true;
     }
 

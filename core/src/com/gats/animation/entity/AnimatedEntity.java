@@ -29,4 +29,7 @@ public class AnimatedEntity extends Entity {
         accTime += deltaTime;
         batch.draw(animation.getKeyFrame(accTime), getPos().x, getPos().y);
     }
+    public TextureRegion getTextureRegion(){
+        return animation.getKeyFrame(0);
+    }
 }
