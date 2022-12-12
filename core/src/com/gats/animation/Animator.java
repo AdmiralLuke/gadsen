@@ -116,9 +116,9 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(TileMoveAction.class, ActionConverters::convertTileMoveAction);
                         put(TileDestroyAction.class, ActionConverters::convertTileDestroyAction);
                         put(CharacterFallAction.class, ActionConverters::convertCharacterFallAction);
+                        put(CharacterAimAction.class,ActionConverters::convertCharacterAimAction);
                     }
                 };
-
 
         public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
             ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> new ExpandedAction(new IdleAction(0, 0)))
@@ -232,7 +232,15 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             return new ExpandedAction(summonProjectile, destroyProjectile);
         }
+    private static ExpandedAction convertCharacterAimAction(com.gats.simulation.Action action, Animator animator) {
+            CharacterAimAction aimAction = (CharacterAimAction) action;
+            AimIndicator currentAimIndicator = animator.teams[aimAction.getTeam()][aimAction.getCharacter()].getAimingIndicator();
+        RotateAction rotateAction = new RotateAction(0,currentAimIndicator,aimAction.getAngle());
+        ScaleAction scaleAction = new ScaleAction(0,currentAimIndicator,new Vector2(aimAction.getStrength(),1));
+        return new ExpandedAction(rotateAction,scaleAction);
     }
+  }
+
 
     /**
      * Setzt eine Welt basierend auf den Daten in state auf und bereitet diese für nachfolgende Animationen vor
@@ -284,7 +292,10 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         Animation<TextureRegion> idleAnimation = new Animation<TextureRegion>(0.5f,
                 textureAtlas.findRegions("tile/coolCat"));
-
+        TextureRegion aimingIndicatorSprite = textureAtlas.findRegion("tile/testIndicator");
+        TextureRegion animationFrame = idleAnimation.getKeyFrame(0);
+        //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
+        Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth()/2f,animationFrame.getRegionHeight()/2f);
         characterGroup = new EntityGroup();
         characterGroup.setRelPos(new Vector2(45 * 12, 45 * 12));
         root.add(characterGroup);
@@ -294,6 +305,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 GameCharacter animGameCharacter = new GameCharacter(idleAnimation);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
+                animGameCharacter.setAimingIndicator(new AimIndicator(aimingIndicatorSprite,centerOfCharacterSprite,animGameCharacter));
                 characterGroup.add(animGameCharacter);
             }
 
