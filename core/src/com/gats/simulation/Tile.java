@@ -49,11 +49,16 @@ public class Tile {
      * @param y Position Y
      */
     Tile(int x, int y, GameState state) {
-        new Tile(x, y, false, state);
+        this.position = new IntVector2(x, y);
+        this.isAnchor = false;
+        this.state = state;
+        this.isAnchored = false;
     }
 
     Tile(int x, int y, GameState state, boolean isAnchored) {
-        new Tile(x, y, false, state);
+        this.position = new IntVector2(x, y);
+        this.isAnchor = false;
+        this.state = state;
         this.isAnchored = isAnchored;
     }
 
