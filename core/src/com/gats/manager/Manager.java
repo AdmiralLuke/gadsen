@@ -264,6 +264,9 @@ public class Manager {
             }
 
             futureExecutor.start();
+            if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
+                animationLogProcessor.animate(simulation.clearReturnActionLog());
+            }
             try {
                 while (futureExecutor.isAlive()) {
                     System.out.println("waiting for commands");
