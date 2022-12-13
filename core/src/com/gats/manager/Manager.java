@@ -193,6 +193,7 @@ public class Manager {
 
             Player currentPlayer = players[currentPlayerIndex];
             Controller controller = new Controller(this, gcController);
+
             Thread futureExecutor;
             Future<?> future;
             switch (currentPlayer.getType()) {
@@ -225,10 +226,14 @@ public class Manager {
                     });
                     break;
                 case AI:
+                    System.out.println("TimeStamp1: " + System.currentTimeMillis());
                     future = executor.submit(() -> {
+                        System.out.println("TimeStamp3: " + System.currentTimeMillis());
                         Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
+                        System.out.println("TimeStamp4: " + System.currentTimeMillis());
                         currentPlayer.executeTurn(state, controller);
                     });
+                    System.out.println("TimeStamp2: " + System.currentTimeMillis());
                     futureExecutor = new Thread(() -> {
                         Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
                         try {
@@ -241,6 +246,7 @@ public class Manager {
                             e.printStackTrace();
                         } catch (TimeoutException e) {
                             future.cancel(true);
+                            System.out.println("TimeStamp5: " + System.currentTimeMillis());
 
                             System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
                                     + ") computation surpassed timeout");
@@ -289,6 +295,16 @@ public class Manager {
                     futureExecutor.interrupt();
                     break;
                 }
+            }
+            try {
+                futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
+            } catch (InterruptedException e) {
+                System.out.printf("Interrupted while shutting down future executor\n");
+                if (pendingShutdown) {
+                    futureExecutor.interrupt();
+                    break;
+                }
+                throw new RuntimeException(e);
             }
         }
         System.out.println("Shutdown complete");

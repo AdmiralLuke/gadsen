@@ -1,9 +1,7 @@
 package com.gats.animation;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.StringBuilder;
@@ -17,9 +15,20 @@ import java.io.InputStream;
  * Repräsentiert eine Spielfigur auf der Karte
  */
 public class GameCharacter extends AnimatedEntity {
+
+    public enum AnimationType{
+        ANIMATION_TYPE_IDLE,
+        ANIMATION_TYPE_WALKING,
+        ANIMATION_TYPE_FALLING
+    }
+    private static Animation<TextureRegion>[] animations = new Animation[AnimationType.values().length];
     private AimIndicator aimingIndicator;
     private Color teamColor;
+
     private static ShaderProgram outlineShader;
+
+    //ToDo move all asset loading and prep to Seperate class
+    public static void loadAssets(TextureAtlas atlas)
     {
         StringBuilder builder = new StringBuilder();
         try(InputStream stream = GameCharacter.class.getClassLoader().getResourceAsStream("shader/vertex.glsl")){
@@ -46,18 +55,20 @@ public class GameCharacter extends AnimatedEntity {
         }
         String fragmentShader = builder.toString();
         outlineShader = new ShaderProgram(vertexShader, fragmentShader);
+
+
+        animations[AnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/idleShort"));
+        animations[AnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/characterOrangeLeftWalking"));
+        animations[AnimationType.ANIMATION_TYPE_FALLING.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/fallShort"));
+        for (Animation<TextureRegion> anim: animations
+             ) {
+            anim.setPlayMode(Animation.PlayMode.LOOP);
+        }
     }
 
-    public GameCharacter(Animation<TextureRegion> animation, Color teamColor) {
-        super(animation);
+    public GameCharacter(Color teamColor){
+        super(animations[AnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
         this.teamColor = teamColor;
-        animation.setPlayMode(Animation.PlayMode.LOOP);
-    }
-
-    public GameCharacter(Animation<TextureRegion> animation, AimIndicator aimIndicator){
-        super(animation);
-        animation.setPlayMode(Animation.PlayMode.LOOP);
-        this.aimingIndicator = aimIndicator;
     }
 
     @Override
@@ -69,8 +80,12 @@ public class GameCharacter extends AnimatedEntity {
         batch.flush();
         batch.setShader(null);
         if(aimingIndicator!=null){
-            aimingIndicator.draw(batch,deltaTime,parentAlpha);
+            aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
+    }
+
+    public void setAnimation(AnimationType type){
+        super.setAnimation(animations[type.ordinal()]);
     }
 
     public AimIndicator getAimingIndicator(){
@@ -79,5 +94,11 @@ public class GameCharacter extends AnimatedEntity {
 
     public void setAimingIndicator(AimIndicator aimIndicator) {
         this.aimingIndicator = aimIndicator;
+    }
+
+    @Override
+    public void setRelPos(Vector2 pos) {
+        setFlipped(this.getPos().x < pos.x);
+        super.setRelPos(pos);
     }
 }

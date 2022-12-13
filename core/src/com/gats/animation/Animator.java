@@ -162,17 +162,28 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.Action action, Animator animator) {
             CharacterMoveAction moveAction = (CharacterMoveAction) action;
-            Entity target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
 
-            return new ExpandedAction(new MoveAction(action.getDelay(), target, moveAction.getDuration(), moveAction.getPath()));
+            GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_WALKING);
+            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
+            startWalking.setChildren(new Action[]{animMoveAction});
+            SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
+            animMoveAction.setChildren(new Action[]{stopWalking});
+
+            return new ExpandedAction(startWalking, stopWalking);
         }
 
         private static ExpandedAction convertCharacterFallAction(com.gats.simulation.Action action, Animator animator) {
             CharacterFallAction moveAction = (CharacterFallAction) action;
-            //ToDo insert Fall animation
-            Entity target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
 
-            return new ExpandedAction(new MoveAction(action.getDelay(), target, moveAction.getDuration(), moveAction.getPath()));
+            GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            SetAnimationAction startFalling = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_FALLING);
+            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
+            startFalling.setChildren(new Action[]{animMoveAction});
+            SetAnimationAction stopFalling = new SetAnimationAction(0, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
+            animMoveAction.setChildren(new Action[]{stopFalling});
+
+            return new ExpandedAction(startFalling, stopFalling);
         }
 
         private static ExpandedAction convertProjectileMoveAction(com.gats.simulation.Action action, Animator animator) {
@@ -240,7 +251,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             SummonAction summonProjectile = new SummonAction(action.getDelay(), destroyProjectile::setTarget, () -> {
                 animator.map.setTile(destroyAction.getPos(), TileMap.TYLE_TYPE_NONE);
-                Entity particle = new AnimatedEntity(animator.destroyTileAnimation);
+                Entity particle = new AnimatedEntity(animator.destroyTileAnimation, new Vector2(16, 16));
                 particle.setRelPos(destroyAction.getPos().toFloat().scl(animator.map.getTileSize()));
                 animator.root.add(particle);
                 return particle;
@@ -271,9 +282,9 @@ public class Animator implements Screen, AnimationLogProcessor {
         this.batch = new SpriteBatch();
         this.root = new EntityGroup();
 
+        GameCharacter.loadAssets(atlas);
         this.destroyTileAnimation = new Animation<TextureRegion>(0.5f,
                 textureAtlas.findRegions("tile/coolCat"));
-
         setupView(viewport);
 
         setup(state, gameMode);
@@ -313,16 +324,16 @@ public class Animator implements Screen, AnimationLogProcessor {
         //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
         Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth()/2f,animationFrame.getRegionHeight()/2f);
         characterGroup = new EntityGroup();
-        characterGroup.setRelPos(new Vector2(45 * 12, 45 * 12));
+//        characterGroup.setRelPos(new Vector2(45 * 12, 45 * 12));
         root.add(characterGroup);
         for (int curTeam = 0; curTeam < teamCount; curTeam++)
             for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                 com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                 GameCharacter animGameCharacter;
                 if (gameMode == GameState.GAME_MODE_CHRISTMAS)
-                    animGameCharacter = new GameCharacter(idleAnimation, teamColors[Math.min(1, curTeam)]);
+                    animGameCharacter = new GameCharacter(teamColors[Math.min(1, curTeam)]);
                 else
-                    animGameCharacter = new GameCharacter(idleAnimation, teamColors[curTeam]);
+                    animGameCharacter = new GameCharacter(teamColors[curTeam]);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
                 animGameCharacter.setAimingIndicator(new AimIndicator(aimingIndicatorSprite,centerOfCharacterSprite,animGameCharacter));

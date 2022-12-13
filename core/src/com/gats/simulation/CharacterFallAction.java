@@ -12,7 +12,7 @@ public class CharacterFallAction extends CharacterAction {
         this.posBef = posBef;
         this.posAft = posAft;
         this.path = new LinearPath(posBef, posAft);
-        this.duration = (float)(path.getEndTime() / 0.001);
+        this.duration = path.getEndTime();
     }
 
     public Path getPath() {

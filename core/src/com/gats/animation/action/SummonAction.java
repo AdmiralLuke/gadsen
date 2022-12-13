@@ -29,6 +29,6 @@ public class SummonAction extends Action{
         Entity entity = null;
         if (summoner != null) entity = summoner.summon();
         if (listener != null) listener.onSummon(entity);
-        endAction(current);
+        endAction(oldTime);
     }
 }

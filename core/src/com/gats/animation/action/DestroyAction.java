@@ -30,7 +30,7 @@ public class DestroyAction extends Action{
     protected void runAction(float oldTime, float current) {
         if (destroyer != null) destroyer.destroy(target);
         if (listener != null) listener.onDestroy(target);
-        endAction(current);
+        endAction(oldTime);
     }
 
     public void setTarget(Entity target) {

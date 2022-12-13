@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.gats.manager.ChristmasBot;
 import com.gats.manager.Manager;
 import com.gats.manager.Player;
 import com.gats.manager.RunConfiguration;
@@ -105,6 +106,11 @@ public class GameSettings {
         ) {
             this.selectedBots.add(selectedBot.getSelected().getClassRef());
         }
+        if (this.gameMode == 1) {
+            for (int i =0; i<3; i++){
+                this.selectedBots.add(ChristmasBot.class);
+            }
+        }
     }
 
     private void setGameMode(int gameMode) {
@@ -190,11 +196,6 @@ public class GameSettings {
         //erstellt BotAuswahlButtons mit dem Weihnachtsbot als auswahl
         botSelectors.clear();
         botSelectors.add(christmasBotSelectorBox);
-        for (int i = 0; i < christmasBotAmount; i++) {
-            //forcing other bot selectors, that are hidden from the player to be christmas bots
-            //Todo get Christmas bot
-            botSelectors.add(createBotButton(skin, Manager.getPossiblePlayers()));
-        }
         //add buttons to the table that are meant to be adjusted
 
     }

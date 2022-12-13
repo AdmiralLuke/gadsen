@@ -144,7 +144,7 @@ public class GameCharacter {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
         while (this.posY / 16 > 0 && this.state.getTile(posX / 16, (posY / 16) - 1) == null) {
-            this.posY -= 1;
+            this.posY -= 16;
             fallen++;
         }
         int health = this.getHealth();
