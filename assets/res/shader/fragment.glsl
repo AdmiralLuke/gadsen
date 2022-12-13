@@ -1,3 +1,4 @@
+#version 330
 #ifdef GL_ES
 #define LOWP lowp
 precision mediump float;
@@ -5,7 +6,7 @@ precision mediump float;
 #define LOWP
 #endif
 varying LOWP vec4 v_color;
-uniform float line_thickness = 1;
+uniform float line_thickness;
 varying vec2 v_texCoords;
 uniform vec4 outline_color;
 uniform sampler2D u_texture;

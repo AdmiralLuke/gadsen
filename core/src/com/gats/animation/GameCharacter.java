@@ -79,6 +79,7 @@ public class GameCharacter extends AnimatedEntity {
         batch.flush();
         batch.setShader(outlineShader);
         outlineShader.setUniformf("outline_color", teamColor);
+        outlineShader.setUniformf("line_thickness", 1f);
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);
