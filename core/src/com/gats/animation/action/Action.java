@@ -32,7 +32,7 @@ public abstract class Action {
         float oldTime = current;
         this.current += deltaTime;
         if (current < delay) return -1;
-        runAction(oldTime, current);
+        runAction(Math.max(delay, oldTime), current);
         if (current <= end) return -1;
         return current - end;
     }

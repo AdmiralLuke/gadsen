@@ -22,6 +22,6 @@ public class RotateAction extends Action{
     protected void runAction(float oldTime, float current) {
 
         if(target!=null){target.setRotationAngle(-this.angle);}
-        endAction(current);
+        endAction(oldTime);
     }
 }

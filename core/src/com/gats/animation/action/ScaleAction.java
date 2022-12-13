@@ -21,7 +21,7 @@ public class ScaleAction extends Action{
     protected void runAction(float oldTime, float current) {
 
         if(target!=null){target.setScale(scale);}
-        endAction(current);
+        endAction(oldTime);
 
     }
 }

@@ -24,7 +24,7 @@ public class MoveAction extends Action{
 
     @Override
     protected void runAction(float oldTime, float current) {
-        System.out.printf("executing animator action at %s ms\n", System.currentTimeMillis());
+//        System.out.printf("executing animator action at %s ms\n", System.currentTimeMillis());
 //        System.out.println("executing animator move action");
 //        System.out.printf("current time: %f endtime: %f\n", current, endTime);
 //        System.out.printf("moving from: %s moving to: %s\n", target.getPos().toString(), path.getPos(Math.min(endTime, current)).toString());

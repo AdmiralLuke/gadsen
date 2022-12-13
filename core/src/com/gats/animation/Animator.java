@@ -272,6 +272,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             AimIndicator currentAimIndicator = animator.teams[aimAction.getTeam()][aimAction.getCharacter()].getAimingIndicator();
             RotateAction rotateAction = new RotateAction(0, currentAimIndicator, aimAction.getAngle());
             ScaleAction scaleAction = new ScaleAction(0, currentAimIndicator, new Vector2(aimAction.getStrength(), 1));
+            rotateAction.setChildren(new Action[]{scaleAction});
             return new ExpandedAction(rotateAction, scaleAction);
         }
 
@@ -350,7 +351,9 @@ public class Animator implements Screen, AnimationLogProcessor {
                     animGameCharacter = new GameCharacter(teamColors[curTeam]);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
-                animGameCharacter.setAimingIndicator(new AimIndicator(aimingIndicatorSprite, centerOfCharacterSprite, animGameCharacter));
+                AimIndicator aimIndicator = new AimIndicator(aimingIndicatorSprite, centerOfCharacterSprite, animGameCharacter);
+                aimIndicator.setScale(new Vector2(0.5f, 1));
+                animGameCharacter.setAimingIndicator(aimIndicator);
                 characterGroup.add(animGameCharacter);
             }
 
@@ -376,7 +379,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         //viewport.update(400,400);
 
 
-        this.camera = new OrthographicCamera(30, 30 * width / height);
+        this.camera = new OrthographicCamera(30, 30f * width / height);
         this.viewport.setCamera(camera);
         camera.zoom = 1f;
         camera.position.set(new float[]{0, 0, 0});
@@ -405,7 +408,6 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     @Override
     public void render(float delta) {
-
 
         if (actionList.isEmpty()) {
             if (!pendingLogs.isEmpty()) {

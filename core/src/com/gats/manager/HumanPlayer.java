@@ -173,12 +173,12 @@ public class HumanPlayer extends Player {
                 weaponTypeStack.add(nextType);
                 controller.selectWeapon(nextType);
                 break;
-            case KEY_CHARACTER_INCREASE_STRENGTH:
+            case KEY_CHARACTER_DECREASE_STRENGTH:
                 strength -= 0.05;
                 if (strength <0) strength = 0;
                 controller.aim(angle, strength);
                 break;
-            case KEY_CHARACTER_DECREASE_STRENGTH:
+            case KEY_CHARACTER_INCREASE_STRENGTH:
                 strength += 0.05;
                 if (strength >1) strength = 1;
                 controller.aim(angle, strength);
