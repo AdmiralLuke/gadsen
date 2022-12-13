@@ -351,7 +351,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                     animGameCharacter = new GameCharacter(teamColors[curTeam]);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
-                AimIndicator aimIndicator = new AimIndicator(aimingIndicatorSprite, centerOfCharacterSprite, animGameCharacter);
+                AimIndicator aimIndicator = new AimIndicator(aimingIndicatorSprite, animGameCharacter);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
                 animGameCharacter.setAimingIndicator(aimIndicator);
                 characterGroup.add(animGameCharacter);

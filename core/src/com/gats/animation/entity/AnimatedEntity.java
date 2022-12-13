@@ -52,4 +52,8 @@ public class AnimatedEntity extends Entity {
     public void setFlipped(boolean flipped) {
         this.flipped = flipped;
     }
+
+    public Vector2 getSize() {
+        return new Vector2(size);
+    }
 }
