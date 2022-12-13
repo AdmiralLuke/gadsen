@@ -40,6 +40,8 @@ public class Animator implements Screen, AnimationLogProcessor {
     private final TextureAtlas textureAtlas;
     private GameState state;
 
+    private GameCharacter activeCharacter;
+
     private Viewport viewport;
     private Viewport backgroundViewport;
 
@@ -79,7 +81,6 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private Map<Class<?>, ActionConverter> actionConverters = ActionConverters.map;
     private EntityGroup characterGroup;
-
 
 
     interface ActionConverter {
@@ -132,12 +133,18 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(TileMoveAction.class, ActionConverters::convertTileMoveAction);
                         put(TileDestroyAction.class, ActionConverters::convertTileDestroyAction);
                         put(CharacterFallAction.class, ActionConverters::convertCharacterFallAction);
-                        put(CharacterAimAction.class,ActionConverters::convertCharacterAimAction);
+                        put(CharacterAimAction.class, ActionConverters::convertCharacterAimAction);
+                        put(InitAction.class, ((simAction, animator) -> new ExpandedAction(new IdleAction(0, 0))));
+                        put(TurnStartAction.class, ActionConverters::convertTurnStartAction);
                     }
                 };
 
         public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
-            ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> new ExpandedAction(new IdleAction(0, 0)))
+            System.out.println("Converting " + simAction.getClass());
+            ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> {
+                        System.out.println("Missing Converter for Action of type " + simAction.getClass());
+                        return new ExpandedAction(new IdleAction(simAction.getDelay(), 0));
+                    })
                     .apply(simAction, animator);
             expandedAction.tail.setChildren(extractChildren(simAction, animator));
 
@@ -259,14 +266,21 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             return new ExpandedAction(summonProjectile, destroyProjectile);
         }
-    private static ExpandedAction convertCharacterAimAction(com.gats.simulation.Action action, Animator animator) {
+
+        private static ExpandedAction convertCharacterAimAction(com.gats.simulation.Action action, Animator animator) {
             CharacterAimAction aimAction = (CharacterAimAction) action;
             AimIndicator currentAimIndicator = animator.teams[aimAction.getTeam()][aimAction.getCharacter()].getAimingIndicator();
-        RotateAction rotateAction = new RotateAction(0,currentAimIndicator,aimAction.getAngle());
-        ScaleAction scaleAction = new ScaleAction(0,currentAimIndicator,new Vector2(aimAction.getStrength(),1));
-        return new ExpandedAction(rotateAction,scaleAction);
+            RotateAction rotateAction = new RotateAction(0, currentAimIndicator, aimAction.getAngle());
+            ScaleAction scaleAction = new ScaleAction(0, currentAimIndicator, new Vector2(aimAction.getStrength(), 1));
+            return new ExpandedAction(rotateAction, scaleAction);
+        }
+
+        private static ExpandedAction convertTurnStartAction(com.gats.simulation.Action action, Animator animator) {
+            TurnStartAction startAction = (TurnStartAction) action;
+            GameCharacter target = animator.teams[startAction.getTeam()][startAction.getCharacter()];
+            return new ExpandedAction(new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter));
+        }
     }
-  }
 
 
     /**
@@ -322,7 +336,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         TextureRegion aimingIndicatorSprite = textureAtlas.findRegion("tile/testIndicator");
         TextureRegion animationFrame = idleAnimation.getKeyFrame(0);
         //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
-        Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth()/2f,animationFrame.getRegionHeight()/2f);
+        Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth() / 2f, animationFrame.getRegionHeight() / 2f);
         characterGroup = new EntityGroup();
 //        characterGroup.setRelPos(new Vector2(45 * 12, 45 * 12));
         root.add(characterGroup);
@@ -336,7 +350,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                     animGameCharacter = new GameCharacter(teamColors[curTeam]);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
-                animGameCharacter.setAimingIndicator(new AimIndicator(aimingIndicatorSprite,centerOfCharacterSprite,animGameCharacter));
+                animGameCharacter.setAimingIndicator(new AimIndicator(aimingIndicatorSprite, centerOfCharacterSprite, animGameCharacter));
                 characterGroup.add(animGameCharacter);
             }
 
@@ -382,10 +396,6 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private Action convertAction(com.gats.simulation.Action action) {
         return ActionConverters.convert(action, this);
-    }
-
-    protected void setActiveCharacter(int teamIndex, int characterIndex) {
-
     }
 
     @Override
@@ -526,5 +536,11 @@ public class Animator implements Screen, AnimationLogProcessor {
             } catch (InterruptedException ignored) {
             }
         }
+    }
+
+    public GameCharacter setActiveGameCharacter(GameCharacter newCharacter){
+        GameCharacter old = activeCharacter;
+        activeCharacter = newCharacter;
+        return old;
     }
 }

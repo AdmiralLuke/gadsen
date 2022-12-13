@@ -16,6 +16,9 @@ import java.io.InputStream;
  */
 public class GameCharacter extends AnimatedEntity {
 
+
+    private boolean aimActive = false;
+
     public enum AnimationType{
         ANIMATION_TYPE_IDLE,
         ANIMATION_TYPE_WALKING,
@@ -79,7 +82,7 @@ public class GameCharacter extends AnimatedEntity {
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);
-        if(aimingIndicator!=null){
+        if(aimingIndicator!=null && aimActive){
             aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
     }
@@ -100,5 +103,9 @@ public class GameCharacter extends AnimatedEntity {
     public void setRelPos(Vector2 pos) {
         setFlipped(this.getPos().x < pos.x);
         super.setRelPos(pos);
+    }
+
+    public void aimActive(boolean active) {
+        aimActive = active;
     }
 }
