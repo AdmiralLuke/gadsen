@@ -143,15 +143,15 @@ public class GameCharacter {
     void fall() {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
-        while (this.posY / 16 > 0 && this.state.getTile(posX / 16, (posY / 16) - 1) == null) {
+        while (this.posY / 16 > 0 && this.state.getTile(posX / 16, (int)Math.ceil(posY / 16) - 1) == null) {
             this.posY -= 16;
             fallen++;
         }
         int health = this.getHealth();
-        if (this.posY / 16 == 0) {
+        if (this.posY / 16 <= 0) {
             this.setHealth(0);
         } else {
-            this.setHealth(fallen / 10);
+            this.setHealth(getHealth() - fallen);
         }
         this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f));
         this.sim.getActionLog().goToNextAction();
@@ -181,7 +181,7 @@ public class GameCharacter {
 
         if (dx < 0) {
             for (int i = 0; i >= dx; i--) {
-                if (state.getTile((posX  + i) / 16 , ((posY) / 16) - 1) == null) {
+                if (state.getTile((posX  + i) / 16 , (int)(Math.ceil(posY) / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -202,7 +202,7 @@ public class GameCharacter {
 
         } else {
             for (int i = 0; i <= dx; i++) {
-                if (state.getTile((posX + i) / 16, ((posY) / 16) - 1) == null) {
+                if (state.getTile((posX + i) / 16, (int)Math.ceil(posY / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -215,7 +215,7 @@ public class GameCharacter {
                     this.fall();
                     return;
                 }
-                if (state.getTile((posX + i + 1) / 16, posY / 16) != null) {
+                if (state.getTile(((posX + i) / 16) + 1, posY / 16) != null) {
                     dx = i;
                     break;
                 }
@@ -228,7 +228,7 @@ public class GameCharacter {
         this.posX += dx;
         Vector2 posAf = new Vector2(posX, posY);
 
-        System.out.println("moved to "+ posAf);
+        // System.out.println("moved to "+ posAf);
         this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
     }
 

@@ -1,6 +1,8 @@
 package com.gats.manager;
 
+import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
+import com.gats.simulation.IntVector2;
 import com.gats.simulation.WeaponType;
 
 public class TestBot extends Bot {
@@ -48,8 +50,16 @@ public class TestBot extends Bot {
      */
     @Override
     protected void executeTurn(GameState state, Controller controller) {
-        controller.move(4);
+        // Aktuelle Position des aktiven Spielers
+        Vector2 position = controller.getGameCharacter().getPlayerPos();
+        // kann ich da hinlaufen...?
+        if (state.getTile((int)(position.x / 16) + 1, (int)(position.y) - 1) != null) {
+            // einen Schritt weiter
+            controller.move(16);
+        }
+
+        // wähle die Zuckerstange aus
         controller.selectWeapon(WeaponType.SUGAR_CANE);
-        controller.shoot(20, 0.5f, WeaponType.SUGAR_CANE);
+        controller.shoot(20 + (int)(Math.random() * 30), 0.5f, WeaponType.SUGAR_CANE);
     }
 }
