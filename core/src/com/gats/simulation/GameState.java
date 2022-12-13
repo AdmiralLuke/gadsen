@@ -21,8 +21,8 @@ public class GameState {
 
     private int width;
     private int height;
-    private static final int GAME_MODE_NORMAL = 0;
-    private static final int GAME_MODE_CHRISTMAS = 1;
+    public static final int GAME_MODE_NORMAL = 0;
+    public static final int GAME_MODE_CHRISTMAS = 1;
 
     private int gameMode = GAME_MODE_NORMAL;
 

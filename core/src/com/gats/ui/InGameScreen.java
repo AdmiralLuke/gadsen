@@ -54,7 +54,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         runConfiguration.animationLogProcessor = this;
         runConfiguration.hud = hudStage;
         manager = new Manager(runConfiguration);
-        animator = new Animator(manager.getState(), gameViewport, ingameAtlas);
+        animator = new Animator(manager.getState(), gameViewport, ingameAtlas, gameSettings.getGameMode());
         manager.start();
 
         humanList = manager.getHumanList();

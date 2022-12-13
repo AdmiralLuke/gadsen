@@ -2,6 +2,7 @@ package com.gats.animation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -17,13 +18,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.manager.AnimationLogProcessor;
+import com.gats.manager.Manager;
 import com.gats.simulation.*;
 
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Function;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -59,12 +60,27 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private final Object notificationObject = new Object();
 
+    private static final Color[] teamColors = new Color[]{
+            Color.BLUE,
+            Color.RED,
+            Color.YELLOW,
+            Color.GREEN,
+            Color.CYAN,
+            Color.PINK,
+            Color.ORANGE,
+            Color.PURPLE,
+            Color.WHITE,
+            Color.BLACK
+    };
+
     private int teamCount;
     private int charactersPerTeam;
     private List<Action> actionList = new LinkedList<>();
 
     private Map<Class<?>, ActionConverter> actionConverters = ActionConverters.map;
     private EntityGroup characterGroup;
+
+
 
     interface ActionConverter {
         public ExpandedAction apply(com.gats.simulation.Action simAction, Animator animator);
@@ -249,7 +265,7 @@ public class Animator implements Screen, AnimationLogProcessor {
      * @param viewport viewport used for rendering
      * @param atlas    the TextureAtlas containing all required assets
      */
-    public Animator(GameState state, Viewport viewport, TextureAtlas atlas) {
+    public Animator(GameState state, Viewport viewport, TextureAtlas atlas, int gameMode) {
         this.state = state;
         this.textureAtlas = atlas;
         this.batch = new SpriteBatch();
@@ -260,12 +276,12 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         setupView(viewport);
 
-        setup(state);
+        setup(state, gameMode);
         // assign textures to tiles after processing game Stage
         //put sprite information into gameStage?
     }
 
-    private void setup(GameState state) {
+    private void setup(GameState state, int gameMode) {
 
 
         background = new SpriteEntity(
@@ -302,7 +318,11 @@ public class Animator implements Screen, AnimationLogProcessor {
         for (int curTeam = 0; curTeam < teamCount; curTeam++)
             for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                 com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
-                GameCharacter animGameCharacter = new GameCharacter(idleAnimation);
+                GameCharacter animGameCharacter;
+                if (gameMode == GameState.GAME_MODE_CHRISTMAS)
+                    animGameCharacter = new GameCharacter(idleAnimation, teamColors[Math.min(1, curTeam)]);
+                else
+                    animGameCharacter = new GameCharacter(idleAnimation, teamColors[curTeam]);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
                 animGameCharacter.setAimingIndicator(new AimIndicator(aimingIndicatorSprite,centerOfCharacterSprite,animGameCharacter));
