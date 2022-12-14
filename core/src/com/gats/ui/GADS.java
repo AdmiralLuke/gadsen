@@ -33,7 +33,6 @@ public class GADS extends Game {
 
 	GameSettings gameSettings;
 
-	int gameMode = 0;
 	@Override
 	public void create() {
 		gameSettings = new GameSettings(this);
