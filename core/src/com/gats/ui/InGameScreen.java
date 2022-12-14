@@ -110,11 +110,15 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         animator.hide();
     }
 
+    /**
+     * Gets called when the application is destroyed or currently when escape is pressed to return to menu. Not the best but the fastest way rn.
+     */
     @Override
     public void dispose() {
         animator.dispose();
         hudStage.dispose();
         manager.dispose();
+        gameManager.setScreenMenu();
     }
     public void setupInput(){
 

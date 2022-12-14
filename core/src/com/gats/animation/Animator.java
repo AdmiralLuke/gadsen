@@ -505,7 +505,8 @@ public class Animator implements Screen, AnimationLogProcessor {
     @Override
     public void dispose() {
         batch.dispose();
-        textureAtlas.dispose();
+        //disposes the atlas for every class because it is passed down as a parameter, no bruno for changing back to menu
+        //textureAtlas.dispose();
 
     }
 

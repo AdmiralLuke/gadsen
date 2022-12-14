@@ -22,7 +22,6 @@ public class GADS extends Game {
 
 	InGameScreen ingame;
 	Stage hudStage;
-	MenuScreen menuScreen;
 
 	Simulation simulation;
 
@@ -42,7 +41,6 @@ public class GADS extends Game {
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
 		assetManager.loadTextures();
-		menuScreen = new MenuScreen(this, assetManager);
 		setScreen(new MenuScreen(this, assetManager));
 	}
 
@@ -57,17 +55,15 @@ public class GADS extends Game {
 	@Override
 	public void dispose() {
 		if (screen != null) this.screen.dispose();
+		assetManager.unloadAtlas();
 	}
 
 	public void setScreenIngame() {
-		// ToDo: add Team Information from Sliders
 		setScreen(new InGameScreen(this, assetManager, gameSettings));
-		menuScreen.dispose();
 	}
 
 	public void setScreenMenu() {
-		menuScreen = new MenuScreen(this, assetManager);
-		setScreen(menuScreen);
+		setScreen(new MenuScreen(this, assetManager));
 	}
 
 	public String[] getMaps(){

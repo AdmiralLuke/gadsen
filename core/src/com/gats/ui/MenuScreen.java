@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
@@ -33,8 +34,10 @@ private SpriteBatch menuBatch;
         this.gameInstance = gameInstance;
         this.gadsAssetManager = gadsAssetManager;
 
-
-        this.camera = new OrthographicCamera(30, 30 * (Gdx.graphics.getHeight() / Gdx.graphics.getWidth()));
+        //Todo: fix background size
+        //-> maybe adjust to fill viewport specifically for the background or ad another background
+        this.background = atlas.findRegion("background/WeihnachtsBG");
+        this.camera = new OrthographicCamera(30, 30 * (Gdx.graphics.getHeight() * 1f / Gdx.graphics.getWidth()));
         menuViewport = new ExtendViewport(40 * 12, 40 * 12, camera);
 
 
@@ -43,6 +46,7 @@ private SpriteBatch menuBatch;
 
         menuBatch = new SpriteBatch();
         //create a table, holds ui widgets like buttons and textfields
+
         setupMenuScreen(mainMenu);
     }
 
@@ -67,8 +71,6 @@ private SpriteBatch menuBatch;
         menu.addActor(menuTable);
         menuTable.setDebug(false); // This is optional, but enables debug lines for tables.
         menuTable.setFillParent(true);
-       this.background = atlas.findRegion("background/WeihnachtsBG");
-       int i = 1;
     }
 
 

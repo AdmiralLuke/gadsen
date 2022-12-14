@@ -35,6 +35,8 @@ public class HudStage extends Stage {
     final int cameraLeft = Keys.LEFT;
     final int cameraRight = Keys.RIGHT;
 
+    final int exitToMenu = Keys.ESCAPE;
+
     private HumanPlayer currentPlayer;
 
     private boolean turnInProgress = false;
@@ -68,7 +70,7 @@ public class HudStage extends Stage {
     @Override
     public boolean keyDown(int keycode) {
 
-        //input handling for the camera
+        //input handling for the camera and ui
         switch (keycode) {
             case cameraUp:
                 directions[1] += 1;
@@ -81,6 +83,9 @@ public class HudStage extends Stage {
                 break;
             case cameraRight:
                 directions[0] += 1;
+                break;
+            case exitToMenu:
+                ingameScreen.dispose();
                 break;
                //ToDO cameraZoom
             default:
