@@ -226,14 +226,10 @@ public class Manager {
                     });
                     break;
                 case AI:
-                    System.out.println("TimeStamp1: " + System.currentTimeMillis());
                     future = executor.submit(() -> {
-                        System.out.println("TimeStamp3: " + System.currentTimeMillis());
                         Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
-                        System.out.println("TimeStamp4: " + System.currentTimeMillis());
                         currentPlayer.executeTurn(state, controller);
                     });
-                    System.out.println("TimeStamp2: " + System.currentTimeMillis());
                     futureExecutor = new Thread(() -> {
                         Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
                         try {
@@ -246,7 +242,6 @@ public class Manager {
                             e.printStackTrace();
                         } catch (TimeoutException e) {
                             future.cancel(true);
-                            System.out.println("TimeStamp5: " + System.currentTimeMillis());
 
                             System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
                                     + ") computation surpassed timeout");
@@ -269,19 +264,16 @@ public class Manager {
             }
             try {
                 while (futureExecutor.isAlive()) {
-                    System.out.println("waiting for commands");
                     Command nextCmd = commandQueue.take();
                     if (nextCmd.isEndTurn()) break;
-                    System.out.println("processing command");
                     nextCmd.run();
-                    System.out.println("finished processing");
 
                     if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                         animationLogProcessor.animate(simulation.clearReturnActionLog());
                     }
                 }
             } catch (InterruptedException e) {
-                System.out.printf("Interrupted while processing cmds\n");
+                System.err.println("Interrupted while processing cmds");
                 if (pendingShutdown) {
                     futureExecutor.interrupt();
                     break;

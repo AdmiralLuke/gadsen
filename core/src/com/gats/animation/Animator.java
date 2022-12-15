@@ -142,7 +142,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
             System.out.println("Converting " + simAction.getClass());
             ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> {
-                        System.out.println("Missing Converter for Action of type " + simAction.getClass());
+                        System.err.println("Missing Converter for Action of type " + simAction.getClass());
                         return new ExpandedAction(new IdleAction(simAction.getDelay(), 0));
                     })
                     .apply(simAction, animator);
@@ -204,7 +204,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 moveProjectile.setTarget(target);
                 destroyProjectile.setTarget(target);
             }, () -> {
-                Entity projectile = Projectiles.summon();
+                Entity projectile = Projectiles.summon(projectileAction.getType());
                 animator.root.add(projectile);
                 return projectile;
             });
@@ -294,6 +294,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     public Animator(GameState state, Viewport viewport, TextureAtlas atlas, int gameMode) {
         this.state = state;
         this.textureAtlas = atlas;
+        Projectiles.projectileAtlas = atlas;
         this.batch = new SpriteBatch();
         this.root = new EntityGroup();
 

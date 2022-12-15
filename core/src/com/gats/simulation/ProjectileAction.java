@@ -5,7 +5,7 @@ package com.gats.simulation;
  */
 public class ProjectileAction extends Action{
 
-    enum ProjectileType {
+    public enum ProjectileType {
         COOKIE,
         CANDY_CANE
     }

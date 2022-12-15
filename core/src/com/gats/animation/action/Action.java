@@ -27,8 +27,6 @@ public abstract class Action {
      * @return True, if and only if the action has been completed
      */
     public float step(float deltaTime){
-//        System.out.println("executing animator action");
-//        System.out.printf("delta time: %f oldTime: %f delay: %f", deltaTime, current, delay);
         float oldTime = current;
         this.current += deltaTime;
         if (current < delay) return -1;

@@ -18,16 +18,10 @@ public class MoveAction extends Action{
         this.target = target;
         this.path = path;
         this.endTime = delay + duration;
-        System.out.printf("queueing animator action at %s ms\n", System.currentTimeMillis());
-        System.out.printf("Move Action created with destination:" + path.getPos(endTime).toString());
     }
 
     @Override
     protected void runAction(float oldTime, float current) {
-//        System.out.printf("executing animator action at %s ms\n", System.currentTimeMillis());
-//        System.out.println("executing animator move action");
-//        System.out.printf("current time: %f endtime: %f\n", current, endTime);
-//        System.out.printf("moving from: %s moving to: %s\n", target.getPos().toString(), path.getPos(Math.min(endTime, current)).toString());
         if(target!= null) target.setRelPos(path.getPos(Math.min(endTime, current)));
         if(current > endTime) endAction(endTime);
     }
