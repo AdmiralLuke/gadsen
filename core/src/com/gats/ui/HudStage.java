@@ -23,6 +23,27 @@ import java.util.List;
 
 public class HudStage extends Stage {
 
+    enum Key {
+        KEY_CAMERA_UP,
+        KEY_CAMERA_DOWN,
+        KEY_CAMERA_LEFT,
+        KEY_CAMERA_RIGHT,
+        KEY_CAMERA_ZOOM_IN,
+        KEY_CAMERA_ZOOM_OUT,
+        KEY_CAMERA_ZOOM_RESET,
+        KEY_EXIT_TO_MENU
+    }
+
+    private final int KEY_CAMERA_UP = Keys.UP;
+    private final int KEY_CAMERA_DOWN = Keys.DOWN;
+    private final int KEY_CAMERA_LEFT = Keys.LEFT;
+    private final int KEY_CAMERA_RIGHT = Keys.RIGHT;
+    private final int KEY_CAMERA_ZOOM_IN = Keys.PLUS;
+    private final int KEY_CAMERA_ZOOM_OUT = Keys.MINUS;
+    private final int KEY_CAMERA_ZOOM_RESET = Keys.R;
+
+    private final int KEY_EXIT_TO_MENU = Keys.ESCAPE;
+    private
     SpriteBatch batch;
     TextureAtlas atlas;
     TextureRegion healthbar;
@@ -30,7 +51,6 @@ public class HudStage extends Stage {
 
     InGameScreen ingameScreen;
     Simulation gameSimulation;
-    final int cameraUp = Keys.UP;
     final int cameraDown = Keys.DOWN;
     final int cameraLeft = Keys.LEFT;
     final int cameraRight = Keys.RIGHT;
@@ -55,13 +75,16 @@ public class HudStage extends Stage {
     //used for storing arrow key input -> for now used for camera
     //first index for x Axis, second for y
     //length 3 because the cameraposition is 3d
-    float[] directions = new float[3];
+    float[] ingameCameraDirection = new float[3];
 
 
     /**
      * Called whenever a button is just pressed.
      * For now it handles input from the Arrow Keys, used for the camera Movement.
-     * This is done by storing the direction in {@link HudStage#directions}.
+     * This is done by storing the direction in {@link HudStage#ingameCameraDirection}.
+     *
+     * Also calls {@link HumanPlayer#processKeyDown(int keycode)} for user input.
+     * Currently is the default case.
      *
      * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
      * @return was the input handled
@@ -69,33 +92,37 @@ public class HudStage extends Stage {
 
     @Override
     public boolean keyDown(int keycode) {
-
         //input handling for the camera and ui
         switch (keycode) {
-            case cameraUp:
-                directions[1] += 1;
+            case KEY_CAMERA_UP:
+                ingameCameraDirection[1] += 1;
                 break;
-            case cameraDown:
-                directions[1] -= 1;
+            case KEY_CAMERA_DOWN:
+                ingameCameraDirection[1] -= 1;
                 break;
-            case cameraLeft:
-                directions[0] -= 1;
+            case KEY_CAMERA_LEFT:
+                ingameCameraDirection[0] -= 1;
                 break;
-            case cameraRight:
-                directions[0] += 1;
+            case KEY_CAMERA_RIGHT:
+                ingameCameraDirection[0] += 1;
                 break;
-            case exitToMenu:
+            case KEY_EXIT_TO_MENU:
                 ingameScreen.dispose();
                 break;
-               //ToDO cameraZoom
+            case KEY_CAMERA_ZOOM_IN:
+                break;
+            case KEY_CAMERA_ZOOM_OUT:
+                break;
+            case KEY_CAMERA_ZOOM_RESET:
+                break;
+            //ToDO cameraZoom
             default:
                 if (turnInProgress && currentPlayer != null) {
                     currentPlayer.processKeyDown(keycode);
                 }
                 break;
         }
-        ingameScreen.setCameraDir(directions);
-
+        ingameScreen.setCameraDir(ingameCameraDirection);
 
 
         return true;
@@ -103,13 +130,13 @@ public class HudStage extends Stage {
 
     }
 
-    public void activateTurn(HumanPlayer humanPlayer){
+    public void activateTurn(HumanPlayer humanPlayer) {
         currentPlayer = humanPlayer;
 //        System.out.printf("Activating turn for player %s\n", humanPlayer.toString());
         turnInProgress = true;
     }
 
-    public void endTurn(){
+    public void endTurn() {
         turnInProgress = false;
     }
 
@@ -125,16 +152,16 @@ public class HudStage extends Stage {
 
         switch (keycode) {
             case Keys.UP:
-                directions[1] -= 1;
+                ingameCameraDirection[1] -= 1;
                 break;
             case Keys.DOWN:
-                directions[1] += 1;
+               ingameCameraDirection[1] += 1;
                 break;
             case Keys.LEFT:
-                directions[0] += 1;
+               ingameCameraDirection[0] += 1;
                 break;
             case Keys.RIGHT:
-                directions[0] -= 1;
+                ingameCameraDirection[0] -= 1;
                 break;
             default:
                 if (turnInProgress && currentPlayer != null) {
@@ -142,7 +169,7 @@ public class HudStage extends Stage {
                 }
                 break;
         }
-        ingameScreen.setCameraDir(directions);
+        ingameScreen.setCameraDir(ingameCameraDirection);
 
         return true;
     }
