@@ -335,7 +335,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         Animation<TextureRegion> idleAnimation = new Animation<TextureRegion>(0.5f,
                 textureAtlas.findRegions("tile/coolCat"));
-        TextureRegion aimingIndicatorSprite = textureAtlas.findRegion("tile/testIndicator");
+        TextureRegion aimingIndicatorSprite = textureAtlas.findRegion("tile/aimIndicator");
         TextureRegion animationFrame = idleAnimation.getKeyFrame(0);
         //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
         Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth() / 2f, animationFrame.getRegionHeight() / 2f);
@@ -352,7 +352,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                     animGameCharacter = new GameCharacter(teamColors[curTeam]);
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
                 teams[curTeam][curCharacter] = animGameCharacter;
-                AimIndicator aimIndicator = new AimIndicator(aimingIndicatorSprite, centerOfCharacterSprite, animGameCharacter);
+                AimIndicator aimIndicator = new AimIndicator(aimingIndicatorSprite, animGameCharacter);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
                 animGameCharacter.setAimingIndicator(aimIndicator);
                 characterGroup.add(animGameCharacter);
@@ -463,7 +463,6 @@ public class Animator implements Screen, AnimationLogProcessor {
         batch.setProjectionMatrix(backgroundViewport.getCamera().combined);
         batch.begin();
         background.draw(batch, delta, 1);
-        //ToDo: Make the BG fill out the screen
         batch.setProjectionMatrix(camera.combined);
         //tells the batch to render in the way specified by the camera
         // e.g. Coordinate-system and Viewport scaling
@@ -506,7 +505,8 @@ public class Animator implements Screen, AnimationLogProcessor {
     @Override
     public void dispose() {
         batch.dispose();
-        textureAtlas.dispose();
+        //disposes the atlas for every class because it is passed down as a parameter, no bruno for changing back to menu
+        //textureAtlas.dispose();
 
     }
 

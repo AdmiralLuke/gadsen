@@ -76,16 +76,20 @@ public class GameCharacter extends AnimatedEntity {
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
+
         batch.flush();
+
+        //draw the aimIndicator before the character, so it is overlapped by it
+        if(aimingIndicator!=null && aimActive){
+            aimingIndicator.draw(batch, deltaTime, parentAlpha);
+        }
         batch.setShader(outlineShader);
         outlineShader.setUniformf("outline_color", teamColor);
         outlineShader.setUniformf("line_thickness", 1f);
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);
-        if(aimingIndicator!=null && aimActive){
-            aimingIndicator.draw(batch, deltaTime, parentAlpha);
-        }
+
     }
 
     public void setAnimation(AnimationType type){

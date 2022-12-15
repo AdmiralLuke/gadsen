@@ -367,7 +367,7 @@ public class GameSettings {
         //platziert den Table an der oberen Kante des Bildschirms
         table.top();
         //Spieltitel wird in der ersten Zeile hinzugefügt und hat eine breite von 4 Spalten
-        table.add(new Image(titleImage)).colspan(4).pad(15).height(80);
+        table.add(new Image(titleImage)).colspan(4).pad(15).height(80).minWidth(titleImage.getRegionWidth());
 
         //table.row(); erzeugt eine neue Zeile in der Tabelle
         table.row();
