@@ -200,6 +200,9 @@ public class HumanPlayer extends Player {
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_END_TURN:
+                //needed to set this true here, because otherwise it will stay true
+                //will potentially not get reset fast enough
+                isDown[Key.KEY_CHARACTER_END_TURN.ordinal()] = false;
                 this.endCurrentTurn();
                 break;
         }
