@@ -21,7 +21,9 @@ public class HumanPlayer extends Player {
         KEY_CHARACTER_AIM_RIGHT,
         KEY_CHARACTER_INCREASE_STRENGTH,
         KEY_CHARACTER_DECREASE_STRENGTH,
-        KEY_CHARACTER_CYCLE_WEAPON
+        KEY_CHARACTER_CYCLE_WEAPON,
+
+        KEY_CHARACTER_END_TURN
     }
 
 
@@ -33,6 +35,8 @@ public class HumanPlayer extends Player {
         final int KEY_CHARACTER_INCREASE_STRENGTH = Input.Keys.W;
         final int KEY_CHARACTER_DECREASE_STRENGTH = Input.Keys.S;
         final int KEY_CHARACTER_CYCLE_WEAPON = Input.Keys.TAB;
+
+        final int KEY_CHARACTER_END_TURN = Input.Keys.X;
 
 
 
@@ -99,8 +103,19 @@ public class HumanPlayer extends Player {
             try {
                 wait(5000);
             } catch (InterruptedException ignored) {
-                //Turn has been ended preemptively
+                System.out.println("Turn has been ended preemptively");
+
             }
+        }
+    }
+    /**
+    * Ends the current turn of the player preemptively.
+    * Callen when pressing {@link HumanPlayer#KEY_CHARACTER_END_TURN}.
+     * notifies itself, so the wait will end.
+     */
+    protected void endCurrentTurn(){
+        synchronized (this){
+            this.notify();
         }
     }
 
@@ -142,6 +157,10 @@ public class HumanPlayer extends Player {
                 isDown[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_DECREASE_STRENGTH);
                 break;
+                case KEY_CHARACTER_END_TURN:
+                isDown[Key.KEY_CHARACTER_END_TURN.ordinal()] = true;
+                execute(Key.KEY_CHARACTER_END_TURN);
+                break;
         }
     }
 
@@ -182,6 +201,9 @@ public class HumanPlayer extends Player {
                 strength += 0.05;
                 if (strength >1) strength = 1;
                 controller.aim(angle, strength);
+                break;
+            case KEY_CHARACTER_END_TURN:
+                this.endCurrentTurn();
                 break;
         }
     }
