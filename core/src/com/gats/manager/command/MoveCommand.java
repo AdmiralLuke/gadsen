@@ -12,7 +12,6 @@ public class MoveCommand extends Command{
 
     @Override
     public void run() {
-        System.out.println("executing move command");
         controller.move(dx);
     }
 }

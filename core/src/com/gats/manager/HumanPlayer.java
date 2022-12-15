@@ -122,14 +122,11 @@ public class HumanPlayer extends Player {
     public void processKeyDown(int keycode) {
         System.out.println("Received Key: " + keycode);
         switch (keycode) {
-            // Q und E für rotieren/zielen mit den Waffen
             case KEY_CHARACTER_AIM_LEFT:
                 isDown[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_AIM_LEFT);
-                //currentPlayer.toggleAimLeft();
                 break;
             case KEY_CHARACTER_AIM_RIGHT:
-                System.out.printf("pressing key at %s ms\n", System.currentTimeMillis());
                 isDown[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_AIM_RIGHT);
                 break;

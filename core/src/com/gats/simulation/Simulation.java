@@ -17,6 +17,11 @@ public class Simulation {
     //hud stage übergeben für die inputs?
     public Simulation(int gameMode,String mapName, int teamAm, int teamSize){
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
+        if (gameMode == GameState.GAME_MODE_CHRISTMAS) {
+            gameState.getTeams()[1][0].setHealth(1);
+            gameState.getTeams()[2][0].setHealth(1);
+            gameState.getTeams()[3][0].setHealth(1);
+        }
         IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y,0));
