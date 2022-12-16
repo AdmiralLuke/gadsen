@@ -53,12 +53,18 @@ public class GameCharacter {
         switch (type) {
             case COOKIE:
                 selectedWeapon = 0;
+                sim.getActionLog().goToNextAction();
+                sim.getActionLog().addAction(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.COOKIE));
                 break;
             case SUGAR_CANE:
                 selectedWeapon = 1;
+                sim.getActionLog().goToNextAction();
+                sim.getActionLog().addAction(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.SUGAR_CANE));
                 break;
             default:
                 selectedWeapon = -1;
+                sim.getActionLog().goToNextAction();
+                sim.getActionLog().addAction(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.NOT_SELECTED));
         }
     }
 
