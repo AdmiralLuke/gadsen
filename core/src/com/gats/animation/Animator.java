@@ -136,6 +136,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(CharacterAimAction.class, ActionConverters::convertCharacterAimAction);
                         put(InitAction.class, ((simAction, animator) -> new ExpandedAction(new IdleAction(0, 0))));
                         put(TurnStartAction.class, ActionConverters::convertTurnStartAction);
+                        put(CharacterSwitchWeaponAction.class, ActionConverters::convertCharacterSwitchWeaponAction);
                     }
                 };
 
@@ -281,6 +282,23 @@ public class Animator implements Screen, AnimationLogProcessor {
             GameCharacter target = animator.teams[startAction.getTeam()][startAction.getCharacter()];
             return new ExpandedAction(new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter));
         }
+
+        private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.Action action, Animator animator) {
+            CharacterSwitchWeaponAction switchWeaponAction = (CharacterSwitchWeaponAction) action;
+            GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
+            SetAnimationAction setAnimationAction;
+            switch (switchWeaponAction.getWpType()) {
+                case COOKIE:
+                    setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_COOKIE);
+                    break;
+                case SUGAR_CANE:
+                    setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_SUGAR_CANE);
+                    break;
+                default:
+                    setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
+            }
+            return new ExpandedAction(setAnimationAction);
+        }
     }
 
 
@@ -320,7 +338,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         backgroundTexture = textureAtlas.findRegion("background/WeihnachtsBG").getTexture();
         //backgroundTexture.setWrap();
 
-        TextureRegion[] tileTextures = new TextureRegion[]{
+        tileTextures = new TextureRegion[]{
                 textureAtlas.findRegion("tile/16x_box01"),
                 textureAtlas.findRegion("tile/16x_anchor01")
         };

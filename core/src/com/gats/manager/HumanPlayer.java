@@ -101,7 +101,7 @@ public class HumanPlayer extends Player {
         this.controller = controller;
         synchronized (this){
             try {
-                wait(5000);
+                this.wait(20000);
             } catch (InterruptedException ignored) {
                 System.out.println("Turn has been ended preemptively");
 
@@ -162,6 +162,7 @@ public class HumanPlayer extends Player {
     }
 
     private void execute(Key key) {
+        System.out.println("Commanding Controller: " + controller);
         switch (key) {
             // Qund E für rotieren/zielen mit den Waffen
             case KEY_CHARACTER_AIM_LEFT:

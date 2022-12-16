@@ -22,7 +22,9 @@ public class GameCharacter extends AnimatedEntity {
     public enum AnimationType{
         ANIMATION_TYPE_IDLE,
         ANIMATION_TYPE_WALKING,
-        ANIMATION_TYPE_FALLING
+        ANIMATION_TYPE_FALLING,
+        ANIMATION_TYPE_COOKIE,
+        ANIMATION_TYPE_SUGAR_CANE
     }
     private static Animation<TextureRegion>[] animations = new Animation[AnimationType.values().length];
     private AimIndicator aimingIndicator;
@@ -63,6 +65,8 @@ public class GameCharacter extends AnimatedEntity {
         animations[AnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/idleShort"));
         animations[AnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/characterOrangeLeftWalking"));
         animations[AnimationType.ANIMATION_TYPE_FALLING.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/fallShort"));
+        animations[AnimationType.ANIMATION_TYPE_COOKIE.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/idleShortCookie"));
+        animations[AnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/idleShortSugarCaneInHand"));
         for (Animation<TextureRegion> anim: animations
              ) {
             anim.setPlayMode(Animation.PlayMode.LOOP);

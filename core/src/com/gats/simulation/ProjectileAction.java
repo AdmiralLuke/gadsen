@@ -1,5 +1,7 @@
 package com.gats.simulation;
 
+import org.lwjgl.Sys;
+
 /**
  * {@link Action Ereignis}, das den Weg während der Lebensdauer eines {@link Projectile Projektils} beschreibt
  */
@@ -20,6 +22,7 @@ public class ProjectileAction extends Action{
 
     public ProjectileAction(Path path, ProjectileType type, float duration) {
         super(0);
+        System.out.println("Creating Projectile Action");
         this.type = type;
         this.path = path;
         this.duration = duration;
