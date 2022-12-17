@@ -273,6 +273,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                 return particle;
             });
 
+            summonProjectile.setChildren(new Action[]{destroyProjectile});
+
             return new ExpandedAction(summonProjectile, destroyProjectile);
         }
 
