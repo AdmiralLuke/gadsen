@@ -43,6 +43,11 @@ public class Simulation {
 
 
     public ActionLog endTurn() {
+        if (this.gameState.getGameMode() == GameState.GAME_MODE_CHRISTMAS && this.gameState.getTeams()[0][0].getHealth() <= 0) {
+            gameState.setActive(false);
+            return this.actionLog;
+        }
+
         if (gameState.getTurn().size() <= 1) {
             gameState.setActive(false);
             return this.actionLog;
@@ -72,6 +77,7 @@ public class Simulation {
             nextChar = gameState.getTurn().peek();
         }
         gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetStamina();
+        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).setAlreadyShooted(false);
         return clearAndReturnActionLog();
     }
 

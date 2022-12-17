@@ -11,6 +11,7 @@ public class GameCharacter {
     private int posY;
     private int health = 100;
     private int stamina = 48;
+    private boolean alreadyShooted = false;
 
     private int team;
     private int teamPos;
@@ -69,12 +70,20 @@ public class GameCharacter {
     }
 
     boolean shoot(Vector2 dir, float strength) {
+        if (alreadyShooted) {
+            return false;
+        }
         if (selectedWeapon != -1) {
             weapons[selectedWeapon].shoot(dir, strength);
+            alreadyShooted = true;
             return true;
         } else {
             return false;
         }
+    }
+
+    void setAlreadyShooted(boolean alreadyShooted) {
+        this.alreadyShooted = alreadyShooted;
     }
 
     /**

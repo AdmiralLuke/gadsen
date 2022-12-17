@@ -62,6 +62,10 @@ public class GameState {
 
     }
 
+    int getGameMode() {
+        return gameMode;
+    }
+
     /**
      * spawns player
      */
