@@ -72,6 +72,8 @@ public class Projectile {
         this.damageLoss = 0;
         this.range = range;
         this.pos = pos;
+        this.pos.y += 7;
+        this.pos.x += 7;
         this.dir = dir;
         this.type = type;
         this.projectileType = prType;

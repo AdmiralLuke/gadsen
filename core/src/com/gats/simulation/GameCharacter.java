@@ -68,7 +68,7 @@ public class GameCharacter {
         }
     }
 
-    public boolean shoot(Vector2 dir, float strength) {
+    boolean shoot(Vector2 dir, float strength) {
         if (selectedWeapon != -1) {
             weapons[selectedWeapon].shoot(dir, strength);
             return true;

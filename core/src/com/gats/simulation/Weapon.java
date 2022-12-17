@@ -74,7 +74,5 @@ abstract class Weapon {
         Projectile proj = new Projectile(damage, projRange, character.getPlayerPos(), dir, type, AcType, sim, character, strength);
         proj.move();
         shoots--;
-
-
     }
 }
