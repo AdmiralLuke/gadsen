@@ -24,4 +24,9 @@ public class LaserPath implements Path{
     public Vector2 getStartPos() {
         return startPos;
     }
+
+    @Override
+    public float getEndTime() {
+        return 0;
+    }
 }

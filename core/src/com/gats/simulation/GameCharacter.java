@@ -153,6 +153,7 @@ public class GameCharacter {
             this.posY -= 16;
             fallen++;
         }
+        if (fallen == 0) return;
         int health = this.getHealth();
         if (this.posY / 16 <= 0) {
             this.setHealth(0);

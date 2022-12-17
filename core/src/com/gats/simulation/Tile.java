@@ -52,7 +52,14 @@ public class Tile {
         this.position = new IntVector2(x, y);
         this.isAnchor = false;
         this.state = state;
-        this.isAnchored = false;
+        this.isAnchored = true;
+        if (isAnchored) {
+            state.getBoard()[x][y] = this;
+            sortIntoTree();
+        } else {
+            // Die Garbage Collection wird das schon löschen
+            state.getBoard()[x][y] = null;
+        }
     }
 
     Tile(int x, int y, GameState state, boolean isAnchored) {
@@ -60,6 +67,13 @@ public class Tile {
         this.isAnchor = false;
         this.state = state;
         this.isAnchored = isAnchored;
+        if (isAnchored) {
+            state.getBoard()[x][y] = this;
+            sortIntoTree();
+        } else {
+            // Die Garbage Collection wird das schon löschen
+            state.getBoard()[x][y] = null;
+        }
     }
 
     /**
@@ -87,7 +101,6 @@ public class Tile {
      * fügt eine Tile in die Graphenstruktur aus Tiles an
      */
     void sortIntoTree() {
-
         if (this.position.x > 0) {
             this.left = getTileAtPosition(position.x - 1, position.y, state);
         }
@@ -187,16 +200,18 @@ public class Tile {
                     if (character.getPlayerPos().x == this.position.x && character.getPlayerPos().y == this.position.y) {
                         LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()));
                         int tmpHealth = character.getHealth();
-                        character.setHealth(tmpHealth - ((int)path.getEndTime() * 5));
-                        Action tmpAction = new TileMoveAction(posBef, this.position, 0.05f);
+                        character.setHealth(tmpHealth - ((int)path.getEndTime() / 10));
+                        Action tmpAction = new TileMoveAction(posBef, this.position, 1f);
                         Action tmpDestAction = new TileDestroyAction(this.getPosition());
+                        tmpAction.addChild(tmpDestAction);
                         tmpDestAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), tmpHealth, character.getHealth()));
+                        this.state.getSim().getActionLog().addAction(tmpAction);
                         return;
                     }
                 }
             }
         }
-        float duration = 0.05f;
+        float duration = 1f;
         Action tmpAction = new TileMoveAction(posBef, this.position, duration);
         Action tmpDestAction = new TileDestroyAction(this.getPosition());
         tmpAction.addChild(tmpDestAction);
@@ -216,17 +231,18 @@ public class Tile {
      */
     public ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, int direction) {
         tiles.add(this);
+        if (tiles.get(tiles.size() - 1).isAnchor) return null;
         if (this.hasUp() && !(direction == 2)) {
-            up.convertGraphToList(tiles, 1);
+            return up.convertGraphToList(tiles, 1);
         }
         if (this.hasDown() && !(direction == 1)) {
-            down.convertGraphToList(tiles, 2);
+            return down.convertGraphToList(tiles, 2);
         }
         if (this.hasLeft() && !(direction == 0)) {
-            left.convertGraphToList(tiles, 3);
+            return left.convertGraphToList(tiles, 3);
         }
         if (this.hasRight() && !(direction == 3)) {
-            right.convertGraphToList(tiles, 0);
+            return right.convertGraphToList(tiles, 0);
         }
         return tiles;
     }
