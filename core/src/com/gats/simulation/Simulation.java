@@ -14,7 +14,13 @@ public class Simulation {
     private GameState gameState;
     private ActionLog actionLog;
 
-    //hud stage übergeben für die inputs?
+    /**
+     * erstellt eine neue Simulation
+     * @param gameMode Modus in dem gespielt wird
+     * @param mapName Map auf der gespielt wird
+     * @param teamAm Anzahl Teams
+     * @param teamSize Anzahl Charaktere pro Team
+     */
     public Simulation(int gameMode,String mapName, int teamAm, int teamSize){
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
         if (gameMode == GameState.GAME_MODE_CHRISTMAS) {
@@ -27,10 +33,14 @@ public class Simulation {
         actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y,0));
     }
 
+    /**
+     * gibt den aktuellen GameState zurück
+     * @return aktueller GameState
+     */
     public GameState getState() {
         return gameState;
     }
-    public ActionLog getActionLog(){
+    ActionLog getActionLog(){
         return actionLog;
     }
 

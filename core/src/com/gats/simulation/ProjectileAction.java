@@ -1,5 +1,6 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.math.Vector2;
 import org.lwjgl.Sys;
 
 /**
@@ -20,13 +21,16 @@ public class ProjectileAction extends Action{
     private float duration;
 
 
-    public ProjectileAction(Path path, ProjectileType type, float duration) {
+    public ProjectileAction(Path path, ProjectileType type, float duration, Vector2 posAft) {
         super(0);
         System.out.println("Creating Projectile Action");
         this.type = type;
         this.path = path;
-        this.duration = duration / 100;
-
+        if (ProjectileType.COOKIE == type) {
+            this.duration = -((path.getPos(0).x - posAft.x) / ((ParablePath)path).getV().x);;
+        } else {
+            this.duration = duration;
+        }
         System.out.println("Shooting " + (path.getPos(0.001).cpy().sub(path.getPos(0))));
         System.out.println("Shooting " + (path.getPos(1).cpy().sub(path.getPos(0))));
     }

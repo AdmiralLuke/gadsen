@@ -8,8 +8,9 @@ import com.badlogic.gdx.math.Vector2;
 public class ParablePath implements Path {
 
     private final Vector2 s;
-    private final static double g = 9.81;
+    private final static double g = 9.81 * 8;
     private final Vector2 v;
+    private float endTime;
 
     public ParablePath(Vector2 s, Vector2 v) {
         this.s = s;
@@ -26,5 +27,9 @@ public class ParablePath implements Path {
     @Override
     public float getEndTime() {
         return 0;
+    }
+
+    public Vector2 getV() {
+        return v;
     }
 }

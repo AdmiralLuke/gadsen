@@ -45,8 +45,8 @@ public class GameCharacter {
     }
 
     /**
-     * Gibt den Weapon
-     * @return
+     * Gibt den Waffen Typ der aktuell gewählten Waffe aus (als Enum)
+     * @return Enum WeaponType
      */
     public WeaponType getSelectedWeapon() {
         if (selectedWeapon != -1) {
@@ -56,6 +56,10 @@ public class GameCharacter {
         }
     }
 
+    /**
+     * Wählt eine Waffe anhand des Typs aus
+     * @param type Waffentyp
+     */
     void selectWeapon(WeaponType type) {
         switch (type) {
             case COOKIE:
@@ -75,6 +79,10 @@ public class GameCharacter {
         }
     }
 
+    /**
+     * Schießt mit der ausgewählten Waffe. Kann nur einmal pro Spielzug aufgerufen werden
+     * @return true wenn erfolgreich abgeschossen
+     */
     boolean shoot() {
         if (alreadyShooted) {
             return false;
@@ -88,23 +96,40 @@ public class GameCharacter {
         }
     }
 
+    /**
+     * Bestimmt, ob der Charakter noch schießen darf
+     * @param alreadyShooted true wenn er bereits geschossen hat
+     */
     void setAlreadyShooted(boolean alreadyShooted) {
         this.alreadyShooted = alreadyShooted;
     }
 
     /**
-     * Gibt die Lebensanzahl eines Spielers zurück (maximal 100)
-     * @return Lebensanzahl des Spielers
+     * Gibt die Lebensanzahl eines Charakters zurück (maximal 100)
+     * @return Lebensanzahl des Charakters
      */
     public int getHealth() { return this.health; }
+
+    /**
+     * Gibt die Ausdaueranzahl des Charakters zurück
+     * @return Ausdaueranzahl des Charakters
+     */
     public int getStamina() { return this.stamina; }
     void setHealth(int newHealth) { this.health = newHealth; }
     void setStamina(int newStamina) { this.stamina = newStamina; }
 
+    /**
+     * Gibt die Teamnummer des Charakters zurück
+     * @return Teamnummer des Charakters
+     */
     public int getTeam() {
         return team;
     }
 
+    /**
+     * gibt die Position im Team zurück
+     * @return Charakter-Position im Team
+     */
     public int getTeamPos() {
         return teamPos;
     }
@@ -161,6 +186,9 @@ public class GameCharacter {
         this.stamina = 60;
     }
 
+    /**
+     * Lässt den Charakter fallen
+     */
     void fall() {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
