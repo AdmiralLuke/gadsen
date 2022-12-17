@@ -17,6 +17,8 @@ public class GameCharacter {
     private int teamPos;
     private GameState state;
     private Simulation sim;
+    private Vector2 dir;
+    private float strength;
 
     private Weapon[] weapons;
     private int selectedWeapon = -1;
@@ -69,7 +71,7 @@ public class GameCharacter {
         }
     }
 
-    boolean shoot(Vector2 dir, float strength) {
+    boolean shoot() {
         if (alreadyShooted) {
             return false;
         }
@@ -197,7 +199,7 @@ public class GameCharacter {
 
         if (dx < 0) {
             for (int i = 0; i >= dx; i--) {
-                if (state.getTile((posX  + i) / 16 , (int)(Math.ceil(posY) / 16) - 1) == null) {
+                if (state.getTile((posX  + i + 15) / 16 , (int)(Math.ceil(posY) / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -218,7 +220,7 @@ public class GameCharacter {
 
         } else {
             for (int i = 0; i <= dx; i++) {
-                if (state.getTile((posX + i) / 16, (int)Math.ceil(posY / 16) - 1) == null) {
+                if (state.getTile((posX + i + 2) / 16, (int)Math.ceil(posY / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -276,7 +278,15 @@ public class GameCharacter {
      */
     protected void aim(Vector2 angle, float strength){
         //Todo: see if angleDeg is the wrong value to use
+        this.dir = angle;
         this.sim.getActionLog().addAction(new CharacterAimAction(this.team,this.teamPos, angle, strength));
     }
 
+    float getStrength() {
+        return strength;
+    }
+
+    Vector2 getDir() {
+        return dir;
+    }
 }

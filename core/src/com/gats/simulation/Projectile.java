@@ -113,7 +113,6 @@ public class Projectile {
                                 int oldHealth = character.getHealth();
                                 character.setHealth(oldHealth - damage);
                                 sim.getActionLog().addAction(new CharacterHitAction(character.getTeam(), character.getTeamPos(), oldHealth, character.getHealth()));
-                                sim.getActionLog().goToNextAction();
                                 return;
                             }
                         }

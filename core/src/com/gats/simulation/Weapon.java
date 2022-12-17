@@ -71,6 +71,7 @@ abstract class Weapon {
         }
         sim.getActionLog().goToNextAction();
         sim.getActionLog().addAction(new CharacterShootAction(character.getTeam(), character.getTeamPos()));
+        sim.getActionLog().goToNextAction();
         Projectile proj = new Projectile(damage, projRange, character.getPlayerPos(), dir, type, AcType, sim, character, strength);
         proj.move();
         shoots--;

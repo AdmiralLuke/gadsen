@@ -22,6 +22,14 @@ public class ActionLog {
         this.lastAddedAction.getChildren().add(action);
     }
 
+    void goToLast() {
+        lastAddedAction = lastAddedAction.getChildren().get(lastAddedAction.getChildren().size() - 1);
+    }
+
+    void returnToRoot() {
+        this.lastAddedAction = rootAction;
+    }
+
     void goToNextAction() {
         if (lastAddedAction == rootAction) {
             return;

@@ -159,7 +159,7 @@ public class Tile {
      * oder auf anderer Box landet
      */
     void onDestroy() {
-        this.state.getSim().getActionLog().goToNextAction();
+        this.state.getSim().getActionLog().goToLast();
         ArrayList<Tile> rightList = null;
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;
@@ -176,6 +176,7 @@ public class Tile {
         if (leftList != null) checkForAnchor(leftList);
         if (upperList != null) checkForAnchor(upperList);
         if (lowerList != null) checkForAnchor(lowerList);
+        state.getSim().getActionLog().returnToRoot();
     }
 
     void checkForAnchor(ArrayList<Tile> list) {
