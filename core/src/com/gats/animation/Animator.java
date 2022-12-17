@@ -322,11 +322,21 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterHitAction(com.gats.simulation.Action action, Animator animator) {
             CharacterHitAction hitAction = (CharacterHitAction) action;
+            Action lastAction;
             GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
-            SetAnimationAction setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_HIT);
-            SetAnimationAction resetAnimationAction = new SetAnimationAction(1.0f, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
-            setAnimationAction.setChildren(new Action[]{resetAnimationAction});
-            return new ExpandedAction(setAnimationAction, resetAnimationAction);
+            SetAnimationAction hitAnimation = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_HIT);
+            if (hitAction.getHealthAft() <= 0){
+                SetAnimationAction deathAnimation = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacter.AnimationType.ANIMATION_TYPE_HIT), target, GameCharacter.AnimationType.ANIMATION_TYPE_DEATH);
+                hitAnimation.setChildren(new Action[]{deathAnimation});
+                DestroyAction destroyCharacter = new DestroyAction(GameCharacter.getAnimationDuration(GameCharacter.AnimationType.ANIMATION_TYPE_DEATH), target, null, animator.characterGroup::remove);
+                deathAnimation.setChildren(new Action[]{destroyCharacter});
+                lastAction = destroyCharacter;
+            }else{
+                SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacter.AnimationType.ANIMATION_TYPE_HIT), target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
+                hitAnimation.setChildren(new Action[]{resetAnimationAction});
+                lastAction = resetAnimationAction;
+            }
+            return new ExpandedAction(hitAnimation, lastAction);
         }
     }
 

@@ -26,7 +26,8 @@ public class GameCharacter extends AnimatedEntity {
         ANIMATION_TYPE_FALLING,
         ANIMATION_TYPE_COOKIE,
         ANIMATION_TYPE_SUGAR_CANE,
-        ANIMATION_TYPE_HIT
+        ANIMATION_TYPE_HIT,
+        ANIMATION_TYPE_DEATH
     }
 
     private static Animation<TextureRegion>[] animations = new Animation[AnimationType.values().length];
@@ -74,6 +75,7 @@ public class GameCharacter extends AnimatedEntity {
         animations[AnimationType.ANIMATION_TYPE_COOKIE.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/idleShortCookie"));
         animations[AnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/idleShortSugarCaneInHand"));
         animations[AnimationType.ANIMATION_TYPE_HIT.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/hitAnimationRed"));
+        animations[AnimationType.ANIMATION_TYPE_DEATH.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/characterOrangeLeftDeath"));
         for (Animation<TextureRegion> anim : animations
         ) {
             anim.setPlayMode(Animation.PlayMode.LOOP);
@@ -137,6 +139,10 @@ public class GameCharacter extends AnimatedEntity {
     public void setRelPos(Vector2 pos) {
         setFlipped(this.getPos().x < pos.x);
         super.setRelPos(pos);
+    }
+
+    public static float getAnimationDuration(AnimationType type){
+        return animations[type.ordinal()].getAnimationDuration();
     }
 
     public void aimActive(boolean active) {
