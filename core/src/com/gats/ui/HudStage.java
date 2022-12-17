@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.animation.Animator;
+import com.gats.animation.AnimatorCamera;
 import com.gats.manager.HumanPlayer;
 import com.gats.simulation.CharacterMoveAction;
 import com.gats.simulation.GameCharacter;
@@ -38,8 +39,8 @@ public class HudStage extends Stage {
     private final int KEY_CAMERA_DOWN = Keys.DOWN;
     private final int KEY_CAMERA_LEFT = Keys.LEFT;
     private final int KEY_CAMERA_RIGHT = Keys.RIGHT;
-    private final int KEY_CAMERA_ZOOM_IN = Keys.PLUS;
-    private final int KEY_CAMERA_ZOOM_OUT = Keys.MINUS;
+    private final int KEY_CAMERA_ZOOM_IN = Keys.I;
+    private final int KEY_CAMERA_ZOOM_OUT = Keys.O;
     private final int KEY_CAMERA_ZOOM_RESET = Keys.R;
 
     private final int KEY_EXIT_TO_MENU = Keys.ESCAPE;
@@ -50,6 +51,8 @@ public class HudStage extends Stage {
     GADSAssetManager assetManager;
 
     InGameScreen ingameScreen;
+    AnimatorCamera camera;
+
     Simulation gameSimulation;
     final int cameraDown = Keys.DOWN;
     final int cameraLeft = Keys.LEFT;
@@ -77,6 +80,8 @@ public class HudStage extends Stage {
     //length 3 because the cameraposition is 3d
     float[] ingameCameraDirection = new float[3];
 
+    float cameraZoomPressed = 0;
+    boolean cameraReset;
 
     /**
      * Called whenever a button is just pressed.
@@ -110,19 +115,24 @@ public class HudStage extends Stage {
                 ingameScreen.dispose();
                 break;
             case KEY_CAMERA_ZOOM_IN:
+                cameraZoomPressed -= 1;
                 break;
             case KEY_CAMERA_ZOOM_OUT:
+                cameraZoomPressed += 1;
+
                 break;
             case KEY_CAMERA_ZOOM_RESET:
+              ingameScreen.resetCamera();
+               //Todo: Zoom Reset
                 break;
-            //ToDO cameraZoom
+
             default:
                 if (turnInProgress && currentPlayer != null) {
                     currentPlayer.processKeyDown(keycode);
                 }
                 break;
         }
-        ingameScreen.setCameraDir(ingameCameraDirection);
+        ingameScreen.processInputs(ingameCameraDirection,cameraZoomPressed);
 
 
         return true;
@@ -163,13 +173,20 @@ public class HudStage extends Stage {
             case Keys.RIGHT:
                 ingameCameraDirection[0] -= 1;
                 break;
+             case KEY_CAMERA_ZOOM_IN:
+                cameraZoomPressed += 1;
+                break;
+            case KEY_CAMERA_ZOOM_OUT:
+                cameraZoomPressed -= 1;
+
+                break;
             default:
                 if (turnInProgress && currentPlayer != null) {
                     currentPlayer.processKeyUp(keycode);
                 }
                 break;
         }
-        ingameScreen.setCameraDir(ingameCameraDirection);
+        ingameScreen.processInputs(ingameCameraDirection,cameraZoomPressed);
 
         return true;
     }
