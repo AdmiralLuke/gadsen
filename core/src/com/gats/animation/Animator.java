@@ -248,7 +248,9 @@ public class Animator implements Screen, AnimationLogProcessor {
                 tileType.set(animator.map.getTile(IntPos));
                 animator.map.setTile(IntPos, TileMap.TYLE_TYPE_NONE);
                 if (tileType.intValue() != TileMap.TYLE_TYPE_NONE) {
-                    Entity projectile = new SpriteEntity(animator.tileTextures[tileType.intValue()]);
+                    TextureRegion tex = animator.tileTextures[tileType.intValue()];
+                    SpriteEntity projectile = new SpriteEntity(tex);//tileType.intValue()]);
+                    projectile.setSize(new Vector2(tex.getRegionWidth(), tex.getRegionHeight()));
                     animator.root.add(projectile);
                     return projectile;
                 }
@@ -319,8 +321,8 @@ public class Animator implements Screen, AnimationLogProcessor {
         }
 
         private static ExpandedAction convertCharacterHitAction(com.gats.simulation.Action action, Animator animator) {
-            CharacterHitAction switchWeaponAction = (CharacterHitAction) action;
-            GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
+            CharacterHitAction hitAction = (CharacterHitAction) action;
+            GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
             SetAnimationAction setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_HIT);
             SetAnimationAction resetAnimationAction = new SetAnimationAction(1.0f, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
             setAnimationAction.setChildren(new Action[]{resetAnimationAction});
