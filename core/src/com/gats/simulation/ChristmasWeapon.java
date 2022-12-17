@@ -2,10 +2,10 @@ package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * @Weihnachtsaufgabe Waffen für die Weihnachtsaufgabe (Kekse & Zuckerstange)
+ */
 public class ChristmasWeapon extends Weapon{
-
-
-
 
     ChristmasWeapon(int damage, double projRange, int shoots, boolean hitThroughBoxes, WeaponType type, Simulation sim, GameCharacter character) {
         super(damage, 0, projRange, shoots, hitThroughBoxes, type, sim, character);

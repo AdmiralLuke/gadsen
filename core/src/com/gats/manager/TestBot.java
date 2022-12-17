@@ -53,7 +53,7 @@ public class TestBot extends Bot {
         Vector2 position = controller.getGameCharacter().getPlayerPos();
         // kann ich da hinlaufen...?
         if (state.getTile((int)(position.x / 16) + 1, (int)(position.y) - 1) != null) {
-            // einen Schritt weiter
+            // einen Schritt weiter (eine Tile ist 16 Pixel breit)
             controller.move(16);
         }
 

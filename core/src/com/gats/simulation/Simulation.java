@@ -54,11 +54,13 @@ public class Simulation {
 
     public ActionLog endTurn() {
         if (this.gameState.getGameMode() == GameState.GAME_MODE_CHRISTMAS && this.gameState.getTeams()[0][0].getHealth() <= 0) {
+            this.actionLog.addAction(new GameOverAction(1));
             gameState.setActive(false);
             return this.actionLog;
         }
 
         if (gameState.getTurn().size() <= 1) {
+            this.actionLog.addAction(new GameOverAction(this.gameState.getTurn().peek().y));
             gameState.setActive(false);
             return this.actionLog;
         }

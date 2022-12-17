@@ -309,6 +309,7 @@ public class GameCharacter {
      * @param strength Stärke des Zielens
      */
     protected void aim(Vector2 angle, float strength){
+        strength = Math.abs(strength) % 1.01f;
         this.dir = angle;
         this.sim.getActionLog().addAction(new CharacterAimAction(this.team,this.teamPos, angle, strength));
     }
