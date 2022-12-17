@@ -167,12 +167,12 @@ public class HumanPlayer extends Player {
         switch (key) {
             // Qund E für rotieren/zielen mit den Waffen
             case KEY_CHARACTER_AIM_LEFT:
-                angle += 5;
+                angle += 1;
                 angle = angle % 360;
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_AIM_RIGHT:
-                angle -= 5;
+                angle -= 1;
                 if (angle < 0) angle += 360;
                 controller.aim(angle, strength);
                 break;
@@ -192,12 +192,12 @@ public class HumanPlayer extends Player {
                 controller.selectWeapon(nextType);
                 break;
             case KEY_CHARACTER_DECREASE_STRENGTH:
-                strength -= 0.05;
+                strength -= 0.025;
                 if (strength < 0) strength = 0;
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_INCREASE_STRENGTH:
-                strength += 0.05;
+                strength += 0.025;
                 if (strength > 1) strength = 1;
                 controller.aim(angle, strength);
                 break;
