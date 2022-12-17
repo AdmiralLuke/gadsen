@@ -100,7 +100,7 @@ public class Projectile {
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y) && this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
                     this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos) : new LaserPath(startPos, pos);
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len()));
-                    this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).destroyTile();
+                    this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).onDestroy();
                     return;
                 }
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {
@@ -139,7 +139,7 @@ public class Projectile {
                 }
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y) && this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len() ));
-                    this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).destroyTile();
+                    this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).onDestroy();
                     return;
                 }
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {
@@ -158,7 +158,7 @@ public class Projectile {
                     }
                 }
                 pos.x += 1;
-                pos.y = ((v.y * ((-s.x + pos.x) / v.x)) - (g/2) * (float)Math.pow(((-s.x + pos.x) / v.x), 2) + s.y) / 1000;
+                pos.y = ((v.y * ((-s.x + pos.x) / v.x)) - (g/2) * (float)Math.pow(((-s.x + pos.x) / v.x), 2)) + s.y;
             }
         }
         Vector2 posCharBef = this.character.getPlayerPos();

@@ -19,8 +19,7 @@ public class ParablePath implements Path {
     @Override
     public Vector2 getPos(double t) {
         double x = (v.x * t) + s.x;
-        double y = (((v.y * t) - ((g / 2) * t * t)) + s.y) / 1000;
+        double y = (((v.y * t) - ((g / 2) * t * t)) + s.y);
         return new Vector2((float)x, (float)y);
     }
-
 }
