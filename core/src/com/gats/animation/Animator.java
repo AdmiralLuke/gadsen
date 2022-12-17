@@ -322,7 +322,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterHitAction switchWeaponAction = (CharacterHitAction) action;
             GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
             SetAnimationAction setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_HIT);
-            SetAnimationAction resetAnimationAction = new SetAnimationAction(1, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
+            SetAnimationAction resetAnimationAction = new SetAnimationAction(1.0f, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
             setAnimationAction.setChildren(new Action[]{resetAnimationAction});
             return new ExpandedAction(setAnimationAction, resetAnimationAction);
         }

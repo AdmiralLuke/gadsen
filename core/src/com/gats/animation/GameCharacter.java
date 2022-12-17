@@ -25,7 +25,8 @@ public class GameCharacter extends AnimatedEntity {
         ANIMATION_TYPE_WALKING,
         ANIMATION_TYPE_FALLING,
         ANIMATION_TYPE_COOKIE,
-        ANIMATION_TYPE_HIT, ANIMATION_TYPE_SUGAR_CANE
+        ANIMATION_TYPE_SUGAR_CANE,
+        ANIMATION_TYPE_HIT
     }
 
     private static Animation<TextureRegion>[] animations = new Animation[AnimationType.values().length];
