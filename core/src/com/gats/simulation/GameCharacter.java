@@ -17,8 +17,8 @@ public class GameCharacter {
     private int teamPos;
     private GameState state;
     private Simulation sim;
-    private Vector2 dir;
-    private float strength;
+    private Vector2 dir = new Vector2(1,0);
+    private float strength = 0.5f;
 
     private Weapon[] weapons;
     private int selectedWeapon = -1;
