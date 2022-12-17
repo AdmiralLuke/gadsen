@@ -58,7 +58,7 @@ abstract class Weapon {
         if (this.getType() == WeaponType.COOKIE) {
             this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
         } else {
-            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LIN_LASER);
+            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR);
         }
     }
 

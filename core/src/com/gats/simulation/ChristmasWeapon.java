@@ -47,7 +47,7 @@ public class ChristmasWeapon extends Weapon{
         if (this.getType() == WeaponType.COOKIE) {
             super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
         } else {
-            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LIN_LASER);
+            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR);
         }
     }
 }
