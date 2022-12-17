@@ -463,7 +463,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 iter.remove();
                 //Schedule children to run for the time not consumed by their parent
                 Action[] children = cur.getChildren();
-                if (children.length > 0) remainders.push(new Remainder(remainder, children));
+                if (children != null && children.length > 0) remainders.push(new Remainder(remainder, children));
             }
         }
 
