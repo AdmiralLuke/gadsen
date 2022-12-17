@@ -19,24 +19,29 @@ public class GameCharacter extends AnimatedEntity {
 
     private boolean aimActive = false;
 
-    public enum AnimationType{
+
+    public enum AnimationType {
         ANIMATION_TYPE_IDLE,
         ANIMATION_TYPE_WALKING,
         ANIMATION_TYPE_FALLING,
         ANIMATION_TYPE_COOKIE,
-        ANIMATION_TYPE_SUGAR_CANE
+        ANIMATION_TYPE_HIT, ANIMATION_TYPE_SUGAR_CANE
     }
+
     private static Animation<TextureRegion>[] animations = new Animation[AnimationType.values().length];
     private AimIndicator aimingIndicator;
+
+    private AnimationType idleType = AnimationType.ANIMATION_TYPE_IDLE;
+
+    private AnimationType currentAnimation = AnimationType.ANIMATION_TYPE_IDLE;
     private Color teamColor;
 
     private static ShaderProgram outlineShader;
 
     //ToDo move all asset loading and prep to Seperate class
-    public static void loadAssets(TextureAtlas atlas)
-    {
+    public static void loadAssets(TextureAtlas atlas) {
         StringBuilder builder = new StringBuilder();
-        try(InputStream stream = GameCharacter.class.getClassLoader().getResourceAsStream("shader/vertex.glsl")){
+        try (InputStream stream = GameCharacter.class.getClassLoader().getResourceAsStream("shader/vertex.glsl")) {
             int c = 0;
             if (stream == null) throw new RuntimeException("Could not read outline vertex shader");
             while ((c = stream.read()) != -1) {
@@ -49,7 +54,7 @@ public class GameCharacter extends AnimatedEntity {
         String vertexShader = builder.toString();
 
         builder = new StringBuilder();
-        try(InputStream stream = GameCharacter.class.getClassLoader().getResourceAsStream("shader/fragment.glsl")){
+        try (InputStream stream = GameCharacter.class.getClassLoader().getResourceAsStream("shader/fragment.glsl")) {
             int c = 0;
             if (stream == null) throw new RuntimeException("Could not read outline fragment shader");
             while ((c = stream.read()) != -1) {
@@ -62,18 +67,19 @@ public class GameCharacter extends AnimatedEntity {
         outlineShader = new ShaderProgram(vertexShader, fragmentShader);
 
 
-        animations[AnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/idleShort"));
-        animations[AnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/characterOrangeLeftWalking"));
-        animations[AnimationType.ANIMATION_TYPE_FALLING.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/fallShort"));
-        animations[AnimationType.ANIMATION_TYPE_COOKIE.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/idleShortCookie"));
-        animations[AnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] = new Animation<>(1/10f, atlas.findRegions("tile/idleShortSugarCaneInHand"));
-        for (Animation<TextureRegion> anim: animations
-             ) {
+        animations[AnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/idleShort"));
+        animations[AnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/characterOrangeLeftWalking"));
+        animations[AnimationType.ANIMATION_TYPE_FALLING.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/fallShort"));
+        animations[AnimationType.ANIMATION_TYPE_COOKIE.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/idleShortCookie"));
+        animations[AnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/idleShortSugarCaneInHand"));
+        animations[AnimationType.ANIMATION_TYPE_HIT.ordinal()] = new Animation<>(1 / 10f, atlas.findRegions("tile/hitAnimationRed"));
+        for (Animation<TextureRegion> anim : animations
+        ) {
             anim.setPlayMode(Animation.PlayMode.LOOP);
         }
     }
 
-    public GameCharacter(Color teamColor){
+    public GameCharacter(Color teamColor) {
         super(animations[AnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
         this.teamColor = teamColor;
     }
@@ -84,7 +90,7 @@ public class GameCharacter extends AnimatedEntity {
         batch.flush();
 
         //draw the aimIndicator before the character, so it is overlapped by it
-        if(aimingIndicator!=null && aimActive){
+        if (aimingIndicator != null && aimActive) {
             aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
         batch.setShader(outlineShader);
@@ -96,11 +102,29 @@ public class GameCharacter extends AnimatedEntity {
 
     }
 
-    public void setAnimation(AnimationType type){
-        super.setAnimation(animations[type.ordinal()]);
+    public void setAnimation(AnimationType type) {
+        currentAnimation = type;
+        if (type == AnimationType.ANIMATION_TYPE_IDLE)
+            super.setAnimation(animations[idleType.ordinal()]);
+        else
+            super.setAnimation(animations[type.ordinal()]);
     }
 
-    public AimIndicator getAimingIndicator(){
+    public Animation<TextureRegion> getAnimation() {
+        return super.getAnimation();
+    }
+
+    public AnimationType getIdleType() {
+        return idleType;
+    }
+
+    public void setIdleType(AnimationType idleType) {
+        this.idleType = idleType;
+        if (currentAnimation == AnimationType.ANIMATION_TYPE_IDLE)
+            setAnimation(AnimationType.ANIMATION_TYPE_IDLE);
+    }
+
+    public AimIndicator getAimingIndicator() {
         return this.aimingIndicator;
     }
 

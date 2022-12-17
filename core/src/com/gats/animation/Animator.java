@@ -142,6 +142,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(TurnStartAction.class, ActionConverters::convertTurnStartAction);
                         put(CharacterSwitchWeaponAction.class, ActionConverters::convertCharacterSwitchWeaponAction);
                         put(CharacterShootAction.class, ActionConverters::convertCharacterShootAction);
+                        put(CharacterHitAction.class, ActionConverters::convertCharacterHitAction);
                     }
                 };
 
@@ -296,16 +297,16 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.Action action, Animator animator) {
             CharacterSwitchWeaponAction switchWeaponAction = (CharacterSwitchWeaponAction) action;
             GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
-            SetAnimationAction setAnimationAction;
+            SetIdleAnimationAction setAnimationAction;
             switch (switchWeaponAction.getWpType()) {
                 case COOKIE:
-                    setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_COOKIE);
+                    setAnimationAction = new SetIdleAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_COOKIE);
                     break;
                 case SUGAR_CANE:
-                    setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_SUGAR_CANE);
+                    setAnimationAction = new SetIdleAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_SUGAR_CANE);
                     break;
                 default:
-                    setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
+                    setAnimationAction = new SetIdleAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
             }
             return new ExpandedAction(setAnimationAction);
         }
@@ -315,6 +316,15 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterShootAction shootAction = (CharacterShootAction) action;
             //ToDo play weapon animation
             return new ExpandedAction(new IdleAction(shootAction.getDelay(), 0));
+        }
+
+        private static ExpandedAction convertCharacterHitAction(com.gats.simulation.Action action, Animator animator) {
+            CharacterHitAction switchWeaponAction = (CharacterHitAction) action;
+            GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
+            SetAnimationAction setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_HIT);
+            SetAnimationAction resetAnimationAction = new SetAnimationAction(1, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
+            setAnimationAction.setChildren(new Action[]{resetAnimationAction});
+            return new ExpandedAction(setAnimationAction, resetAnimationAction);
         }
     }
 

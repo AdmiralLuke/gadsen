@@ -45,6 +45,10 @@ public class AnimatedEntity extends Entity {
         this.animation = animation;
     }
 
+    public Animation<TextureRegion> getAnimation() {
+        return animation;
+    }
+
     public boolean isFlipped() {
         return flipped;
     }
