@@ -27,17 +27,16 @@ public class HumanPlayer extends Player {
     }
 
 
-        final int KEY_CHARACTER_MOVE_LEFT = Input.Keys.A;
-        final int KEY_CHARACTER_MOVE_RIGHT = Input.Keys.D;
-        final int KEY_CHARACTER_SHOOT_ACTION = Input.Keys.SPACE;
-        final int KEY_CHARACTER_AIM_LEFT = Input.Keys.Q;
-        final int KEY_CHARACTER_AIM_RIGHT = Input.Keys.E;
-        final int KEY_CHARACTER_INCREASE_STRENGTH = Input.Keys.W;
-        final int KEY_CHARACTER_DECREASE_STRENGTH = Input.Keys.S;
-        final int KEY_CHARACTER_CYCLE_WEAPON = Input.Keys.TAB;
+    final int KEY_CHARACTER_MOVE_LEFT = Input.Keys.A;
+    final int KEY_CHARACTER_MOVE_RIGHT = Input.Keys.D;
+    final int KEY_CHARACTER_SHOOT_ACTION = Input.Keys.SPACE;
+    final int KEY_CHARACTER_AIM_LEFT = Input.Keys.Q;
+    final int KEY_CHARACTER_AIM_RIGHT = Input.Keys.E;
+    final int KEY_CHARACTER_INCREASE_STRENGTH = Input.Keys.W;
+    final int KEY_CHARACTER_DECREASE_STRENGTH = Input.Keys.S;
+    final int KEY_CHARACTER_CYCLE_WEAPON = Input.Keys.TAB;
 
-        final int KEY_CHARACTER_END_TURN = Input.Keys.X;
-
+    final int KEY_CHARACTER_END_TURN = Input.Keys.X;
 
 
     private boolean[] isDown = new boolean[Key.values().length];
@@ -63,7 +62,8 @@ public class HumanPlayer extends Player {
 
     private float strength = 0.5f;
 
-    private Queue<WeaponType> weaponTypeStack= new LinkedList<>();
+    private Queue<WeaponType> weaponTypeStack = new LinkedList<>();
+
     {
         weaponTypeStack.add(WeaponType.COOKIE);
         weaponTypeStack.add(WeaponType.SUGAR_CANE);
@@ -99,7 +99,7 @@ public class HumanPlayer extends Player {
     protected void executeTurn(GameState state, Controller controller) {
         this.state = state;
         this.controller = controller;
-        synchronized (this){
+        synchronized (this) {
             try {
                 this.wait(20000);
             } catch (InterruptedException ignored) {
@@ -108,13 +108,14 @@ public class HumanPlayer extends Player {
             }
         }
     }
+
     /**
-    * Ends the current turn of the player preemptively.
-    * Callen when pressing {@link HumanPlayer#KEY_CHARACTER_END_TURN}.
+     * Ends the current turn of the player preemptively.
+     * Callen when pressing {@link HumanPlayer#KEY_CHARACTER_END_TURN}.
      * notifies itself, so the wait will end.
      */
-    protected void endCurrentTurn(){
-        synchronized (this){
+    protected void endCurrentTurn() {
+        synchronized (this) {
             this.notify();
         }
     }
@@ -154,7 +155,7 @@ public class HumanPlayer extends Player {
                 isDown[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_DECREASE_STRENGTH);
                 break;
-                case KEY_CHARACTER_END_TURN:
+            case KEY_CHARACTER_END_TURN:
                 isDown[Key.KEY_CHARACTER_END_TURN.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_END_TURN);
                 break;
@@ -166,13 +167,13 @@ public class HumanPlayer extends Player {
         switch (key) {
             // Qund E für rotieren/zielen mit den Waffen
             case KEY_CHARACTER_AIM_LEFT:
-                angle -= 5;
-                if(angle<0) angle+=360;
+                angle += 5;
+                angle = angle % 360;
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_AIM_RIGHT:
-                angle += 5;
-                angle = angle % 360;
+                angle -= 5;
+                if (angle < 0) angle += 360;
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_MOVE_LEFT:
@@ -192,12 +193,12 @@ public class HumanPlayer extends Player {
                 break;
             case KEY_CHARACTER_DECREASE_STRENGTH:
                 strength -= 0.05;
-                if (strength <0) strength = 0;
+                if (strength < 0) strength = 0;
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_INCREASE_STRENGTH:
                 strength += 0.05;
-                if (strength >1) strength = 1;
+                if (strength > 1) strength = 1;
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_END_TURN:
@@ -215,7 +216,6 @@ public class HumanPlayer extends Player {
 
 
     public void processKeyUp(int keycode) {
-
 
 
         switch (keycode) {

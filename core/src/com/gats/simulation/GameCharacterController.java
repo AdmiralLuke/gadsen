@@ -11,8 +11,8 @@ import com.badlogic.gdx.math.Vector2;
 public class GameCharacterController {
     private GameCharacter gameCharacter;
     private GameState state;
-    private Vector2 aim_angle = new Vector2(0, 0);
-    private float aim_strength = 0;
+    private Vector2 aim_angle = new Vector2(1, 0);
+    private float aim_strength = 0.5f;
 
     protected GameCharacterController(GameCharacter gameCharacter, GameState state) {
         this.gameCharacter = gameCharacter;
@@ -35,6 +35,8 @@ public class GameCharacterController {
     }
 
     public void aim(Vector2 angle, float strength) {
+
+        System.out.println("Aiming " + aim_angle);
         this.aim_angle = angle;
         this.aim_strength = strength;
         gameCharacter.aim(angle,strength);
@@ -45,6 +47,7 @@ public class GameCharacterController {
     }
 
     public void shoot() {
+        System.out.println("Commanding " + aim_angle);
         gameCharacter.shoot(aim_angle, aim_strength);
     }
 

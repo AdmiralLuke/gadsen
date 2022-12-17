@@ -266,7 +266,7 @@ public class GameCharacter {
      */
     protected void aim(Vector2 angle, float strength){
         //Todo: see if angleDeg is the wrong value to use
-        this.sim.getActionLog().addAction(new CharacterAimAction(this.team,this.teamPos, angle.angleDeg(),strength));
+        this.sim.getActionLog().addAction(new CharacterAimAction(this.team,this.teamPos, angle, strength));
     }
 
 }

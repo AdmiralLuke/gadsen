@@ -8,15 +8,15 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class CharacterAimAction extends CharacterAction {
     //Todo: Adjust strength value that will be translated to the scaling and it will change size
-    private float angle;
+    private Vector2 angle;
     private float strength;
-    public CharacterAimAction(int team, int character, float angle, float strength) {
+    public CharacterAimAction(int team, int character, Vector2 angle, float strength) {
         super(team, character, 0);
         this.angle = angle;
         this.strength = strength;
     }
 
-    public float getAngle() {
+    public Vector2 getAngle() {
         return this.angle;
     }
 

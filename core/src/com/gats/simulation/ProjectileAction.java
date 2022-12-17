@@ -26,6 +26,9 @@ public class ProjectileAction extends Action{
         this.type = type;
         this.path = path;
         this.duration = 0.010f;
+
+        System.out.println("Shooting " + (path.getPos(0.001).cpy().sub(path.getPos(0))));
+        System.out.println("Shooting " + (path.getPos(1).cpy().sub(path.getPos(0))));
     }
 
 

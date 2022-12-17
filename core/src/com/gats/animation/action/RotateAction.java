@@ -10,9 +10,9 @@ import com.gats.animation.entity.SpriteEntity;
 public class RotateAction extends Action{
 
     private SpriteEntity target;
-    private float angle;
+    private Vector2 angle;
 
-    public RotateAction(float start,SpriteEntity target, float angle) {
+    public RotateAction(float start,SpriteEntity target, Vector2 angle) {
         super(start);
         this.target = target;
         this.angle = angle;
@@ -21,7 +21,7 @@ public class RotateAction extends Action{
     @Override
     protected void runAction(float oldTime, float current) {
 
-        if(target!=null){target.setRotationAngle(-this.angle);}
+        if(target!=null){target.setRotationAngle(this.angle.angleDeg());}
         endAction(oldTime);
     }
 }
