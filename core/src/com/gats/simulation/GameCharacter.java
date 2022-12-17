@@ -44,6 +44,10 @@ public class GameCharacter {
         initInventory();
     }
 
+    /**
+     * Gibt den Weapon
+     * @return
+     */
     public WeaponType getSelectedWeapon() {
         if (selectedWeapon != -1) {
             return weapons[selectedWeapon].getType();
@@ -52,7 +56,7 @@ public class GameCharacter {
         }
     }
 
-    public void selectWeapon(WeaponType type) {
+    void selectWeapon(WeaponType type) {
         switch (type) {
             case COOKIE:
                 selectedWeapon = 0;
@@ -122,7 +126,7 @@ public class GameCharacter {
      * @param n Waffe die gewählt werden soll
      * @return Waffe die gewählt wurde
      */
-    public Weapon getWeapon(int n) {
+    Weapon getWeapon(int n) {
         ChristmasWeapon wp =  (ChristmasWeapon)weapons[n];
         this.sim.getActionLog().goToNextAction();
         this.sim.getActionLog().addAction(new CharacterSwitchWeaponAction(this.team, this.teamPos, wp.getType()));
@@ -277,7 +281,6 @@ public class GameCharacter {
      * @param strength Stärke des Zielens
      */
     protected void aim(Vector2 angle, float strength){
-        //Todo: see if angleDeg is the wrong value to use
         this.dir = angle;
         this.sim.getActionLog().addAction(new CharacterAimAction(this.team,this.teamPos, angle, strength));
     }
