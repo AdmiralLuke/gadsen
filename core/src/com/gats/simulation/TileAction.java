@@ -7,6 +7,7 @@ abstract class TileAction extends Action{
 
 
     private IntVector2 pos;
+
     protected TileAction(IntVector2 tilePos, float delay) {
         super(delay);
         this.pos = tilePos;

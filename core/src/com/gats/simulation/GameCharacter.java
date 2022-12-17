@@ -160,7 +160,7 @@ public class GameCharacter {
         } else {
             this.setHealth(getHealth() - fallen);
         }
-        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f));
+        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0));
         this.sim.getActionLog().goToNextAction();
         this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
     }

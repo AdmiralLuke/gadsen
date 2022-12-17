@@ -50,7 +50,9 @@ public class Simulation {
 
         for (GameCharacter[] characters : this.gameState.getTeams()) {
             for (GameCharacter character : characters) {
-                character.fall();
+                if (character != null) {
+                    character.fall();
+                }
             }
         }
 

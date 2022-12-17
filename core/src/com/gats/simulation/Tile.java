@@ -198,7 +198,7 @@ public class Tile {
             for (GameCharacter[] characters : state.getTeams()) {
                 for (GameCharacter character : characters) {
                     if (character.getPlayerPos().x == this.position.x && character.getPlayerPos().y == this.position.y) {
-                        LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()));
+                        LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()), 0.1f);
                         int tmpHealth = character.getHealth();
                         character.setHealth(tmpHealth - ((int)path.getEndTime() / 10));
                         Action tmpAction = new TileMoveAction(posBef, this.position, 1f);

@@ -9,15 +9,14 @@ import com.badlogic.gdx.math.Vector2;
 public final class TileMoveAction extends TileAction{
     private Path path;
 
-    private static double v = 0.1;
     private float duration;
     private IntVector2 posAft;
 
     public TileMoveAction(IntVector2 posBef, IntVector2 posAft, float duration) {
         super(posBef, 0);
         this.posAft = posAft;
-        this.path = new LinearPath(posBef.toFloat().scl(Tile.tileSize.toFloat()), posAft.toFloat().scl(Tile.tileSize.toFloat()));
-        this.duration = (float)(path.getEndTime() * v);
+        this.path = new LinearPath(posBef.toFloat().scl(Tile.tileSize.toFloat()), posAft.toFloat().scl(Tile.tileSize.toFloat()), 0.1f);
+        this.duration = path.getEndTime();
     }
 
 

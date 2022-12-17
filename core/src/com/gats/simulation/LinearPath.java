@@ -21,10 +21,10 @@ public class LinearPath implements Path{
      * @param g Ziel-Vektor
      * @param endTime Dauer des Weges von s nach g
      */
-    public LinearPath(Vector2 s, Vector2 g, float endTime) {
+    public LinearPath(Vector2 s, Vector2 g, float endTime, float v) {
         this.s = s;
         this.g = g;
-        this.endTime = endTime;
+        this.endTime = endTime * v;
         this.dir = g.cpy().sub(s);
     }
 
@@ -33,7 +33,7 @@ public class LinearPath implements Path{
      * @param s Start-Vektor
      * @param g Ziel-Vektor
      */
-    public LinearPath(Vector2 s, Vector2 g) {
+    public LinearPath(Vector2 s, Vector2 g, float v) {
         this.s = s;
         this.g = g;
         this.endTime = 0;
@@ -43,6 +43,7 @@ public class LinearPath implements Path{
         } catch (NullPointerException e) {
             System.err.println("Fehler beim bestimmen der Länge eines Vektors -> LinearPath");
         }
+        endTime *= v;
     }
 
     /**

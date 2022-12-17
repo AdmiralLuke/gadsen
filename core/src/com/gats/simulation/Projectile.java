@@ -93,12 +93,12 @@ public class Projectile {
             while (livingTime < range) {
                 if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
                     || this.pos.x / 16<= 0 ||this.pos.y / 16 <= 0) {
-                    this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos) : new LaserPath(startPos, pos);
+                    this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, (this.pos.cpy().sub(startPos).len())));
                     return;
                 }
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y) && this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
-                    this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos) : new LaserPath(startPos, pos);
+                    this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len()));
                     this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).onDestroy();
                     return;
@@ -107,7 +107,7 @@ public class Projectile {
                     for (GameCharacter[] characters : this.sim.getState().getTeams()) {
                         for (GameCharacter character : characters) {
                             if ((int) character.getPlayerPos().x == (int) this.pos.x && (int) character.getPlayerPos().y == (int) this.pos.y) {
-                                this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos) : new LaserPath(startPos, pos);
+                                this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos,0.1f) : new LaserPath(startPos, pos);
                                 sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len()));
                                 sim.getActionLog().goToNextAction();
                                 int oldHealth = character.getHealth();
@@ -122,13 +122,13 @@ public class Projectile {
                 this.pos.add(dir);
                 this.livingTime += 0.1;
             }
-            this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos) : new LaserPath(startPos, pos);
+            this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
             sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len()));
             return;
         } else if (this.type == Type.PARABLE) {
             Vector2 s = pos.cpy();
             Vector2 v = dir.cpy();
-            v.set((float)(v.x * strength * 0.01), (float)(v.y * strength * 0.01));
+            v.set((float)(v.x * strength), (float)(v.y * strength));
             this.path = new ParablePath(s, v);
             while (livingTime < range) {
                 System.out.println("Pos: " + pos.x + ", " + pos.y);
