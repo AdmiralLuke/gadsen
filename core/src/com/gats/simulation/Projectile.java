@@ -129,6 +129,7 @@ public class Projectile {
             v.set((float)(v.x * strength * 0.01), (float)(v.y * strength * 0.01));
             this.path = new ParablePath(s, v);
             while (livingTime < range) {
+                System.out.println("Pos: " + pos.x + ", " + pos.y);
                 if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
                         || this.pos.x <= 0 ||this.pos.y <= 0) {
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len()));
@@ -158,7 +159,6 @@ public class Projectile {
                 pos.y = (v.y * ((-s.x + pos.x) / v.x)) - (g/2) * (float)Math.pow(((-s.x + pos.x) / v.x), 2) + s.y;
             }
         }
-
         Vector2 posCharBef = this.character.getPlayerPos();
         character.move(-1);
         sim.getActionLog().addAction(new CharacterMoveAction(posCharBef, character.getPlayerPos(), character.getTeam(), character.getTeamPos(), 0));

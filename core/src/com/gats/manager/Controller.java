@@ -23,7 +23,7 @@ public class Controller {
     private GameCharacter gameCharacter;
 
     protected Controller(Manager manager, GameCharacterController gcController) {
-
+        System.out.println("Created new Controller: " + this);
         this.manager = manager;
         this.gcController = gcController;
         this.gameCharacter = gcController.getGameCharacter();

@@ -16,7 +16,7 @@ public class Projectiles {
     protected static Entity summon(ProjectileAction.ProjectileType type){
         switch (type){
             case COOKIE:
-                return new AnimatedEntity(new Animation<>(1/8f, projectileAtlas.findRegions("tile/cookieTumblingCropped")), new Vector2(1,1));
+                return new AnimatedEntity(new Animation<>(1/8f, projectileAtlas.findRegions("tile/#161_cookieTumblingCropped")), new Vector2(1,1));
             case CANDY_CANE:
                 return new AnimatedEntity(new Animation<>(1/8f, projectileAtlas.findRegions("tile/sugarcaneProjectileFront")), new Vector2(1,1));
 

@@ -137,6 +137,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(InitAction.class, ((simAction, animator) -> new ExpandedAction(new IdleAction(0, 0))));
                         put(TurnStartAction.class, ActionConverters::convertTurnStartAction);
                         put(CharacterSwitchWeaponAction.class, ActionConverters::convertCharacterSwitchWeaponAction);
+                        put(CharacterShootAction.class, ActionConverters::convertCharacterShootAction);
                     }
                 };
 
@@ -197,6 +198,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertProjectileMoveAction(com.gats.simulation.Action action, Animator animator) {
             ProjectileAction projectileAction = (ProjectileAction) action;
 
+
             MoveAction moveProjectile = new MoveAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
 
             DestroyAction destroyProjectile = new DestroyAction(0, null, null, animator.root::remove);
@@ -248,6 +250,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                 return new Entity();
             });
 
+            summonTileEntity.setChildren(new Action[]{moveTileEntity});
+            moveTileEntity.setChildren(new Action[]{destroyTileEntity});
             return new ExpandedAction(summonTileEntity, destroyTileEntity);
         }
 
@@ -298,6 +302,13 @@ public class Animator implements Screen, AnimationLogProcessor {
                     setAnimationAction = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
             }
             return new ExpandedAction(setAnimationAction);
+        }
+
+
+        private static ExpandedAction convertCharacterShootAction(com.gats.simulation.Action action, Animator animator) {
+            CharacterShootAction shootAction = (CharacterShootAction) action;
+            //ToDo play weapon animation
+            return new ExpandedAction(new IdleAction(shootAction.getDelay(), 0));
         }
     }
 
@@ -462,7 +473,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 if (remainder >= 0) {
                     //Schedule children to run for the time that's not consumed by their parent
                     Action[] children = cur.getChildren();
-                    if (children.length > 0) remainders.push(new Remainder(remainder, children));
+                    if (children != null && children.length > 0) remainders.push(new Remainder(remainder, children));
                 } else {
                     //Add the child to the list of running actions if not completed in the remaining time
                     actionList.add(cur);

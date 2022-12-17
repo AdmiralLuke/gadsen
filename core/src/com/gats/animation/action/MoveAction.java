@@ -5,7 +5,7 @@ import com.gats.animation.entity.Entity;
 import com.gats.simulation.Path;
 import org.lwjgl.Sys;
 
-public class MoveAction extends Action{
+public class MoveAction extends Action {
 
     private Entity target;
 
@@ -22,8 +22,10 @@ public class MoveAction extends Action{
 
     @Override
     protected void runAction(float oldTime, float current) {
-        if(target!= null) target.setRelPos(path.getPos(Math.min(endTime, current)));
-        if(current > endTime) endAction(endTime);
+        if (target != null) {
+            target.setRelPos(path.getPos(Math.min(endTime, current)));
+        }
+        if (current > endTime) endAction(endTime);
     }
 
     public void setTarget(Entity target) {
