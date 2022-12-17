@@ -90,8 +90,8 @@ public class Projectile {
         Vector2 startPos = this.pos.cpy();
         if (this.type == Type.LINEAR || this.type == Type.LIN_LASER) {
             while (livingTime < range) {
-                if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
-                    || this.pos.x / 16<= 0 ||this.pos.y / 16 <= 0) {
+                if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() || this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
+                    || this.pos.x / 16 <= 0 ||this.pos.y / 16 <= 0) {
                     this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, (this.pos.cpy().sub(startPos).len()), this.pos));
                     return;
@@ -105,6 +105,9 @@ public class Projectile {
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {
                     for (GameCharacter[] characters : this.sim.getState().getTeams()) {
                         for (GameCharacter character : characters) {
+                            if (character == null) {
+                                continue;
+                            }
                             if ((int) character.getPlayerPos().x == (int) this.pos.x && (int) character.getPlayerPos().y == (int) this.pos.y) {
                                 this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos,0.1f) : new LaserPath(startPos, pos);
                                 sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos));
@@ -143,7 +146,7 @@ public class Projectile {
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {
                     for (GameCharacter[] characters : this.sim.getState().getTeams()) {
                         for (GameCharacter character : characters) {
-                            if (character.getHealth() == 0) {
+                            if (character == null) {
                                 continue;
                             }
                             if ((int) character.getPlayerPos().x == (int) this.pos.x && (int) character.getPlayerPos().y == (int) this.pos.y) {

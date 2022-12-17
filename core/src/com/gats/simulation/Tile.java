@@ -198,6 +198,9 @@ public class Tile {
             this.position.add(0, -1);
             for (GameCharacter[] characters : state.getTeams()) {
                 for (GameCharacter character : characters) {
+                    if (character == null) {
+                        continue;
+                    }
                     if (character.getPlayerPos().x == this.position.x && character.getPlayerPos().y == this.position.y) {
                         LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()), 0.1f);
                         int tmpHealth = character.getHealth();

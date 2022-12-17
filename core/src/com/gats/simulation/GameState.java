@@ -44,11 +44,11 @@ public class GameState {
     /**
      * Erstellt einen GameState
      *
-     * @param gameMode
-     * @param mapName
-     * @param teamCount
-     * @param charactersPerTeam
-     * @param sim
+     * @param gameMode Modus
+     * @param mapName Map Name
+     * @param teamCount Anzahl Teams
+     * @param charactersPerTeam Anzahl Charaktere pro Team
+     * @param sim Simulation
      */
     GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
