@@ -102,19 +102,20 @@ public class Projectile {
                     this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).onDestroy();
                     return;
                 }
-                if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {
+                if (!(this.pos.x == startPos.x && this.pos.y == startPos.y)) {
                     for (GameCharacter[] characters : this.sim.getState().getTeams()) {
                         for (GameCharacter character : characters) {
-                            if (character == null) {
+                            if (character == null || this.character == character) {
                                 continue;
                             }
-                            if ((int) character.getPlayerPos().x == (int) this.pos.x && (int) character.getPlayerPos().y == (int) this.pos.y) {
-                                this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos,0.1f) : new LaserPath(startPos, pos);
-                                sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos));
+                            if ((int)(character.getPlayerPos().x / 16)  == (int)(this.pos.x / 16)  && (int)(character.getPlayerPos().y / 16)  == (int)(this.pos.y / 16)) {
+                                this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
+                                Action tmpAction = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
                                 sim.getActionLog().goToNextAction();
                                 int oldHealth = character.getHealth();
                                 character.setHealth(oldHealth - damage);
-                                sim.getActionLog().addAction(new CharacterHitAction(character.getTeam(), character.getTeamPos(), oldHealth, character.getHealth()));
+                                tmpAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), oldHealth, character.getHealth()));
+                                sim.getActionLog().addAction(tmpAction);
                                 return;
                             }
                         }
@@ -146,15 +147,16 @@ public class Projectile {
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y)) {
                     for (GameCharacter[] characters : this.sim.getState().getTeams()) {
                         for (GameCharacter character : characters) {
-                            if (character == null) {
+                            if (character == null || this.character == character) {
                                 continue;
                             }
-                            if ((int) character.getPlayerPos().x == (int) this.pos.x && (int) character.getPlayerPos().y == (int) this.pos.y) {
-                                sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos ));
+                            if ((int)(character.getPlayerPos().x / 16) == (int)(this.pos.x / 16) && (int)(character.getPlayerPos().y / 16) == (int)(this.pos.y / 16)) {
+                                Action tmpAction = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
                                 sim.getActionLog().goToNextAction();
                                 int oldHealth = character.getHealth();
                                 character.setHealth(oldHealth - damage);
-                                sim.getActionLog().addAction(new CharacterHitAction(character.getTeam(), character.getTeamPos(), oldHealth, character.getHealth()));
+                                tmpAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), oldHealth, character.getHealth()));
+                                sim.getActionLog().addAction(tmpAction);
                                 sim.getActionLog().goToNextAction();
                                 return;
                             }

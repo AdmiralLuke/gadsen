@@ -29,7 +29,7 @@ public class ProjectileAction extends Action{
         if (ProjectileType.COOKIE == type) {
             this.duration = -((path.getPos(0).x - posAft.x) / ((ParablePath)path).getV().x);;
         } else {
-            this.duration = duration;
+            this.duration = duration / 100;
         }
         System.out.println("Shooting " + (path.getPos(0.001).cpy().sub(path.getPos(0))));
         System.out.println("Shooting " + (path.getPos(1).cpy().sub(path.getPos(0))));
