@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
+import com.gats.animation.AnimatorCamera;
 import com.gats.manager.AnimationLogProcessor;
 import com.gats.manager.HumanPlayer;
 import com.gats.manager.Manager;
@@ -130,8 +131,12 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     }
 
     //this section handles the input
-    public void setCameraDir(float[] dir){
-        animator.setCameraDir(dir);
+    public void processInputs(float[] ingameCameraDirection,float zoomPressed) {
+      AnimatorCamera camera = animator.getCamera();
+       camera.setDirections(ingameCameraDirection);
+       camera.setZoomPressed(zoomPressed);
     }
-
+    public void resetCamera(){
+        animator.getCamera().resetCamera();
+    }
 }

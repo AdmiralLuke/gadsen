@@ -36,7 +36,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     //ToDo organize Assets in seperate class
     private final Animation<TextureRegion> destroyTileAnimation; //ToDo replace placeholder
-    private OrthographicCamera camera;
+    private AnimatorCamera camera;
     private final TextureAtlas textureAtlas;
     private GameState state;
 
@@ -81,6 +81,10 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private Map<Class<?>, ActionConverter> actionConverters = ActionConverters.map;
     private EntityGroup characterGroup;
+
+    public AnimatorCamera getCamera() {
+        return this.camera;
+    }
 
 
     interface ActionConverter {
@@ -401,7 +405,6 @@ public class Animator implements Screen, AnimationLogProcessor {
         int width = Gdx.graphics.getWidth();
         this.viewport = newViewport;
         this.backgroundViewport = new FillViewport(259, 128);
-        camera = new OrthographicCamera();
         //center camera once
         //camera.position.set(Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f-12,0);
         //camera.zoom = 1;
@@ -409,13 +412,14 @@ public class Animator implements Screen, AnimationLogProcessor {
         //viewport.update(400,400);
 
 
-        this.camera = new OrthographicCamera(30, 30f * width / height);
+        this.camera = new AnimatorCamera(30, 30f * width / height);
         this.viewport.setCamera(camera);
         camera.zoom = 1f;
         camera.position.set(new float[]{0, 0, 0});
         this.backgroundViewport.update(width, height);
         this.viewport.update(width, height, true);
         camera.update();
+
     }
 
     /**
@@ -482,7 +486,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         }
 
 
-        cameraMove(delta);
+        camera.updateMovement(delta);
         camera.update();
 
 
@@ -539,26 +543,8 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     }
 
-    //animator movement
-    Vector3 cameraDirection = new Vector3(0, 0, 0);
-    int cameraSpeed = 200;
 
-    public void setCameraDir(float[] directions) {
-        this.cameraDirection = new Vector3(directions);
-//left*-cameraSpeed+right*cameraSpeed,up*cameraSpeed+down*-cameraSpeed,0
-        //for later camera.position.lerp() for smooth movement
-    }
 
-    /**
-     * Moves the camera with the Speed defined in {@link Animator#cameraSpeed} and the {@link Animator#cameraDirection}.
-     *
-     * @param delta Delta-time of the Application.
-     */
-    private void cameraMove(float delta) {
-
-        camera.translate(new Vector3(cameraDirection).scl(cameraSpeed * delta));
-
-    }
 
     @Override
     public void awaitNotification() {
