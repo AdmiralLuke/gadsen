@@ -263,7 +263,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             TileDestroyAction destroyAction = (TileDestroyAction) action;
 
-            DestroyAction destroyProjectile = new DestroyAction(animator.destroyTileAnimation.getAnimationDuration() * 1000, null, null, animator.root::remove);
+            DestroyAction destroyProjectile = new DestroyAction(animator.destroyTileAnimation.getAnimationDuration(), null, null, animator.root::remove);
 
             SummonAction summonProjectile = new SummonAction(action.getDelay(), destroyProjectile::setTarget, () -> {
                 animator.map.setTile(destroyAction.getPos(), TileMap.TYLE_TYPE_NONE);

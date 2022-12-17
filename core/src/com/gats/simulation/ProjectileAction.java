@@ -25,7 +25,7 @@ public class ProjectileAction extends Action{
         System.out.println("Creating Projectile Action");
         this.type = type;
         this.path = path;
-        this.duration = duration;
+        this.duration = 0.010f;
     }
 
 

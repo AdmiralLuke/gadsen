@@ -47,6 +47,13 @@ public class Simulation {
             gameState.setActive(false);
             return this.actionLog;
         }
+
+        for (GameCharacter[] characters : this.gameState.getTeams()) {
+            for (GameCharacter character : characters) {
+                character.fall();
+            }
+        }
+
         IntVector2 lastChar = gameState.getTurn().pop();
         if (gameState.getCharacterFromTeams(lastChar.x, lastChar.y).getHealth() > 0) {
             gameState.getTurn().add(lastChar);

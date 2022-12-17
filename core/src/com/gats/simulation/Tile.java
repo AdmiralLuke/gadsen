@@ -188,7 +188,7 @@ public class Tile {
                         LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()));
                         int tmpHealth = character.getHealth();
                         character.setHealth(tmpHealth - ((int)path.getEndTime() * 5));
-                        Action tmpAction = new TileMoveAction(posBef, this.position, 2);
+                        Action tmpAction = new TileMoveAction(posBef, this.position, 0.05f);
                         Action tmpDestAction = new TileDestroyAction(this.getPosition());
                         tmpDestAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), tmpHealth, character.getHealth()));
                         return;
@@ -196,7 +196,7 @@ public class Tile {
                 }
             }
         }
-        float duration = 2000;
+        float duration = 0.05f;
         Action tmpAction = new TileMoveAction(posBef, this.position, duration);
         Action tmpDestAction = new TileDestroyAction(this.getPosition());
         tmpAction.addChild(tmpDestAction);
