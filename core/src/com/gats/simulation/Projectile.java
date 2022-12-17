@@ -128,7 +128,7 @@ public class Projectile {
         } else if (this.type == Type.PARABLE) {
             Vector2 s = pos.cpy();
             Vector2 v = dir.cpy();
-            v.set((float)(v.x * strength), (float)(v.y * strength));
+            v.set((float)(v.x * strength) * 100, (float)(v.y * strength) * 100);
             this.path = new ParablePath(s, v);
             while (livingTime < range) {
                 System.out.println("Pos: " + pos.x + ", " + pos.y);
