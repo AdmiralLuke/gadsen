@@ -1,12 +1,16 @@
 package com.gats.ui;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
 public class MapRetriever implements FilenameFilter {
-    static File dirHandler;
+    static FileHandle dirHandler;
     final String defaultMapFiletype = ".json";
     String filetype;
     String mapDirectory =  "core/resources/maps";
+
 
     /**Creates a {@link MapRetriever}, wich is responsible for providing the selectable Maps
      * found in {@link MapRetriever#mapDirectory}.
@@ -22,10 +26,10 @@ public class MapRetriever implements FilenameFilter {
      * @param newDirectory Changes the {@link MapRetriever#mapDirectory}, where it will look for maps.
      */
      MapRetriever(String newDirectory) {
-        dirHandler = new File(newDirectory);
+        dirHandler = Gdx.files.internal(newDirectory);
         if(!dirHandler.isDirectory()){
             System.err.println("Provided Path for MapHandler is not a valid directory!");
-            System.exit(-1);
+            throw new RuntimeException();
         }
 
     }
@@ -43,14 +47,14 @@ public class MapRetriever implements FilenameFilter {
     /**
      * Lists all Map files, with the default File Extension,
      * in {@link MapRetriever#mapDirectory}.
-     * @return
+     * @return String Array with map Names located in mapDirectory
      */
     public String[] listMaps(){
         this.filetype = defaultMapFiletype;
-        String[] maps = dirHandler.list(this);
-        removeExtension(maps);
+       String[] mapNames = fileHandleToStringArray(dirHandler.list(this));
+        removeExtension(mapNames);
         //does not work yet
-        return maps;
+        return mapNames;
     }
 
 
@@ -58,14 +62,24 @@ public class MapRetriever implements FilenameFilter {
     /**
      * Lists all Maps files, with the provided File Extension,
      * in {@link MapRetriever#mapDirectory}.
-     * @param fileExtension
-     * @return
+     * @param fileExtension Map File Extension.
+     * @return String Array with map Names located in mapDirectory
      */
     public String[] listMaps(String fileExtension){
         this.filetype = fileExtension;
-        String[] maps= dirHandler.list(this);
+        String[] maps= fileHandleToStringArray(dirHandler.list(this));
         removeExtension(maps);
         return maps;
+    }
+
+    public String[] fileHandleToStringArray(FileHandle[] handles){
+
+        String[] fileHandleNames = new String[handles.length];
+        for(int i = 0;i<handles.length;i++) {
+                fileHandleNames[i] = handles[i].name();
+            }
+        return fileHandleNames;
+
     }
 
     /** Checks whether a given file contains the given extension .
