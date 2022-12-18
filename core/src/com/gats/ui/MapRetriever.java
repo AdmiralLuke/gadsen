@@ -32,8 +32,7 @@ public class MapRetriever implements FilenameFilter {
         dirHandler = null;//Gdx.files.internal(newDirectory);
         if(dirHandler!=null) {
             if (!dirHandler.isDirectory()) {
-                System.err.println("Provided Path for MapHandler is not a valid directory!");
-                throw new RuntimeException();
+                throw new RuntimeException("Provided Path for MapHandler is not a valid directory!");
             }
         }
 
