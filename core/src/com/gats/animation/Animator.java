@@ -143,8 +143,10 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(CharacterSwitchWeaponAction.class, ActionConverters::convertCharacterSwitchWeaponAction);
                         put(CharacterShootAction.class, ActionConverters::convertCharacterShootAction);
                         put(CharacterHitAction.class, ActionConverters::convertCharacterHitAction);
+                        put(GameOverAction.class, ActionConverters::convertGameOverAction);
                     }
                 };
+
 
         public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
             System.out.println("Converting " + simAction.getClass());
@@ -338,6 +340,21 @@ public class Animator implements Screen, AnimationLogProcessor {
             }
             return new ExpandedAction(hitAnimation, lastAction);
         }
+        private static ExpandedAction convertGameOverAction(com.gats.simulation.Action action, Animator animator) {
+           GameOverAction winAction = (GameOverAction) action;
+            Vector2 pos = animator.getCamera().getScreenCenter();
+            Entity winSprite = new WinEntity(animator.textureAtlas.findRegion("ui/victoryTileset"),pos);
+
+            SummonAction summonWinScreen = new SummonAction(action.getDelay(),null,()->{
+                animator.root.add(winSprite);
+                return winSprite;
+            } );
+
+
+
+            return new ExpandedAction(summonWinScreen);
+        }
+
     }
 
 

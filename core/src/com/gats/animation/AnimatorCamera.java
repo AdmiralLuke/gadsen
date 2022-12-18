@@ -60,4 +60,8 @@ public class AnimatorCamera extends OrthographicCamera {
     public void setZoomPressed(float zoomPressed) {
         this.cameraZoomPressed = zoomPressed;
     }
+
+    public Vector2 getScreenCenter() {
+        return new Vector2(position.x,position.y);
+    }
 }

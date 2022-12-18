@@ -70,6 +70,19 @@ public class SpriteEntity extends Entity {
         return angle;
     }
 
+    /**
+     * Returns the center of the rendered Sprite as a Vector.
+     * This is calculated with the {@link SpriteEntity#scale};
+     * @return Vector of the sprite center.
+     */
+    public Vector2 getSpriteCenter()
+    {
+        if(this.textureRegion!=null){
+            return new Vector2(size.x/2f,size.y/2f);
+        }
+        return new Vector2(0,0);
+    }
+
     public void setRotationAngle(float angle) {
         this.angle = angle;
     }

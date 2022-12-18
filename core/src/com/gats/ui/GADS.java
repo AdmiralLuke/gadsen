@@ -39,7 +39,7 @@ public class GADS extends Game {
 		//subject to change
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
-		assetManager.loadTextures();
+		assetManager.loadFiles();
 		setScreen(new MenuScreen(this, assetManager));
 	}
 
