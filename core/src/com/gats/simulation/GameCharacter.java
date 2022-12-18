@@ -231,7 +231,7 @@ public class GameCharacter {
 
         if (dx < 0) {
             for (int i = 0; i >= dx; i--) {
-                if (state.getTile((posX  + i + 15) / 16 , (int)(Math.ceil(posY) / 16) - 1) == null) {
+                if (state.getTile((posX + i + 8) / 16 , (int)((posY) / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -252,7 +252,7 @@ public class GameCharacter {
 
         } else {
             for (int i = 0; i <= dx; i++) {
-                if (state.getTile((posX + i + 2) / 16, (int)Math.ceil(posY / 16) - 1) == null) {
+                if (state.getTile((posX + i + 8) / 16, (int)(posY / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
