@@ -11,6 +11,8 @@ public class MapRetriever implements FilenameFilter {
     String filetype;
     String mapDirectory =  "core/resources/maps";
 
+    String[] hardCodeMapNames = new String[]{"christmasMap","map1","MapSafeGround","testingMap"};
+
 
     /**Creates a {@link MapRetriever}, wich is responsible for providing the selectable Maps
      * found in {@link MapRetriever#mapDirectory}.
@@ -26,10 +28,13 @@ public class MapRetriever implements FilenameFilter {
      * @param newDirectory Changes the {@link MapRetriever#mapDirectory}, where it will look for maps.
      */
      MapRetriever(String newDirectory) {
-        dirHandler = Gdx.files.internal(newDirectory);
-        if(!dirHandler.isDirectory()){
-            System.err.println("Provided Path for MapHandler is not a valid directory!");
-            throw new RuntimeException();
+
+        dirHandler = null;//Gdx.files.internal(newDirectory);
+        if(dirHandler!=null) {
+            if (!dirHandler.isDirectory()) {
+                System.err.println("Provided Path for MapHandler is not a valid directory!");
+                throw new RuntimeException();
+            }
         }
 
     }
@@ -51,7 +56,13 @@ public class MapRetriever implements FilenameFilter {
      */
     public String[] listMaps(){
         this.filetype = defaultMapFiletype;
-       String[] mapNames = fileHandleToStringArray(dirHandler.list(this));
+        String[] mapNames;
+        if(dirHandler!=null) {
+           mapNames = fileHandleToStringArray(dirHandler.list(this));
+        }
+        else{
+            mapNames = this.hardCodeMapNames;
+        }
         removeExtension(mapNames);
         //does not work yet
         return mapNames;
