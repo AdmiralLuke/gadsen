@@ -347,7 +347,14 @@ public class Animator implements Screen, AnimationLogProcessor {
             SummonAction summonWinScreen = new SummonAction(action.getDelay(),null,()->{
 
                 Vector2 pos = animator.getCamera().getScreenCenter();
-                Entity winSprite = new WinEntity(animator.textureAtlas.findRegion("ui/victoryTileset"),pos);
+                TextureRegion display;
+                if(winAction.getTeam() == 0){
+                   display = animator.textureAtlas.findRegion("ui/victoryTileset");
+                }
+                else {
+                    display = animator.textureAtlas.findRegion("ui/loseTilesetTitle");
+                }
+                Entity winSprite = new WinEntity(display,pos);
                 animator.root.add(winSprite);
                 return winSprite;
             } );

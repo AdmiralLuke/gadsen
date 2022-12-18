@@ -5,6 +5,8 @@ public class CharacterHitAction extends CharacterAction{
     private int healthAft;
     public CharacterHitAction(int team, int character, int healthBef, int healthAft) {
         super(team, character, 0.01f);
+        this.healthBef = healthBef;
+        this.healthAft = healthAft;
     }
 
     public int getHealthAft() {
