@@ -22,8 +22,8 @@ public class ChristmasWeapon extends Weapon{
     }
 
     @Override
-    public int getStartDamage() {
-        return super.getStartDamage();
+    public int getDamage() {
+        return super.getDamage();
     }
 
     @Override

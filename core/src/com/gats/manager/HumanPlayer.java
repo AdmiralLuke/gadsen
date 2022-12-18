@@ -9,7 +9,7 @@ import java.util.Queue;
 
 public class HumanPlayer extends Player {
 
-    private static float NO_TICK = -10000.0f;
+    private static final float NO_TICK = -10000.0f;
 
     enum Key {
         KEY_CHARACTER_MOVE_LEFT,

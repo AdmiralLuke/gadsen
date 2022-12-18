@@ -147,11 +147,11 @@ public class GameCharacter {
     }
 
     /**
-     * wählt Waffe n aus dem Inventar aus
-     * @param n Waffe die gewählt werden soll
-     * @return Waffe die gewählt wurde
+     * Gibt eine Waffe aus dem Inventar zurück.
+     * @param n Index der Waffe, die gewählt werden soll.
+     * @return Instanz der Waffe.
      */
-    Weapon getWeapon(int n) {
+    public Weapon getWeapon(int n) {
         ChristmasWeapon wp =  (ChristmasWeapon)weapons[n];
         this.sim.getActionLog().goToNextAction();
         this.sim.getActionLog().addAction(new CharacterSwitchWeaponAction(this.team, this.teamPos, wp.getType()));

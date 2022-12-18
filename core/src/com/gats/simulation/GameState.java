@@ -100,6 +100,11 @@ public class GameState {
         }
     }
 
+    //ToDo migrate to Simulation
+    /**
+     * Gibt zurück, ob das Spiel noch läuft. Ist während der Ausführung immer true und wird nur für interne Zwecke verwendet
+     * @return True, wenn das Spiel noch nicht beendet ist
+     */
     public boolean isActive() {
         return active;
     }
@@ -156,20 +161,26 @@ public class GameState {
     }
 
     /**
-     * Gibt einen bestimmten Spieler aus einem bestimmten Team zurück
+     * Gibt einen bestimmten Charakter aus einem bestimmten Team zurück
      *
-     * @param team   Team-Nummer
-     * @param member Spieler-Nummer im Team
-     * @return ausgewählter Spieler im ausgewählten Team
+     * @param team   Team-Index
+     * @param member Charakter-Index im Team
+     * @return ausgewählter Charakter im ausgewählten Team
      */
     public GameCharacter getCharacterFromTeams(int team, int member) {
         return teams[team][member];
     }
 
+    /**
+     * @return Anzahl der Teams/Spieler
+     */
     public int getTeamCount() {
         return teamCount;
     }
 
+    /**
+     * @return Anzahl der Charaktere pro Team
+     */
     public int getCharactersPerTeam() {
         return charactersPerTeam;
     }
@@ -195,14 +206,14 @@ public class GameState {
     }
 
     /**
-     * @return X Size of the map in tiles
+     * @return Horizontale Größe des Spielfeldes in #Boxen
      */
     public int getBoardSizeX() {
         return board.length;
     }
 
     /**
-     * @return Y Size of the map in tiles
+     * @return Vertikale Größe des Spielfeldes in #Boxen
      */
     public int getBoardSizeY() {
         return board.length == 0 ? 0 : board[0].length;

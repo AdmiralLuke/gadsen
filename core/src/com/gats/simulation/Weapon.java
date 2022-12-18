@@ -29,32 +29,40 @@ abstract class Weapon {
         this.character = character;
     }
 
-
+    /**
+     * @return Waffen-Typ als enum
+     */
     public WeaponType getType() {
         return type;
     }
 
-    public boolean canHitThroughBoxes() {
+    protected boolean canHitThroughBoxes() {
         return hitThroughBoxes;
     }
 
-    public int getStartDamage() {
+    /**
+     * @return Schaden, den diese Waffe beim Treffen verursacht.
+     */
+    public int getDamage() {
         return damage;
     }
 
-    public double getDamageLoss() {
+    protected double getDamageLoss() {
         return damageLoss;
     }
 
-    public double getProjRange() {
+    protected double getProjRange() {
         return projRange;
     }
 
+    /**
+     * @return Anzahl der Schüsse, die mit dieser Waffe verbleiben
+     */
     public int getShootsLeft() {
         return shoots;
     }
 
-    public void shoot(Vector2 dir, double strength) {
+    protected void shoot(Vector2 dir, double strength) {
         if (this.getType() == WeaponType.COOKIE) {
             this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
         } else {
@@ -62,7 +70,7 @@ abstract class Weapon {
         }
     }
 
-    public void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type) {
+    protected void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type) {
         if (strength > projRange) {
             projRange = strength;
         }

@@ -33,12 +33,19 @@ public class Tile {
         return isAnchor? 1 : 0;
     }
 
+    /**
+     * @return Position der Box im Spielbrett-Grid
+     */
     public IntVector2 getPosition() {
-        return this.position;
+        return this.position.cpy();
     }
 
-    public Vector2 getFloatPosition() {
-        return this.position.toFloat();
+    /**
+     * Gibt die Position der Box in Welt-Koordinaten zurück
+     * @return Untere Linke Ecke der Box
+     */
+    public Vector2 getWorldPosition() {
+        return this.position.toFloat().scl(tileSize.x, tileSize.y);
     }
 
 
@@ -233,7 +240,7 @@ public class Tile {
      *                  3 kommt von rechts
      * @return ArrayList mit allen verbunden Tiles
      */
-    public ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, int direction) {
+    protected ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, int direction) {
         tiles.add(this);
         if (tiles.get(tiles.size() - 1).isAnchor) return null;
         if (this.hasUp() && !(direction == 2)) {
@@ -273,7 +280,7 @@ public class Tile {
     /**
      * @return neuen Clon einer Tile
      */
-    public Tile returnClone() {
+    protected Tile returnClone() {
         try {
             return this.clone();
         } catch (CloneNotSupportedException e) {

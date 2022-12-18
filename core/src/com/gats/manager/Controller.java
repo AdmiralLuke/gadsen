@@ -45,39 +45,76 @@ public class Controller {
 
     }
 
+
+    /**
+     * Ermöglicht es Zielen, Waffe wählen und Schiessen in einem Statement auszuführen
+     * @param angle Schussrichtung als 2D-Vektor
+     * @param strength Stärke des Schusses zwischen 0 und 1 (inklusive).
+     * @param type Die Waffe die gewählt werden soll.
+     */
     public void shoot(Vector2 angle, float strength, WeaponType type) {
         aim(angle, strength);
         selectWeapon(type);
         shoot();
     }
 
+    /**
+     * Ermöglicht es Zielen, Waffe wählen und Schiessen in einem Statement auszuführen
+     * @param angle Schussrichtung als Winkel zur X-Achse in Grad. D.h. 0 ist nach Rechts; 90 nach Oben; 180 nach Links etc.
+     * @param strength Stärke des Schusses zwischen 0 und 1 (inklusive).
+     * @param type Die Waffe die gewählt werden soll.
+     */
     public void shoot(float angle, float strength, WeaponType type) {
         aim(angle, strength);
         selectWeapon(type);
         shoot();
     }
 
+    /**
+     * Zielt mit dem angegebenen Winkel und der gewählten Stärke.
+     * @param angle Schussrichtung als Winkel zur X-Achse in Grad. D.h. 0 ist nach Rechts; 90 nach Oben; 180 nach Links etc.
+     * @param strength Stärke des Schusses zwischen 0 und 1 (inklusive).
+     */
     public void aim(float angle, float strength) {
         double radians = angle / 180f * Math.PI;
         aim(new Vector2((float) Math.cos(radians), (float) Math.sin(radians)), strength);
     }
 
+    /**
+     * Zielt mit dem angegebenen Winkel und der gewählten Stärke
+     * @param angle Schussrichtung als 2D-Vektor
+     * @param strength Stärke des Schusses zwischen 0 und 1 (inklusive).
+     */
     public void aim(Vector2 angle, float strength) {
         if (active) manager.queueCommand(new AimCommand(gcController, angle, strength));
     }
 
+    /**
+     * Wählt die angegebene Waffe aus.
+     * @param type Die Waffe die gewählt werden soll.
+     */
     public void selectWeapon(WeaponType type) {
         if (active) manager.queueCommand(new WeaponSelectCommand(gcController, type));
     }
 
+    /**
+     * Befehligt den Charakter mit der ausgewählten Waffe, Winkel und Stärke zu schießen.
+     * Es kann nur einmal pro Zug geschossen werden.
+     */
     public void shoot() {
         if (active) manager.queueCommand(new ShootCommand(gcController));
     }
 
+    /**
+     * Reaktiviert diesen Controller. Wird von internen Komponenten genutzt, um den Zugfolge der Charaktere zu steuern.
+     */
     protected void activate() {
         active = true;
     }
 
+    /**
+     * Deaktiviert diesen Controller (Wenn der Zug vorbei ist). Wird von internen Komponenten genutzt, um den Zugfolge der Charaktere zu steuern.
+     */
     protected void deactivate() {
         active = false;
     }
