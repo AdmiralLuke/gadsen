@@ -343,10 +343,11 @@ public class Animator implements Screen, AnimationLogProcessor {
         }
         private static ExpandedAction convertGameOverAction(com.gats.simulation.Action action, Animator animator) {
            GameOverAction winAction = (GameOverAction) action;
-            Vector2 pos = animator.getCamera().getScreenCenter();
-            Entity winSprite = new WinEntity(animator.textureAtlas.findRegion("ui/victoryTileset"),pos);
 
             SummonAction summonWinScreen = new SummonAction(action.getDelay(),null,()->{
+
+                Vector2 pos = animator.getCamera().getScreenCenter();
+                Entity winSprite = new WinEntity(animator.textureAtlas.findRegion("ui/victoryTileset"),pos);
                 animator.root.add(winSprite);
                 return winSprite;
             } );
