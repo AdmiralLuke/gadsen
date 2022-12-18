@@ -24,6 +24,7 @@ import java.util.List;
 
 public class HudStage extends Stage {
 
+
     enum Key {
         KEY_CAMERA_UP,
         KEY_CAMERA_DOWN,
@@ -194,6 +195,13 @@ public class HudStage extends Stage {
     @Override
     public void draw() {
         super.draw();
+    }
+
+
+    protected void tick(float delta) {
+        if (turnInProgress && currentPlayer != null) {
+            currentPlayer.tick(delta);
+        }
     }
 
 

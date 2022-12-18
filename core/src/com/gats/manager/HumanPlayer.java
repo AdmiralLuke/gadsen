@@ -1,17 +1,15 @@
 package com.gats.manager;
 
 import com.badlogic.gdx.Input;
-import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
-import com.sun.jmx.remote.internal.ArrayQueue;
-import org.lwjgl.Sys;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Stack;
 
 public class HumanPlayer extends Player {
+
+    private static float NO_TICK = -10000.0f;
 
     enum Key {
         KEY_CHARACTER_MOVE_LEFT,
@@ -39,14 +37,22 @@ public class HumanPlayer extends Player {
     final int KEY_CHARACTER_END_TURN = Input.Keys.X;
 
 
-    private boolean[] isDown = new boolean[Key.values().length];
+    private float[] lastTick = new float[Key.values().length];
 
-    private boolean characterMoveLeftPressed = false;
-    private boolean characterMoveRightPressed = false;
-    private boolean characterShootPressed = false;
-    private boolean characterAimLeftPressed = false;
-    private boolean characterAimRightPressed = false;
-    private boolean characterCycleWeapon = false;
+    private static final float[] tickspeed = new float[Key.values().length]; // in Hz
+
+    {
+        tickspeed[Key.KEY_CHARACTER_MOVE_LEFT.ordinal()] = 0.1f;
+        tickspeed[Key.KEY_CHARACTER_MOVE_RIGHT.ordinal()] = 0.1f;
+        tickspeed[Key.KEY_CHARACTER_SHOOT_ACTION.ordinal()] = 0.1f;
+        tickspeed[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = 0.1f;
+        tickspeed[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = 0.1f;
+        tickspeed[Key.KEY_CHARACTER_INCREASE_STRENGTH.ordinal()] = 0.1f;
+        tickspeed[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()] = 0.1f;
+        tickspeed[Key.KEY_CHARACTER_CYCLE_WEAPON.ordinal()] = 0.1f;
+
+        tickspeed[Key.KEY_CHARACTER_END_TURN.ordinal()] = 0.1f;
+    }
 
     //amount of time in seconds, the turn of the human player will take
     //if the time limit is reached, the execute turn will wait for turnOverhead seconds
@@ -97,8 +103,10 @@ public class HumanPlayer extends Player {
 
     @Override
     protected void executeTurn(GameState state, Controller controller) {
+        //ToDo move input processing to UI package
         this.state = state;
         this.controller = controller;
+        for (int i = 0; i < lastTick.length; i++) lastTick[i] = NO_TICK;
         synchronized (this) {
             try {
                 this.wait(20000);
@@ -124,39 +132,39 @@ public class HumanPlayer extends Player {
         System.out.println("Received Key: " + keycode);
         switch (keycode) {
             case KEY_CHARACTER_AIM_LEFT:
-                isDown[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = true;
+                lastTick[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = -tickspeed[Key.KEY_CHARACTER_AIM_LEFT.ordinal()];
                 execute(Key.KEY_CHARACTER_AIM_LEFT);
                 break;
             case KEY_CHARACTER_AIM_RIGHT:
-                isDown[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = true;
+                lastTick[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = -tickspeed[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()];
                 execute(Key.KEY_CHARACTER_AIM_RIGHT);
                 break;
             case KEY_CHARACTER_MOVE_LEFT:
-                isDown[Key.KEY_CHARACTER_MOVE_LEFT.ordinal()] = true;
+                lastTick[Key.KEY_CHARACTER_MOVE_LEFT.ordinal()] = -tickspeed[Key.KEY_CHARACTER_MOVE_LEFT.ordinal()];
                 execute(Key.KEY_CHARACTER_MOVE_LEFT);
                 break;
             case KEY_CHARACTER_MOVE_RIGHT:
-                isDown[Key.KEY_CHARACTER_MOVE_RIGHT.ordinal()] = true;
+                lastTick[Key.KEY_CHARACTER_MOVE_RIGHT.ordinal()] = -tickspeed[Key.KEY_CHARACTER_MOVE_RIGHT.ordinal()];
                 execute(Key.KEY_CHARACTER_MOVE_RIGHT);
                 break;
             case KEY_CHARACTER_SHOOT_ACTION:
-                isDown[Key.KEY_CHARACTER_SHOOT_ACTION.ordinal()] = true;
+                //lastTick[Key.KEY_CHARACTER_SHOOT_ACTION.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_SHOOT_ACTION);
                 break;
             case KEY_CHARACTER_CYCLE_WEAPON:
-                isDown[Key.KEY_CHARACTER_CYCLE_WEAPON.ordinal()] = true;
+                //lastTick[Key.KEY_CHARACTER_CYCLE_WEAPON.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_CYCLE_WEAPON);
                 break;
             case KEY_CHARACTER_INCREASE_STRENGTH:
-                isDown[Key.KEY_CHARACTER_INCREASE_STRENGTH.ordinal()] = true;
+                lastTick[Key.KEY_CHARACTER_INCREASE_STRENGTH.ordinal()] = -tickspeed[Key.KEY_CHARACTER_INCREASE_STRENGTH.ordinal()];
                 execute(Key.KEY_CHARACTER_INCREASE_STRENGTH);
                 break;
             case KEY_CHARACTER_DECREASE_STRENGTH:
-                isDown[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()] = true;
+                lastTick[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()] = -tickspeed[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()];
                 execute(Key.KEY_CHARACTER_DECREASE_STRENGTH);
                 break;
             case KEY_CHARACTER_END_TURN:
-                isDown[Key.KEY_CHARACTER_END_TURN.ordinal()] = true;
+                //lastTick[Key.KEY_CHARACTER_END_TURN.ordinal()] = true;
                 execute(Key.KEY_CHARACTER_END_TURN);
                 break;
         }
@@ -202,15 +210,22 @@ public class HumanPlayer extends Player {
                 controller.aim(angle, strength);
                 break;
             case KEY_CHARACTER_END_TURN:
-                //needed to set this true here, because otherwise it will stay true
-                //will potentially not get reset fast enough
-                isDown[Key.KEY_CHARACTER_END_TURN.ordinal()] = false;
                 this.endCurrentTurn();
                 break;
         }
     }
 
-    public void tick() {
+    public void tick(float delta) {
+        for (Key key : Key.values()) {
+            int index = key.ordinal();
+            if (lastTick[index] > (NO_TICK/2)) {
+                lastTick[index] += delta;
+                while (lastTick[index] >= 0.0f) {
+                    lastTick[index] -= tickspeed[index];
+                    execute(key);
+                }
+            }
+        }
         //ToDo implement holding keys
     }
 
@@ -221,29 +236,29 @@ public class HumanPlayer extends Player {
         switch (keycode) {
             // Qund E für rotieren/zielen mit den Waffen
             case KEY_CHARACTER_AIM_LEFT:
-                isDown[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_AIM_LEFT.ordinal()] = NO_TICK;
                 //currentPlayer.toggleAimLeft();
                 break;
             case KEY_CHARACTER_AIM_RIGHT:
-                isDown[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_AIM_RIGHT.ordinal()] = NO_TICK;
                 break;
             case KEY_CHARACTER_MOVE_LEFT:
-                isDown[Key.KEY_CHARACTER_MOVE_LEFT.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_MOVE_LEFT.ordinal()] = NO_TICK;
                 break;
             case KEY_CHARACTER_MOVE_RIGHT:
-                isDown[Key.KEY_CHARACTER_MOVE_RIGHT.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_MOVE_RIGHT.ordinal()] = NO_TICK;
                 break;
             case KEY_CHARACTER_SHOOT_ACTION:
-                isDown[Key.KEY_CHARACTER_SHOOT_ACTION.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_SHOOT_ACTION.ordinal()] = NO_TICK;
                 break;
             case KEY_CHARACTER_CYCLE_WEAPON:
-                isDown[Key.KEY_CHARACTER_CYCLE_WEAPON.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_CYCLE_WEAPON.ordinal()] = NO_TICK;
                 break;
             case KEY_CHARACTER_INCREASE_STRENGTH:
-                isDown[Key.KEY_CHARACTER_INCREASE_STRENGTH.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_INCREASE_STRENGTH.ordinal()] = NO_TICK;
                 break;
             case KEY_CHARACTER_DECREASE_STRENGTH:
-                isDown[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()] = false;
+                lastTick[Key.KEY_CHARACTER_DECREASE_STRENGTH.ordinal()] = NO_TICK;
                 break;
         }
     }
@@ -251,19 +266,6 @@ public class HumanPlayer extends Player {
     @Override
     protected PlayerType getType() {
         return PlayerType.Human;
-    }
-
-    /**
-     * Setzt die boolean Werte, welche vom Input durch die {@link com.gats.ui.HudStage}
-     * über set Methodenaufrufe verändert werden, auf false.
-     */
-    protected void resetControls() {
-        characterMoveRightPressed = false;
-        characterMoveLeftPressed = false;
-        characterCycleWeapon = false;
-        characterShootPressed = false;
-        characterAimLeftPressed = false;
-        characterAimRightPressed = false;
     }
 
 }

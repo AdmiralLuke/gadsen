@@ -70,6 +70,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
     @Override
     public void render(float delta) {
+        hudStage.tick(delta);
         hudStage.act();
         animator.render(delta);
         hudStage.draw();
