@@ -295,6 +295,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertTurnStartAction(com.gats.simulation.Action action, Animator animator) {
             TurnStartAction startAction = (TurnStartAction) action;
             GameCharacter target = animator.teams[startAction.getTeam()][startAction.getCharacter()];
+            animator.getCamera().moveToVector(target.getPos());
             return new ExpandedAction(new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter));
         }
 

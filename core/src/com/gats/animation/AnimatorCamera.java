@@ -1,6 +1,7 @@
 package com.gats.animation;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -63,5 +64,10 @@ public class AnimatorCamera extends OrthographicCamera {
 
     public Vector2 getScreenCenter() {
         return new Vector2(position.x,position.y);
+    }
+
+    public void moveToVector(Vector2 position){
+
+       this.position.set(position,0);
     }
 }
