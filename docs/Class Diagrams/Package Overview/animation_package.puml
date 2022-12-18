@@ -1,0 +1,65 @@
+@startuml
+
+title Animation Package Class Diagram
+
+package com.gats.core.animation{
+  class Animator{
+    -EntityGroup root
+    -Texture background
+    +Animator(GameState state)
+    +void animate(ActionLog log)
+  }
+  
+  class Entity{
+    -Vector2 pos
+    -Vector2 relPos
+    
+    ~draw(batch: Batch)
+  }
+  
+  class EntityGroup{
+    -List<Entity> children
+  }
+  
+  class SpriteEntity{
+    
+  }
+  
+  class AnimatedEntity{
+  
+  }
+  
+  class Tile
+  
+  class GameCharacter{
+    
+  }
+  
+  class Projectile{
+  }
+  
+  class Weapon{
+  }
+}
+
+package com.badlogic.gdx{
+  interface Screen
+}
+
+
+Screen <|-- Animator
+
+Animator --> EntityGroup: "contains as root"
+
+Entity <|-- EntityGroup
+Entity <|-- SpriteEntity
+Entity <|-- AnimatedEntity
+Entity "0..n" --o "1" EntityGroup
+
+SpriteEntity <|-- Tile
+
+AnimatedEntity <|-- GameCharacter
+AnimatedEntity <|-- Weapon
+AnimatedEntity <|-- Projectile
+
+@enduml

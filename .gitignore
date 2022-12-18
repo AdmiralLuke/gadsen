@@ -112,3 +112,16 @@ Thumbs.db
 /ios/xcode/native/
 /ios/IOSLauncher.app
 /ios/IOSLauncher.app.dSYM
+
+## Project Specific
+### Ignore resources as they are the asset-pipelines output
+/core/resources/
+### Exclude build directories
+/assets/build/
+/pipeline/build
+/pipeline/src/test/tmp/
+/util/src/test/tmp/
+/util/build/
+
+### Exclude tiled tmp files
+*.tiled-session

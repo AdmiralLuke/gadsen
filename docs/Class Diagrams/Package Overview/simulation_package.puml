@@ -1,0 +1,64 @@
+@startuml
+
+title Simulation Package - Class Diagram
+
+package com.gads.core.simulation{
+  class Simulation
+  
+  class GameState {
+  
+  }
+  
+  class ActionLog{
+    - Queue<Action>: actions
+  }
+  
+  abstract Weapon
+  
+  abstract Projectile
+  
+  abstract Action{
+    - Int: delay
+  }
+  abstract CharacterAction
+  class CharacterMoveAction
+  class CharacterShootAction
+  abstract ProjectileAction
+  abstract TileAction
+  class TileMoveAction
+  class TileDestroyAction
+  class TileSummonAction
+  
+  class Tile{
+    -isAnchor: bool
+  }
+  
+  class Character
+}
+
+Simulation *-- GameState
+Simulation "1" --> "0..n" ActionLog: Generiert
+Simulation "1" *-- "1..n" Weapon
+
+GameState "1" *-- "0..n" Tile
+GameState "1" *-- "0..n" Character
+
+ActionLog "1" o-- "1..n" Action
+
+Action <|-- CharacterAction
+Action <|-- ProjectileAction
+Action <|-- TileAction
+
+
+CharacterAction <|-- CharacterMoveAction
+CharacterAction <|-- CharacterShootAction
+
+TileAction <|-- TileMoveAction
+TileAction <|-- TileDestroyAction
+TileAction <|-- TileSummonAction
+
+Weapon "1" o-- "0..n" Projectile
+
+Projectile "1" o-- "0..n" Projectile
+
+@enduml
