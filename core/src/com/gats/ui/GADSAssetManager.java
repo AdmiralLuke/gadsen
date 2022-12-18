@@ -13,7 +13,7 @@ public class GADSAssetManager{
     //dedicatod to loading and mangaing assets used in the application
 
     //Pfad an dem sich der Textureatlas mit Assets relevant für das Spiel
-    public final String resourceDirectory = "core/resources/";
+    public final String resourceDirectory = "";
     public final String inGameAtlas = resourceDirectory+ "texture_atlas/TextureAtlas.atlas";
 
     public final String skin = resourceDirectory + "ui/skin.json";

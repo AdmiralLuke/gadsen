@@ -66,8 +66,7 @@ private SpriteBatch menuBatch;
      */
     public void setupMenuScreen(Stage menu, TextureRegion title) {
 
-        Skin skin = new Skin(Gdx.files.internal("core/resources/ui/skin.json"));
-        skin = gadsAssetManager.getSkin();
+        Skin skin = gadsAssetManager.getSkin();
         Table menuTable = gameSettings.buildMainLayoutTable(skin,null ,title);
         menu.addActor(menuTable);
         menuTable.setDebug(false); // This is optional, but enables debug lines for tables.
