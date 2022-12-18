@@ -239,7 +239,7 @@ public class GameCharacter {
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
 
-                    System.out.println("moved to because there was hole"+ posAf);
+//                    System.out.println("moved to because there was hole"+ posAf);
                     this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
                     this.fall();
                     return;
@@ -260,7 +260,7 @@ public class GameCharacter {
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
 
-                    System.out.println("moved to because there was hole"+ posAf);
+//                    System.out.println("moved to because there was hole"+ posAf);
                     this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
                     this.fall();
                     return;

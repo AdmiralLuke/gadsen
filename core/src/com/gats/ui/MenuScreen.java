@@ -99,7 +99,6 @@ private SpriteBatch menuBatch;
            menuViewport.apply();
            backgroundViewport.update(width, height, true);
 
-           System.out.println(menuViewport.getScreenWidth());
            //center the camera
            //camera.position.set(camera.viewportWidth/2f,camera.viewportHeight/2f,0);
            backgroundViewport.apply();

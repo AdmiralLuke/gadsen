@@ -133,7 +133,7 @@ public class Projectile {
             v.set((float)(v.x * strength) * 400, (float)(v.y * strength) * 400);
             this.path = new ParablePath(s, v);
             while (livingTime < range) {
-                System.out.println("Pos: " + pos.x + ", " + pos.y);
+//                System.out.println("Pos: " + pos.x + ", " + pos.y);
                 if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
                         || this.pos.x <= 0 ||this.pos.y <= 0) {
                     sim.getActionLog().addAction(new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos));

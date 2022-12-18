@@ -265,9 +265,7 @@ public class Manager {
             try {
                 while (true) {
                     Command nextCmd = commandQueue.take();
-                    if (nextCmd.isEndTurn()){
-                        System.out.println("Endturn received " + controller);
-                        break;}
+                    if (nextCmd.isEndTurn()) break;
                     nextCmd.run();
 
                     if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
@@ -282,7 +280,6 @@ public class Manager {
                 }
                 throw new RuntimeException(e);
             }
-            System.out.println("Deactivating controller: " + controller);
             controller.deactivate();
             ActionLog finalLog = simulation.endTurn();
             if (gui) {
@@ -305,7 +302,7 @@ public class Manager {
                 throw new RuntimeException(e);
             }
         }
-        System.out.println("Shutdown complete");
+//        System.out.println("Shutdown complete");
     }
 
     public void dispose() {

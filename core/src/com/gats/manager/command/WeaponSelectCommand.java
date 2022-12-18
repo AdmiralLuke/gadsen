@@ -10,7 +10,6 @@ public class WeaponSelectCommand extends Command{
     public WeaponSelectCommand(GameCharacterController controller, WeaponType type) {
         super(controller);
         this.type = type;
-        System.out.println("Selecting " + type);
     }
 
     @Override

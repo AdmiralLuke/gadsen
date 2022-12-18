@@ -23,7 +23,6 @@ public class ProjectileAction extends Action{
 
     public ProjectileAction(Path path, ProjectileType type, float duration, Vector2 posAft) {
         super(0);
-        System.out.println("Creating Projectile Action");
         this.type = type;
         this.path = path;
         if (ProjectileType.COOKIE == type) {
@@ -31,8 +30,6 @@ public class ProjectileAction extends Action{
         } else {
             this.duration = duration / 100;
         }
-        System.out.println("Shooting " + (path.getPos(0.001).cpy().sub(path.getPos(0))));
-        System.out.println("Shooting " + (path.getPos(1).cpy().sub(path.getPos(0))));
     }
 
 
