@@ -64,6 +64,7 @@ public class GameSettings {
         this.availableMaps = new MapRetriever().listMaps();
         this.availableGameMode = new String[]{"Normal", "Weihnachtsaufgabe"};
         this.availableBots =  Manager.getPossiblePlayers();
+        this.gameMode = 0;
     }
 
     public GameSettings(int gameMode, String mapName, int teamAmount, int teamSize, GADS gameInstance) {
@@ -88,8 +89,13 @@ public class GameSettings {
     void evaluateSettings() {
         String gameModeName = gameModeButton.getSelected();
         if (gameModeName.equals(christmasGameModeName)) {
-            this.gameMode = 1;
+            ///can be moved to the setGamemode function
+            //overload with name and string comparison
+            setGameMode(1);
             setChristmasSpecialSettings(christmasTable.getSkin());
+        }
+        else{
+        setGameMode(0);
         }
         setMapName(mapSelectionBox.getSelected());
         setTeamAmount((int) teamAmountSlider.getValue());
