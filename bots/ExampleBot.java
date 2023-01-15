@@ -1,5 +1,5 @@
-package.bots;
-import com.gats.manager
+package bots;
+import com.gats.manager.*;
 
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
