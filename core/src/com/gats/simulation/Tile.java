@@ -1,6 +1,8 @@
 package com.gats.simulation;
 import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Repräsentiert eine Box aus denen die Karte aufgebaut ist.
@@ -168,9 +170,17 @@ public class Tile {
     void onDestroy() {
         this.state.getSim().getActionLog().goToLast();
         ArrayList<Tile> rightList = null;
+        HashMap<Tile, Integer> rightHashList = new HashMap<>();
+
         ArrayList<Tile> upperList = null;
+        HashMap<Tile, Integer> upperHashList = new HashMap<>();
+
         ArrayList<Tile> lowerList = null;
+        HashMap<Tile, Integer> lowerHashList = new HashMap<>();
+
         ArrayList<Tile> leftList = null;
+        HashMap<Tile, Integer> leftHashList = new HashMap<>();
+
         state.getBoard()[this.position.x][this.position.y] = null;
         this.state.getSim().getActionLog().addAction(new TileDestroyAction(this.position));
         if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), 0);
@@ -302,4 +312,17 @@ public class Tile {
     boolean hasLeft() { return left != null; }
     boolean hasUp() { return up != null; }
     boolean hasDown() { return down != null; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tile tile = (Tile) o;
+        return isAnchor == tile.isAnchor && isAnchored == tile.isAnchored && getPosition().equals(tile.getPosition());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isAnchor, isAnchored, getPosition());
+    }
 }

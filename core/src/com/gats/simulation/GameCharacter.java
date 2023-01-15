@@ -192,7 +192,7 @@ public class GameCharacter {
     void fall() {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
-        while (this.posY / 16 > 0 && this.state.getTile(posX / 16, (int)Math.ceil(posY / 16) - 1) == null) {
+        while (this.posY / 16 > 0 && this.state.getTile((int)((posX + 10) / 16) , (int)(posY / 16) - 1) == null) {
             this.posY -= 16;
             fallen++;
         }
@@ -231,7 +231,7 @@ public class GameCharacter {
 
         if (dx < 0) {
             for (int i = 0; i >= dx; i--) {
-                if (state.getTile((posX + i + 8) / 16 , (int)((posY) / 16) - 1) == null) {
+                if (state.getTile((posX + i + 12) / 16 , ((posY) / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -252,7 +252,7 @@ public class GameCharacter {
 
         } else {
             for (int i = 0; i <= dx; i++) {
-                if (state.getTile((posX + i + 8) / 16, (int)(posY / 16) - 1) == null) {
+                if (state.getTile((posX + i +4) / 16, (int)(posY / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -260,7 +260,7 @@ public class GameCharacter {
                     this.posX += dx;
                     Vector2 posAf = new Vector2(posX, posY);
 
-//                    System.out.println("moved to because there was hole"+ posAf);
+//                   System.out.println("moved to because there was hole"+ posAf);
                     this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
                     this.fall();
                     return;

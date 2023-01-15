@@ -1,15 +1,11 @@
-package com.gats.manager;
-// ^ das auskommentieren oder löschen
-
-// v bei folgenden statements müssen die Kommentar / entfernt werden, damit euer Bot funktioniert:
-// package.bots;
-// import com.gats.manager
+package.bots;
+import com.gats.manager
 
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
-public class TestBot extends Bot {
+public class ExampleBot extends Bot {
 
     /**
      * Hier gebt ihr euren Namen an

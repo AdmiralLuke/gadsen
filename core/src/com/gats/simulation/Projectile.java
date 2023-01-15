@@ -163,7 +163,7 @@ public class Projectile {
                         }
                     }
                 }
-                pos.x += 1;
+                pos.x += dir.x > 0 ? 1 : -1;
                 pos.y = ((v.y * ((-s.x + pos.x) / v.x)) - (g/2) * (float)Math.pow(((-s.x + pos.x) / v.x), 2)) + s.y;
             }
         }
