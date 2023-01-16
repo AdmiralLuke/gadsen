@@ -155,13 +155,15 @@ public class Manager {
         File botDir = new File("bots");
         if (botDir.exists()) {
             try {
-                URL url = botDir.toURI().toURL();
+                URL url = new File(".").toURI().toURL();
                 URL[] urls = new URL[]{url};
                 ClassLoader loader = new URLClassLoader(urls);
                 for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))
                 ) {
                     try {
-                        players.add(new NamedPlayerClass((Class<? extends Player>) loader.loadClass("bots." + botFile.getName())));
+                        Class<?> nextClass = loader.loadClass("bots." + botFile.getName().replace(".class", ""));
+                        if(Bot.class.isAssignableFrom(nextClass)) players.add(new NamedPlayerClass((Class<? extends Player>) nextClass));
+
                     } catch (ClassNotFoundException e) {
                         System.err.println("Could not find class for " + botFile.getName());
                     }
