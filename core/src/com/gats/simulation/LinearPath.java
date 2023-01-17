@@ -62,8 +62,8 @@ public class LinearPath implements Path{
     public float getEndTime() {
         return endTime;
     }
-
-    public Vector2 getDir() {
+    @Override
+    public Vector2 getDir(double t) {
         return dir;
     }
 

@@ -17,6 +17,16 @@ public class LaserPath implements Path{
         return t == 0 ? startPos : endPos;
     }
 
+    /**
+     * Not implemented.
+     * @param t
+     * @return
+     */
+    @Override
+    public Vector2 getDir(double t){
+        return Vector2.Zero;
+    }
+
     public Vector2 getEndPos() {
         return endPos;
     }

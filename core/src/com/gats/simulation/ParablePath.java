@@ -23,6 +23,9 @@ public class ParablePath implements Path {
         double y = (((v.y * t) - ((g / 2) * t * t)) + s.y);
         return new Vector2((float)x, (float)y);
     }
+    public Vector2 getDir(double t){
+        return new Vector2 (v.x,v.y -(float)(g*t*t));
+    }
 
     @Override
     public float getEndTime() {
