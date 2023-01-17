@@ -140,7 +140,7 @@ public class GameCharacter extends AnimatedEntity {
 
     @Override
     public void setRelPos(Vector2 pos) {
-        setFlipped(this.getPos().x < pos.x);
+        //setFlipped(this.getPos().x < pos.x);
         super.setRelPos(pos);
     }
 

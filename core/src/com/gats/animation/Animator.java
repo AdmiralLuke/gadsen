@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.manager.AnimationLogProcessor;
 import com.gats.manager.Manager;
 import com.gats.simulation.*;
+import org.w3c.dom.Text;
 
 
 import java.util.*;
@@ -182,7 +183,9 @@ public class Animator implements Screen, AnimationLogProcessor {
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacter.AnimationType.ANIMATION_TYPE_WALKING);
             MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
-            startWalking.setChildren(new Action[]{animMoveAction});
+            //rotateAction to set the angle/direction of movement, to flip the character sprite
+            RotateAction animRotateAction = new RotateAction(0,target,moveAction.getDuration(),moveAction.getPath());
+            startWalking.setChildren(new Action[]{animMoveAction,animRotateAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacter.AnimationType.ANIMATION_TYPE_IDLE);
             animMoveAction.setChildren(new Action[]{stopWalking});
 
@@ -207,11 +210,13 @@ public class Animator implements Screen, AnimationLogProcessor {
 
 
             MoveAction moveProjectile = new MoveAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
+            RotateAction rotateProjectile = new RotateAction(0,null,projectileAction.getDuration(),projectileAction.getPath());
 
             DestroyAction destroyProjectile = new DestroyAction(0, null, null, animator.root::remove);
 
             SummonAction summonProjectile = new SummonAction(action.getDelay(), target -> {
                 moveProjectile.setTarget(target);
+                rotateProjectile.setTarget(target);
                 destroyProjectile.setTarget(target);
             }, () -> {
                 Entity projectile = Projectiles.summon(projectileAction.getType());
@@ -220,7 +225,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             });
 
             //The Projectile should be moved after being summoned
-            summonProjectile.setChildren(new Action[]{moveProjectile});
+            summonProjectile.setChildren(new Action[]{moveProjectile,rotateProjectile});
 
             //The Projectile should get destroyed at the end of its path
             moveProjectile.setChildren(new Action[]{destroyProjectile});
@@ -447,6 +452,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 AimIndicator aimIndicator = new AimIndicator(aimingIndicatorSprite, animGameCharacter);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
                 animGameCharacter.setAimingIndicator(aimIndicator);
+                animGameCharacter.setMirror(true);
                 characterGroup.add(animGameCharacter);
             }
 
