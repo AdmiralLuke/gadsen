@@ -13,13 +13,26 @@ public class RotateAction extends Action{
     private Vector2 angle;
     private float endTime;
     private Path path;
-
+/**
+     * When only given an angle, the {@link RotateAction} is performed once.
+     * @param start Starting time/Delay of the Action
+     * @param target {@link Entity} to be rotated
+     * @param angle Vector the angle is gathered from
+     */
     public RotateAction(float start,Entity target, Vector2 angle) {
         super(start);
         this.target = target;
         this.endTime = start;
         this.angle = angle;
     }
+
+    /**
+     * If the {@link RotateAction} is created with a {@link Path}, it will change the angle of {@link Entity} till it ended.
+     * @param start Starting time/Delay of the Action
+     * @param target {@link Entity} to be rotated
+     * @param duration Amount of time the Path takes to end
+     * @param path {@link Path} the angle/direction is used from
+     */
     public RotateAction(float start, Entity target,float duration, Path path){
         super(start);
         this.target = target;
