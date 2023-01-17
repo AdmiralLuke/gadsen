@@ -283,8 +283,17 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(summonProjectile, destroyProjectile);
         }
 
+        /**
+         * Converts a {@link CharacterAimAction} to adjust the rotation and scale of its {@link AimIndicator}.
+         *
+         * @param action Aim Action to be converted
+         * @param animator Current Animator
+         * @return {@link ExpandedAction} with a {@link RotateAction} and {@link ScaleAction}.
+         */
         private static ExpandedAction convertCharacterAimAction(com.gats.simulation.Action action, Animator animator) {
+            //cast to access CharacterAimAction values
             CharacterAimAction aimAction = (CharacterAimAction) action;
+            //get the aimIndicator from the player that shot
             AimIndicator currentAimIndicator = animator.teams[aimAction.getTeam()][aimAction.getCharacter()].getAimingIndicator();
             RotateAction rotateAction = new RotateAction(0, currentAimIndicator, aimAction.getAngle());
             ScaleAction scaleAction = new ScaleAction(0, currentAimIndicator, new Vector2(aimAction.getStrength(), 1));
