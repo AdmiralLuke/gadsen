@@ -1,6 +1,7 @@
 package com.gats.animation;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
@@ -99,6 +100,8 @@ public class GameCharacter extends AnimatedEntity {
         batch.setShader(outlineShader);
         outlineShader.setUniformf("outline_color", teamColor);
         outlineShader.setUniformf("line_thickness", 1f);
+        Texture texture = getAnimation().getKeyFrame(0).getTexture();
+        outlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);
