@@ -1,4 +1,4 @@
-#version 330
+#version 150
 #ifdef GL_ES
 #define LOWP lowp
 precision mediump float;
