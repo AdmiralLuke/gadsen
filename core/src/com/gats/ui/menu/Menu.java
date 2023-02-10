@@ -169,7 +169,8 @@ public class Menu {
 		return mapSelector;
 	}
 	private TeamAmountSlider createTeamAmountSlider(Skin skin) {
-
+		return null;
+		//Todo
 	}
 
 
