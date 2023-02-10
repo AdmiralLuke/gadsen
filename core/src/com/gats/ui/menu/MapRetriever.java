@@ -1,4 +1,4 @@
-package com.gats.ui;
+package com.gats.ui.menu;
 import com.badlogic.gdx.files.FileHandle;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class MapRetriever implements FilenameFilter {
      * then looks for for the external dir
      */
 
-    MapRetriever() {
+    protected MapRetriever() {
         FileHandle directory = determineMapDirectory(internalMapDirectory);
         if (directory!=null){
             dirHandler = directory;

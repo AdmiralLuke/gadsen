@@ -2,16 +2,12 @@ package com.gats.ui;
 
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.gats.simulation.Simulation;
-
-import java.io.File;
-import java.util.LinkedList;
+import com.gats.ui.menu.MapRetriever;
+import com.gats.ui.menu.TestScreen;
 
 /**
  * GADS ist die verantwortliche Klasse im LifeCycle der Anwendung.
@@ -43,7 +39,8 @@ public class GADS extends Game {
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
 		assetManager.loadFiles();
-		setScreen(new MenuScreen(this, assetManager));
+//		setScreen(new MenuScreen(this, assetManager));
+		setScreen(new TestScreen(new SpriteBatch(),assetManager));
 	}
 
 	public void render() {
@@ -66,12 +63,6 @@ public class GADS extends Game {
 
 	public void setScreenMenu() {
 		setScreen(new MenuScreen(this, assetManager));
-	}
-
-	public String[] getMaps(){
-		return new MapRetriever().listMaps();
-
-
 	}
 
 	public String[] getBots(){

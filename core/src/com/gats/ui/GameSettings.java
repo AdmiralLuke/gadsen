@@ -6,12 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.gats.manager.ChristmasBot;
 import com.gats.manager.Manager;
 import com.gats.manager.Player;
 import com.gats.manager.RunConfiguration;
-import com.sun.tools.javac.code.Attribute;
+import com.gats.ui.menu.MapRetriever;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -61,7 +60,6 @@ public class GameSettings {
 
     public GameSettings(GADS gameInstance) {
         this.game = gameInstance;
-        this.availableMaps = new MapRetriever().listMaps();
         this.availableGameMode = new String[]{"Normal", "Weihnachtsaufgabe"};
         this.availableBots =  Manager.getPossiblePlayers();
         this.gameMode = 0;
@@ -415,6 +413,9 @@ public class GameSettings {
         config.players = getPlayers();
         return config;
     }
+
+
+    //done
 
     class SliderLabel extends Label {
         Slider sliderInstance;
