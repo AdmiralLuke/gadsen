@@ -1,14 +1,13 @@
 package com.gats.ui.menu;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
-import com.gats.ui.menu.buttons.RelationSlider;
-import com.gats.ui.menu.buttons.SliderLabel;
-import com.gats.ui.menu.buttons.TeamAmountSlider;
+import com.gats.ui.menu.buttons.*;
 
 public class Menu {
 
@@ -55,15 +54,15 @@ public class Menu {
 		- evtl. manuelles positionieren oder eigenes Layout/Table schreiben.
 			- bspw. Menü aufteilen in Zeilen, Elemente mit einem Set Speichern? oder als Matrix?
 
-
 	*/
 
 /*
 	Plan
-	Buttons in extra klassen auslagern
+	manche Buttons in extra klassen auslagern
 	getter und setter sowie button generation in eindeutigen bereiche verlagern
 
 	Menu evtl noch in Gamemodespezifische "Screens"/Layouts aufgeteilen
+	- ist aber an sich doch eher nicht notwendig
 
 
  */
@@ -101,9 +100,9 @@ public class Menu {
 
 		//section for creating buttons
 
-		createButtons();
-
-
+		createButtons(skin);
+		StartButton startButton = new StartButton("Spiel starten",skin,this);
+		ExitButton exitButton = new ExitButton("Beenden",skin);
 		//------------------------
 
 
@@ -124,29 +123,16 @@ public class Menu {
 		//menuTable.row(); erzeugt eine neue Zeile in der Tabelle
 		menuTable.row();
 
-		//Startknopf wird platziert
-		//menuTable.add(createStartButton(StartButtonImage)).colspan(4);
-		menuTable.add(createTextStartButton("Spiel Starten", skin)).colspan(4);
+		menuTable.add(startButton).colspan(4);
 		menuTable.row();
 
-		menuTable.add(createGameModeSelector()).pad(10).colspan(4);
+		menuTable.add(gameModeSelector).pad(10).colspan(4);
 		menuTable.row();
 
-		//gamemodespecific menuTable enthält während der Laufzeit das menü für den ausgewählten Spielmodus
-		this.gameModeSpecificTable = new Table(skin);
-		menuTable.add(gameModeSpecificTable).colspan(4);
-
-		makeButtons(skin);
-		//Standardmäßig wird das Normale Menü erzeugt
-		makeNormalMenuButtons(skin);
-		makeChristmasMenuButtons(skin);
-
-		setGameModeSpecificTable(normalMenuTable);
-		//ganz unten im Menü ist der Exit button
 		menuTable.row();
 
-		menuTable.add(createExitButton(skin)).colspan(4).pad(10);
-		gameModeButton.setSelected("Weihnachtsaufgabe");
+		//ganz unten im  ist der Exit button
+		menuTable.add(exitButton).colspan(4).pad(10);
 		return menuTable;
 	}
 
@@ -163,27 +149,6 @@ public class Menu {
 	}
 
 
-
-	/**
-	 * Creates a text button to start the game.
-	 * <p>
-	 * Adds a change Listener to it, wich will call {@link Menu#startGame()}
-	 *
-	 * @param spielStarten
-	 * @param skin
-	 * @return
-	 */
-	private TextButton createTextStartButton(String spielStarten, Skin skin) {
-		TextButton start = new TextButton(spielStarten, skin);
-		start.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				startGame();
-			}
-		});
-
-		return start;
-	}
 
 	private <T> SelectBox<T> createGameModeSelector(Skin skin){
 		return new SelectBox<T>(skin);
@@ -206,5 +171,6 @@ public class Menu {
 	private TeamAmountSlider createTeamAmountSlider(Skin skin) {
 
 	}
+
 
 }

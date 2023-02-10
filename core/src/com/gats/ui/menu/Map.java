@@ -1,4 +1,4 @@
-package com.gats.ui.menu.buttons;
+package com.gats.ui.menu;
 
 public class Map {
 
