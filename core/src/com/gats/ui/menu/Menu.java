@@ -198,7 +198,8 @@ public class Menu {
 			public void changed(ChangeEvent event, Actor actor) {
 				//teamAmountSlider.adjustTeamSizeToSpawnpoints();
 			}
-		})
+		});
+
 
 		return mapSelector;
 	}

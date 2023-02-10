@@ -73,7 +73,6 @@ public class GameSettings {
         this.mapName = mapName;
         this.teamAmount = teamAmount;
         this.teamSize = teamSize;
-        this.availableMaps = new MapRetriever().listMaps();
 
         this.availableGameMode = new String[]{"Weihnachtsaufgabe", "Normal"};
 
