@@ -140,4 +140,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     public void resetCamera(){
         animator.getCamera().resetCamera();
     }
+
+    public void toggleCameraMove() {
+        animator.getCamera().toggleCanMoveToVector();
+    }
 }
