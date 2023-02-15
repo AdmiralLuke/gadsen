@@ -21,8 +21,9 @@ public class SliderLabel extends Label {
 	@Override
 	public void act(float delta) {
 		super.act(delta);
-
-		setText(textValue + (int) sliderInstance.getValue());
+		if(this.sliderInstance!=null) {
+			setText(textValue + (int) sliderInstance.getValue());
+		}
 
 	}
 

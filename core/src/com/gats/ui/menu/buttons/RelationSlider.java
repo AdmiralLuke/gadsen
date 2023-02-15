@@ -8,13 +8,13 @@ import java.util.ArrayList;
 public class RelationSlider extends Slider{
 
 	ArrayList<Slider> relatedSliders;
+	boolean freeze;
 	public RelationSlider(float min, float max, float stepSize, boolean vertical, Skin skin) {
 		super(min, max, stepSize, vertical, skin);
+		relatedSliders = new ArrayList<>();
+		freeze=false;
 	}
 
-	public void setRelatedSliders(ArrayList<Slider> relatedSliders) {
-		this.relatedSliders = relatedSliders;
-	}
 
 	public void addRelatedSlider(Slider slider) {
 		this.relatedSliders.add(slider);
@@ -26,9 +26,15 @@ public class RelationSlider extends Slider{
 	 * @param max
 	 */
 	public void adjustRelatedSliders(float min, float max){
-		for (Slider slider:relatedSliders) {
-			slider.setRange(min,max);
+		if(!freeze) {
+			for (Slider slider : relatedSliders) {
+				slider.setRange(min, max);
+			}
 		}
+	}
+
+	public void freezeSlider(boolean freeze){
+		this.freeze=freeze;
 	}
 
 

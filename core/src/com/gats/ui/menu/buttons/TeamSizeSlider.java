@@ -2,6 +2,10 @@ package com.gats.ui.menu.buttons;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+
+/**
+ *  Class for TeamSize, currently functionality comes from teamAmount slider
+ */
 public class TeamSizeSlider extends RelationSlider {
 	public TeamSizeSlider(float min, float max, float stepSize, boolean vertical, Skin skin) {
 		super(min, max, stepSize, vertical, skin);

@@ -2,12 +2,8 @@ package com.gats.ui;
 
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.gats.simulation.Simulation;
-import com.gats.ui.menu.MapRetriever;
-import com.gats.ui.menu.TestScreen;
+import com.gats.manager.RunConfiguration;
 
 /**
  * GADS ist die verantwortliche Klasse im LifeCycle der Anwendung.
@@ -19,28 +15,16 @@ import com.gats.ui.menu.TestScreen;
 public class GADS extends Game {
 	GADSAssetManager assetManager;
 
-	InGameScreen ingame;
-	Stage hudStage;
-
-	Simulation simulation;
-
-	//gameMode, can later be selected via Menu?
-	//mapName, can later be selected via menu?
-	//-> necessary for gameState
-
-
-
-	GameSettings gameSettings;
-
+	public void startGame(RunConfiguration config){
+		setScreenIngame(config);
+	}
 	@Override
 	public void create() {
-		gameSettings = new GameSettings(this);
-		//subject to change
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
 		assetManager.loadFiles();
-//		setScreen(new MenuScreen(this, assetManager));
-		setScreen(new TestScreen(new SpriteBatch(),assetManager));
+		setScreen(new MenuScreen(this, assetManager));
+//		setScreen(new TestScreen(new SpriteBatch(),assetManager));
 	}
 
 	public void render() {
@@ -57,18 +41,18 @@ public class GADS extends Game {
 		assetManager.unloadAtlas();
 	}
 
-	public void setScreenIngame() {
-		setScreen(new InGameScreen(this, assetManager, gameSettings));
+	public void setScreenIngame(RunConfiguration runConfig) {
+		setScreen(new InGameScreen(this, assetManager, runConfig));
 	}
 
 	public void setScreenMenu() {
 		setScreen(new MenuScreen(this, assetManager));
 	}
 
-	public String[] getBots(){
-		String[] bots = {"Human","testerino","MIO","IsThisTheCrustyCrab?","NOOOTHISISPATRICK"};
-		//ToDo: implement the selection correctly, when Bots are implemente
 
-		return bots;
+	public String[] getGameModes() {
+		//Todo, maybe move to simulation?
+
+		return new String[]{"Normal","Weihnachtsaufgabe"};
 	}
 }

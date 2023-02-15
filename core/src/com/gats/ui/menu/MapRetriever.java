@@ -1,8 +1,15 @@
 package com.gats.ui.menu;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.gats.simulation.IntVector2;
+import com.gats.simulation.Tile;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MapRetriever implements FilenameFilter {
     static FileHandle dirHandler;
@@ -67,10 +74,13 @@ public class MapRetriever implements FilenameFilter {
     /**
      * Lists all Map files, with the default File Extension,
      * in {@link MapRetriever#internalMapDirectory}.
+     *
      * @return String Array with map Names located in mapDirectory
      */
-    public String[] listMaps(){
-        return listMaps(defaultMapFiletype);
+    public GameMap[] listMaps(){
+
+    return listMaps(defaultMapFiletype);
+
     }
 
 
@@ -81,22 +91,31 @@ public class MapRetriever implements FilenameFilter {
      * @param fileExtension Map File Extension.
      * @return String Array with map Names located in mapDirectory
      */
-    public String[] listMaps(String fileExtension){
+    public GameMap[] listMaps(String fileExtension){
         this.filetype = fileExtension;
          String[] mapNames = new String[0];
+        ArrayList<GameMap> maps = new ArrayList<>();
 
         if(dirHandler!=null) {
             mapNames = fileHandleToStringArray(dirHandler.list(this));
             removeExtension(mapNames);
+            maps = strToGameMap(mapNames);
         }
         if(dirHandler==null || !dirHandler.toString().equals(internalMapDirectory)) {
-            /**
+            /*
              * If the directory is not the internal, then hardcoded maps should be added to the directory.
              * Otherwise they would be redundandly listed.
              */
-            mapNames = appendHardcodeMaps(mapNames);
+            maps.addAll(0,strToGameMap(hardCodeMapNames));
         }
-        return mapNames;
+
+
+        GameMap[] gameMapArr = new GameMap[maps.size()];
+        for(int i = 0;i<maps.size();i++){
+            gameMapArr[i]=maps.get(i);
+        }
+        return gameMapArr;
+
     }
 
     public String[] fileHandleToStringArray(FileHandle[] handles){
@@ -108,19 +127,56 @@ public class MapRetriever implements FilenameFilter {
         return fileHandleNames;
 
     }
-    public String[] appendHardcodeMaps(String[] maps){
-        String[] newMaps = new String[maps.length+hardCodeMapNames.length];
+    public GameMap[] appendHardcodeMaps(GameMap[] maps){
+        GameMap[] newMaps = new GameMap[maps.length+hardCodeMapNames.length];
         int counter = 0;
+
+
         for (String map:hardCodeMapNames) {
-            newMaps[counter] = map;
+            newMaps[counter] = readMapFromFile(map);
             counter++;
         }
-        for (String map:maps) {
+        for (GameMap map:maps) {
             newMaps[counter] = map;
             counter++;
         }
         return newMaps;
     }
+
+    private GameMap readMapFromFile(String mapName) {
+        JsonReader reader = new JsonReader();
+        JsonValue map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
+       int width = map.get("width").asInt();
+        int height = map.get("height").asInt();
+
+        JsonValue tileData = map.get("layers").get(0).get("data");
+
+        int spawnpoints = 0;
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int type = tileData.get(i + (height - j - 1) * width).asInt();
+                if (type==3){
+                spawnpoints++;
+                }
+            }
+        }
+
+        return new GameMap(mapName,spawnpoints);
+    }
+
+    private ArrayList<GameMap> strToGameMap(String[] mapNames){
+       ArrayList<GameMap> maps = new ArrayList<GameMap>();
+       int count=0;
+        for (String map:mapNames) {
+           maps.add(readMapFromFile(map));
+
+        }
+
+        return maps;
+
+    }
+
 
     /** Checks whether a given file contains the given extension .
      * @param name Filename that is tested for the extension provided in {@link MapRetriever#filetype}.

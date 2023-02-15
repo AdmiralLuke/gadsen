@@ -1,21 +1,32 @@
 package com.gats.ui.menu;
 
-public class Map {
+public class GameMap {
 
 	private final String mapName;
 	private final int numberOfSpawnpoints;
 
 
-	public Map(String name,int spawnpoints){
+	public GameMap(String name, int spawnpoints){
 		this.mapName=name;
 		this.numberOfSpawnpoints=spawnpoints;
+
+		readFromFile();
 	}
 
-	public String getMapName(){
+
+	public String getName(){
 		return this.mapName;
+	}
+
+	public String toString(){
+		return getName();
 	}
 
 	public int getNumberOfSpawnpoints(){
 		return this.numberOfSpawnpoints;
+	}
+
+	public void readFromFile(){
+
 	}
 }
