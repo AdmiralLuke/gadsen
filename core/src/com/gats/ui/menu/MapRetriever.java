@@ -1,12 +1,15 @@
 package com.gats.ui.menu;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gats.simulation.IntVector2;
 import com.gats.simulation.Tile;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +18,8 @@ public class MapRetriever implements FilenameFilter {
     static FileHandle dirHandler;
     final String defaultMapFiletype = ".json";
     String filetype;
+
+    boolean debug = true;
 
     /**
      * For dev use in the Project/Ide.
@@ -145,27 +150,54 @@ public class MapRetriever implements FilenameFilter {
 
     private GameMap readMapFromFile(String mapName) {
         JsonReader reader = new JsonReader();
-        JsonValue map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
-       int width = map.get("width").asInt();
-        int height = map.get("height").asInt();
+        JsonValue map;
+        try {
+            if(debug) {
+                System.out.println("Get Map from: " + getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
+            }
+            map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
+        }
+        catch(Exception e){
+            if(debug) {
+                System.out.println("Could not find/load file!");
+            }
+            map = null;
+        }
+        if(map==null) {
+              try {
+                  if(debug) {
+                      System.out.println("Try to get File from:" + Paths.get("./maps/" + mapName + ".json"));
+                  }
+                  map = reader.parse(new FileHandle(Paths.get("./maps/" + mapName + ".json").toFile()));
+              } catch (Exception e) {
+                  if(debug) {
+                      System.out.println("Could not find/load file!");
+                  }
+              }
+          }
+        if(map != null) {
+            int width = map.get("width").asInt();
+            int height = map.get("height").asInt();
 
-        JsonValue tileData = map.get("layers").get(0).get("data");
+            JsonValue tileData = map.get("layers").get(0).get("data");
 
-        int spawnpoints = 0;
+            int spawnpoints = 0;
 
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                int type = tileData.get(i + (height - j - 1) * width).asInt();
-                if (type==3){
-                spawnpoints++;
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    int type = tileData.get(i + (height - j - 1) * width).asInt();
+                    if (type == 3) {
+                        spawnpoints++;
+                    }
                 }
             }
-        }
 
-        return new GameMap(mapName,spawnpoints);
+            return new GameMap(mapName, spawnpoints);
+        }
+        return new GameMap("ProblemLoadingMap",0);
     }
 
-    private ArrayList<GameMap> strToGameMap(String[] mapNames){
+    private ArrayList<GameMap> strToGameMap(String[] mapNames)  {
        ArrayList<GameMap> maps = new ArrayList<GameMap>();
        int count=0;
         for (String map:mapNames) {
