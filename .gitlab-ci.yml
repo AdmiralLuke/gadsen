@@ -159,5 +159,5 @@ create-release:
     paths:
       - desktop/build/libs/*.jar
   script:
-    - curl --header 'Content-Type: application/json' --header "PRIVATE-TOKEN: <your_access_token>" \ --data '{ "name": "New release", "tag_name": "v0.3", "description": "Super nice release", "milestones": [ "v1.0", "v1.0-rc" ], "assets": { "links": [ { "name": "hoge", "url": "https://google.com", "direct_asset_path": "/binaries/linux-amd64", "link_type": "other" } ] } }' \ --request POST "https://gitlab.example.com/api/v4/projects/24/releases"
+    - ls
 

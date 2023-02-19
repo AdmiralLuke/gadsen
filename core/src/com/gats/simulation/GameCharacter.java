@@ -192,7 +192,7 @@ public class GameCharacter {
     void fall() {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
-        while (this.posY / 16 > 0 && this.state.getTile((int)((posX + 10) / 16) , (int)(posY / 16) - 1) == null) {
+        while (this.posY / 16 > 0 && this.state.getTile((int)((posX + 12) / 16) , (int)(posY / 16) - 1) == null) {
             this.posY -= 16;
             fallen++;
         }
@@ -203,7 +203,7 @@ public class GameCharacter {
         } else {
             this.setHealth(getHealth() - fallen);
         }
-        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0));
+        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f));
         this.sim.getActionLog().goToNextAction();
         this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
     }

@@ -163,6 +163,12 @@ public class Tile {
         return isAnchor;
     }
 
+    void deleteFromGraph() {
+        if (this.right != null) this.right.left = null;
+        if (this.left != null) this.left.right = null;
+        if (this.up != null) this.up.down = null;
+        if (this.down != null) this.down.up = null;
+    }
     /**
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
      * oder auf anderer Box landet
@@ -170,23 +176,23 @@ public class Tile {
     void onDestroy() {
         this.state.getSim().getActionLog().goToLast();
         ArrayList<Tile> rightList = null;
-        HashMap<Tile, Integer> rightHashList = new HashMap<>();
-
         ArrayList<Tile> upperList = null;
-        HashMap<Tile, Integer> upperHashList = new HashMap<>();
-
         ArrayList<Tile> lowerList = null;
-        HashMap<Tile, Integer> lowerHashList = new HashMap<>();
-
         ArrayList<Tile> leftList = null;
-        HashMap<Tile, Integer> leftHashList = new HashMap<>();
+
+        boolean[][] rightMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] upperMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] lowerMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] leftMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+
 
         state.getBoard()[this.position.x][this.position.y] = null;
+        this.deleteFromGraph();
         this.state.getSim().getActionLog().addAction(new TileDestroyAction(this.position));
-        if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), 0);
-        if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), 1);
-        if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), 2);
-        if (hasLeft()) leftList = left.convertGraphToList(new ArrayList<Tile>(), 3);
+        if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), rightMap);
+        if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), upperMap);
+        if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), lowerMap);
+        if (hasLeft()) leftList = left.convertGraphToList(new ArrayList<Tile>(), leftMap);
 
 
         if (rightList != null) checkForAnchor(rightList);
@@ -243,27 +249,25 @@ public class Tile {
     /**
      *
      * @param tiles ArrayList mit rekursiv aufbauend verbundenen Tiles
-     * @param direction Angabe woher man kommt (um Endlos zu vermeiden)
-     *                  0 kommt von links
-     *                  1 kommt von unten
-     *                  2 kommt von oben
-     *                  3 kommt von rechts
+     * @param map lookup-map um bereits besuchte Tiles zu markieren
      * @return ArrayList mit allen verbunden Tiles
      */
-    protected ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, int direction) {
+    protected ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, boolean[][] map) {
         tiles.add(this);
+        IntVector2 pos = this.getPosition();
+        map[pos.x][pos.y] = true;
         if (tiles.get(tiles.size() - 1).isAnchor) return null;
-        if (this.hasUp() && !(direction == 2)) {
-            return up.convertGraphToList(tiles, 1);
+        if (this.hasUp() && !map[pos.x][pos.y + 1]) {
+            up.convertGraphToList(tiles, map);
         }
-        if (this.hasDown() && !(direction == 1)) {
-            return down.convertGraphToList(tiles, 2);
+        if (this.hasDown() && !map[pos.x][pos.y - 1]) {
+            down.convertGraphToList(tiles, map);
         }
-        if (this.hasLeft() && !(direction == 0)) {
-            return left.convertGraphToList(tiles, 3);
+        if (this.hasLeft() && !map[pos.x - 1][pos.y]) {
+            left.convertGraphToList(tiles, map);
         }
-        if (this.hasRight() && !(direction == 3)) {
-            return right.convertGraphToList(tiles, 0);
+        if (this.hasRight() && !map[pos.x + 1][pos.y]) {
+            right.convertGraphToList(tiles, map);
         }
         return tiles;
     }
