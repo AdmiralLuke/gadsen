@@ -128,13 +128,7 @@ public class Tile {
         if (this.up != null) { this.up.down = this; }
         if (this.down != null) { this.down.up = this; }
 
-        for (GameCharacter[] characters : this.state.getTeams()) {
-            for (GameCharacter character : characters) {
-                if (character != null) {
-                    character.fall();
-                }
-            }
-        }
+
     }
 
     /**
@@ -213,7 +207,16 @@ public class Tile {
         if (leftList != null) checkForAnchor(leftList);
         if (upperList != null) checkForAnchor(upperList);
         if (lowerList != null) checkForAnchor(lowerList);
+        for (GameCharacter[] characters : this.state.getTeams()) {
+            for (GameCharacter character : characters) {
+                if (character != null) {
+                    character.fall();
+                }
+            }
+        }
         state.getSim().getActionLog().returnToRoot();
+
+
     }
 
     void checkForAnchor(ArrayList<Tile> list) {
