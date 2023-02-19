@@ -11,6 +11,7 @@ import com.gats.manager.ChristmasBot;
 import com.gats.manager.Manager;
 import com.gats.manager.Player;
 import com.gats.manager.RunConfiguration;
+import com.gats.ui.assets.AssetContainer;
 import com.sun.tools.javac.code.Attribute;
 
 import java.util.ArrayList;
@@ -360,8 +361,8 @@ public class GameSettings {
 
     }
 
-    Table buildMainLayoutTable(Skin skin, TextureRegion StartButtonImage, TextureRegion titleImage) {
-
+    Table buildMainLayoutTable(TextureRegion StartButtonImage, TextureRegion titleImage) {
+        Skin skin = AssetContainer.MainMenuAssets.skin;
         Table table = new Table(skin);
         table.setFillParent(true);
         //platziert den Table an der oberen Kante des Bildschirms

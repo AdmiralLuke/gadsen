@@ -1,14 +1,13 @@
 package com.gats.animation.action;
 
 import com.gats.animation.GameCharacter;
-import com.gats.animation.entity.Entity;
-import com.gats.simulation.Path;
+import com.gats.ui.assets.AssetContainer;
 
 public class SetAnimationAction extends Action{
     private GameCharacter target;
-    private GameCharacter.AnimationType type;
+    private AssetContainer.IngameAssets.GameCharacterAnimationType type;
 
-    public SetAnimationAction(float delay, GameCharacter target, GameCharacter.AnimationType type) {
+    public SetAnimationAction(float delay, GameCharacter target, AssetContainer.IngameAssets.GameCharacterAnimationType type) {
         super(delay);
         this.target = target;
         this.type = type;

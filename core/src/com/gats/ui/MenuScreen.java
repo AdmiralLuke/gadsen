@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.*;
+import com.gats.ui.assets.AssetContainer;
 import org.w3c.dom.Text;
 
 /**
@@ -22,26 +23,21 @@ public class MenuScreen implements Screen {
     private Viewport backgroundViewport;
     private GameSettings gameSettings;
     private GADS gameInstance;
-    private GADSAssetManager gadsAssetManager;
     private Stage mainMenu;
     private Camera camera;
-    private TextureAtlas atlas;
 private TextureRegion background;
 private SpriteBatch menuBatch;
 
-    public MenuScreen(GADS gameInstance, GADSAssetManager gadsAssetManager) {
-
-        atlas = gadsAssetManager.getAtlas();
+    public MenuScreen(GADS gameInstance) {
 
         this.gameInstance = gameInstance;
-        this.gadsAssetManager = gadsAssetManager;
-        TextureRegion titleSprite = new TextureRegion(atlas.findRegion("ui/titleTileset"));
+        TextureRegion titleSprite = AssetContainer.MainMenuAssets.titleSprite;
 
-        this.background = atlas.findRegion("background/WeihnachtsBG");
+        this.background = AssetContainer.MainMenuAssets.background;
         this.camera = new OrthographicCamera(30, 30 * (Gdx.graphics.getHeight() * 1f / Gdx.graphics.getWidth()));
         //set the viewport, world with and height are currently the one of the title sprite, so the table is always on screen
         //the world sizes are roughly estimating the table size in title image width, no way of getting the size of the button table/it did not really work out
-        menuViewport = new ExtendViewport(titleSprite.getRegionWidth()/3, titleSprite.getRegionWidth()+100, camera);
+        menuViewport = new ExtendViewport(titleSprite.getRegionWidth()/3f, titleSprite.getRegionWidth()+100, camera);
         backgroundViewport = new FillViewport(background.getRegionWidth(),background.getRegionHeight());
         mainMenu = new Stage(menuViewport);
         gameSettings = gameInstance.gameSettings;
@@ -49,7 +45,7 @@ private SpriteBatch menuBatch;
         menuBatch = new SpriteBatch();
         //create a table, holds ui widgets like buttons and textfields
 
-        setupMenuScreen(mainMenu,titleSprite);
+        setupMenuScreen(mainMenu);
     }
 
     @Override
@@ -64,10 +60,10 @@ private SpriteBatch menuBatch;
      *
      * @param menu Stage that is supposed to receive the buttons.
      */
-    public void setupMenuScreen(Stage menu, TextureRegion title) {
+    public void setupMenuScreen(Stage menu) {
 
-        Skin skin = gadsAssetManager.getSkin();
-        Table menuTable = gameSettings.buildMainLayoutTable(skin,null ,title);
+        //Todo: Refactor this; this has no business being in a seperate class
+        Table menuTable = gameSettings.buildMainLayoutTable(null ,AssetContainer.MainMenuAssets.titleSprite);
         menu.addActor(menuTable);
         menuTable.setDebug(false); // This is optional, but enables debug lines for tables.
         menuTable.setFillParent(true);
