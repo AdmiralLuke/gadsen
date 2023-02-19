@@ -192,7 +192,7 @@ public class GameCharacter {
     void fall() {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
-        while (this.posY / 16 > 0 && this.state.getTile((int)((posX + 12) / 16) , (int)(posY / 16) - 1) == null) {
+        while (this.posY / 16 > 0 && this.state.getTile((int)((posX - (posX % 16)) / 16) , (int)(posY / 16) - 1) == null) {
             this.posY -= 16;
             fallen++;
         }
@@ -231,7 +231,7 @@ public class GameCharacter {
 
         if (dx < 0) {
             for (int i = 0; i >= dx; i--) {
-                if (state.getTile((posX + i + 12) / 16 , ((posY) / 16) - 1) == null) {
+                if (state.getTile((posX + i + 14) / 16 , ((posY) / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;
@@ -252,7 +252,7 @@ public class GameCharacter {
 
         } else {
             for (int i = 0; i <= dx; i++) {
-                if (state.getTile((posX + i +4) / 16, (int)(posY / 16) - 1) == null) {
+                if (state.getTile((posX + i) / 16, (int)(posY / 16) - 1) == null) {
                     dx = i;
                     if (this.stamina < abs(dx)) {
                         dx = dx > 0 ? stamina : -stamina;

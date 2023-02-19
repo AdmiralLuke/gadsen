@@ -163,6 +163,10 @@ public class Tile {
         return isAnchor;
     }
 
+    /**
+     * entfernt eine Tile aus dem Graphen (und alle Referenzen)
+     * GarbageColleciton goes huii
+     */
     void deleteFromGraph() {
         if (this.right != null) this.right.left = null;
         if (this.left != null) this.left.right = null;
@@ -217,17 +221,19 @@ public class Tile {
 
     void destroyTile() {
         IntVector2 posBef = this.position.cpy();
+        int fallen = 0;
         while (getTileAtPosition(this.position.x, this.position.y, state) == null && this.position.y > 0) {
+            fallen++;
             this.position.add(0, -1);
             for (GameCharacter[] characters : state.getTeams()) {
                 for (GameCharacter character : characters) {
                     if (character == null) {
                         continue;
                     }
-                    if (character.getPlayerPos().x == this.position.x && character.getPlayerPos().y == this.position.y) {
+                    if ((int)(character.getPlayerPos().x / 16) == this.position.x && (int)(character.getPlayerPos().y / 16) == this.position.y) {
                         LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()), 0.1f);
                         int tmpHealth = character.getHealth();
-                        character.setHealth(tmpHealth - ((int)path.getEndTime() / 10));
+                        character.setHealth(tmpHealth - fallen);
                         Action tmpAction = new TileMoveAction(posBef, this.position, 1f);
                         Action tmpDestAction = new TileDestroyAction(this.getPosition());
                         tmpAction.addChild(tmpDestAction);
