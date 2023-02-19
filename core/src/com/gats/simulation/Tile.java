@@ -127,6 +127,14 @@ public class Tile {
         if (this.right != null) { this.right.left = this; }
         if (this.up != null) { this.up.down = this; }
         if (this.down != null) { this.down.up = this; }
+
+        for (GameCharacter[] characters : this.state.getTeams()) {
+            for (GameCharacter character : characters) {
+                if (character != null) {
+                    character.fall();
+                }
+            }
+        }
     }
 
     /**
@@ -172,6 +180,8 @@ public class Tile {
         if (this.left != null) this.left.right = null;
         if (this.up != null) this.up.down = null;
         if (this.down != null) this.down.up = null;
+
+
     }
     /**
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
