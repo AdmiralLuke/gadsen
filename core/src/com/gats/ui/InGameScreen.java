@@ -37,7 +37,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     // adjust pipeline, so it provides a different directory for ingame assets
     // and menu assets? or we code importing into AssetManager?
     private TextureAtlas ingameAtlas;
-    public InGameScreen(GADS instance, GADSAssetManager aM, GameSettings gameSettings){
+    public InGameScreen(GADS instance, GADSAssetManager aM, RunConfiguration runConfig){
 
         gameManager = instance;
         assetManager = aM;
@@ -50,12 +50,12 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         hudStage = new HudStage(hudViewport,this, assetManager);
         setupInput();
 
-        RunConfiguration runConfiguration = gameSettings.toRunConfiguration();
-        runConfiguration.gui = true;
-        runConfiguration.animationLogProcessor = this;
-        runConfiguration.hud = hudStage;
-        manager = new Manager(runConfiguration);
-        animator = new Animator(manager.getState(), gameViewport, ingameAtlas, gameSettings.getGameMode());
+
+        runConfig.gui = true;
+        runConfig.animationLogProcessor = this;
+        runConfig.hud = hudStage;
+        manager = new Manager(runConfig);
+        animator = new Animator(manager.getState(), gameViewport, ingameAtlas, runConfig.gameMode );
         manager.start();
 
         humanList = manager.getHumanList();
@@ -139,5 +139,9 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     }
     public void resetCamera(){
         animator.getCamera().resetCamera();
+    }
+
+    public void toggleCameraMove() {
+        animator.getCamera().toggleCanMoveToVector();
     }
 }
