@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.gats.animation.entity.AnimatedEntity;
 import com.gats.animation.entity.Entity;
-import com.gats.animation.entity.SpriteEntity;
 import com.gats.simulation.ProjectileAction;
 import com.gats.ui.assets.AssetContainer;
 
@@ -21,7 +20,7 @@ public class Projectiles {
                 texture = AssetContainer.IngameAssets.Cookie;
                 break;
             case CANDY_CANE:
-                texture = AssetContainer.IngameAssets.CandyCane;
+                texture = AssetContainer.IngameAssets.SugarCane;
                 break;
             default:
                 throw new RuntimeException("Type " + type + " is not Supported!");

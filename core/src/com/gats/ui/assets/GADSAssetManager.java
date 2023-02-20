@@ -1,14 +1,12 @@
 package com.gats.ui.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 import com.gats.ui.assets.AssetContainer.MainMenuAssets;
@@ -87,39 +85,39 @@ public class GADSAssetManager {
         MainMenuAssets.skin = manager.get(skin, Skin.class);
 
         //Ingame
-        IngameAssets.destroyTileAnimation = new Animation<TextureRegion>(1/15f, atlas.findRegions("tile/16x_tileDestroyAnimation"));
+        IngameAssets.destroyTileAnimation = new Animation<TextureRegion>(0.5f, atlas.findRegions("character/16x_tileDestroyAnimation"));
 
         IngameAssets.victoryDisplay = atlas.findRegion("ui/victoryTileset");
         IngameAssets.lossDisplay = atlas.findRegion("ui/loseTilesetTitle");
 
         IngameAssets.background = atlas.findRegion("background/WeihnachtsBG");
 
-        IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("tile/16x_box01"), atlas.findRegion("tile/16x_anchor01")};
+        IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("character/16x_box01"), atlas.findRegion("character/16x_anchor01")};
 
-        IngameAssets.aimingIndicatorSprite = atlas.findRegion("tile/aimIndicator");
+        IngameAssets.aimingIndicatorSprite = atlas.findRegion("character/aimIndicator");
 
         IngameAssets.gameCharacterAnimations = new Animation[GameCharacterAnimationType.values().length];
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("tile/idleShort"));
+                new Animation<>(1 / 10f, atlas.findRegions("character/idleShort"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_WALKING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("tile/characterOrangeLeftWalking"));
+                new Animation<>(1 / 10f, atlas.findRegions("character/characterOrangeLeftWalking"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_FALLING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("tile/fallShort"));
+                new Animation<>(1 / 10f, atlas.findRegions("character/fallShort"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_COOKIE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("tile/idleShortCookie"));
+                new Animation<>(1 / 10f, atlas.findRegions("character/idleShortCookie"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("tile/idleShortSugarCaneInHand"));
+                new Animation<>(1 / 10f, atlas.findRegions("character/idleShortSugarCaneInHand"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_HIT.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("tile/hitAnimationRed"));
+                new Animation<>(1 / 10f, atlas.findRegions("character/hitAnimationRed"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_DEATH.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("tile/characterOrangeLeftDeath"));
+                new Animation<>(1 / 10f, atlas.findRegions("character/characterOrangeLeftDeath"));
         for (Animation<TextureRegion> anim : IngameAssets.gameCharacterAnimations
         ) {
             anim.setPlayMode(Animation.PlayMode.LOOP);
@@ -127,9 +125,9 @@ public class GADSAssetManager {
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
 
-        IngameAssets.Cookie = atlas.findRegions("tile/#161_cookieTumblingCropped");
+        IngameAssets.Cookie = atlas.findRegions("character/#161_cookieTumblingCropped");
 
-        IngameAssets.CandyCane = atlas.findRegions("tile/sugarcaneProjectileFront");
+        IngameAssets.SugarCane = atlas.findRegions("character/sugarcaneProjectileFront");
 
         finishedLoading = true;
     }
