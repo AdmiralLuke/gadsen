@@ -87,7 +87,7 @@ public class GADSAssetManager {
         MainMenuAssets.skin = manager.get(skin, Skin.class);
 
         //Ingame
-        IngameAssets.destroyTileAnimation = new Animation<TextureRegion>(0.5f, atlas.findRegions("tile/coolCat")); //ToDo replace placeholder
+        IngameAssets.destroyTileAnimation = new Animation<TextureRegion>(1/15f, atlas.findRegions("tile/16x_tileDestroyAnimation"));
 
         IngameAssets.victoryDisplay = atlas.findRegion("ui/victoryTileset");
         IngameAssets.lossDisplay = atlas.findRegion("ui/loseTilesetTitle");
