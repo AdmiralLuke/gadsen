@@ -244,7 +244,7 @@ public class GameCharacter {
                     this.fall();
                     return;
                 }
-                if (state.getTile(((posX + i) / 16) - 1, posY / 16) != null) {
+                if (state.getTile(((posX) / 16), posY / 16) != null) {
                     dx = i;
                     break;
                 }
@@ -265,7 +265,7 @@ public class GameCharacter {
                     this.fall();
                     return;
                 }
-                if (state.getTile(((posX + i) / 16) + 1, posY / 16) != null) {
+                if (state.getTile(((posX - (posX % 16)) / 16) + 1, posY / 16) != null) {
                     dx = i;
                     break;
                 }
