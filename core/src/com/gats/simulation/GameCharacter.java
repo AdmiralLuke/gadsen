@@ -192,7 +192,7 @@ public class GameCharacter {
     void fall() {
         Vector2 posBef = this.getPlayerPos().cpy();
         int fallen = 0;
-        while (this.posY / 16 > 0 && this.state.getTile((int)((posX - (posX % 16)) / 16) , (int)(posY / 16) - 1) == null) {
+        while (this.posY / 16 > 0 && this.state.getTile((int)((posX + (posX % 16)) / 16) , (int)(posY / 16) - 1) == null) {
             this.posY -= 16;
             fallen++;
         }
