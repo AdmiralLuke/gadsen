@@ -15,6 +15,7 @@ public class TestTile {
     public void init() {
         sim = new Simulation(0, "map1", 2, 1);
         state = sim.getState();
+        sim.getActionLog().addAction(new InitAction());
         clearMap();
     }
 
@@ -62,7 +63,7 @@ public class TestTile {
 
 
         // dieses Tile sollte NICHT im Board bleiben, da es nicht verankert ist
-        Tile testTile3 = new Tile(5,10, state);
+        Tile testTile3 = new Tile(5,10, state, false);
         Assert.assertNull("An der Stelle [5,10] sollte sich KEIN TIle befinden, da dort keine Verankerung ist", state.getBoard()[5][10]);
     }
 

@@ -14,6 +14,7 @@ public class TestDamage {
     public void init() {
         sim = new Simulation(0, "map1", 2, 1);
         state = sim.getState();
+        sim.getActionLog().addAction(new InitAction());
         clearMap();
     }
 
@@ -50,12 +51,12 @@ public class TestDamage {
         GameCharacter character = state.getCharacterFromTeams(0, 0);
         Assert.assertEquals("Leben sollte 100 sein ist aber " + character.getHealth(), character.getHealth(), 100);
         character.setPosX(0);
-        character.setPosY(1);
+        character.setPosY(17);
 
         state.getBoard()[3][2] = new Tile(3, 2, true, state);
         GameCharacter character2 = state.getCharacterFromTeams(1, 0);
-        character2.setPosX(3);
-        character2.setPosY(3);
+        character2.setPosX(3*16 + 1);
+        character2.setPosY(3*16 + 1);
 
         Weapon wp = character2.getWeapon(1);
         wp.shoot(character.getPlayerPos().sub(character2.getPlayerPos()), 1);
