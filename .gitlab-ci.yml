@@ -157,3 +157,30 @@ create-release:
   script:
     - ls
 
+
+test-desktop-build:
+  stage: build
+  only:
+    - dev_u_269
+  script:
+    - echo $PWD
+    - gradle --build-cache build
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+test-desktop-run:
+  stage: test
+  only:
+    - dev_u_269
+  script:
+    - gradle run
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
