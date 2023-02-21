@@ -1,23 +1,14 @@
 package com.gats.ui;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gats.animation.Animator;
 import com.gats.animation.AnimatorCamera;
 import com.gats.manager.HumanPlayer;
-import com.gats.simulation.CharacterMoveAction;
-import com.gats.simulation.GameCharacter;
-import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.Simulation;
-import org.junit.Assert;
-import org.lwjgl.Sys;
+import com.gats.ui.assets.GADSAssetManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +40,6 @@ public class HudStage extends Stage {
     private final int KEY_EXIT_TO_MENU = Keys.ESCAPE;
     private
     SpriteBatch batch;
-    TextureAtlas atlas;
-    TextureRegion healthbar;
-    GADSAssetManager assetManager;
 
     InGameScreen ingameScreen;
     AnimatorCamera camera;
@@ -69,11 +57,10 @@ public class HudStage extends Stage {
     private List<HumanPlayer> humanList = new ArrayList<>();
 
 
-    public HudStage(Viewport hudViewport, InGameScreen ingameScreen, GADSAssetManager assetManager) {
+    public HudStage(Viewport hudViewport, InGameScreen ingameScreen) {
         super(hudViewport);
         this.ingameScreen = ingameScreen;
         batch = new SpriteBatch();
-        this.atlas = assetManager.getAtlas();
 
     }
 

@@ -13,7 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gats.ui.GADSAssetManager;
+import com.gats.ui.assets.AssetContainer;
+import com.gats.ui.assets.GADSAssetManager;
 import com.gats.ui.menu.layout.ActorLayout;
 import com.gats.ui.menu.layout.BasicLefthandLayer;
 import com.gats.ui.menu.layout.Layer;
@@ -32,9 +33,9 @@ public class TestScreen implements Screen {
 	private int wordlWidth;
 	private int worldHeight;
 	private ActorLayout layout;
-	public TestScreen(SpriteBatch batch, GADSAssetManager assetManager){
+	public TestScreen(SpriteBatch batch){
 	this.batch = batch;
-	this.texture = assetManager.getAtlas().findRegion("tile/16x_box01");
+	this.texture = AssetContainer.IngameAssets.tileTextures[0];
 	this.viewport = new ExtendViewport(256,256);
 		viewport.setCamera(new OrthographicCamera());
 		this.test = new Stage(this.viewport,this.batch);

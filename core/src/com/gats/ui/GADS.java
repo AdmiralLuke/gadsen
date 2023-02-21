@@ -3,6 +3,7 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.gats.ui.assets.GADSAssetManager;
 import com.gats.manager.RunConfiguration;
 
 /**
@@ -22,9 +23,10 @@ public class GADS extends Game {
 	public void create() {
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
-		assetManager.loadFiles();
-		setScreen(new MenuScreen(this, assetManager));
-//		setScreen(new TestScreen(new SpriteBatch(),assetManager));
+
+		//ToDo: add Loading Screen
+
+		setScreen(new MenuScreen(this));
 	}
 
 	public void render() {
@@ -42,11 +44,11 @@ public class GADS extends Game {
 	}
 
 	public void setScreenIngame(RunConfiguration runConfig) {
-		setScreen(new InGameScreen(this, assetManager, runConfig));
+		setScreen(new InGameScreen(this, runConfig));
 	}
 
 	public void setScreenMenu() {
-		setScreen(new MenuScreen(this, assetManager));
+		setScreen(new MenuScreen(this));
 	}
 
 
