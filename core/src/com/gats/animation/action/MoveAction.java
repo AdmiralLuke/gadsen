@@ -23,7 +23,8 @@ public class MoveAction extends Action {
     @Override
     protected void runAction(float oldTime, float current) {
         if (target != null) {
-            target.setRelPos(path.getPos(Math.min(endTime, current)));
+            float time = Math.min(endTime,current);
+            target.setRelPos(path.getPos(time));
         }
         if (current > endTime) endAction(endTime);
     }

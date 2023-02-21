@@ -16,6 +16,12 @@ import com.badlogic.gdx.math.Vector2;
 public class Entity {
     private Vector2 pos = new Vector2(0, 0);
     private Vector2 relPos = new Vector2(0, 0);
+/**
+     * rotation angle of the Entity from 0 - 360
+     */
+    private float angle = 0f;
+
+
     protected Parent parent = null;
 
 
@@ -36,9 +42,20 @@ public class Entity {
     public Vector2 getRelPos() {
         return relPos;
     }
+     public float getRotationAngle() {
+        return angle;
+    }
 
     public void setRelPos(float x, float y) {
         setRelPos(new Vector2(x, y));
+    }
+
+    /**
+     * Sets the angle of this entity
+     * @param angle
+     */
+    public void setRotationAngle(float angle) {
+        this.angle = angle;
     }
 
     protected void setPos(Vector2 pos) {
