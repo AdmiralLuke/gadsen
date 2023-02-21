@@ -12,6 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.*;
+import com.gats.manager.Manager;
+import com.gats.manager.RunConfiguration;
+import com.gats.ui.menu.Menu;
 import com.gats.ui.assets.AssetContainer;
 import org.w3c.dom.Text;
 
@@ -21,9 +24,9 @@ import org.w3c.dom.Text;
 public class MenuScreen implements Screen {
     private Viewport menuViewport;
     private Viewport backgroundViewport;
-    private GameSettings gameSettings;
     private GADS gameInstance;
     private Stage mainMenu;
+    private Menu menuBuilder;
     private Camera camera;
 private TextureRegion background;
 private SpriteBatch menuBatch;
@@ -40,12 +43,15 @@ private SpriteBatch menuBatch;
         menuViewport = new ExtendViewport(titleSprite.getRegionWidth()/3f, titleSprite.getRegionWidth()+100, camera);
         backgroundViewport = new FillViewport(background.getRegionWidth(),background.getRegionHeight());
         mainMenu = new Stage(menuViewport);
-        gameSettings = gameInstance.gameSettings;
 
         menuBatch = new SpriteBatch();
         //create a table, holds ui widgets like buttons and textfields
 
         setupMenuScreen(mainMenu);
+    }
+
+    public void startGame(RunConfiguration config){
+       gameInstance.startGame(config);
     }
 
     @Override
@@ -58,15 +64,13 @@ private SpriteBatch menuBatch;
      * Creates a {@link Table}for the button Layout,
      * initiates the buttons and puts them into the table.
      *
-     * @param menu Stage that is supposed to receive the buttons.
+     * @param menuStage is the Stage that is supposed to receive the buttons.
      */
-    public void setupMenuScreen(Stage menu) {
+    public void setupMenuScreen(Stage menuStage) {
 
-        //Todo: Refactor this; this has no business being in a seperate class
-        Table menuTable = gameSettings.buildMainLayoutTable(null ,AssetContainer.MainMenuAssets.titleSprite);
-        menu.addActor(menuTable);
-        menuTable.setDebug(false); // This is optional, but enables debug lines for tables.
-        menuTable.setFillParent(true);
+        this.menuBuilder = new Menu(skin,title, Manager.getPossiblePlayers(),gameInstance.getGameModes(),this);
+
+        menuStage.addActor(menuBuilder.buildMenuLayout(skin));
     }
 
 

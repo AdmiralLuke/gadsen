@@ -35,6 +35,8 @@ public class HudStage extends Stage {
     private final int KEY_CAMERA_ZOOM_OUT = Keys.O;
     private final int KEY_CAMERA_ZOOM_RESET = Keys.R;
 
+    private final int KEY_CAMERA_TOGGLE_PLAYER_FOCUS = Keys.F;
+
     private final int KEY_EXIT_TO_MENU = Keys.ESCAPE;
     private
     SpriteBatch batch;
@@ -115,6 +117,8 @@ public class HudStage extends Stage {
               ingameScreen.resetCamera();
                //Todo: Zoom Reset
                 break;
+            case KEY_CAMERA_TOGGLE_PLAYER_FOCUS:
+                ingameScreen.toggleCameraMove();
 
             default:
                 if (turnInProgress && currentPlayer != null) {

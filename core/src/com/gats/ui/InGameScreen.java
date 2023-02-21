@@ -33,7 +33,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private HudStage hudStage;
     private Animator animator;
     private final GADS gameManager;
-    public InGameScreen(GADS instance, GameSettings gameSettings){
+    public InGameScreen(GADS instance, RunConfiguration runConfig){
 
         gameManager = instance;
         gameViewport = new FillViewport(worldWidth,worldHeight);
@@ -43,12 +43,12 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         hudStage = new HudStage(hudViewport,this);
         setupInput();
 
-        RunConfiguration runConfiguration = gameSettings.toRunConfiguration();
-        runConfiguration.gui = true;
-        runConfiguration.animationLogProcessor = this;
-        runConfiguration.hud = hudStage;
-        manager = new Manager(runConfiguration);
-        animator = new Animator(manager.getState(), gameViewport, gameSettings.getGameMode());
+
+        runConfig.gui = true;
+        runConfig.animationLogProcessor = this;
+        runConfig.hud = hudStage;
+        manager = new Manager(runConfig);
+        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode );
         manager.start();
 
         humanList = manager.getHumanList();
@@ -132,5 +132,9 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     }
     public void resetCamera(){
         animator.getCamera().resetCamera();
+    }
+
+    public void toggleCameraMove() {
+        animator.getCamera().toggleCanMoveToVector();
     }
 }

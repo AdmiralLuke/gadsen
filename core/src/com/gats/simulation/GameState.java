@@ -1,9 +1,11 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -133,7 +135,22 @@ public class GameState {
      */
     private List<IntVector2> loadMap(String mapName) {
         JsonReader reader = new JsonReader();
-        JsonValue map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
+        JsonValue map;
+        try{
+            //attempt to load map from jar
+            map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
+        }catch (Exception e){
+            map =null;
+        }
+        if(map ==null){
+           try {
+               //attempt to load map from external maps dir
+               map = reader.parse(new FileHandle(Paths.get("./maps/"+mapName+".json").toFile()));
+           }catch (Exception e){
+             throw new RuntimeException("Could not find or load map:"+mapName);
+           }
+        }
+
         width = map.get("width").asInt();
         height = map.get("height").asInt();
         board = new Tile[width][height];

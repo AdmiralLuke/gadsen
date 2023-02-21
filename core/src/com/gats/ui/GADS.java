@@ -2,10 +2,9 @@ package com.gats.ui;
 
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.gats.simulation.Simulation;
 import com.gats.ui.assets.GADSAssetManager;
+import com.gats.manager.RunConfiguration;
 
 /**
  * GADS ist die verantwortliche Klasse im LifeCycle der Anwendung.
@@ -17,23 +16,11 @@ import com.gats.ui.assets.GADSAssetManager;
 public class GADS extends Game {
 	GADSAssetManager assetManager;
 
-	InGameScreen ingame;
-	Stage hudStage;
-
-	Simulation simulation;
-
-	//gameMode, can later be selected via Menu?
-	//mapName, can later be selected via menu?
-	//-> necessary for gameState
-
-
-
-	GameSettings gameSettings;
-
+	public void startGame(RunConfiguration config){
+		setScreenIngame(config);
+	}
 	@Override
 	public void create() {
-		gameSettings = new GameSettings(this);
-		//subject to change
 		//size of the viewport is subject to change
 		assetManager = new GADSAssetManager();
 
@@ -56,24 +43,18 @@ public class GADS extends Game {
 		assetManager.unloadAtlas();
 	}
 
-	public void setScreenIngame() {
-		setScreen(new InGameScreen(this, gameSettings));
+	public void setScreenIngame(RunConfiguration runConfig) {
+		setScreen(new InGameScreen(this, runConfig));
 	}
 
 	public void setScreenMenu() {
 		setScreen(new MenuScreen(this));
 	}
 
-	public String[] getMaps(){
-		return new MapRetriever().listMaps();
 
+	public String[] getGameModes() {
+		//Todo, maybe move to simulation?
 
-	}
-
-	public String[] getBots(){
-		String[] bots = {"Human","testerino","MIO","IsThisTheCrustyCrab?","NOOOTHISISPATRICK"};
-		//ToDo: implement the selection correctly, when Bots are implemente
-
-		return bots;
+		return new String[]{"Normal","Weihnachtsaufgabe"};
 	}
 }
