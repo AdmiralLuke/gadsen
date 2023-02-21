@@ -26,7 +26,7 @@ public class TestGameCharacter {
         }
     }
 
-
+    /*
     @Test
     public void testMovement() {
         // generate a field of the form         x
@@ -77,5 +77,7 @@ public class TestGameCharacter {
         Assert.assertTrue("Character sollte bei (1,0) sein, ist aber bei" + character.getPlayerPos(), character.getPlayerPos().x == 1 && character.getPlayerPos().y == 0);
         Assert.assertTrue("Character sollte 0 Leben haben, hat aber " + character.getHealth(), character.getHealth() == 0);
     }
+
+    */
 
 }

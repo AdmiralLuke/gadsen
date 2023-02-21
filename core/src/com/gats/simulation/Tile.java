@@ -1,6 +1,8 @@
 package com.gats.simulation;
 import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Repräsentiert eine Box aus denen die Karte aufgebaut ist.
@@ -125,6 +127,8 @@ public class Tile {
         if (this.right != null) { this.right.left = this; }
         if (this.up != null) { this.up.down = this; }
         if (this.down != null) { this.down.up = this; }
+
+
     }
 
     /**
@@ -162,6 +166,18 @@ public class Tile {
     }
 
     /**
+     * entfernt eine Tile aus dem Graphen (und alle Referenzen)
+     * GarbageColleciton goes huii
+     */
+    void deleteFromGraph() {
+        if (this.right != null) this.right.left = null;
+        if (this.left != null) this.left.right = null;
+        if (this.up != null) this.up.down = null;
+        if (this.down != null) this.down.up = null;
+
+
+    }
+    /**
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
      * oder auf anderer Box landet
      */
@@ -171,19 +187,36 @@ public class Tile {
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;
         ArrayList<Tile> leftList = null;
+
+        boolean[][] rightMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] upperMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] lowerMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] leftMap = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+
+
         state.getBoard()[this.position.x][this.position.y] = null;
+        this.deleteFromGraph();
         this.state.getSim().getActionLog().addAction(new TileDestroyAction(this.position));
-        if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), 0);
-        if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), 1);
-        if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), 2);
-        if (hasLeft()) leftList = left.convertGraphToList(new ArrayList<Tile>(), 3);
+        if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), rightMap);
+        if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), upperMap);
+        if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), lowerMap);
+        if (hasLeft()) leftList = left.convertGraphToList(new ArrayList<Tile>(), leftMap);
 
 
         if (rightList != null) checkForAnchor(rightList);
         if (leftList != null) checkForAnchor(leftList);
         if (upperList != null) checkForAnchor(upperList);
         if (lowerList != null) checkForAnchor(lowerList);
+        for (GameCharacter[] characters : this.state.getTeams()) {
+            for (GameCharacter character : characters) {
+                if (character != null) {
+                    character.fall();
+                }
+            }
+        }
         state.getSim().getActionLog().returnToRoot();
+
+
     }
 
     void checkForAnchor(ArrayList<Tile> list) {
@@ -201,17 +234,19 @@ public class Tile {
 
     void destroyTile() {
         IntVector2 posBef = this.position.cpy();
+        int fallen = 0;
         while (getTileAtPosition(this.position.x, this.position.y, state) == null && this.position.y > 0) {
+            fallen++;
             this.position.add(0, -1);
             for (GameCharacter[] characters : state.getTeams()) {
                 for (GameCharacter character : characters) {
                     if (character == null) {
                         continue;
                     }
-                    if (character.getPlayerPos().x == this.position.x && character.getPlayerPos().y == this.position.y) {
+                    if ((int)(character.getPlayerPos().x / 16) == this.position.x && (int)(character.getPlayerPos().y / 16) == this.position.y) {
                         LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()), 0.1f);
                         int tmpHealth = character.getHealth();
-                        character.setHealth(tmpHealth - ((int)path.getEndTime() / 10));
+                        character.setHealth(tmpHealth - fallen);
                         Action tmpAction = new TileMoveAction(posBef, this.position, 1f);
                         Action tmpDestAction = new TileDestroyAction(this.getPosition());
                         tmpAction.addChild(tmpDestAction);
@@ -233,27 +268,25 @@ public class Tile {
     /**
      *
      * @param tiles ArrayList mit rekursiv aufbauend verbundenen Tiles
-     * @param direction Angabe woher man kommt (um Endlos zu vermeiden)
-     *                  0 kommt von links
-     *                  1 kommt von unten
-     *                  2 kommt von oben
-     *                  3 kommt von rechts
+     * @param map lookup-map um bereits besuchte Tiles zu markieren
      * @return ArrayList mit allen verbunden Tiles
      */
-    protected ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, int direction) {
+    protected ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, boolean[][] map) {
         tiles.add(this);
+        IntVector2 pos = this.getPosition();
+        map[pos.x][pos.y] = true;
         if (tiles.get(tiles.size() - 1).isAnchor) return null;
-        if (this.hasUp() && !(direction == 2)) {
-            return up.convertGraphToList(tiles, 1);
+        if (this.hasUp() && !map[pos.x][pos.y + 1]) {
+            up.convertGraphToList(tiles, map);
         }
-        if (this.hasDown() && !(direction == 1)) {
-            return down.convertGraphToList(tiles, 2);
+        if (this.hasDown() && !map[pos.x][pos.y - 1]) {
+            down.convertGraphToList(tiles, map);
         }
-        if (this.hasLeft() && !(direction == 0)) {
-            return left.convertGraphToList(tiles, 3);
+        if (this.hasLeft() && !map[pos.x - 1][pos.y]) {
+            left.convertGraphToList(tiles, map);
         }
-        if (this.hasRight() && !(direction == 3)) {
-            return right.convertGraphToList(tiles, 0);
+        if (this.hasRight() && !map[pos.x + 1][pos.y]) {
+            right.convertGraphToList(tiles, map);
         }
         return tiles;
     }
@@ -302,4 +335,17 @@ public class Tile {
     boolean hasLeft() { return left != null; }
     boolean hasUp() { return up != null; }
     boolean hasDown() { return down != null; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tile tile = (Tile) o;
+        return isAnchor == tile.isAnchor && isAnchored == tile.isAnchored && getPosition().equals(tile.getPosition());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isAnchor, isAnchored, getPosition());
+    }
 }
