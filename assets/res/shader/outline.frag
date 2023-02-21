@@ -22,7 +22,7 @@ void main()
 
     vec2 size = vec2(1.0, 1.0) / tex_size * line_thickness;
     vec4 texColor = texture2D(u_texture, v_texCoords);
-    if (texColor.a == 0) {
+    if (texColor.a <= 0.1) {
         float a = texture2D(u_texture, v_texCoords + vec2(size.x, 0)).a;
         a += texture2D(u_texture, v_texCoords + vec2(size.x, size.y)).a;
         a += texture2D(u_texture, v_texCoords + vec2(0, size.y)).a;
