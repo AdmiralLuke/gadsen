@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.StringBuilder;
 import com.gats.animation.entity.AnimatedEntity;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.animation.entity.GameCharacterHudElement;
+import com.gats.ui.assets.AssetContainer.IngameAssets;
+import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,14 +26,14 @@ public class GameCharacter extends AnimatedEntity {
 
     private AimIndicator aimingIndicator;
 
-    private AssetContainer.IngameAssets.GameCharacterAnimationType idleType = AssetContainer.IngameAssets.GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
+    private GameCharacterAnimationType idleType = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
 
-    private AssetContainer.IngameAssets.GameCharacterAnimationType currentAnimation = AssetContainer.IngameAssets.GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
+    private GameCharacterAnimationType currentAnimation = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
     private Color teamColor;
 
 
     public GameCharacter(Color teamColor) {
-        super(AssetContainer.IngameAssets.gameCharacterAnimations[AssetContainer.IngameAssets.GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
+        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
         this.teamColor = teamColor;
     }
 
@@ -44,37 +46,37 @@ public class GameCharacter extends AnimatedEntity {
         if (aimingIndicator != null && aimActive) {
             aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
-        batch.setShader(AssetContainer.IngameAssets.outlineShader);
-        AssetContainer.IngameAssets.outlineShader.setUniformf("outline_color", teamColor);
-        AssetContainer.IngameAssets.outlineShader.setUniformf("line_thickness", 1f);
+        batch.setShader(IngameAssets.outlineShader);
+        IngameAssets.outlineShader.setUniformf("outline_color", teamColor);
+        IngameAssets.outlineShader.setUniformf("line_thickness", 1f);
         Texture texture = getAnimation().getKeyFrame(0).getTexture();
-        AssetContainer.IngameAssets.outlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
+        IngameAssets.outlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);
 
     }
 
-    public void setAnimation(AssetContainer.IngameAssets.GameCharacterAnimationType type) {
+    public void setAnimation(GameCharacterAnimationType type) {
         currentAnimation = type;
-        if (type == AssetContainer.IngameAssets.GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
-            super.setAnimation(AssetContainer.IngameAssets.gameCharacterAnimations[idleType.ordinal()]);
+        if (type == GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
+            super.setAnimation(IngameAssets.gameCharacterAnimations[idleType.ordinal()]);
         else
-            super.setAnimation(AssetContainer.IngameAssets.gameCharacterAnimations[type.ordinal()]);
+            super.setAnimation(IngameAssets.gameCharacterAnimations[type.ordinal()]);
     }
 
     public Animation<TextureRegion> getAnimation() {
         return super.getAnimation();
     }
 
-    public AssetContainer.IngameAssets.GameCharacterAnimationType getIdleType() {
+    public GameCharacterAnimationType getIdleType() {
         return idleType;
     }
 
-    public void setIdleType(AssetContainer.IngameAssets.GameCharacterAnimationType idleType) {
+    public void setIdleType(GameCharacterAnimationType idleType) {
         this.idleType = idleType;
-        if (currentAnimation == AssetContainer.IngameAssets.GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
-            setAnimation(AssetContainer.IngameAssets.GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
+        if (currentAnimation == GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
+            setAnimation(GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
     }
 
     public AimIndicator getAimingIndicator() {
@@ -91,8 +93,8 @@ public class GameCharacter extends AnimatedEntity {
         super.setRelPos(pos);
     }
 
-    public static float getAnimationDuration(AssetContainer.IngameAssets.GameCharacterAnimationType type){
-        return AssetContainer.IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
+    public static float getAnimationDuration(GameCharacterAnimationType type){
+        return IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
     }
 
     public void aimActive(boolean active) {
