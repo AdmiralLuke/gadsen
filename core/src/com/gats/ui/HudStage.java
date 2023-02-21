@@ -40,8 +40,6 @@ public class HudStage extends Stage {
     private final int KEY_EXIT_TO_MENU = Keys.ESCAPE;
     private
     SpriteBatch batch;
-    TextureRegion healthbar;
-    GADSAssetManager assetManager;
 
     InGameScreen ingameScreen;
     AnimatorCamera camera;

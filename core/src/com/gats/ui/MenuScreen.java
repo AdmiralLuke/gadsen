@@ -68,9 +68,9 @@ private SpriteBatch menuBatch;
      */
     public void setupMenuScreen(Stage menuStage) {
 
-        this.menuBuilder = new Menu(skin,title, Manager.getPossiblePlayers(),gameInstance.getGameModes(),this);
+        this.menuBuilder = new Menu(AssetContainer.MainMenuAssets.skin, AssetContainer.MainMenuAssets.titleSprite, Manager.getPossiblePlayers(),gameInstance.getGameModes(),this);
 
-        menuStage.addActor(menuBuilder.buildMenuLayout(skin));
+        menuStage.addActor(menuBuilder.buildMenuLayout(AssetContainer.MainMenuAssets.skin));
     }
 
 
