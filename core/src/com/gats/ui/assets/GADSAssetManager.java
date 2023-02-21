@@ -79,6 +79,7 @@ public class GADSAssetManager {
 
     private void moveToContainer() {
         TextureAtlas atlas = manager.get(this.atlas, TextureAtlas.class);
+
         //Main Menu
         MainMenuAssets.background = atlas.findRegion("background/WeihnachtsBG");
         MainMenuAssets.titleSprite = atlas.findRegion("ui/titleTileset");
@@ -125,7 +126,7 @@ public class GADSAssetManager {
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
 
-        IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingR");
+        IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
 
         IngameAssets.SugarCane = atlas.findRegions("projectile/sugarcaneProjectileFront");
 
