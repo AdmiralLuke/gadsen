@@ -3,8 +3,6 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.animation.AnimatorCamera;
@@ -13,6 +11,8 @@ import com.gats.manager.HumanPlayer;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.ActionLog;
+import com.gats.ui.assets.AssetContainer;
+import com.gats.ui.menu.debugView.DebugView;
 
 import java.util.List;
 
@@ -33,12 +33,15 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private HudStage hudStage;
     private Animator animator;
     private final GADS gameManager;
+
+    private DebugView debugView;
     public InGameScreen(GADS instance, RunConfiguration runConfig){
 
         gameManager = instance;
         gameViewport = new FillViewport(worldWidth,worldHeight);
         hudViewport = new FitViewport(worldWidth,worldHeight);
 
+        debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
         hudStage = new HudStage(hudViewport,this);
         setupInput();
@@ -67,6 +70,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         hudStage.act();
         animator.render(delta);
         hudStage.draw();
+        debugView.draw();
         //animator.animate(gameManager.simulation.getActionLog());
     }
 

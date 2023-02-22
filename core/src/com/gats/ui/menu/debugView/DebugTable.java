@@ -1,12 +1,13 @@
-package com.gats.ui.menu;
+package com.gats.ui.menu.debugView;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
 
 public class DebugTable extends Table {
 
-	Label playerLabel;
+	ColoredLabelWithBackground playerLabel;
 	Label characterLabel;
 
 	final String playerText = "Spielerindex: ";
@@ -15,8 +16,10 @@ public class DebugTable extends Table {
 	public DebugTable(Skin skin) {
 		super(skin);
 
-		playerLabel = new Label(playerText, skin);
+		playerLabel = new ColoredLabelWithBackground(playerText, skin,0,1,0,1);
 		characterLabel = new Label(characterText, skin);
+		playerLabel.setColor(0, 1, 0, 1);
+		rebuildTable();
 	}
 
 	public void addString(String string){
