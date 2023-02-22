@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 /**
- * Slider for selecting Amount of Teams to play with
+ * Slider um die Anzahl der Teams zu bestimmen
  */
 public class TeamAmountSlider extends RelationSlider {
 
@@ -25,7 +25,7 @@ public class TeamAmountSlider extends RelationSlider {
 	}
 
 	/**
-	 * calls {@link BotSelectorTable#resizeTable(int value)} to adjust the amount of selectable bots
+	 * ruft {@link BotSelectorTable#resizeTable(int value)} auf um die Anzahl der Auszuwählenden bots anzupassen
 	 * @param value
 	 */
 	private void adjustBotSelector(int value) {
@@ -34,33 +34,35 @@ public class TeamAmountSlider extends RelationSlider {
 		}
 	}
 
-	/**
-	 * Changes the range of this and the TeamSizeSlider in relation to the number of Spawnpoints provided.
+	/** Ändert die Intervalgrenzen von this und dem {@link TeamSizeSlider} in relation zu der Anzahl an Spawnpunkten auf der Map.
 	 * @param numberOfspawnpoints
 	 */
 	public void adjustTeamSizeToSpawnpoints(int numberOfspawnpoints) {
 		this.currentSpawnpoints = numberOfspawnpoints;
+		//Falls keine Spawnpunkte vorhanden sind, die Auswahl begrenzen auf 0
 		if (numberOfspawnpoints == 0) {
 			this.setRange(0, 0);
 			adjustRelatedSliders(0, 0);
 		} else {
+			//Ausgewählte Teamanzahl nutzen, um die mögliche Teamgröße zu berechnen
 			int selectedValue = (int) this.getValue();
 			if(selectedValue==0){
-				selectedValue=1;
-			}
-			int maxTeamsize = numberOfspawnpoints / selectedValue;
-			if (maxTeamsize > 0) {
-				adjustRelatedSliders(1, maxTeamsize);
-			} else {
-				adjustRelatedSliders(1, 1);
+				//Falls aus vorheriger auswahl kein Team ausgewählt wurde, wird der ausgewählte Wert auf 2 Teams gesetzt
+				selectedValue=2;
 			}
 
-			this.setRange(1, numberOfspawnpoints);
+			//Teamgröße berechnen
+			int maxTeamsize = numberOfspawnpoints / selectedValue;
+
+			//Teamgröße muss mindestens 1 sein
+			adjustRelatedSliders(1, Math.max(maxTeamsize, 1));
+
+			this.setRange(2, numberOfspawnpoints);
 		}
 	}
 
 	/**
-	 * This function gets called by other buttons (e.g. MapSelector) after a change happened to adjust the values to the correct one.
+	 * Wird aufgerufen, wenn andere Buttons (bspw. MapSelector) verändert werden, um die Anzahl der Spawnpunkte/Teamgröße anzupassen
 	 * @param spawnpoints of the current selection
 	 */
 	public void changeValues(int spawnpoints){
@@ -72,8 +74,7 @@ public class TeamAmountSlider extends RelationSlider {
 	}
 
 		/**
-		 * Adds a reference to the BotSelector to this table, so it can be updated when {@link TeamAmountSlider}
-		 * is changed. -> will call {@link BotSelectorTable#resizeTable(int)}
+		 * Fügt eine Referenz auf einen BotSelectorAdds hinzu, sodass die Anzahl der BotAuswahlboxen angepasst werden kann durch{@link BotSelectorTable#resizeTable(int)}
 		 * @param botSelector a
 		 */
 		public void addBotSelector(BotSelectorTable botSelector){
