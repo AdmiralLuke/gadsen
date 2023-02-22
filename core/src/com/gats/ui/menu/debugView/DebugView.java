@@ -25,7 +25,7 @@ public class DebugView {
 	private DebugTable layoutTable;
 
 	public DebugView(Skin skin){
-		viewport = new ExtendViewport(500,500);
+		viewport = new ExtendViewport(600,600);
 		viewport.setCamera(new OrthographicCamera(30,30*(Gdx.graphics.getHeight()*1f/Gdx.graphics.getWidth())));
 		viewport.apply();
 

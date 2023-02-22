@@ -93,6 +93,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         animator.resize(width, height);
         hudStage.getViewport().update(width, height);
         hudStage.getViewport().apply();
+        debugView.getViewport().update(width,height);
     }
 
     @Override
