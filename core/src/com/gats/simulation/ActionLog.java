@@ -47,13 +47,11 @@ public class ActionLog {
 
     @Override
     public String toString() {
-        String output = "ActionLog\n";
 
-        output += rootAction.toString() +"\n";
+        String output = rootAction.toString() +" | ";
         for (Action action: lastAddedAction.getChildren()) {
-           output += " "+action.toString()+"\n";
+           output += action.toString()+" | ";
         }
-
-        return output+="EndLog\n";
+        return output;
     }
 }

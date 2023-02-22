@@ -40,9 +40,18 @@ public class DebugView {
 	}
 
 
+	/**
+	 * Fügt Action log in die View ein;
+	 * @param log
+	 */
 	public void add(ActionLog log){
 		layoutTable.addActionLog(log);
 	}
+
+	/**
+	 * Fügt einen String in die View/Table ein.
+	 * @param string
+	 */
 	public void add(String string){
 		layoutTable.addString(string);
 	}
@@ -51,6 +60,13 @@ public class DebugView {
 		layoutTable.rebuildTable();
 	}
 
+	/**
+	 * Wird vermultich entfernt, da durch dies die  Actionlogs ersichtlich wird
+	 * Weiterhin ist es kompliziert die Informationen zu erhalten
+	 *
+	 * @param player
+	 * @param character
+	 */
 	public void setCurrentPlayerAndChar(int player,int character){
 
 		layoutTable.updatePlayerLabel(player);
