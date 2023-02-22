@@ -27,7 +27,6 @@ public class NormalLayout extends GamemodeLayout {
 
 		this.row();
 
-		menu.getBotSelector().resizeTable(menu.getMapSelector().getSelected().getNumberOfSpawnpoints());
 		this.add(menu.getBotSelector()).colspan(getDefaultColspan());
 		this.row();
 	}
