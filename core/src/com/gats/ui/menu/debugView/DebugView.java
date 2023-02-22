@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.*;
+import com.gats.simulation.ActionLog;
 
 public class DebugView {
 
@@ -24,7 +25,7 @@ public class DebugView {
 	private DebugTable layoutTable;
 
 	public DebugView(Skin skin){
-		viewport = new ExtendViewport(500,500,2000,2000);
+		viewport = new ExtendViewport(500,500);
 		viewport.setCamera(new OrthographicCamera(30,30*(Gdx.graphics.getHeight()*1f/Gdx.graphics.getWidth())));
 		viewport.apply();
 
@@ -39,11 +40,15 @@ public class DebugView {
 	}
 
 
-	public void addToInformation(String info){
-		currentState += info+"\n" ;
+	public void add(ActionLog log){
+		layoutTable.addActionLog(log);
 	}
+	public void add(String string){
+		layoutTable.addString(string);
+	}
+
 	public void refreshState(){
-		this.currentState = "Turn";
+		layoutTable.rebuildTable();
 	}
 
 	public void setCurrentPlayerAndChar(int player,int character){
@@ -69,8 +74,7 @@ public class DebugView {
 		viewport.apply(true);
 		batch.setProjectionMatrix(viewport.getCamera().combined);
 
-		if(currentState!=null) {
-			stage.act();
+		if(stage!=null) {
 			stage.draw();
 
 			//	batch.begin();

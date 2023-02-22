@@ -39,4 +39,13 @@ public final class CharacterMoveAction extends CharacterAction{
     public float getDuration() {
         return duration;
     }
+
+    @Override
+    public String toString() {
+        String output=  super.toString();
+
+        output += path.toString();
+        output += " ";
+        return output;
+    }
 }

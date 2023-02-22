@@ -44,4 +44,14 @@ public class ProjectileAction extends Action{
     public ProjectileType getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+       String output =  super.toString();
+
+       output += type.toString() + " " + path.toString();
+       output += " ";
+       return output;
+
+    }
 }

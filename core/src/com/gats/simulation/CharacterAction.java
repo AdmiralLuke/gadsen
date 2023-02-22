@@ -28,4 +28,15 @@ abstract class CharacterAction extends Action{
     public int getTeam() {
         return team;
     }
+
+    @Override
+    public String toString() {
+       String output = super.toString();
+
+       output += "Team: " + team;
+       output += " ";
+       output += "Character: " + character;
+        output += " ";
+       return output;
+    }
 }

@@ -79,7 +79,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
      *
      * @param log Queue of all {@link com.gats.simulation.Action animation-related Actions}
      */
-    public void animate(ActionLog log) {animator.animate(log);}
+    public void animate(ActionLog log) {animator.animate(log);
+    debugView.add(log);}
 
 
     @Override

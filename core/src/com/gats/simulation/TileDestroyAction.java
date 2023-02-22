@@ -9,4 +9,11 @@ public final class TileDestroyAction extends TileAction{
     public TileDestroyAction(IntVector2 position) {
         super(position, 0.005f);
     }
+
+
+    @Override
+    public String toString() {
+        String output = "TileDestroy" + super.getPos().toString();
+       return output;
+    }
 }

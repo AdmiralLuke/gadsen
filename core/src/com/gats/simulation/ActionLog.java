@@ -45,4 +45,15 @@ public class ActionLog {
         return rootAction;
     }
 
+    @Override
+    public String toString() {
+        String output = "ActionLog\n";
+
+        output += rootAction.toString() +"\n";
+        for (Action action: lastAddedAction.getChildren()) {
+           output += " "+action.toString()+"\n";
+        }
+
+        return output+="EndLog\n";
+    }
 }

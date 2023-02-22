@@ -22,4 +22,17 @@ public class CharacterFallAction extends CharacterAction {
     public float getDuration() {
         return duration;
     }
+
+
+    @Override
+    public String toString() {
+       String output = super.toString();
+
+       output += "posBef: " +posBef;
+       output += " ";
+       output += "posAft: " + posAft;
+       output += " ";
+       return output;
+
+    }
 }

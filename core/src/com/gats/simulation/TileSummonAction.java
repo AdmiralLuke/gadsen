@@ -11,4 +11,9 @@ public final class TileSummonAction extends TileAction{
     public TileSummonAction(IntVector2 pos) {
         super(pos, 0);
     }
+
+    @Override
+    public String toString() {
+        return "TileSummon: " + super.getPos().toString();
+    }
 }

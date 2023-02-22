@@ -26,6 +26,10 @@ public class ColoredLabelWithBackground extends Label {
 		this(text,skin,colors[0],colors[1],colors[2],colors[3]);
 
 	}
+	public ColoredLabelWithBackground(CharSequence text, Skin skin, Color color) {
+		this(text,skin,color.r,color.g,color.b,color.a);
+
+	}
 
 	/**
 	 * Farbiges Label mit Hintergrund

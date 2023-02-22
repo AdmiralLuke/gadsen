@@ -23,4 +23,17 @@ public class CharacterAimAction extends CharacterAction {
     public float getStrength() {
         return strength;
     }
+
+    @Override
+    public String toString() {
+
+        String output = super.toString();
+        String angleDegree = "" +angle.angleDeg();
+
+        output += "Angle: " + angle.toString() + " Deg: "+ angleDegree;
+        output += " ";
+        output += "Strength: " + strength;
+        output += " ";
+        return output;
+    }
 }

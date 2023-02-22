@@ -12,4 +12,13 @@ public class CharacterSwitchWeaponAction extends CharacterAction {
     public WeaponType getWpType() {
         return wpType;
     }
+
+
+    @Override
+    public String toString() {
+
+        String output = "NewWeapon: " + wpType.toString();
+        return output;
+
+    }
 }

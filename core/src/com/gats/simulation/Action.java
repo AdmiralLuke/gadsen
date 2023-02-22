@@ -31,4 +31,8 @@ public abstract class Action {
         return this.arrayList.iterator();
     }
 
+    @Override
+    public String toString() {
+        return "delay=" + delay + " ";
+    }
 }

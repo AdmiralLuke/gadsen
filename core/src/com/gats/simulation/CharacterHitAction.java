@@ -16,4 +16,14 @@ public class CharacterHitAction extends CharacterAction{
     public int getHealthBef() {
         return healthBef;
     }
+
+
+    @Override
+    public String toString() {
+       String output = super.toString();
+       output += "healthBef: " + healthBef;
+       output += " ";
+       output += "healthAft: " + healthAft;
+       return output;
+    }
 }
