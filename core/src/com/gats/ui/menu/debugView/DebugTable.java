@@ -16,9 +16,8 @@ public class DebugTable extends Table {
 	public DebugTable(Skin skin) {
 		super(skin);
 
-		playerLabel = new ColoredLabelWithBackground(playerText, skin,0,1,0,1);
+		playerLabel = new ColoredLabelWithBackground(playerText, skin,1,1,1,1);
 		characterLabel = new Label(characterText, skin);
-		playerLabel.setColor(0, 1, 0, 1);
 		rebuildTable();
 	}
 
