@@ -70,14 +70,6 @@ public class Simulation {
             gameState.setActive(false);
             return this.actionLog;
         }
-//ToDo: discuss removal, every floating character should already have fallen by now
-//        for (GameCharacter[] characters : this.gameState.getTeams()) {
-//            for (GameCharacter character : characters) {
-//                if (character != null) {
-//                    character.fall();
-//                }
-//            }
-//        }
 
         IntVector2 lastChar = gameState.getTurn().pop();
         if (gameState.getCharacterFromTeams(lastChar.x, lastChar.y).getHealth() > 0) {

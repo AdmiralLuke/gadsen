@@ -265,8 +265,7 @@ public class GameCharacter {
         int bottomTileY = Simulation.convertToTileCoordsY(boundingBox.y);
         int fallen = 0;
         boolean collision = false;
-        System.out.println(boundingBox.y/16f);
-        System.out.println((boundingBox.y -1)/16f);
+
         while (this.boundingBox.y > 0) {
             boundingBox.y -= 1;
             int nextBottomTileY = Simulation.convertToTileCoordsY(boundingBox.y);
