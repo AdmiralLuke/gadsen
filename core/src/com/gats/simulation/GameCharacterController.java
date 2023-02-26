@@ -12,6 +12,14 @@ public class GameCharacterController {
     private GameCharacter gameCharacter;
     private GameState state;
 
+    private Action getHead(){
+        return state.getSim().getActionLog().getRootAction(); //ToDo: verify correctness
+    }
+
+    private ActionLog endCommand(){
+        return state.getSim().clearAndReturnActionLog();
+    }
+
     protected GameCharacterController(GameCharacter gameCharacter, GameState state) {
         this.gameCharacter = gameCharacter;
         this.state = state;
@@ -28,20 +36,24 @@ public class GameCharacterController {
      * Veranlasst den Charakter unter Aufwendung von Stamina einen dx Schritt zu tätigen.
      * Positive Werte bewegen den Charakter nach rechts, Negative nach links.
      */
-    public void move(int dx) {
-        gameCharacter.move(dx);
+    public ActionLog move(int dx) {
+        gameCharacter.walk(dx, getHead());
+        return endCommand();
     }
 
-    public void aim(Vector2 angle, float strength) {
-        gameCharacter.aim(angle,strength);
+    public ActionLog aim(Vector2 angle, float strength) {
+        gameCharacter.aim(angle,strength, getHead());
+        return endCommand();
     }
 
-    public void selectWeapon(WeaponType type) {
-        gameCharacter.selectWeapon(type);
+    public ActionLog selectWeapon(WeaponType type) {
+        gameCharacter.selectWeapon(type, getHead());
+        return endCommand();
     }
 
-    public void shoot() {
-        gameCharacter.shoot();
+    public ActionLog shoot() {
+        gameCharacter.shoot(getHead());
+        return endCommand();
     }
 
 }

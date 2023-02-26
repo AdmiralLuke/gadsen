@@ -62,26 +62,25 @@ abstract class Weapon {
         return shoots;
     }
 
-    protected void shoot(Vector2 dir, double strength) {
+    protected void shoot(Vector2 dir, double strength, Action head) {
         if (this.getType() == WeaponType.COOKIE) {
-            this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
+            this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE, head);
         } else {
-            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR);
+            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR, head);
         }
     }
 
-    protected void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type) {
+    protected void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type, Action head) {
         if (strength > projRange) {
             projRange = strength;
         }
         if (shoots <= 0) {
             return;
         }
-        sim.getActionLog().goToNextAction();
-        sim.getActionLog().addAction(new CharacterShootAction(character.getTeam(), character.getTeamPos()));
-        sim.getActionLog().goToNextAction();
+        CharacterShootAction shootAction = new CharacterShootAction(character.getTeam(), character.getTeamPos());
+        head.addChild(shootAction);
         Projectile proj = new Projectile(damage, projRange, character.getPlayerPos(), dir, type, AcType, sim, character, strength);
-        proj.move();
+        proj.move(shootAction);
         if (this.type != WeaponType.NOT_SELECTED) shoots--;
     }
 }
