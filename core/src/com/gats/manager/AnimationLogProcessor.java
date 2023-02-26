@@ -1,6 +1,6 @@
 package com.gats.manager;
 
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.ActionLog;
 
 public interface AnimationLogProcessor {
 

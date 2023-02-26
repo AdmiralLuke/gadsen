@@ -1,7 +1,8 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 
-import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.IntVector2;
+import com.gats.simulation.Tile;
 
 /**
  * Beschreibt ein {@link Action Ereigniss}, bei dem eine neue {@link Tile Box} auf der Karte erscheint

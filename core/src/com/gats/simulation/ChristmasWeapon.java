@@ -1,6 +1,8 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.ProjectileAction;
 
 /**
  * @Weihnachtsaufgabe Waffen für die Weihnachtsaufgabe (Kekse & Zuckerstange)

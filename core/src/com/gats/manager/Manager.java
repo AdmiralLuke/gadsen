@@ -2,7 +2,7 @@ package com.gats.manager;
 
 import com.gats.manager.command.Command;
 import com.gats.manager.command.EndTurnCommand;
-import com.gats.simulation.*;
+import com.gats.simulation.action.ActionLog;
 import com.gats.ui.HudStage;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;

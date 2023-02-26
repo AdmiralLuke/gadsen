@@ -1,6 +1,8 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.LinearPath;
+import com.gats.simulation.Path;
 
 public class CharacterFallAction extends CharacterAction {
     private Vector2 posBef;

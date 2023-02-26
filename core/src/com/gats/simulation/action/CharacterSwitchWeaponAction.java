@@ -1,4 +1,6 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
+
+import com.gats.simulation.WeaponType;
 
 public class CharacterSwitchWeaponAction extends CharacterAction {
 

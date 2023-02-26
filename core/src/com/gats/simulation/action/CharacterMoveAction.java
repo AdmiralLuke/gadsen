@@ -1,6 +1,9 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.GameCharacter;
+import com.gats.simulation.LinearPath;
+import com.gats.simulation.Path;
 
 /**
  * Beschreibt ein {@link Action Ereigniss}, bei dem die {@link GameCharacter Spielfigur} mittels der Laufmechanik bewegt wird
@@ -20,7 +23,7 @@ public final class CharacterMoveAction extends CharacterAction{
      * @param delay Wartezeit nach Ausführung
      */
 
-    CharacterMoveAction(Vector2 posBef, Vector2 posAft, int team, int character, float delay) {
+    public CharacterMoveAction(Vector2 posBef, Vector2 posAft, int team, int character, float delay) {
         super(team, character, delay);
         LinearPath linPath = new LinearPath(posBef, posAft, 1f);
         this.path = linPath;

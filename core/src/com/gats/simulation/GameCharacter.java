@@ -1,6 +1,7 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.*;
 
 /**
  * Repräsentiert eine {@link GameCharacter Spielfigur} auf der Karte
@@ -414,14 +415,6 @@ public class GameCharacter {
      */
     int abs(int n) {
         return n >= 0 ? n : -n;
-    }
-
-    /**
-     * bewegt den Spieler nach in eine Richtung
-     * verbraucht Stamina
-     */
-    protected void moveDX(int dx) {
-        walk(dx, this.sim.getActionLog().lastAddedAction);
     }
 
     /**

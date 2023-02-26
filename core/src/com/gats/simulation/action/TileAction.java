@@ -1,4 +1,7 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
+
+import com.gats.simulation.IntVector2;
+import com.gats.simulation.Tile;
 
 /**
  * Oberklasse für alle {@link Action Ereignisse}, die sich auf eine {@link Tile Box} beziehen

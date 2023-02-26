@@ -1,7 +1,6 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -75,7 +74,7 @@ public class GameState {
         if (gameMode == GAME_MODE_CHRISTMAS) {
             spawnpoints.sort(Comparator.comparingInt(v -> v.x));
             for (int i = 0; i < 4; i++) {
-                IntVector2 pos = spawnpoints.get(i).scl(Tile.tileSize);
+                IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);
                 this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, sim);
                 turn.add(new IntVector2(i, 0));
             }
@@ -90,7 +89,7 @@ public class GameState {
         for (int i = 0; i < teamCount; i++) {
             for (int j = 0; j < charactersPerTeam; j++) {
                 int index = rnd.nextInt(pointCount--);
-                IntVector2 pos = spawnpoints.remove(index).scl(Tile.tileSize);
+                IntVector2 pos = spawnpoints.remove(index).scl(Tile.TileSize);
                 this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, sim);
             }
         }

@@ -1,5 +1,4 @@
-package com.gats.simulation;
-import java.util.ArrayDeque;
+package com.gats.simulation.action;
 
 /**
  * Repräsentiert die Zusammenfassung aller UI-relevanten {@link Action Ereignisse},
@@ -10,12 +9,10 @@ public class ActionLog {
 
 
     private Action rootAction;
-    Action lastAddedAction;
 
 
-    ActionLog(Action rootAction) {
+    public ActionLog(Action rootAction) {
         this.rootAction = rootAction;
-        this.lastAddedAction = rootAction;
     }
 
 

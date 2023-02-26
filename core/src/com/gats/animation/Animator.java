@@ -14,10 +14,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.manager.AnimationLogProcessor;
 import com.gats.simulation.*;
-import com.gats.ui.assets.AssetContainer;
+import com.gats.simulation.action.*;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
-import org.w3c.dom.Text;
 
 
 import java.util.*;
@@ -27,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Kernklasse für die Visualisierung des Spielgeschehens.
- * Übersetzt {@link com.gats.simulation.GameState GameState} und {@link com.gats.simulation.ActionLog ActionLog}
+ * Übersetzt {@link com.gats.simulation.GameState GameState} und {@link ActionLog ActionLog}
  * des {@link com.gats.simulation Simulation-Package} in für libGDX renderbare Objekte
  */
 public class Animator implements Screen, AnimationLogProcessor {
@@ -80,7 +79,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
 
     interface ActionConverter {
-        public ExpandedAction apply(com.gats.simulation.Action simAction, Animator animator);
+        public ExpandedAction apply(com.gats.simulation.action.Action simAction, Animator animator);
     }
 
     private static class Remainder {
@@ -140,7 +139,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 };
 
 
-        public static Action convert(com.gats.simulation.Action simAction, Animator animator) {
+        public static Action convert(com.gats.simulation.action.Action simAction, Animator animator) {
 //            System.out.println("Converting " + simAction.getClass());
             ExpandedAction expandedAction = map.getOrDefault(simAction.getClass(), (v, w) -> {
                         System.err.println("Missing Converter for Action of type " + simAction.getClass());
@@ -152,15 +151,15 @@ public class Animator implements Screen, AnimationLogProcessor {
             return expandedAction.head;
         }
 
-        private static Action[] extractChildren(com.gats.simulation.Action action, Animator animator) {
+        private static Action[] extractChildren(com.gats.simulation.action.Action action, Animator animator) {
             int childCount = action.getChildren().size();
             if (childCount == 0) return new Action[]{};
 
             Action[] children = new Action[childCount];
             int i = 0;
-            Iterator<com.gats.simulation.Action> iterator = action.iterator();
+            Iterator<com.gats.simulation.action.Action> iterator = action.iterator();
             while (iterator.hasNext()) {
-                com.gats.simulation.Action curChild = iterator.next();
+                com.gats.simulation.action.Action curChild = iterator.next();
                 children[i] = convert(curChild, animator);
                 i++;
             }
@@ -168,7 +167,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return children;
         }
 
-        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterMoveAction moveAction = (CharacterMoveAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
@@ -183,7 +182,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(startWalking, stopWalking);
         }
 
-        private static ExpandedAction convertCharacterFallAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterFallAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterFallAction moveAction = (CharacterFallAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
@@ -196,7 +195,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(startFalling, stopFalling);
         }
 
-        private static ExpandedAction convertProjectileMoveAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertProjectileMoveAction(com.gats.simulation.action.Action action, Animator animator) {
             ProjectileAction projectileAction = (ProjectileAction) action;
 
 
@@ -225,7 +224,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(summonProjectile, destroyProjectile);
         }
 
-        private static ExpandedAction convertTileMoveAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertTileMoveAction(com.gats.simulation.action.Action action, Animator animator) {
             TileMoveAction tileMoveAction = (TileMoveAction) action;
 
             final IntVector2 IntPos = tileMoveAction.getPos();
@@ -260,7 +259,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(summonTileEntity, destroyTileEntity);
         }
 
-        private static ExpandedAction convertTileDestroyAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertTileDestroyAction(com.gats.simulation.action.Action action, Animator animator) {
 
             TileDestroyAction destroyAction = (TileDestroyAction) action;
 
@@ -286,7 +285,7 @@ public class Animator implements Screen, AnimationLogProcessor {
          * @param animator Current Animator
          * @return {@link ExpandedAction} with a {@link RotateAction} and {@link ScaleAction}.
          */
-        private static ExpandedAction convertCharacterAimAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterAimAction(com.gats.simulation.action.Action action, Animator animator) {
             //cast to access CharacterAimAction values
             CharacterAimAction aimAction = (CharacterAimAction) action;
             //get the aimIndicator from the player that shot
@@ -297,14 +296,14 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(rotateAction, scaleAction);
         }
 
-        private static ExpandedAction convertTurnStartAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertTurnStartAction(com.gats.simulation.action.Action action, Animator animator) {
             TurnStartAction startAction = (TurnStartAction) action;
             GameCharacter target = animator.teams[startAction.getTeam()][startAction.getCharacter()];
             animator.getCamera().moveToVector(target.getPos());
             return new ExpandedAction(new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter));
         }
 
-        private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterSwitchWeaponAction switchWeaponAction = (CharacterSwitchWeaponAction) action;
             GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
             SetIdleAnimationAction setAnimationAction;
@@ -322,13 +321,13 @@ public class Animator implements Screen, AnimationLogProcessor {
         }
 
 
-        private static ExpandedAction convertCharacterShootAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterShootAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterShootAction shootAction = (CharacterShootAction) action;
             //ToDo play weapon animation
             return new ExpandedAction(new IdleAction(shootAction.getDelay(), 0));
         }
 
-        private static ExpandedAction convertCharacterHitAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterHitAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterHitAction hitAction = (CharacterHitAction) action;
             Action lastAction;
             GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
@@ -346,7 +345,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             }
             return new ExpandedAction(hitAnimation, lastAction);
         }
-        private static ExpandedAction convertGameOverAction(com.gats.simulation.Action action, Animator animator) {
+        private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
            GameOverAction winAction = (GameOverAction) action;
 
             SummonAction summonWinScreen = new SummonAction(action.getDelay(),null,()->{
@@ -467,13 +466,13 @@ public class Animator implements Screen, AnimationLogProcessor {
     /**
      * Animates the logs actions
      *
-     * @param log Queue aller {@link com.gats.simulation.Action animations-relevanten Ereignisse}
+     * @param log Queue aller {@link com.gats.simulation.action.Action animations-relevanten Ereignisse}
      */
     public void animate(ActionLog log) {
         pendingLogs.add(log);
     }
 
-    private Action convertAction(com.gats.simulation.Action action) {
+    private Action convertAction(com.gats.simulation.action.Action action) {
         return ActionConverters.convert(action, this);
     }
 

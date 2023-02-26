@@ -1,4 +1,4 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,7 +23,7 @@ public abstract class Action {
         return this.arrayList;
     }
 
-    protected void addChild(Action a) {
+    public void addChild(Action a) {
         this.arrayList.add(a);
     }
 

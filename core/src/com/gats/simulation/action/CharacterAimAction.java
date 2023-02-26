@@ -1,4 +1,4 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 
 import com.badlogic.gdx.math.Vector2;

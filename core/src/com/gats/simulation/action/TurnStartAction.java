@@ -1,4 +1,4 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 public class TurnStartAction extends CharacterAction {
 

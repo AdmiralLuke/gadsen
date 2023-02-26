@@ -1,7 +1,9 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 import com.badlogic.gdx.math.Vector2;
-import org.lwjgl.Sys;
+import com.gats.simulation.ParablePath;
+import com.gats.simulation.Path;
+import com.gats.simulation.Projectile;
 
 /**
  * {@link Action Ereignis}, das den Weg während der Lebensdauer eines {@link Projectile Projektils} beschreibt

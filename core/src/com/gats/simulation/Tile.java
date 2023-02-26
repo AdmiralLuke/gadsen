@@ -1,9 +1,11 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.TileDestroyAction;
+import com.gats.simulation.action.TileMoveAction;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -11,7 +13,10 @@ import java.util.Objects;
  * Das genaue Verhalten insbesondere von Spezialboxen, wie z.B. Waffendrops wird durch erbende Klassen realisiert.
  */
 public class Tile {
-    protected static final IntVector2 tileSize = new IntVector2(16, 16);
+
+    public static final int TileSizeX = 16;
+    public static final int TileSizeY = 16;
+    protected static final IntVector2 TileSize = new IntVector2(TileSizeX, TileSizeY);
 
     // Box als Ankerpunkt
 
@@ -50,9 +55,14 @@ public class Tile {
      * @return Untere Linke Ecke der Box
      */
     public Vector2 getWorldPosition() {
-        return this.position.toFloat().scl(tileSize.x, tileSize.y);
+        return this.position.toFloat().scl(TileSize.x, TileSize.y);
     }
 
+    /**
+     * Gibt die dimension einer Box zurück
+     * @return Box-dimension als ganzzahliger 2D Vektor
+     */
+    public IntVector2 getTileSize(){return TileSize.cpy();}
 
     /**
      * Box wird nur aus Position erstellt. Definitiv kein Anker selbst

@@ -1,6 +1,6 @@
 package com.gats.manager.command;
 
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.ActionLog;
 
 public class EndTurnCommand extends Command{
     public EndTurnCommand() {
