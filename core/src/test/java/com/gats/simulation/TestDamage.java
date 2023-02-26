@@ -14,7 +14,7 @@ public class TestDamage {
     public void init() {
         sim = new Simulation(0, "map1", 2, 1);
         state = sim.getState();
-        sim.getActionLog().addAction(new InitAction());
+        sim.getActionLog().getRootAction().addChild(new InitAction());
         clearMap();
     }
 
@@ -37,7 +37,7 @@ public class TestDamage {
         state.getBoard()[0][4] = new Tile(0, 4, true, state);
         state.getBoard()[0][5] = new Tile(0, 5, state);
 
-        state.getBoard()[0][4].onDestroy();
+        state.getBoard()[0][4].onDestroy(new VoidAction());
         Assert.assertNull("die Tile sollte zerstört sein", state.getBoard()[0][4]);
         Assert.assertNull("die Tile sollte zerstört sein", state.getBoard()[0][5]);
 
@@ -59,7 +59,7 @@ public class TestDamage {
         character2.setPosY(3*16 + 1);
 
         Weapon wp = character2.getWeapon(1);
-        wp.shoot(character.getPlayerPos().sub(character2.getPlayerPos()), 1);
+        wp.shoot(character.getPlayerPos().sub(character2.getPlayerPos()), 1, new VoidAction());
 
         Assert.assertNotEquals("Leben sollte nicht mehr 100 sein ist aber 100", character.getHealth(), 100);
     }

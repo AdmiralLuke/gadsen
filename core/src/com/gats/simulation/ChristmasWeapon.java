@@ -43,11 +43,11 @@ public class ChristmasWeapon extends Weapon{
 
 
 
-    public void shoot(Vector2 dir, double strength) {
+    public void shoot(Vector2 dir, double strength, Action head) {
         if (this.getType() == WeaponType.COOKIE) {
-            super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
+            super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE, head);
         } else {
-            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR);
+            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR, head);
         }
     }
 }

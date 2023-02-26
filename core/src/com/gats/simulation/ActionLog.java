@@ -18,28 +18,6 @@ public class ActionLog {
         this.lastAddedAction = rootAction;
     }
 
-    void addAction(Action action) {
-        this.lastAddedAction.getChildren().add(action);
-    }
-
-    void goToLast() {
-        lastAddedAction = lastAddedAction.getChildren().get(lastAddedAction.getChildren().size() - 1);
-    }
-
-    void returnToRoot() {
-        this.lastAddedAction = rootAction;
-    }
-
-    void goToNextAction() {
-        if (lastAddedAction == rootAction) {
-            return;
-        }
-        this.lastAddedAction = lastAddedAction.getChildren().get(0);
-    }
-
-    void addActions(ActionLog log) {
-        this.lastAddedAction.getChildren().add(log.rootAction);
-    }
 
     public Action getRootAction() {
         return rootAction;

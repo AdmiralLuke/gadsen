@@ -1,5 +1,7 @@
 package com.gats.simulation;
+
 import com.badlogic.gdx.math.Vector2;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -32,7 +34,7 @@ public class Tile {
 
 
     public int getType() {
-        return isAnchor? 1 : 0;
+        return isAnchor ? 1 : 0;
     }
 
     /**
@@ -44,6 +46,7 @@ public class Tile {
 
     /**
      * Gibt die Position der Box in Welt-Koordinaten zurück
+     *
      * @return Untere Linke Ecke der Box
      */
     public Vector2 getWorldPosition() {
@@ -123,10 +126,18 @@ public class Tile {
             this.up = getTileAtPosition(position.x, position.y + 1, state);
         }
 
-        if (this.left != null) { this.left.right = this; }
-        if (this.right != null) { this.right.left = this; }
-        if (this.up != null) { this.up.down = this; }
-        if (this.down != null) { this.down.up = this; }
+        if (this.left != null) {
+            this.left.right = this;
+        }
+        if (this.right != null) {
+            this.right.left = this;
+        }
+        if (this.up != null) {
+            this.up.down = this;
+        }
+        if (this.down != null) {
+            this.down.up = this;
+        }
 
 
     }
@@ -144,23 +155,23 @@ public class Tile {
      * Schaut sich im Board Array an, ob Nachbarboxen verankert sind, oder selber Anker sind
      *
      * @return true wenn Nachbar anchored oder Anker ist
-     *      x
-     *     xax
-     *      x
+     * x
+     * xax
+     * x
      * a = verankert bzw. ankernd
      * x = kann angehangen werden
      */
     private boolean checkIfAnchored(int x, int y, GameState state) {
         boolean isAnchor = false;
         if (x > 0) {
-            isAnchor = state.getTile(x - 1,y) != null || state.getTile(x + 1,y) != null;
+            isAnchor = state.getTile(x - 1, y) != null || state.getTile(x + 1, y) != null;
         } else if (x == 0) {
-            isAnchor = state.getTile(x + 1,y) != null;
+            isAnchor = state.getTile(x + 1, y) != null;
         }
         if (y > 0 && !isAnchor) {
-            isAnchor = state.getTile(x,y - 1) != null || state.getTile(x,y + 1) != null;
+            isAnchor = state.getTile(x, y - 1) != null || state.getTile(x, y + 1) != null;
         } else if (y == 0 & !isAnchor) {
-            isAnchor = state.getTile(x,y + 1) != null;
+            isAnchor = state.getTile(x, y + 1) != null;
         }
         return isAnchor;
     }
@@ -177,12 +188,12 @@ public class Tile {
 
 
     }
+
     /**
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
      * oder auf anderer Box landet
      */
-    void onDestroy() {
-        this.state.getSim().getActionLog().goToLast();
+    Action onDestroy(Action head) {
         ArrayList<Tile> rightList = null;
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;
@@ -196,30 +207,31 @@ public class Tile {
 
         state.getBoard()[this.position.x][this.position.y] = null;
         this.deleteFromGraph();
-        this.state.getSim().getActionLog().addAction(new TileDestroyAction(this.position));
+        TileDestroyAction destroyAction = new TileDestroyAction(this.position);
+        head.addChild(destroyAction);
         if (hasRight()) rightList = right.convertGraphToList(new ArrayList<Tile>(), rightMap);
         if (hasUp()) upperList = up.convertGraphToList(new ArrayList<Tile>(), upperMap);
         if (hasDown()) lowerList = down.convertGraphToList(new ArrayList<Tile>(), lowerMap);
         if (hasLeft()) leftList = left.convertGraphToList(new ArrayList<Tile>(), leftMap);
 
 
-        if (rightList != null) checkForAnchor(rightList);
-        if (leftList != null) checkForAnchor(leftList);
-        if (upperList != null) checkForAnchor(upperList);
-        if (lowerList != null) checkForAnchor(lowerList);
+        if (rightList != null) checkForAnchor(rightList, destroyAction);
+        if (leftList != null) checkForAnchor(leftList, destroyAction);
+        if (upperList != null) checkForAnchor(upperList, destroyAction);
+        if (lowerList != null) checkForAnchor(lowerList, destroyAction);
         for (GameCharacter[] characters : this.state.getTeams()) {
             for (GameCharacter character : characters) {
                 if (character != null) {
-                    character.fall();
+                    character.fall(destroyAction);
                 }
             }
         }
-        state.getSim().getActionLog().returnToRoot();
 
+        return destroyAction;
 
     }
 
-    void checkForAnchor(ArrayList<Tile> list) {
+    void checkForAnchor(ArrayList<Tile> list, Action head) {
         for (Tile tile : list) {
             if (tile.isAnchor) {
                 return;
@@ -227,12 +239,12 @@ public class Tile {
         }
         for (Tile tile : list) {
             state.getBoard()[tile.position.x][tile.position.y] = null;
-            tile.destroyTile();
+            tile.destroyTile(head);
         }
         list.clear();
     }
 
-    void destroyTile() {
+    Action destroyTile(Action head) {
         IntVector2 posBef = this.position.cpy();
         int fallen = 0;
         while (getTileAtPosition(this.position.x, this.position.y, state) == null && this.position.y > 0) {
@@ -243,32 +255,31 @@ public class Tile {
                     if (character == null) {
                         continue;
                     }
-                    if ((int)(character.getPlayerPos().x / 16) == this.position.x && (int)(character.getPlayerPos().y / 16) == this.position.y) {
-                        LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()), 0.1f);
-                        int tmpHealth = character.getHealth();
-                        character.setHealth(tmpHealth - fallen);
-                        Action tmpAction = new TileMoveAction(posBef, this.position, 1f);
-                        Action tmpDestAction = new TileDestroyAction(this.getPosition());
-                        tmpAction.addChild(tmpDestAction);
-                        tmpDestAction.addChild(new CharacterHitAction(character.getTeam(), character.getTeamPos(), tmpHealth, character.getHealth()));
-                        this.state.getSim().getActionLog().addAction(tmpAction);
-                        return;
+                    if ((int) (character.getPlayerPos().x / 16) == this.position.x && (int) (character.getPlayerPos().y / 16) == this.position.y) {
+                        //ToDo: fix, what happens when multiple characters are hit?
+                        //LinearPath path = new LinearPath(posBef.toFloat().scl(tileSize.toFloat()), this.position.toFloat().scl(tileSize.toFloat()), 0.1f);
+                        int oldHealth = character.getHealth();
+                        Action moveAction = new TileMoveAction(posBef, this.position, 1f);
+                        head.addChild(moveAction);
+                        Action destroyAction = new TileDestroyAction(this.getPosition());
+                        character.setHealth(oldHealth - fallen * 4, moveAction);
+                        moveAction.addChild(destroyAction);
+                        return destroyAction;
                     }
                 }
             }
         }
         float duration = 1f;
-        Action tmpAction = new TileMoveAction(posBef, this.position, duration);
-        Action tmpDestAction = new TileDestroyAction(this.getPosition());
-        tmpAction.addChild(tmpDestAction);
+        Action tileMoveAction = new TileMoveAction(posBef, this.position, duration);
+        Action tileDestAction = new TileDestroyAction(this.getPosition());
+        tileMoveAction.addChild(tileDestAction);
 
-        this.state.getSim().getActionLog().addAction(tmpAction);
+        return tileDestAction;
     }
 
     /**
-     *
      * @param tiles ArrayList mit rekursiv aufbauend verbundenen Tiles
-     * @param map lookup-map um bereits besuchte Tiles zu markieren
+     * @param map   lookup-map um bereits besuchte Tiles zu markieren
      * @return ArrayList mit allen verbunden Tiles
      */
     protected ArrayList<Tile> convertGraphToList(ArrayList<Tile> tiles, boolean[][] map) {
@@ -297,6 +308,7 @@ public class Tile {
 
     /**
      * vergleicht 2 Tiles anhand der Position miteinander
+     *
      * @param t weitere Tile mit der verglichen werden soll
      * @return true wenn gleiche Position sonst false
      */
@@ -331,10 +343,21 @@ public class Tile {
                 '}';
     }
 
-    boolean hasRight() { return right != null; }
-    boolean hasLeft() { return left != null; }
-    boolean hasUp() { return up != null; }
-    boolean hasDown() { return down != null; }
+    boolean hasRight() {
+        return right != null;
+    }
+
+    boolean hasLeft() {
+        return left != null;
+    }
+
+    boolean hasUp() {
+        return up != null;
+    }
+
+    boolean hasDown() {
+        return down != null;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -17,14 +17,14 @@ public class Simulation {
      */
     public Simulation(int gameMode,String mapName, int teamAm, int teamSize){
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
-        if (gameMode == GameState.GAME_MODE_CHRISTMAS) {
-            gameState.getTeams()[1][0].setHealth(1);
-            gameState.getTeams()[2][0].setHealth(1);
-            gameState.getTeams()[3][0].setHealth(1);
-        }
         IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y,0));
+        if (gameMode == GameState.GAME_MODE_CHRISTMAS) {
+            gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction());
+            gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction());
+            gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction());
+        }
     }
 
     /**
@@ -48,24 +48,24 @@ public class Simulation {
 
     public ActionLog endTurn() {
         if (this.gameState.getGameMode() == GameState.GAME_MODE_CHRISTMAS && this.gameState.getTeams()[0][0].getHealth() <= 0) {
-            this.actionLog.addAction(new GameOverAction(1));
+            this.actionLog.getRootAction().addChild(new GameOverAction(1));
             gameState.setActive(false);
             return this.actionLog;
         }
 
         if (gameState.getTurn().size() <= 1) {
-            this.actionLog.addAction(new GameOverAction(this.gameState.getTurn().peek().y));
+            this.actionLog.getRootAction().addChild(new GameOverAction(this.gameState.getTurn().peek().y));
             gameState.setActive(false);
             return this.actionLog;
         }
-
-        for (GameCharacter[] characters : this.gameState.getTeams()) {
-            for (GameCharacter character : characters) {
-                if (character != null) {
-                    character.fall();
-                }
-            }
-        }
+//ToDo: discuss removal, every floating character should already have fallen by now
+//        for (GameCharacter[] characters : this.gameState.getTeams()) {
+//            for (GameCharacter character : characters) {
+//                if (character != null) {
+//                    character.fall();
+//                }
+//            }
+//        }
 
         IntVector2 lastChar = gameState.getTurn().pop();
         if (gameState.getCharacterFromTeams(lastChar.x, lastChar.y).getHealth() > 0) {
@@ -83,21 +83,19 @@ public class Simulation {
             nextChar = gameState.getTurn().peek();
         }
         gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetStamina();
-        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).setAlreadyShooted(false);
-        return clearAndReturnActionLog();
+        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).setAlreadyShot(false);
+
+        IntVector2 turnChar = gameState.getTurn().peek();
+        ActionLog lastTurn = this.actionLog;
+        assert turnChar != null;
+        this.actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y, 0));
+        return lastTurn;
     }
 
     public ActionLog clearAndReturnActionLog() {
-        IntVector2 turnChar = gameState.getTurn().peek();
-        ActionLog tmp = this.actionLog;
-        assert turnChar != null;
-        this.actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y, 0));
-        return tmp;
-    }
-
-    public ActionLog clearReturnActionLog() {
         ActionLog tmp = this.actionLog;
         this.actionLog = new ActionLog(new InitAction());
         return tmp;
     }
+
 }

@@ -1,23 +1,29 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.animation.action.IdleAction;
 
 /**
  * Repräsentiert eine {@link GameCharacter Spielfigur} auf der Karte
  */
 public class GameCharacter {
 
-    private int posX;
-    private int posY;
+    private static final IntVector2 SIZE = new IntVector2(16, 16);
+
+    private final IntRectangle boundingBox;
+
+
+    //    private int posX;
+//    private int posY;
     private int health = 100;
     private int stamina = 48;
-    private boolean alreadyShooted = false;
+    private boolean alreadyShot = false;
 
-    private int team;
-    private int teamPos;
-    private GameState state;
-    private Simulation sim;
-    private Vector2 dir = new Vector2(1,0);
+    private final int team;
+    private final int teamPos;
+    private final GameState state;
+    private final Simulation sim;
+    private Vector2 dir = new Vector2(1, 0);
     private float strength = 0.5f;
 
     private Weapon[] weapons;
@@ -26,16 +32,16 @@ public class GameCharacter {
 
     /**
      * erstellt einen neuen Charakter
-     * @param x X-Spawn Punkt
-     * @param y Y-Spawn Punkt
-     * @param state GameState in dem der Charakter existiert
-     * @param team Team-Nummer
+     *
+     * @param x       X-Spawn Punkt
+     * @param y       Y-Spawn Punkt
+     * @param state   GameState in dem der Charakter existiert
+     * @param team    Team-Nummer
      * @param teamPos Nummer im Team
-     * @param sim zugehörige Simulation
+     * @param sim     zugehörige Simulation
      */
     GameCharacter(int x, int y, GameState state, int team, int teamPos, Simulation sim) {
-        this.posX = x;
-        this.posY = y;
+        this.boundingBox = new IntRectangle(x, y, SIZE.x, SIZE.y);
         this.state = state;
         this.team = team;
         this.teamPos = teamPos;
@@ -46,6 +52,7 @@ public class GameCharacter {
 
     /**
      * Gibt den Waffen Typ der aktuell gewählten Waffe aus (als Enum)
+     *
      * @return Enum WeaponType
      */
     public WeaponType getSelectedWeapon() {
@@ -58,38 +65,37 @@ public class GameCharacter {
 
     /**
      * Wählt eine Waffe anhand des Typs aus
+     *
      * @param type Waffentyp
      */
-    void selectWeapon(WeaponType type) {
+    void selectWeapon(WeaponType type, Action head) {
         switch (type) {
             case COOKIE:
                 selectedWeapon = 0;
-                sim.getActionLog().goToNextAction();
-                sim.getActionLog().addAction(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.COOKIE));
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.COOKIE));
                 break;
             case SUGAR_CANE:
                 selectedWeapon = 1;
-                sim.getActionLog().goToNextAction();
-                sim.getActionLog().addAction(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.SUGAR_CANE));
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.SUGAR_CANE));
                 break;
             default:
                 selectedWeapon = -1;
-                sim.getActionLog().goToNextAction();
-                sim.getActionLog().addAction(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.NOT_SELECTED));
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.NOT_SELECTED));
         }
     }
 
     /**
      * Schießt mit der ausgewählten Waffe. Kann nur einmal pro Spielzug aufgerufen werden
+     *
      * @return true wenn erfolgreich abgeschossen
      */
-    boolean shoot() {
-        if (alreadyShooted) {
+    boolean shoot(Action head) {
+        if (alreadyShot) {
             return false;
         }
         if (selectedWeapon != -1) {
-            weapons[selectedWeapon].shoot(dir, strength);
-            alreadyShooted = true;
+            weapons[selectedWeapon].shoot(dir, strength, head);
+            alreadyShot = true;
             return true;
         } else {
             return false;
@@ -98,28 +104,53 @@ public class GameCharacter {
 
     /**
      * Bestimmt, ob der Charakter noch schießen darf
-     * @param alreadyShooted true wenn er bereits geschossen hat
+     *
+     * @param alreadyShot true wenn er bereits geschossen hat
      */
-    void setAlreadyShooted(boolean alreadyShooted) {
-        this.alreadyShooted = alreadyShooted;
+    void setAlreadyShot(boolean alreadyShot) {
+        this.alreadyShot = alreadyShot;
     }
 
     /**
      * Gibt die Lebensanzahl eines Charakters zurück (maximal 100)
+     *
      * @return Lebensanzahl des Charakters
      */
-    public int getHealth() { return this.health; }
+    public int getHealth() {
+        return this.health;
+    }
 
     /**
      * Gibt die Ausdaueranzahl des Charakters zurück
+     *
      * @return Ausdaueranzahl des Charakters
      */
-    public int getStamina() { return this.stamina; }
-    void setHealth(int newHealth) { this.health = newHealth; }
-    void setStamina(int newStamina) { this.stamina = newStamina; }
+    public int getStamina() {
+        return this.stamina;
+    }
+
+    Action setHealth(int newHealth, Action head) {
+        if (newHealth == this.health) return head;
+        Action lastAction;
+        if (newHealth < this.health) {
+            lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
+        } else {
+            lastAction = new CharacterAction(team, teamPos, 0) {
+            };
+            //ToDo implement healAction
+        }
+        this.health = newHealth;
+        head.addChild(lastAction);
+        return lastAction;
+    }
+
+    void setStamina(int newStamina) {
+        this.stamina = newStamina;
+    }
 
     /**
      * Gibt die Teamnummer des Charakters zurück
+     *
      * @return Teamnummer des Charakters
      */
     public int getTeam() {
@@ -128,6 +159,7 @@ public class GameCharacter {
 
     /**
      * gibt die Position im Team zurück
+     *
      * @return Charakter-Position im Team
      */
     public int getTeamPos() {
@@ -135,39 +167,39 @@ public class GameCharacter {
     }
 
 
-
     /**
      * initialisiert das Inventar mit grundlegenden Waffen
+     *
      * @Weihnachtsaufgabe Initilisiert mit Keks und Zuckerstange (jeweils 50 Schuss)
      */
     protected void initInventory() {
         this.weapons = new Weapon[2];
-        weapons[0] = new ChristmasWeapon(10, 40, 50, false, WeaponType.COOKIE,this.sim, this);
+        weapons[0] = new ChristmasWeapon(10, 40, 50, false, WeaponType.COOKIE, this.sim, this);
         weapons[1] = new ChristmasWeapon(20, 40, 4, false, WeaponType.SUGAR_CANE, this.sim, this);
     }
 
     /**
      * Gibt eine Waffe aus dem Inventar zurück.
+     *
      * @param n Index der Waffe, die gewählt werden soll.
      * @return Instanz der Waffe.
      */
     public Weapon getWeapon(int n) {
-        ChristmasWeapon wp =  (ChristmasWeapon)weapons[n];
-        this.sim.getActionLog().goToNextAction();
-        this.sim.getActionLog().addAction(new CharacterSwitchWeaponAction(this.team, this.teamPos, wp.getType()));
-        return wp;
+        return weapons[n];
     }
 
     /**
      * gibt die Aktuelle Spielerposition aus
+     *
      * @return 2D Vektor mit x,y Position
      */
     public Vector2 getPlayerPos() {
-        return new Vector2(posX, posY);
+        return new Vector2(boundingBox.x, boundingBox.y);
     }
 
     /**
      * Gibt die Anzahl an Verfügbaren Waffen aus
+     *
      * @return Anzahl verfügbarer Waffen (unabhängig der Munition)
      */
     public int getWeaponAmount() {
@@ -175,116 +207,230 @@ public class GameCharacter {
     }
 
     void setPosX(int posX) {
-        this.posX = posX;
+        this.boundingBox.x = posX;
     }
 
     void setPosY(int posY) {
-        this.posY = posY;
+        this.boundingBox.y = posY;
     }
 
     void resetStamina() {
         this.stamina = 60;
     }
 
+    //ToDo: move to better place
+    private IntVector2 convertToTileCoords(IntVector2 worldCoords) {
+        return new IntVector2(convertToTileCoordsX(worldCoords.x), convertToTileCoordsY(worldCoords.y));
+    }
+
+    //ToDo: move to better place
+    private int convertToTileCoordsX(int x) {
+        return x / 16;
+    }
+
+    //ToDo: move to better place
+    private int convertToTileCoordsY(int y) {
+        return y / 16;
+    }
+
+
+    //ToDo: move to better place
+    private boolean isSolidTile(int x, int y) {
+        return this.state.getTile(x, y) != null;
+    }
+
+    boolean testVerticalCollision(int bottomTileY, int topTileY, int columnX) {
+        boolean colliding = false;
+        for (int y = bottomTileY; y <= topTileY; y++) {
+            if (isSolidTile(columnX, y)) {
+                colliding = true;
+                break;
+            }
+        }
+        return colliding;
+    }
+
+    boolean testHorizontalCollision(int leftTileX, int rightTileX, int rowY) {
+        boolean colliding = false;
+        for (int x = leftTileX; x <= rightTileX; x++) {
+            if (isSolidTile(x, rowY)) {
+                colliding = true;
+                break;
+            }
+        }
+        return colliding;
+    }
+
+    /**
+     *
+     * @param fallen gefallene Distanz in Welt-Koordinaten
+     * @return Für diese Distanz erhaltener Schaden
+     */
+    public int getFallDmg(int fallen){
+        return Math.max(0, (fallen - 48)/4 );
+    }
+
     /**
      * Lässt den Charakter fallen
      */
-    void fall() {
+    Action fall(Action head) {
         Vector2 posBef = this.getPlayerPos().cpy();
+        int leftTileX = convertToTileCoordsX(boundingBox.x);
+        // Subtract one since its integer coords and boundingBox.x is already 1px wide on its own
+        int rightTileX = convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+        int bottomTileY = convertToTileCoordsY(boundingBox.y);
         int fallen = 0;
-        while (this.posY / 16 > 0 && this.state.getTile((int)((posX + (posX % 16)) / 16) , (int)(posY / 16) - 1) == null) {
-            this.posY -= 16;
+        boolean collision = false;
+        System.out.println(boundingBox.y/16f);
+        System.out.println((boundingBox.y -1)/16f);
+        while (this.boundingBox.y > 0) {
+            boundingBox.y -= 1;
+            int nextBottomTileY = convertToTileCoordsY(boundingBox.y);
+            if (nextBottomTileY != bottomTileY) {
+                //Test collisions on the right side
+                if (testHorizontalCollision(leftTileX, rightTileX, nextBottomTileY)) {
+                    //Detected collision on new Position, reverting
+                    boundingBox.y += 1;
+                    if (fallen == 0) return head;
+                    collision = true;
+                    break;
+                }
+            }
             fallen++;
         }
-        if (fallen == 0) return;
-        int health = this.getHealth();
-        if (this.posY / 16 <= 0) {
-            this.setHealth(0);
-        } else {
-            this.setHealth(getHealth() - fallen);
+
+        Action fallAction = new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f);
+        head.addChild(fallAction);
+        if (collision) {
+            return this.setHealth(getHealth() - getFallDmg(fallen), fallAction);
         }
-        this.sim.getActionLog().addAction(new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f));
-        this.sim.getActionLog().goToLast();
-        this.sim.getActionLog().addAction(new CharacterHitAction(this.team, this.teamPos, health, this.getHealth()));
+        return this.setHealth(0, fallAction);
     }
 
     /**
      * bewegt den Charakter in eine bestimmte Richtung
      * -> maximal bis er auf eine Tile stößt oder die Stamina leer ist
+     *
      * @param dx Anzahl Schritte in x Richtung
      */
-    void move(int dx) {
-//        System.out.println("moving "+ dx);
+    Action walk(int dx, Action head) {
+
         if (dx == 0) {
-            return;
-        }
-        Vector2 bef = new Vector2(posX, posY);
-        // this.posX += this.posX + dx >= 0 ? (this.posX + dx < state.getBoardSizeX() ? dx : state.getBoardSizeX() - 1 - this.posX) : -this.posX;
-
-//        System.out.println("moved from "+ bef);
-        if ((this.posX + dx) / 16 < 0) {
-            dx = -posX;
-        }
-        if ((this.posX + dx) / 16 > state.getBoardSizeX()) {
-            dx = state.getBoardSizeX() - posX;
+            return head;
         }
 
-        if (dx < 0) {
-            for (int i = 0; i >= dx; i--) {
-                if (state.getTile((posX + i + 14) / 16 , ((posY) / 16) - 1) == null) {
-                    dx = i;
-                    if (this.stamina < abs(dx)) {
-                        dx = dx > 0 ? stamina : -stamina;
-                    }
-                    this.posX += dx;
-                    Vector2 posAf = new Vector2(posX, posY);
+        Vector2 bef = getPlayerPos();
+        int sign = dx < 0 ? -1 : 1;
+        int distance = dx * sign;
 
-//                    System.out.println("moved to because there was hole"+ posAf);
-                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
-                    this.fall();
-                    return;
-                }
-                if (state.getTile(((posX) / 16), posY / 16) != null) {
-                    dx = i;
-                    break;
-                }
-            }
+        //Tile coordinates the character occupies
+        int leftTileX = convertToTileCoordsX(boundingBox.x);
+        // Subtract one since its integer coords and boundingBox.x is already 1px wide on its own
+        int rightTileX = convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+        int bottomTileY = convertToTileCoordsY(boundingBox.y);
+        int topTileY = convertToTileCoordsY(boundingBox.y + boundingBox.height - 1);
 
-        } else {
-            for (int i = 0; i <= dx; i++) {
-                if (state.getTile((posX + i) / 16, (int)(posY / 16) - 1) == null) {
-                    dx = i;
-                    if (this.stamina < abs(dx)) {
-                        dx = dx > 0 ? stamina : -stamina;
-                    }
-                    this.posX += dx;
-                    Vector2 posAf = new Vector2(posX, posY);
+        //Y-Index of the floor
+        int floorY = convertToTileCoordsY(boundingBox.y - 1);
+        //X-Index of the leftmost solid Tile the character is standing on
+        int leftLimit = -1;
+        //X-Index of the rightmost solid Tile the character is standing on
+        int rightLimit = -1;
 
-//                   System.out.println("moved to because there was hole"+ posAf);
-                    this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
-                    this.fall();
-                    return;
-                }
-                if (state.getTile(((posX - (posX % 16)) / 16) + 1, posY / 16) != null) {
-                    dx = i;
-                    break;
-                }
+        //find the leftmost solid Tile the character is standing on
+        for (int i = leftTileX; i <= rightTileX; i++) {
+            if (isSolidTile(i, floorY)) {
+                leftLimit = i;
+                break;
             }
         }
-        if (this.stamina < abs(dx)) {
-            return;
-        }
-        stamina -= abs(dx);
-        this.posX += dx;
-        Vector2 posAf = new Vector2(posX, posY);
 
-        // System.out.println("moved to "+ posAf);
-        this.sim.getActionLog().addAction(new CharacterMoveAction(bef, posAf, team, teamPos, 0.001f));
+        if (leftLimit == -1) {
+            //the character was floating in the air
+            //ToDo: log occurrence of invalid state
+            return walk(dx, fall(head));
+        }
+        //find the rightmost solid Tile the character is standing on
+        for (int i = rightTileX; i >= leftLimit; i--) {
+            if (isSolidTile(i, floorY)) {
+                rightLimit = i;
+                break;
+            }
+        }
+
+        boolean falling = false;
+        int moved;
+        for (moved = 0; moved < distance; moved++) {
+            boundingBox.x += sign;
+            int nextRightTileX = convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+            int nextLeftTileX = convertToTileCoordsX(boundingBox.x);
+            if (sign > 0) {
+                if (nextRightTileX != rightTileX) {
+                    //Test collisions on the right side
+                    if (testVerticalCollision(bottomTileY, topTileY, nextRightTileX)) {
+                        //Detected collision on new Position, reverting
+                        boundingBox.x -= sign;
+                        break;
+                    }
+                    rightTileX = nextRightTileX;
+                    if (isSolidTile(rightTileX, floorY)) rightLimit = rightTileX;
+                }
+                if (nextLeftTileX != leftTileX) {
+                    leftTileX = nextLeftTileX;
+                    if (leftLimit == rightLimit) {
+                        //We stepped off the last tile
+                        falling = true;
+                        break;
+                    }
+                    //Recalculating left floor boundary
+                    for (int i = leftTileX; i <= rightLimit; i++) {
+                        if (isSolidTile(i, floorY)) {
+                            leftLimit = i;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                if (nextLeftTileX != leftTileX) {
+                    if (testVerticalCollision(bottomTileY, topTileY, nextLeftTileX)) {
+                        //Detected collision on new Position, reverting
+                        boundingBox.x -= sign;
+                        break;
+                    }
+                    leftTileX = nextLeftTileX;
+                    if (isSolidTile(leftTileX, floorY)) leftLimit = leftTileX;
+                }
+
+                if (nextRightTileX != rightTileX) {
+                    rightTileX = nextRightTileX;
+                    if (leftLimit == rightLimit) {
+                        //We stepped off the last tile
+                        falling = true;
+                        break;
+                    }
+                    //Recalculating right floor boundary
+                    for (int i = rightTileX; i <= leftLimit; i--) {
+                        if (isSolidTile(i, floorY)) {
+                            rightLimit = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        Action lastAction = new CharacterMoveAction(bef, new Vector2(boundingBox.x, boundingBox.y), team, teamPos, 0.001f);
+        head.addChild(lastAction);
+        if (falling) {
+            lastAction = walk(dx - moved, fall(lastAction));
+        }
+        return lastAction;
     }
 
 
     /**
      * berechnet den Betrag einer Zahl
+     *
      * @param n natürliche Zahl
      * @return Betrag von n
      */
@@ -293,26 +439,24 @@ public class GameCharacter {
     }
 
     /**
-     * bewegt den Spieler nach in eine Richung
+     * bewegt den Spieler nach in eine Richtung
      * verbraucht Stamina
      */
     protected void moveDX(int dx) {
-        if (this.sim.getActionLog().getRootAction() != this.sim.getActionLog().lastAddedAction) {
-            this.sim.getActionLog().goToNextAction();
-        }
-        move(dx);
+        walk(dx, this.sim.getActionLog().lastAddedAction);
     }
 
     /**
-     *  Erstellt eine CharacterAimAction. Damit wird im Animator der AimIndicator verändert.
-     * @param angle Winkel mit dem gerade gezielt wird.
+     * Erstellt eine CharacterAimAction. Damit wird im Animator der AimIndicator verändert.
+     *
+     * @param angle    Winkel mit dem gerade gezielt wird.
      * @param strength Stärke des Zielens
      */
-    protected void aim(Vector2 angle, float strength){
+    protected void aim(Vector2 angle, float strength, Action head) {
         strength = Math.abs(strength) % 1.01f;
         this.dir = angle;
         this.strength = strength;
-        this.sim.getActionLog().addAction(new CharacterAimAction(this.team,this.teamPos, angle, strength));
+        head.addChild(new CharacterAimAction(this.team, this.teamPos, angle, strength));
     }
 
     float getStrength() {
