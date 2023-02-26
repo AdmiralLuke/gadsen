@@ -215,14 +215,14 @@ public class Tile {
         if (hasLeft()) leftList = left.convertGraphToList(new ArrayList<Tile>(), leftMap);
 
 
-        if (rightList != null) checkForAnchor(rightList, destroyAction);
-        if (leftList != null) checkForAnchor(leftList, destroyAction);
-        if (upperList != null) checkForAnchor(upperList, destroyAction);
-        if (lowerList != null) checkForAnchor(lowerList, destroyAction);
+        if (rightList != null) checkForAnchor(rightList, head);
+        if (leftList != null) checkForAnchor(leftList, head);
+        if (upperList != null) checkForAnchor(upperList, head);
+        if (lowerList != null) checkForAnchor(lowerList, head);
         for (GameCharacter[] characters : this.state.getTeams()) {
             for (GameCharacter character : characters) {
                 if (character != null) {
-                    character.fall(destroyAction);
+                    character.fall(head);
                 }
             }
         }
@@ -271,6 +271,7 @@ public class Tile {
         }
         float duration = 1f;
         Action tileMoveAction = new TileMoveAction(posBef, this.position, duration);
+        head.addChild(tileMoveAction);
         Action tileDestAction = new TileDestroyAction(this.getPosition());
         tileMoveAction.addChild(tileDestAction);
 
