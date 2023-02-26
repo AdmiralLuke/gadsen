@@ -15,7 +15,7 @@ public class GameCharacter {
     //    private int posX;
 //    private int posY;
     private int health = 100;
-    private int stamina = 48;
+    private int stamina;
     private boolean alreadyShot = false;
 
     private final int team;
@@ -45,7 +45,7 @@ public class GameCharacter {
         this.team = team;
         this.teamPos = teamPos;
         this.sim = sim;
-        this.stamina = 60;
+        resetStamina();
         initInventory();
     }
 
@@ -246,12 +246,11 @@ public class GameCharacter {
     }
 
     /**
-     *
      * @param fallen gefallene Distanz in Welt-Koordinaten
      * @return Für diese Distanz erhaltener Schaden
      */
-    public int getFallDmg(int fallen){
-        return Math.max(0, (fallen - 48)/4 );
+    public int getFallDmg(int fallen) {
+        return Math.max(0, (fallen - 48) / 4);
     }
 
     /**
@@ -262,6 +261,7 @@ public class GameCharacter {
         int leftTileX = Simulation.convertToTileCoordsX(boundingBox.x);
         // Subtract one since its integer coords and boundingBox.x is already 1px wide on its own
         int rightTileX = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+
         int bottomTileY = Simulation.convertToTileCoordsY(boundingBox.y);
         int fallen = 0;
         boolean collision = false;
@@ -298,7 +298,7 @@ public class GameCharacter {
      */
     Action walk(int dx, Action head) {
 
-        if (dx == 0) {
+        if (dx == 0 || stamina <= 0 || health<=0) {
             return head;
         }
 
@@ -307,36 +307,43 @@ public class GameCharacter {
         int distance = dx * sign;
 
         //Tile coordinates the character occupies
-        int leftTileX = Simulation.convertToTileCoordsX(boundingBox.x);
+        //Horizontal coordinates 0->left; 1->right
+        int[] tileX = new int[2];
+        int[] nextTileX = new int[2];
+        tileX[0] = Simulation.convertToTileCoordsX(boundingBox.x);
         // Subtract one since its integer coords and boundingBox.x is already 1px wide on its own
-        int rightTileX = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+        tileX[1] = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+
         int bottomTileY = Simulation.convertToTileCoordsY(boundingBox.y);
         int topTileY = Simulation.convertToTileCoordsY(boundingBox.y + boundingBox.height - 1);
 
         //Y-Index of the floor
         int floorY = Simulation.convertToTileCoordsY(boundingBox.y - 1);
+        int[] limit = new int[2];
         //X-Index of the leftmost solid Tile the character is standing on
-        int leftLimit = -1;
+        limit[0] = -1000;
         //X-Index of the rightmost solid Tile the character is standing on
-        int rightLimit = -1;
+        limit[1] = -1001;
 
         //find the leftmost solid Tile the character is standing on
-        for (int i = leftTileX; i <= rightTileX; i++) {
+        for (int i = tileX[0]; i <= tileX[1]; i++) {
             if (isSolidTile(i, floorY)) {
-                leftLimit = i;
+                limit[0] = i;
                 break;
             }
         }
 
-        if (leftLimit == -1) {
+        if (limit[0] == -1000) {
             //the character was floating in the air
             //ToDo: log occurrence of invalid state
+            System.out.println("left: " + tileX[0]);
+            System.out.println("right: " + tileX[1]);
             return walk(dx, fall(head));
         }
         //find the rightmost solid Tile the character is standing on
-        for (int i = rightTileX; i >= leftLimit; i--) {
+        for (int i = tileX[1]; i >= limit[0]; i--) {
             if (isSolidTile(i, floorY)) {
-                rightLimit = i;
+                limit[1] = i;
                 break;
             }
         }
@@ -344,67 +351,55 @@ public class GameCharacter {
         boolean falling = false;
         int moved;
         for (moved = 0; moved < distance; moved++) {
+            if (stamina <= 0) break;
             boundingBox.x += sign;
-            int nextRightTileX = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
-            int nextLeftTileX = Simulation.convertToTileCoordsX(boundingBox.x);
-            if (sign > 0) {
-                if (nextRightTileX != rightTileX) {
-                    //Test collisions on the right side
-                    if (testVerticalCollision(bottomTileY, topTileY, nextRightTileX)) {
-                        //Detected collision on new Position, reverting
-                        boundingBox.x -= sign;
-                        break;
-                    }
-                    rightTileX = nextRightTileX;
-                    if (isSolidTile(rightTileX, floorY)) rightLimit = rightTileX;
-                }
-                if (nextLeftTileX != leftTileX) {
-                    leftTileX = nextLeftTileX;
-                    if (leftLimit == rightLimit) {
-                        //We stepped off the last tile
-                        falling = true;
-                        break;
-                    }
-                    //Recalculating left floor boundary
-                    for (int i = leftTileX; i <= rightLimit; i++) {
-                        if (isSolidTile(i, floorY)) {
-                            leftLimit = i;
-                            break;
-                        }
-                    }
-                }
-            } else {
-                if (nextLeftTileX != leftTileX) {
-                    if (testVerticalCollision(bottomTileY, topTileY, nextLeftTileX)) {
-                        //Detected collision on new Position, reverting
-                        boundingBox.x -= sign;
-                        break;
-                    }
-                    leftTileX = nextLeftTileX;
-                    if (isSolidTile(leftTileX, floorY)) leftLimit = leftTileX;
-                }
+            stamina--;
+            nextTileX[0] = Simulation.convertToTileCoordsX(boundingBox.x);
+            nextTileX[1] = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+            //Index in walking direction 0 when walking left; 1 when walking right
+            int iid = (sign + 1) / 2;
+            //Index against walking direction; opposite of iid
+            int iad = (sign - 1) / (-2);
 
-                if (nextRightTileX != rightTileX) {
-                    rightTileX = nextRightTileX;
-                    if (leftLimit == rightLimit) {
-                        //We stepped off the last tile
-                        falling = true;
+            //detect whether we are potentially entering a new column of tiles
+            if (nextTileX[iid] != tileX[iid]) {
+                //Test collisions on the side we are moving to
+                if (testVerticalCollision(bottomTileY, topTileY, nextTileX[iid])) {
+                    //Detected collision on new Position, reverting
+                    boundingBox.x -= sign;
+                    stamina++;
+                    break;
+                }
+                //the leading side sucessfully entered the new column without collision
+                tileX[iid] = nextTileX[iid];
+                //If we find a solid tile in the floor of the new column update the floor boundary on the leading side
+                if (isSolidTile(tileX[iid], floorY)) limit[iid] = tileX[iid];
+            }
+            //detect whether we potentially left a column of tiles on the end
+            if (nextTileX[iad] != tileX[iad]) {
+                tileX[iad] = nextTileX[iad];
+                //If the floor we stepped off was also the last floor boundary in movement direction, we fell off
+                if (limit[0] == limit[1]) {
+                    //We stepped off the last tile
+                    falling = true;
+                    break;
+                }
+                //Searching for the floor boundary on the trailing end
+                for (int i = tileX[iad]; i * sign <= limit[iid] * sign; i += sign) {
+                    if (isSolidTile(i, floorY)) {
+                        limit[iad] = i;
                         break;
-                    }
-                    //Recalculating right floor boundary
-                    for (int i = rightTileX; i >= leftLimit; i--) {
-                        if (isSolidTile(i, floorY)) {
-                            rightLimit = i;
-                            break;
-                        }
                     }
                 }
             }
-        }
 
+        }
+        //Movement completed for some reason, log action
         Action lastAction = new CharacterMoveAction(bef, new Vector2(boundingBox.x, boundingBox.y), team, teamPos, 0.001f);
         head.addChild(lastAction);
+
         if (falling) {
+            //We detected a gap while walking, start falling after walk
             lastAction = walk(dx - moved, fall(lastAction));
         }
         return lastAction;
