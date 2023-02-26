@@ -1,7 +1,6 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
-import com.gats.animation.action.IdleAction;
 
 /**
  * Repräsentiert eine {@link GameCharacter Spielfigur} auf der Karte
@@ -218,23 +217,8 @@ public class GameCharacter {
         this.stamina = 60;
     }
 
-    //ToDo: move to better place
-    private IntVector2 convertToTileCoords(IntVector2 worldCoords) {
-        return new IntVector2(convertToTileCoordsX(worldCoords.x), convertToTileCoordsY(worldCoords.y));
-    }
 
-    //ToDo: move to better place
-    private int convertToTileCoordsX(int x) {
-        return x / 16;
-    }
-
-    //ToDo: move to better place
-    private int convertToTileCoordsY(int y) {
-        return y / 16;
-    }
-
-
-    //ToDo: move to better place
+    //ToDo: move to better place; maybe to be called directly from tile
     private boolean isSolidTile(int x, int y) {
         return this.state.getTile(x, y) != null;
     }
@@ -275,17 +259,17 @@ public class GameCharacter {
      */
     Action fall(Action head) {
         Vector2 posBef = this.getPlayerPos().cpy();
-        int leftTileX = convertToTileCoordsX(boundingBox.x);
+        int leftTileX = Simulation.convertToTileCoordsX(boundingBox.x);
         // Subtract one since its integer coords and boundingBox.x is already 1px wide on its own
-        int rightTileX = convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
-        int bottomTileY = convertToTileCoordsY(boundingBox.y);
+        int rightTileX = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+        int bottomTileY = Simulation.convertToTileCoordsY(boundingBox.y);
         int fallen = 0;
         boolean collision = false;
         System.out.println(boundingBox.y/16f);
         System.out.println((boundingBox.y -1)/16f);
         while (this.boundingBox.y > 0) {
             boundingBox.y -= 1;
-            int nextBottomTileY = convertToTileCoordsY(boundingBox.y);
+            int nextBottomTileY = Simulation.convertToTileCoordsY(boundingBox.y);
             if (nextBottomTileY != bottomTileY) {
                 //Test collisions on the right side
                 if (testHorizontalCollision(leftTileX, rightTileX, nextBottomTileY)) {
@@ -324,14 +308,14 @@ public class GameCharacter {
         int distance = dx * sign;
 
         //Tile coordinates the character occupies
-        int leftTileX = convertToTileCoordsX(boundingBox.x);
+        int leftTileX = Simulation.convertToTileCoordsX(boundingBox.x);
         // Subtract one since its integer coords and boundingBox.x is already 1px wide on its own
-        int rightTileX = convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
-        int bottomTileY = convertToTileCoordsY(boundingBox.y);
-        int topTileY = convertToTileCoordsY(boundingBox.y + boundingBox.height - 1);
+        int rightTileX = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+        int bottomTileY = Simulation.convertToTileCoordsY(boundingBox.y);
+        int topTileY = Simulation.convertToTileCoordsY(boundingBox.y + boundingBox.height - 1);
 
         //Y-Index of the floor
-        int floorY = convertToTileCoordsY(boundingBox.y - 1);
+        int floorY = Simulation.convertToTileCoordsY(boundingBox.y - 1);
         //X-Index of the leftmost solid Tile the character is standing on
         int leftLimit = -1;
         //X-Index of the rightmost solid Tile the character is standing on
@@ -362,8 +346,8 @@ public class GameCharacter {
         int moved;
         for (moved = 0; moved < distance; moved++) {
             boundingBox.x += sign;
-            int nextRightTileX = convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
-            int nextLeftTileX = convertToTileCoordsX(boundingBox.x);
+            int nextRightTileX = Simulation.convertToTileCoordsX(boundingBox.x + boundingBox.width - 1);
+            int nextLeftTileX = Simulation.convertToTileCoordsX(boundingBox.x);
             if (sign > 0) {
                 if (nextRightTileX != rightTileX) {
                     //Test collisions on the right side

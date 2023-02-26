@@ -27,6 +27,18 @@ public class Simulation {
         }
     }
 
+    public static IntVector2 convertToTileCoords(IntVector2 worldCoords) {
+        return new IntVector2(convertToTileCoordsX(worldCoords.x), convertToTileCoordsY(worldCoords.y));
+    }
+
+    public static int convertToTileCoordsX(int x) {
+        return x / 16;
+    }
+
+    public static int convertToTileCoordsY(int y) {
+        return y / 16;
+    }
+
     /**
      * gibt den aktuellen GameState zurück
      * @return aktueller GameState
