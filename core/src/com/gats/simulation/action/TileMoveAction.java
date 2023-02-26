@@ -10,10 +10,10 @@ import com.gats.simulation.Tile;
  * z.B. da sie nicht mehr mit einem Anker verbunden ist.
  */
 public final class TileMoveAction extends TileAction{
-    private Path path;
+    private final Path path;
 
-    private float duration;
-    private IntVector2 posAft;
+    private final float duration;
+    private final IntVector2 posAft;
 
     public TileMoveAction(IntVector2 posBef, IntVector2 posAft, float duration) {
         super(posBef, 0);

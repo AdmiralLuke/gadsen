@@ -9,7 +9,7 @@ import com.gats.simulation.Tile;
 abstract class TileAction extends Action{
 
 
-    private IntVector2 pos;
+    private final IntVector2 pos;
 
     protected TileAction(IntVector2 tilePos, float delay) {
         super(delay);

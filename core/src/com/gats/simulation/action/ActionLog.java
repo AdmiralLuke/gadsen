@@ -8,7 +8,7 @@ public class ActionLog {
     // alle ActionLogs die übergeben wurden sind abgearbeitet
 
 
-    private Action rootAction;
+    private final Action rootAction;
 
 
     public ActionLog(Action rootAction) {

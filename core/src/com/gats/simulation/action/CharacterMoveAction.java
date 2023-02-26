@@ -10,9 +10,9 @@ import com.gats.simulation.Path;
  */
 public final class CharacterMoveAction extends CharacterAction{
 
-    private Path path;
-    private static double v = 0.0001;
-    private float duration;
+    private final Path path;
+    private final static float V = 10;
+    private final float duration;
 
     /**
      * erstellt einen Linearen Pfad, wenn ein Charakter sich bewegt
@@ -25,7 +25,7 @@ public final class CharacterMoveAction extends CharacterAction{
 
     public CharacterMoveAction(Vector2 posBef, Vector2 posAft, int team, int character, float delay) {
         super(team, character, delay);
-        LinearPath linPath = new LinearPath(posBef, posAft, 1f);
+        LinearPath linPath = new LinearPath(posBef, posAft, V);
         this.path = linPath;
         this.duration = linPath.getEndTime();
     }

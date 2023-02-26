@@ -5,8 +5,8 @@ package com.gats.simulation.action;
  * Oberklasse für alle {@link Action Ereignisse}, die sich auf eine Spielfigur beziehen
  */
 public abstract class CharacterAction extends Action{
-    private int team;
-    private int character;
+    private final int team;
+    private final int character;
 
 
     /**

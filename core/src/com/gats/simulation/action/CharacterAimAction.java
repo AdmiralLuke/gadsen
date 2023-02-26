@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class CharacterAimAction extends CharacterAction {
 
-    private Vector2 angle;
-    private float strength;
+    private final Vector2 angle;
+    private final float strength;
     public CharacterAimAction(int team, int character, Vector2 angle, float strength) {
         super(team, character, 0);
         this.angle = angle;

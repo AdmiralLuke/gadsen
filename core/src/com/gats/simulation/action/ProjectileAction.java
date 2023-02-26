@@ -15,12 +15,10 @@ public class ProjectileAction extends Action{
         CANDY_CANE
     }
 
-    private ProjectileType type;
+    private final ProjectileType type;
 
-    private Path path;
-
-    private static double v = 0.0001;
-    private float duration;
+    private final Path path;
+    private final float duration;
 
 
     public ProjectileAction(Path path, ProjectileType type, float duration, Vector2 posAft) {
@@ -28,7 +26,7 @@ public class ProjectileAction extends Action{
         this.type = type;
         this.path = path;
         if (ProjectileType.COOKIE == type) {
-            this.duration = -((path.getPos(0).x - posAft.x) / ((ParablePath)path).getV().x);;
+            this.duration = -((path.getPos(0).x - posAft.x) / ((ParablePath)path).getV().x);
         } else {
             this.duration = duration / 100;
         }
