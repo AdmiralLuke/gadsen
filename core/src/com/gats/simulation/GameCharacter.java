@@ -409,7 +409,7 @@ public class GameCharacter {
                         break;
                     }
                     //Recalculating right floor boundary
-                    for (int i = rightTileX; i <= leftLimit; i--) {
+                    for (int i = rightTileX; i >= leftLimit; i--) {
                         if (isSolidTile(i, floorY)) {
                             rightLimit = i;
                             break;
