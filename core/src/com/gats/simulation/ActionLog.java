@@ -23,4 +23,8 @@ public class ActionLog {
         return rootAction;
     }
 
+    public boolean isEmpty() {
+        return this.rootAction.getChildren() == null;
+    }
+
 }
