@@ -16,7 +16,7 @@ public final class TileMoveAction extends TileAction{
     private final IntVector2 posAft;
 
     /**
-     * Stores the event of a {@link Tile} beeing moved linearly, from one tile-coordinate to another.
+     * Stores the event of a {@link Tile} being moved linearly, from one tile-coordinate to another.
      * Works similarly to the {@link ProjectileAction}, as in that it stores the event of a Tile being removed from the tile-map at the start-position,
      * being moved along a path and finally being returned to the tile-map at the end-position
      * ToDo: cleanup either remove duration or move getEndTime out of path interface

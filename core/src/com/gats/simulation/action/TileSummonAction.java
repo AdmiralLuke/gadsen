@@ -10,7 +10,7 @@ import com.gats.simulation.Tile;
  */
 public final class TileSummonAction extends TileAction{
 
-    private TileType type;
+    private final TileType type;
 
     //ToDo: declare different tile types
     public enum TileType{

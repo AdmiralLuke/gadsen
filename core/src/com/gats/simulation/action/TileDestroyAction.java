@@ -8,7 +8,7 @@ import com.gats.simulation.Tile;
  */
 public final class TileDestroyAction extends TileAction{
     /**
-     * Stores the Event of a {@link Tile} beeing destroyed
+     * Stores the Event of a {@link Tile} being destroyed
      * @param tilePos   position of the related {@link Tile} in tile-coordinates
      */
     public TileDestroyAction(IntVector2 tilePos) {
