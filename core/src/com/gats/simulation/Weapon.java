@@ -15,8 +15,8 @@ public abstract class Weapon {
     private double projRange;
     private int shoots;
     private final boolean hitThroughBoxes;
-    private GameCharacter character;
-    private Simulation sim;
+    private final GameCharacter character;
+    private final Simulation sim;
 
     private final WeaponType type;
 

@@ -18,12 +18,15 @@ public class Tile {
     public static final int TileSizeY = 16;
     protected static final IntVector2 TileSize = new IntVector2(TileSizeX, TileSizeY);
 
-    // Box als Ankerpunkt
 
-    private boolean isAnchor;
+    // Box als Ankerpunkt
+    private final boolean isAnchor;
+
+    private final boolean isSolid;
 
     // Box hängt an einer Box oder an Verkettung von Boxen die an Anker hängt
-    private boolean isAnchored;
+    //ToDo: box should always be anchored, or removed from the map otherwise
+    private final boolean isAnchored;
 
 
     // Haltbarkeit der Box
@@ -74,6 +77,7 @@ public class Tile {
         this.position = new IntVector2(x, y);
         this.isAnchor = false;
         this.state = state;
+        this.isSolid = true;
         this.isAnchored = true;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
@@ -88,6 +92,7 @@ public class Tile {
         this.position = new IntVector2(x, y);
         this.isAnchor = false;
         this.state = state;
+        this.isSolid = true;
         this.isAnchored = isAnchored;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
@@ -110,6 +115,7 @@ public class Tile {
         this.isAnchored = isAnchor || checkIfAnchored(x, y, state);
         this.position = new IntVector2(x, y);
         this.state = state;
+        this.isSolid = true;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
             sortIntoTree();
@@ -158,6 +164,7 @@ public class Tile {
     Tile(boolean isAnchor, boolean isAnchored, int health) {
         this.isAnchor = isAnchor;
         this.isAnchored = isAnchored;
+        this.isSolid = true;
         this.health = health;
     }
 
@@ -368,6 +375,10 @@ public class Tile {
 
     boolean hasDown() {
         return down != null;
+    }
+
+    public boolean isSolid() {
+        return isSolid;
     }
 
     @Override

@@ -6,13 +6,12 @@ import com.gats.simulation.action.ActionLog;
 
 /**
  * Provides an access-controlled interface to send commands to players
- *
  * Ermöglicht die Kontrolle eines bestimmten Charakters.
  * Ist nur für einen einzelnen Zug gültig und deaktiviert sich nach Ende des aktuellen Zuges.
  */
 public class GameCharacterController {
-    private GameCharacter gameCharacter;
-    private GameState state;
+    private final GameCharacter gameCharacter;
+    private final GameState state;
 
     private Action getHead(){
         return state.getSim().getActionLog().getRootAction(); //ToDo: verify correctness

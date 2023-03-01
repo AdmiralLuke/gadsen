@@ -10,7 +10,7 @@ import com.gats.simulation.action.TurnStartAction;
  * Während die Simulation läuft werden alle Ereignisse in ActionLogs festgehalten, die anschließend durch das animation package dargestellt werden können.
  */
 public class Simulation {
-    private GameState gameState;
+    private final GameState gameState;
     private ActionLog actionLog;
 
     /**
@@ -71,6 +71,9 @@ public class Simulation {
         }
 
         if (gameState.getTurn().size() <= 1) {
+            //ToDo: Fix edge cases:
+            //If no players are alive the game crashes
+            //If a team survives with multiple characters, the game doesnt end
             this.actionLog.getRootAction().addChild(new GameOverAction(this.gameState.getTurn().peek().y));
             gameState.setActive(false);
             return this.actionLog;
@@ -84,13 +87,15 @@ public class Simulation {
         }
         IntVector2 nextChar = gameState.getTurn().peek();
 
-        while (gameState.getCharacterFromTeams(nextChar.x, nextChar.y).getHealth() <= 0) {
+        while (nextChar != null && gameState.getCharacterFromTeams(nextChar.x, nextChar.y).getHealth() <= 0) {
             gameState.getTurn().pop();
 
             gameState.getTeams()[ nextChar.x][ nextChar.y] = null;
 
             nextChar = gameState.getTurn().peek();
         }
+        if (nextChar == null) throw new NullPointerException("Turn dequeue returned null");
+
         gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetStamina();
         gameState.getCharacterFromTeams(nextChar.x, nextChar.y).setAlreadyShot(false);
 

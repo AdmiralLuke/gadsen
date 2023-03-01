@@ -10,7 +10,6 @@ public class ParablePath implements Path {
     private final Vector2 s;
     private final static double g = 9.81 * 8;
     private final Vector2 v;
-    private float endTime;
 
     public ParablePath(Vector2 s, Vector2 v) {
         this.s = s;

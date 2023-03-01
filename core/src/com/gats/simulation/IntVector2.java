@@ -5,15 +5,19 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 
-import java.io.PrintStream;
 import java.io.Serializable;
 
 public class IntVector2 implements Serializable, Vector<IntVector2> {
 
-
-    public final static IntVector2 X = new IntVector2(1, 0);
-    public final static IntVector2 Y = new IntVector2(0, 1);
-    public final static IntVector2 Zero = new IntVector2(0, 0);
+    /**
+     * The values are protected on purpose. Do not lower their protection level.
+     * Since these constants store objects, a malicious
+     * bot could read the object and alter one or multiple of its attributes.
+     * For this reason, do not use any of the constant objects of the library anywhere in the project.
+     */
+    protected final static IntVector2 X = new IntVector2(1, 0);
+    protected final static IntVector2 Y = new IntVector2(0, 1);
+    protected final static IntVector2 Zero = new IntVector2(0, 0);
 
 
     /** the x-component of this vector **/

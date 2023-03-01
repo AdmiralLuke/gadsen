@@ -4,8 +4,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class LaserPath implements Path{
 
-    private Vector2 startPos;
-    private Vector2 endPos;
+    private final Vector2 startPos;
+    private final Vector2 endPos;
 
     public LaserPath(Vector2 startPos, Vector2 endPos) {
         this.startPos = startPos;

@@ -7,11 +7,11 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class LinearPath implements Path{
 
-    private Vector2 s;
-    private Vector2 g;
+    private final Vector2 s;
+    private final Vector2 g;
     private float endTime;
     // start time = 0
-    private Vector2 dir;
+    private final Vector2 dir;
 
 
     /**

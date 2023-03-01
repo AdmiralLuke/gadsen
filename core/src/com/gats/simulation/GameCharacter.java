@@ -221,7 +221,8 @@ public class GameCharacter {
 
     //ToDo: move to better place; maybe to be called directly from tile
     private boolean isSolidTile(int x, int y) {
-        return this.state.getTile(x, y) != null;
+        Tile tile = this.state.getTile(x, y);
+        return tile != null && tile.isSolid() ;
     }
 
     boolean testVerticalCollision(int bottomTileY, int topTileY, int columnX) {
@@ -406,16 +407,6 @@ public class GameCharacter {
         return lastAction;
     }
 
-
-    /**
-     * berechnet den Betrag einer Zahl
-     *
-     * @param n natürliche Zahl
-     * @return Betrag von n
-     */
-    int abs(int n) {
-        return n >= 0 ? n : -n;
-    }
 
     /**
      * Erstellt eine CharacterAimAction. Damit wird im Animator der AimIndicator verändert.

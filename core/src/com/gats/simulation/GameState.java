@@ -27,14 +27,12 @@ public class GameState {
 
     private int gameMode = GAME_MODE_NORMAL;
 
-    private int activeTeam = 0;
-
     // Teams   Anzahl Teams x Anzahl Player
     private GameCharacter[][] teams;
 
     private int teamCount;
     private int charactersPerTeam;
-    private ArrayDeque<IntVector2> turn = new ArrayDeque<>();
+    private final ArrayDeque<IntVector2> turn = new ArrayDeque<>();
     private boolean active;
     private Simulation sim;
 
@@ -225,16 +223,17 @@ public class GameState {
      * @return Horizontale Größe des Spielfeldes in #Boxen
      */
     public int getBoardSizeX() {
-        return board.length;
+        return width;
     }
 
     /**
      * @return Vertikale Größe des Spielfeldes in #Boxen
      */
     public int getBoardSizeY() {
-        return board.length == 0 ? 0 : board[0].length;
+        return height;
     }
 
+    //ToDo: discuss removal
     /**
      * Spawnt Spieler an zufälligen Positionen
      *
