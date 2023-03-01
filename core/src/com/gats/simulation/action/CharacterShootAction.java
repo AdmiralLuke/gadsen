@@ -9,6 +9,6 @@ import com.gats.simulation.Weapon;
 public final class CharacterShootAction extends CharacterAction{
 
     public CharacterShootAction(int team, int character) {
-        super(team, character, 0);
+        super(0, team, character);
     }
 }

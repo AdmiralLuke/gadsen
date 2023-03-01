@@ -95,13 +95,13 @@ public class Projectile {
                     || this.pos.x / 16 <= 0 ||this.pos.y / 16 <= 0) {
                     this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
 
-                    Action projectileAction = new ProjectileAction(this.path, this.projectileType, (this.pos.cpy().sub(startPos).len()), this.pos);
+                    Action projectileAction = new ProjectileAction(0, this.projectileType, this.path, (this.pos.cpy().sub(startPos).len()), this.pos);
                     head.addChild(projectileAction);
                     return projectileAction;
                 }
                 if (this.sim.getState().getTile((int)((pos.x)/ 16), (int)((pos.y) / 16)) != null) {
                     this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
-                    ProjectileAction action = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
+                    ProjectileAction action = new ProjectileAction(0, this.projectileType, this.path, this.pos.cpy().sub(startPos).len(), this.pos);
                     head.addChild(action);
                     this.sim.getState().getTile((int)(pos.x / 16), (int)(pos.y / 16)).onDestroy(action);
                     return action; // ToDo: maybe revisit this and return action from onDestroy
@@ -114,7 +114,7 @@ public class Projectile {
                             }
                             if ((int)(character.getPlayerPos().x / 16)  == (int)(this.pos.x / 16)  && (int)(character.getPlayerPos().y / 16)  == (int)(this.pos.y / 16)) {
                                 this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
-                                Action projectileAction = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
+                                Action projectileAction = new ProjectileAction(0, this.projectileType, this.path, this.pos.cpy().sub(startPos).len(), this.pos);
                                 head.addChild(projectileAction);
                                 int oldHealth = character.getHealth();
                                 return character.setHealth(oldHealth - damage, projectileAction);
@@ -126,7 +126,7 @@ public class Projectile {
                 this.livingTime += 0.1;
             }
             this.path = this.type == Type.LINEAR ? new LinearPath(startPos, pos, 0.1f) : new LaserPath(startPos, pos);
-            ProjectileAction projectileAction = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
+            ProjectileAction projectileAction = new ProjectileAction(0, this.projectileType, this.path, this.pos.cpy().sub(startPos).len(), this.pos);
             head.addChild(projectileAction);
             return projectileAction;
         } else if (this.type == Type.PARABLE) {
@@ -138,12 +138,12 @@ public class Projectile {
 //                System.out.println("Pos: " + pos.x + ", " + pos.y);
                 if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()
                         || this.pos.x <= 0 ||this.pos.y <= 0) {
-                    ProjectileAction projectileAction = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
+                    ProjectileAction projectileAction = new ProjectileAction(0, this.projectileType, this.path, this.pos.cpy().sub(startPos).len(), this.pos);
                     head.addChild(projectileAction);
                     return projectileAction;
                 }
                 if (!((int)this.pos.x == startPos.x) && !((int)this.pos.y == startPos.y) && this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
-                    ProjectileAction projectileAction = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
+                    ProjectileAction projectileAction = new ProjectileAction(0, this.projectileType, this.path, this.pos.cpy().sub(startPos).len(), this.pos);
                     head.addChild(projectileAction);
                     this.sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).onDestroy(projectileAction);
                     return projectileAction;  // ToDo: maybe revisit this and return action from onDestroy
@@ -155,7 +155,7 @@ public class Projectile {
                                 continue;
                             }
                             if ((int)(character.getPlayerPos().x / 16) == (int)(this.pos.x / 16) && (int)(character.getPlayerPos().y / 16) == (int)(this.pos.y / 16)) {
-                                Action projectileAction = new ProjectileAction(this.path, this.projectileType, this.pos.cpy().sub(startPos).len(), this.pos);
+                                Action projectileAction = new ProjectileAction(0, this.projectileType, this.path, this.pos.cpy().sub(startPos).len(), this.pos);
                                 int oldHealth = character.getHealth();
                                 head.addChild(projectileAction);
                                 return character.setHealth(oldHealth - damage, projectileAction);

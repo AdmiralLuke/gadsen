@@ -2,7 +2,7 @@ package com.gats.simulation.action;
 
 
 /**
- * Oberklasse für alle {@link Action Ereignisse}, die sich auf eine Spielfigur beziehen
+ * Super class for all {@link Action Actions}, that relate to a {@link com.gats.simulation.GameCharacter Character}
  */
 public abstract class CharacterAction extends Action{
     private final int team;
@@ -10,21 +10,28 @@ public abstract class CharacterAction extends Action{
 
 
     /**
-     * Oberklasse für Aktionen eines Characters
-     * @param team Team-Nummer des Characters
-     * @param character Nummer im Team
-     * @param delay Wartezeit nach Aktion
+     * Super class for the Action of a Character
+     *
+     * @param delay     non-negative time-based offset to its parent in seconds
+     * @param team      team index of the Character
+     * @param character Characters index within its team
      */
-    public CharacterAction(int team, int character, float delay) {
+    public CharacterAction(float delay, int team, int character) {
         super(delay);
         this.team = team;
         this.character = character;
     }
 
+    /**
+     * @return Characters index within its team
+     */
     public int getCharacter() {
         return character;
     }
 
+    /**
+     * @return team index of the Character
+     */
     public int getTeam() {
         return team;
     }

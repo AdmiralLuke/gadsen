@@ -123,7 +123,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static final Map<Class<?>, ActionConverter> map =
                 new HashMap<Class<?>, ActionConverter>() {
                     {
-                        put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
+                        put(CharacterWalkAction.class, ActionConverters::convertCharacterMoveAction);
                         put(ProjectileAction.class, ActionConverters::convertProjectileMoveAction);
                         put(TileMoveAction.class, ActionConverters::convertTileMoveAction);
                         put(TileDestroyAction.class, ActionConverters::convertTileDestroyAction);
@@ -168,7 +168,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         }
 
         private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator) {
-            CharacterMoveAction moveAction = (CharacterMoveAction) action;
+            CharacterWalkAction moveAction = (CharacterWalkAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_WALKING);

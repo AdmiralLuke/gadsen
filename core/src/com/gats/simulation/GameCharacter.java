@@ -135,7 +135,7 @@ public class GameCharacter {
         if (newHealth < this.health) {
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
-            lastAction = new CharacterAction(team, teamPos, 0) {
+            lastAction = new CharacterAction(0, team, teamPos) {
             };
             //ToDo implement healAction
         }
@@ -283,7 +283,7 @@ public class GameCharacter {
             fallen++;
         }
 
-        Action fallAction = new CharacterFallAction(posBef, this.getPlayerPos(), team, teamPos, 0.001f);
+        Action fallAction = new CharacterFallAction(0.001f, team, teamPos, posBef, this.getPlayerPos());
         head.addChild(fallAction);
         if (collision) {
             return this.setHealth(getHealth() - getFallDmg(fallen), fallAction);
@@ -396,7 +396,7 @@ public class GameCharacter {
 
         }
         //Movement completed for some reason, log action
-        Action lastAction = new CharacterMoveAction(bef, new Vector2(boundingBox.x, boundingBox.y), team, teamPos, 0.001f);
+        Action lastAction = new CharacterWalkAction(0.001f, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
         head.addChild(lastAction);
 
         if (falling) {

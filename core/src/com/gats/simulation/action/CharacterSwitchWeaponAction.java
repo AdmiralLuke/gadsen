@@ -7,7 +7,7 @@ public class CharacterSwitchWeaponAction extends CharacterAction {
     private final WeaponType wpType;
 
     public CharacterSwitchWeaponAction(int team, int character, WeaponType wpType) {
-        super(team, character, 0);
+        super(0, team, character);
         this.wpType = wpType;
     }
 

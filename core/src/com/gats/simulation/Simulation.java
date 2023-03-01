@@ -24,7 +24,7 @@ public class Simulation {
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
         IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
-        actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y,0));
+        actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         if (gameMode == GameState.GAME_MODE_CHRISTMAS) {
             gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction());
             gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction());
@@ -97,7 +97,7 @@ public class Simulation {
         IntVector2 turnChar = gameState.getTurn().peek();
         ActionLog lastTurn = this.actionLog;
         assert turnChar != null;
-        this.actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y, 0));
+        this.actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         return lastTurn;
     }
 

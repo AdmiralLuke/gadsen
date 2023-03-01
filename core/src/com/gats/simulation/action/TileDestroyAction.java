@@ -4,10 +4,14 @@ import com.gats.simulation.IntVector2;
 import com.gats.simulation.Tile;
 
 /**
- * Beschreibt ein {@link Action Ereigniss}, bei dem eine {@link Tile Box} zerstört wird, da sie unzureichende HP besitzt
+ * Type of {@link TileAction} created, whenever a {@link Tile} is destroyed.
  */
 public final class TileDestroyAction extends TileAction{
-    public TileDestroyAction(IntVector2 position) {
-        super(position, 0.005f);
+    /**
+     * Stores the Event of a {@link Tile} beeing destroyed
+     * @param tilePos   position of the related {@link Tile} in tile-coordinates
+     */
+    public TileDestroyAction(IntVector2 tilePos) {
+        super(0.005f, tilePos);
     }
 }
