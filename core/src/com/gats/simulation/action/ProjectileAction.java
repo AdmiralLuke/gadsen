@@ -37,7 +37,7 @@ public class ProjectileAction extends Action{
         this.path = path;
         //ToDo: remove redundant posAfter, duration should be determined by simulation and posAfter should equal path(duration)
         if (ProjectileType.COOKIE == type) {
-            this.duration = -((path.getPos(0).x - posAft.x) / ((ParablePath)path).getV().x);
+            this.duration = -((path.getPos(0).x - posAft.x) / ((ParablePath)path).getStartVelocity().x);
         } else {
             this.duration = duration / 100;
         }

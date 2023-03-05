@@ -133,7 +133,7 @@ public class Projectile {
             Vector2 s = pos.cpy();
             Vector2 v = dir.cpy();
             v.set((float)(v.x * strength) * 400, (float)(v.y * strength) * 400);
-            this.path = new ParablePath(s, v);
+            this.path = new ParablePath(1, s, v);
             while (livingTime < range) {
 //                System.out.println("Pos: " + pos.x + ", " + pos.y);
                 if (this.pos.x / 16 >= this.sim.getState().getBoardSizeX() ||this.pos.y / 16 >= this.sim.getState().getBoardSizeY()

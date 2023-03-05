@@ -11,7 +11,16 @@ import java.util.*;
 /**
  * Repräsentiert ein laufendes Spiel mit allen dazugehörigen Daten
  * wie z.B. Spielmodus, {@link GameCharacter Spielfiguren} und Zustand der Map.
- * Diese Daten sind meist in weiteren Klassen wie z.B. {@link Tile} gekapselt
+ * Diese Daten sind meist in weiteren Klassen wie z.B. {@link Tile}, {@link GameCharacter}, {@link Weapon} etc. gekapselt.
+ * Diese Datenstruktur (zusammen mit den weiteren Klassen, auf die ihr hier Zugriff erhaltet) bietet euch alle Daten,
+ * die ihr benötigt und erhalten könnt, um Entscheidungen in eurem Spielzug zu treffen.
+ * Diese Entscheidungen gebt ihr anschliessend über die {@link com.gats.manager.Controller Controller}-Instanz an,
+ * die ihr parallel zu diesem GameState erhalten habt. Mehr Infos dazu findet ihr in der Dokumentation des {@link com.gats.manager.Controller}.
+ * Alle Informationen, die für euch direkt relevant sind, sind in Deutsch verfasst. Solltet ihr also auf
+ * Dokumentation stoßen, welche in Englisch verfasst ist, seid ihr auf unsere interne Dokumentation für
+ * Funktionen, auf die ihr keinen Zugriff habt, gestoßen.
+ * Natürlich könnt ihr diese trotzdem durchlesen, wenn euch interessiert wie unser Spiel von innen
+ * funktioniert oder ihr euch anschauen möchtet, wie wir bestimmte Probleme gelöst haben.
  */
 public class GameState {
 
@@ -22,6 +31,8 @@ public class GameState {
 
     private int width;
     private int height;
+
+    //ToDo: use enums
     public static final int GAME_MODE_NORMAL = 0;
     public static final int GAME_MODE_CHRISTMAS = 1;
 
@@ -36,18 +47,20 @@ public class GameState {
     private boolean active;
     private Simulation sim;
 
+
+    //Deprecated ToDo: remove
     GameState(int gameMode, String mapName, Simulation sim) {
         new GameState(gameMode, mapName, 2, 1, sim);
     }
 
     /**
-     * Erstellt einen GameState
+     * Creates a new GameState for the specified attributes.
      *
-     * @param gameMode Modus
-     * @param mapName Map Name
-     * @param teamCount Anzahl Teams
-     * @param charactersPerTeam Anzahl Charaktere pro Team
-     * @param sim Simulation
+     * @param gameMode selected game mode
+     * @param mapName name of the selected map as String
+     * @param teamCount number of teams/players
+     * @param charactersPerTeam number of Characters per team
+     * @param sim the respective simulation instance
      */
     GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
@@ -61,12 +74,16 @@ public class GameState {
 
     }
 
-    int getGameMode() {
+    /**
+     * Gibt den Spiel-Modus des laufenden Spiels zurück.
+     * @return Spiel-Modus als int
+     */
+    public int getGameMode() {
         return gameMode;
     }
 
     /**
-     * spawns player
+     * Spawns players randomly distributed over the possible spawn-location, specified by the map.
      */
     void initTeam(List<IntVector2> spawnpoints) {
         if (gameMode == GAME_MODE_CHRISTMAS) {
@@ -101,34 +118,44 @@ public class GameState {
 
     //ToDo migrate to Simulation
     /**
-     * Gibt zurück, ob das Spiel noch läuft. Ist während der Ausführung immer true und wird nur für interne Zwecke verwendet
-     * @return True, wenn das Spiel noch nicht beendet ist
+     * Return whether the Game is still active.
+     * @return True, if the game is still in progress.
      */
     public boolean isActive() {
         return active;
     }
 
+    //ToDo migrate to Simulation
     protected void setActive(boolean active) {
         this.active = active;
     }
 
+    /**
+     * @return the Queue that saves the order Characters may act in
+     */
     protected ArrayDeque<IntVector2> getTurn() {
         return turn;
     }
-
+    /**
+     * @return the respective simulation instance
+     */
     protected Simulation getSim() {
         return sim;
     }
 
+    /**
+     * @return the 2D array containing all Characters sorted by their team and index within the team
+     */
     protected GameCharacter[][] getTeams() {
         return teams;
     }
 
     /**
-     * Lädt eine Map aus dem Assets Ordner
-     * Annahme: Alle Tiles auf der Map sind verankert
-     *
-     * @param mapName Map im Json Format aus dem Assets Ordner
+     * ToDo: move to separate class
+     * Loads a Map from the asset-directory
+     * Assumes that all Tiles on the map are directly or indirectly anchored.
+     * The Map file has t be encoded in JSON.
+     * @param mapName Name of the map without type as String
      */
     private List<IntVector2> loadMap(String mapName) {
         JsonReader reader = new JsonReader();
@@ -177,8 +204,8 @@ public class GameState {
     /**
      * Gibt einen bestimmten Charakter aus einem bestimmten Team zurück
      *
-     * @param team   Team-Index
-     * @param member Charakter-Index im Team
+     * @param team   Index des Teams zu dem der Charakter gehört
+     * @param member Index des Charakters im Team
      * @return ausgewählter Charakter im ausgewählten Team
      */
     public GameCharacter getCharacterFromTeams(int team, int member) {
@@ -201,18 +228,18 @@ public class GameState {
 
 
     /**
-     * Board for devs (changes are permanent)
-     *
-     * @return board
+     * @return The 2D array that saves all Tiles
      */
     Tile[][] getBoard() {
         return board;
     }
 
     /**
-     * Abfrage von Tiles von einem GameState
+     * Gibt die {@link Tile Box} an einer bestimmten Position zurück
      *
-     * @return Kopie eines Tiles an einer bestimmten Stelle
+     * @param x X-Komponente der Position in Tile-Koordinaten
+     * @param y Y-Komponente der Position in Tile-Koordinaten
+     * @return Box an der gewählten Position
      */
     public Tile getTile(int x, int y) {
         if (x < 0 || y < 0 || x > getBoardSizeX() || y > getBoardSizeY()) return null;

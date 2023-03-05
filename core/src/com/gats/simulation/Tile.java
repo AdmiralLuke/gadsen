@@ -9,13 +9,15 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * Repräsentiert eine Box aus denen die Karte aufgebaut ist.
- * Das genaue Verhalten insbesondere von Spezialboxen, wie z.B. Waffendrops wird durch erbende Klassen realisiert.
+ * Represents one of the Tiles the map is made of.
+ * Special behaviors of certain Tile-Types will be implemented by sub-classes
  */
 public class Tile {
 
     public static final int TileSizeX = 16;
     public static final int TileSizeY = 16;
+
+    //The dimensions of a Tile in World-coordinates
     protected static final IntVector2 TileSize = new IntVector2(TileSizeX, TileSizeY);
 
 

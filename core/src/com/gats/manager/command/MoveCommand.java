@@ -13,6 +13,6 @@ public class MoveCommand extends Command{
 
     @Override
     public ActionLog run() {
-        return controller.move(dx);
+        return controller.walk(dx);
     }
 }

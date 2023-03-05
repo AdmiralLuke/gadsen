@@ -3,73 +3,91 @@ package com.gats.simulation;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Klasse für einen Linearen-Weg zum Interpolieren in Abhängigkeit der Zeit. Verwendet das {@link Path} Interface
+ * Stores a linear path from a start to an end point
  */
-public class LinearPath implements Path{
+public class LinearPath implements Path {
 
-    private final Vector2 s;
-    private final Vector2 g;
+    private final Vector2 start;
+    private final Vector2 end;
     private float endTime;
     // start time = 0
     private final Vector2 dir;
 
 
     /**
-     * Erstellt einen Linearen Pfad anhand 2 Vektoren und einer Dauer des Weges
-     * @param s Start-Vektor
-     * @param g Ziel-Vektor
-     * @param endTime Dauer des Weges von s nach g
+     * Creates a linear path from start to end with the specified duration
+     *
+     * @param duration duration in seconds
+     * @param start    Start point
+     * @param end      End point
      */
-    public LinearPath(Vector2 s, Vector2 g, float endTime, float v) {
-        this.s = s;
-        this.g = g;
-        this.endTime = endTime / v;
-        this.dir = g.cpy().sub(s);
+    public LinearPath(float duration, Vector2 start, Vector2 end) {
+        this.start = start;
+        this.end = end;
+        this.endTime = duration;
+        this.dir = end.cpy().sub(start);
     }
 
     /**
-     * Erstellt einen Linearen Pfad anhand 2 Vektoren, wobei die Dauer des Weges = Länge des Weges
-     * @param s Start-Vektor
-     * @param g Ziel-Vektor
+     * Creates a linear path from start to end that will be travelled with the specified velocity.
+     * The velocity has to be larger than zero.
+     *
+     * @param start Start-Vektor
+     * @param end   Ziel-Vektor
+     * @param v     velocity
      */
-    public LinearPath(Vector2 s, Vector2 g, float v) {
-        this.s = s;
-        this.g = g;
+    public LinearPath(Vector2 start, Vector2 end, float v) {
+        this.start = start;
+        this.end = end;
         this.endTime = 0;
-        this.dir = g.cpy().sub(s);
-        try {
-            endTime = dir.len() / v;
-        } catch (NullPointerException e) {
-            System.err.println("Fehler beim bestimmen der Länge eines Vektors -> LinearPath");
-        }
+        this.dir = end.cpy().sub(start);
+        endTime = dir.len() / v;
     }
 
     /**
-     * gibt die Position mittels grundlegender Interpolation aus
-     * @param t Zeit an der die Position ermittelt wird
-     * @return Position des Objektes in Abhängigkeit der Zeit
+     * Returns the position for the specified time, using linear interpolation between start and end
+     * Will only give valid results between 0 and {@link #getEndTime()} (inclusive).
+     * @param t time in seconds
+     * @return the position at time t
      */
     @Override
-    public Vector2 getPos(double t) {
-        if (endTime == 0) return g.cpy();
+    public Vector2 getPos(float t) {
+        if (endTime == 0) return end.cpy();
         double step = t / endTime;
-        Vector2 addV = new Vector2((float)(dir.x *  step), (float)(dir.y *  step));
-        return s.cpy().add(addV);
+        Vector2 addV = new Vector2((float) (dir.x * step), (float) (dir.y * step));
+        return start.cpy().add(addV);
     }
 
+    /**
+     * @return the duration
+     */
     public float getEndTime() {
         return endTime;
     }
+
+    /**
+     * Returns the direction of this path.
+     * Since this is a linear path it will be constant for all times t
+     *
+     * @param t time in seconds
+     * @return the movement direction
+     */
     @Override
-    public Vector2 getDir(double t) {
+    public Vector2 getDir(float t) {
         return dir;
     }
 
-    public Vector2 getG() {
-        return g;
+    /**
+     * @return the start position of the path
+     */
+    protected Vector2 getStart() {
+        return start;
     }
 
-    public Vector2 getS() {
-        return s;
+    /**
+     * @return the end position of the path
+     */
+    protected Vector2 getEnd() {
+        return end;
     }
 }

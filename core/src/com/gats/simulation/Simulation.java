@@ -97,7 +97,7 @@ public class Simulation {
         if (nextChar == null) throw new NullPointerException("Turn dequeue returned null");
 
         gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetStamina();
-        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).setAlreadyShot(false);
+        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetAlreadyShot();
 
         IntVector2 turnChar = gameState.getTurn().peek();
         ActionLog lastTurn = this.actionLog;
