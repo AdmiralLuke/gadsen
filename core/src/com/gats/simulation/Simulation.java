@@ -1,11 +1,16 @@
 package com.gats.simulation;
 
+import com.gats.simulation.action.ActionLog;
+import com.gats.simulation.action.GameOverAction;
+import com.gats.simulation.action.InitAction;
+import com.gats.simulation.action.TurnStartAction;
+
 /**
  * Enthält die Logik, welche die Spielmechaniken bestimmt.
  * Während die Simulation läuft werden alle Ereignisse in ActionLogs festgehalten, die anschließend durch das animation package dargestellt werden können.
  */
 public class Simulation {
-    private GameState gameState;
+    private final GameState gameState;
     private ActionLog actionLog;
 
     /**
@@ -19,7 +24,7 @@ public class Simulation {
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
         IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
-        actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y,0));
+        actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         if (gameMode == GameState.GAME_MODE_CHRISTMAS) {
             gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction());
             gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction());
@@ -66,6 +71,9 @@ public class Simulation {
         }
 
         if (gameState.getTurn().size() <= 1) {
+            //ToDo: Fix edge cases:
+            //If no players are alive the game crashes
+            //If a team survives with multiple characters, the game doesnt end
             this.actionLog.getRootAction().addChild(new GameOverAction(this.gameState.getTurn().peek().y));
             gameState.setActive(false);
             return this.actionLog;
@@ -79,20 +87,22 @@ public class Simulation {
         }
         IntVector2 nextChar = gameState.getTurn().peek();
 
-        while (gameState.getCharacterFromTeams(nextChar.x, nextChar.y).getHealth() <= 0) {
+        while (nextChar != null && gameState.getCharacterFromTeams(nextChar.x, nextChar.y).getHealth() <= 0) {
             gameState.getTurn().pop();
 
             gameState.getTeams()[ nextChar.x][ nextChar.y] = null;
 
             nextChar = gameState.getTurn().peek();
         }
+        if (nextChar == null) throw new NullPointerException("Turn dequeue returned null");
+
         gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetStamina();
-        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).setAlreadyShot(false);
+        gameState.getCharacterFromTeams(nextChar.x, nextChar.y).resetAlreadyShot();
 
         IntVector2 turnChar = gameState.getTurn().peek();
         ActionLog lastTurn = this.actionLog;
         assert turnChar != null;
-        this.actionLog = new ActionLog(new TurnStartAction(turnChar.x, turnChar.y, 0));
+        this.actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         return lastTurn;
     }
 

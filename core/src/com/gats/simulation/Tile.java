@@ -1,24 +1,34 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.TileDestroyAction;
+import com.gats.simulation.action.TileMoveAction;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * Repräsentiert eine Box aus denen die Karte aufgebaut ist.
- * Das genaue Verhalten insbesondere von Spezialboxen, wie z.B. Waffendrops wird durch erbende Klassen realisiert.
+ * Represents one of the Tiles the map is made of.
+ * Special behaviors of certain Tile-Types will be implemented by sub-classes
  */
 public class Tile {
-    protected static final IntVector2 tileSize = new IntVector2(16, 16);
+
+    public static final int TileSizeX = 16;
+    public static final int TileSizeY = 16;
+
+    //The dimensions of a Tile in World-coordinates
+    protected static final IntVector2 TileSize = new IntVector2(TileSizeX, TileSizeY);
+
 
     // Box als Ankerpunkt
+    private final boolean isAnchor;
 
-    private boolean isAnchor;
+    private final boolean isSolid;
 
     // Box hängt an einer Box oder an Verkettung von Boxen die an Anker hängt
-    private boolean isAnchored;
+    //ToDo: box should always be anchored, or removed from the map otherwise
+    private final boolean isAnchored;
 
 
     // Haltbarkeit der Box
@@ -50,9 +60,14 @@ public class Tile {
      * @return Untere Linke Ecke der Box
      */
     public Vector2 getWorldPosition() {
-        return this.position.toFloat().scl(tileSize.x, tileSize.y);
+        return this.position.toFloat().scl(TileSize.x, TileSize.y);
     }
 
+    /**
+     * Gibt die dimension einer Box zurück
+     * @return Box-dimension als ganzzahliger 2D Vektor
+     */
+    public IntVector2 getTileSize(){return TileSize.cpy();}
 
     /**
      * Box wird nur aus Position erstellt. Definitiv kein Anker selbst
@@ -64,6 +79,7 @@ public class Tile {
         this.position = new IntVector2(x, y);
         this.isAnchor = false;
         this.state = state;
+        this.isSolid = true;
         this.isAnchored = true;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
@@ -78,6 +94,7 @@ public class Tile {
         this.position = new IntVector2(x, y);
         this.isAnchor = false;
         this.state = state;
+        this.isSolid = true;
         this.isAnchored = isAnchored;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
@@ -100,6 +117,7 @@ public class Tile {
         this.isAnchored = isAnchor || checkIfAnchored(x, y, state);
         this.position = new IntVector2(x, y);
         this.state = state;
+        this.isSolid = true;
         if (isAnchored) {
             state.getBoard()[x][y] = this;
             sortIntoTree();
@@ -148,6 +166,7 @@ public class Tile {
     Tile(boolean isAnchor, boolean isAnchored, int health) {
         this.isAnchor = isAnchor;
         this.isAnchored = isAnchored;
+        this.isSolid = true;
         this.health = health;
     }
 
@@ -358,6 +377,10 @@ public class Tile {
 
     boolean hasDown() {
         return down != null;
+    }
+
+    public boolean isSolid() {
+        return isSolid;
     }
 
     @Override

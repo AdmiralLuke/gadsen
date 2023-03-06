@@ -1,19 +1,22 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.CharacterShootAction;
+import com.gats.simulation.action.ProjectileAction;
 
 /**
  * Repräsentiert eine Waffe im Spiel, die durch einen {@link GameCharacter Spielfigur} benutzt werden kann.
  */
-abstract class Weapon {
+public abstract class Weapon {
 
     private final int damage;
     private final double damageLoss;
     private double projRange;
     private int shoots;
     private final boolean hitThroughBoxes;
-    private GameCharacter character;
-    private Simulation sim;
+    private final GameCharacter character;
+    private final Simulation sim;
 
     private final WeaponType type;
 
