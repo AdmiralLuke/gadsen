@@ -74,4 +74,10 @@ public class LinearPath implements Path{
     public Vector2 getS() {
         return s;
     }
+
+    @Override
+    public String toString() {
+        String output = "from: " + getPos(0) + "to: " +getPos(endTime);
+        return output;
+    }
 }

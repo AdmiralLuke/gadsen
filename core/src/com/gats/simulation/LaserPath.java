@@ -39,4 +39,8 @@ public class LaserPath implements Path{
     public float getEndTime() {
         return 0;
     }
+    public String toString() {
+        String output = "from: " + startPos.toString()+ "to: " +endPos.toString();
+        return output;
+    }
 }

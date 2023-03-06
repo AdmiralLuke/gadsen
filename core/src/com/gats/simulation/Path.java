@@ -7,4 +7,6 @@ public interface Path {
 
     Vector2 getDir(double t);
     float getEndTime();
+
+    String toString();
 }

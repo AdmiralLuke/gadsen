@@ -35,4 +35,10 @@ public class ParablePath implements Path {
     public Vector2 getV() {
         return v;
     }
+
+    @Override
+    public String toString() {
+        String output = "from: " + getPos(0) + "to: " +getPos(endTime);
+        return output;
+    }
 }

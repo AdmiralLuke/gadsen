@@ -33,7 +33,7 @@ public class DebugView {
 
 		stage = new Stage(viewport,batch);
 
-		layoutTable = createTable(skin);
+		layoutTable = createTable(skin );
 
 		stage.addActor(layoutTable);
 
@@ -60,26 +60,10 @@ public class DebugView {
 		layoutTable.rebuildTable();
 	}
 
-	/**
-	 * Wird vermultich entfernt, da durch dies die  Actionlogs ersichtlich wird
-	 * Weiterhin ist es kompliziert die Informationen zu erhalten
-	 *
-	 * @param player
-	 * @param character
-	 */
-	public void setCurrentPlayerAndChar(int player,int character){
 
-		layoutTable.updatePlayerLabel(player);
-		layoutTable.updateCharacterLabel(character);
-
-	}
-	String baseInformation(){
-
-		return "";
-	}
 
 	DebugTable createTable(Skin skin){
-		DebugTable table = new DebugTable(skin);
+		DebugTable table = new DebugTable(skin,viewport);
 		table.setFillParent(true);
 		table.top();
 		table.left();
