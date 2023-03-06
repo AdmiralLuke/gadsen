@@ -1,5 +1,6 @@
 package com.gats.manager.command;
 
+import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.WeaponType;
 
@@ -13,7 +14,7 @@ public class WeaponSelectCommand extends Command{
     }
 
     @Override
-    public void run() {
-        controller.selectWeapon(type);
+    public ActionLog run() {
+        return controller.selectWeapon(type);
     }
 }

@@ -1,5 +1,6 @@
 package com.gats.simulation;
 
+import com.gats.simulation.action.InitAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,7 @@ public class TestDamage {
     public void init() {
         sim = new Simulation(0, "map1", 2, 1);
         state = sim.getState();
+        sim.getActionLog().getRootAction().addChild(new InitAction());
         clearMap();
     }
 
@@ -36,7 +38,7 @@ public class TestDamage {
         state.getBoard()[0][4] = new Tile(0, 4, true, state);
         state.getBoard()[0][5] = new Tile(0, 5, state);
 
-        state.getBoard()[0][4].onDestroy();
+        state.getBoard()[0][4].onDestroy(new VoidAction());
         Assert.assertNull("die Tile sollte zerstört sein", state.getBoard()[0][4]);
         Assert.assertNull("die Tile sollte zerstört sein", state.getBoard()[0][5]);
 
@@ -50,15 +52,15 @@ public class TestDamage {
         GameCharacter character = state.getCharacterFromTeams(0, 0);
         Assert.assertEquals("Leben sollte 100 sein ist aber " + character.getHealth(), character.getHealth(), 100);
         character.setPosX(0);
-        character.setPosY(1);
+        character.setPosY(17);
 
         state.getBoard()[3][2] = new Tile(3, 2, true, state);
         GameCharacter character2 = state.getCharacterFromTeams(1, 0);
-        character2.setPosX(3);
-        character2.setPosY(3);
+        character2.setPosX(3*16 + 1);
+        character2.setPosY(3*16 + 1);
 
         Weapon wp = character2.getWeapon(1);
-        wp.shoot(character.getPlayerPos().sub(character2.getPlayerPos()), 1);
+        wp.shoot(character.getPlayerPos().sub(character2.getPlayerPos()), 1, new VoidAction());
 
         Assert.assertNotEquals("Leben sollte nicht mehr 100 sein ist aber 100", character.getHealth(), 100);
     }

@@ -1,5 +1,6 @@
 package com.gats.manager.command;
 
+import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.GameCharacterController;
 
 public class MoveCommand extends Command{
@@ -11,7 +12,7 @@ public class MoveCommand extends Command{
     }
 
     @Override
-    public void run() {
-        controller.move(dx);
+    public ActionLog run() {
+        return controller.walk(dx);
     }
 }

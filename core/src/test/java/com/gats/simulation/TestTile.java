@@ -1,7 +1,6 @@
 package com.gats.simulation;
 
-import com.gats.simulation.GameState;
-import com.gats.simulation.Tile;
+import com.gats.simulation.action.InitAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +14,7 @@ public class TestTile {
     public void init() {
         sim = new Simulation(0, "map1", 2, 1);
         state = sim.getState();
+        sim.getActionLog().getRootAction().addChild(new InitAction());
         clearMap();
     }
 
@@ -62,7 +62,7 @@ public class TestTile {
 
 
         // dieses Tile sollte NICHT im Board bleiben, da es nicht verankert ist
-        Tile testTile3 = new Tile(5,10, state);
+        Tile testTile3 = new Tile(5,10, state, false);
         Assert.assertNull("An der Stelle [5,10] sollte sich KEIN TIle befinden, da dort keine Verankerung ist", state.getBoard()[5][10]);
     }
 
@@ -75,13 +75,13 @@ public class TestTile {
     @Test
     public void testIfDestroyed() {
         clearMap();
-        state.getCharacterFromTeams(0, 0).move(3);
+        state.getCharacterFromTeams(0, 0).walk(3, new VoidAction());
         Tile testTile = new Tile(10, 10, true, state);
         for (int i = 0; i < 9; i++) {
             Tile tmpTile = new Tile(10 - i, 9, state);
             tmpTile = new Tile(10, 9-i, state);
         }
-        testTile.onDestroy();
+        testTile.onDestroy(new VoidAction());
         for (int i = 0; i < state.getBoardSizeX(); i++) {
             for (int j = 0; j < state.getBoardSizeY(); j++) {
                 Assert.assertNull("Alle Objekte in Map sollten null sein", state.getTile(i, j));

@@ -3,8 +3,6 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.animation.AnimatorCamera;
@@ -12,7 +10,8 @@ import com.gats.manager.AnimationLogProcessor;
 import com.gats.manager.HumanPlayer;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.ActionLog;
+import com.gats.simulation.action.Action;
 
 import java.util.List;
 
@@ -33,29 +32,22 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private HudStage hudStage;
     private Animator animator;
     private final GADS gameManager;
-    private final GADSAssetManager assetManager;
-    // adjust pipeline, so it provides a different directory for ingame assets
-    // and menu assets? or we code importing into AssetManager?
-    private TextureAtlas ingameAtlas;
-    public InGameScreen(GADS instance, GADSAssetManager aM, GameSettings gameSettings){
+    public InGameScreen(GADS instance, RunConfiguration runConfig){
 
         gameManager = instance;
-        assetManager = aM;
-        assetManager.loadTextures();
-        ingameAtlas = assetManager.getAtlas();
         gameViewport = new FillViewport(worldWidth,worldHeight);
         hudViewport = new FitViewport(worldWidth,worldHeight);
 
 
-        hudStage = new HudStage(hudViewport,this, assetManager);
+        hudStage = new HudStage(hudViewport,this);
         setupInput();
 
-        RunConfiguration runConfiguration = gameSettings.toRunConfiguration();
-        runConfiguration.gui = true;
-        runConfiguration.animationLogProcessor = this;
-        runConfiguration.hud = hudStage;
-        manager = new Manager(runConfiguration);
-        animator = new Animator(manager.getState(), gameViewport, ingameAtlas, gameSettings.getGameMode());
+
+        runConfig.gui = true;
+        runConfig.animationLogProcessor = this;
+        runConfig.hud = hudStage;
+        manager = new Manager(runConfig);
+        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode );
         manager.start();
 
         humanList = manager.getHumanList();
@@ -80,7 +72,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     /**
      * Forwards the ActionLog to the Animator for processing
      *
-     * @param log Queue of all {@link com.gats.simulation.Action animation-related Actions}
+     * @param log Queue of all {@link Action animation-related Actions}
      */
     public void animate(ActionLog log) {animator.animate(log);}
 
@@ -139,5 +131,9 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     }
     public void resetCamera(){
         animator.getCamera().resetCamera();
+    }
+
+    public void toggleCameraMove() {
+        animator.getCamera().toggleCanMoveToVector();
     }
 }

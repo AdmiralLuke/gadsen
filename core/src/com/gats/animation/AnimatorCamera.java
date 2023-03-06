@@ -17,11 +17,13 @@ public class AnimatorCamera extends OrthographicCamera {
     //1 = zoom out, 0 = no zoom, -1 = zoom in
     private float cameraZoomPressed;
 
+    private boolean canMoveToVector;
     public AnimatorCamera(float viewportWidth, float viewportHeight) {
         super(viewportWidth,viewportHeight);
         this.defaultPosition = new Vector3(0,0,0);
         this.cameraDirection = new Vector3(0,0,0);
         this.cameraSpeed = 200;
+        this.canMoveToVector = false;
 
     }
 
@@ -62,12 +64,25 @@ public class AnimatorCamera extends OrthographicCamera {
         this.cameraZoomPressed = zoomPressed;
     }
 
+    public void setCanMoveToVector(boolean move){
+        canMoveToVector = move;
+    }
+
     public Vector2 getScreenCenter() {
         return new Vector2(position.x,position.y);
     }
 
     public void moveToVector(Vector2 position){
+    if(canMoveToVector){
+        this.position.set(position,0);
+    }
+    }
 
-       this.position.set(position,0);
+    public boolean getCanMoveToVector() {
+        return canMoveToVector;
+    }
+
+    public void toggleCanMoveToVector(){
+        canMoveToVector  = !canMoveToVector;
     }
 }

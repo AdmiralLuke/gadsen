@@ -2,31 +2,31 @@ package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class LaserPath implements Path{
+/**
+ * Special implementation of a path where a linear path is traveled instantaneously.
+ */
+public class LaserPath extends LinearPath{
 
-    private Vector2 startPos;
-    private Vector2 endPos;
-
+    /**
+     * Creates the path from start to end that is travelled instantaneously. E.g. the position will be equal to end for any time larger 0.
+     * @param startPos the start position of the path
+     * @param endPos the end position of the path
+     */
     public LaserPath(Vector2 startPos, Vector2 endPos) {
-        this.startPos = startPos;
-        this.endPos = endPos;
+        super(startPos, endPos, 1);
     }
 
     @Override
-    public Vector2 getPos(double t) {
-        return t == 0 ? startPos : endPos;
+    public Vector2 getPos(float t) {
+        return t <= 0 ? getStart() : getEnd();
     }
 
-    public Vector2 getEndPos() {
-        return endPos;
-    }
-
-    public Vector2 getStartPos() {
-        return startPos;
-    }
-
+    /**
+     * Returns a small value larger than zero, as the path is travelled instantaneously.
+     * @return the duration
+     */
     @Override
     public float getEndTime() {
-        return 0;
+        return 0.001f;
     }
 }

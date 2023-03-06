@@ -12,7 +12,6 @@ import com.gats.animation.entity.Entity;
  */
 public class SpriteEntity extends Entity {
 
-    private float angle = 0;
     private TextureRegion textureRegion;
     private Vector2 scale = new Vector2(1, 1);
     private Vector2 size = new Vector2(1, 1);
@@ -35,7 +34,7 @@ public class SpriteEntity extends Entity {
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         super.draw(batch, deltaTime, parentAlpha);
         batch.draw(textureRegion, getPos().x, getPos().y,0,0, size.x,
-                size.y, scale.x, scale.y,angle);
+                size.y, scale.x, scale.y,getRotationAngle());
     }
 
     public Vector2 getScale() {
@@ -66,9 +65,7 @@ public class SpriteEntity extends Entity {
    public Vector2 getPos(){
         return new Vector2(getRelPos().add(super.getPos()));
    }
-   public float getRotationAngle() {
-        return angle;
-    }
+
 
     /**
      * Returns the center of the rendered Sprite as a Vector.
@@ -83,7 +80,5 @@ public class SpriteEntity extends Entity {
         return new Vector2(0,0);
     }
 
-    public void setRotationAngle(float angle) {
-        this.angle = angle;
-    }
+
 }

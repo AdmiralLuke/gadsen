@@ -2,23 +2,15 @@ package com.gats.manager;
 
 import com.gats.manager.command.Command;
 import com.gats.manager.command.EndTurnCommand;
-import com.gats.simulation.*;
-import com.gats.ui.GameSettings;
+import com.gats.simulation.action.ActionLog;
 import com.gats.ui.HudStage;
-import org.lwjgl.Sys;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
-import jdk.internal.loader.ClassLoaders;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.io.File;
-import java.io.FileFilter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -155,13 +147,15 @@ public class Manager {
         File botDir = new File("bots");
         if (botDir.exists()) {
             try {
-                URL url = botDir.toURI().toURL();
+                URL url = new File(".").toURI().toURL();
                 URL[] urls = new URL[]{url};
                 ClassLoader loader = new URLClassLoader(urls);
                 for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))
                 ) {
                     try {
-                        players.add(new NamedPlayerClass((Class<? extends Player>) loader.loadClass("bots." + botFile.getName())));
+                        Class<?> nextClass = loader.loadClass("bots." + botFile.getName().replace(".class", ""));
+                        if(Bot.class.isAssignableFrom(nextClass)) players.add(new NamedPlayerClass((Class<? extends Player>) nextClass));
+
                     } catch (ClassNotFoundException e) {
                         System.err.println("Could not find class for " + botFile.getName());
                     }
@@ -260,16 +254,19 @@ public class Manager {
 
             futureExecutor.start();
             if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
-                animationLogProcessor.animate(simulation.clearReturnActionLog());
+                //Contains Action produced by entering new turn
+                animationLogProcessor.animate(simulation.clearAndReturnActionLog());
             }
             try {
                 while (true) {
                     Command nextCmd = commandQueue.take();
                     if (nextCmd.isEndTurn()) break;
-                    nextCmd.run();
+                    //Contains action produced by the commands execution
+                    ActionLog log = nextCmd.run();
 
                     if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
-                        animationLogProcessor.animate(simulation.clearReturnActionLog());
+                        animationLogProcessor.animate(log);
+                        //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
                     }
                 }
             } catch (InterruptedException e) {
@@ -281,6 +278,8 @@ public class Manager {
                 throw new RuntimeException(e);
             }
             controller.deactivate();
+
+            //Contains actions produced by ending the turn (after last command is executed)
             ActionLog finalLog = simulation.endTurn();
             if (gui) {
                 animationLogProcessor.animate(finalLog);

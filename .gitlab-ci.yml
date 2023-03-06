@@ -1,4 +1,5 @@
-image: gradle:alpine
+
+image: gradle:7.6-jdk19-alpine
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
 # is usually a priority over speed in CI environments. Using a fresh
@@ -10,6 +11,7 @@ variables:
 before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
+
 
 
 debug:
@@ -127,3 +129,31 @@ test-util:
     when: always
     reports:
       junit: util/build/test-results/test/TEST-*.xml
+
+prepare-release:
+  stage: build
+  only:
+    - main
+  script:
+    - gradle dist
+  cache:
+    when: 'on_success'
+    policy: push
+    paths:
+      - desktop/build/libs/*.jar
+
+
+create-release:
+  stage: deploy
+  only:
+    - main
+  dependencies:
+    - prepare-release
+  cache:
+    when: 'always'
+    policy: pull
+    paths:
+      - desktop/build/libs/*.jar
+  script:
+    - ls
+
