@@ -3,6 +3,7 @@ package com.gats.simulation;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import com.gats.simulation.weapons.*;
 
 public class TestDamage {
 
@@ -58,8 +59,8 @@ public class TestDamage {
         character2.setPosX(3*16 + 1);
         character2.setPosY(3*16 + 1);
 
-        Weapon wp = character2.getWeapon(1);
-        wp.shoot(character.getPlayerPos().sub(character2.getPlayerPos()), 1, new VoidAction());
+        Weapon wp = character2.getWeapon(0);
+        wp.shoot(new VoidAction(), character.getPlayerPos().sub(character2.getPlayerPos()), 1, character.getPlayerPos());
 
         Assert.assertNotEquals("Leben sollte nicht mehr 100 sein ist aber 100", character.getHealth(), 100);
     }

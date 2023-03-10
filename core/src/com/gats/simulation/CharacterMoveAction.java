@@ -20,7 +20,7 @@ public final class CharacterMoveAction extends CharacterAction{
      * @param delay Wartezeit nach Ausführung
      */
 
-    CharacterMoveAction(Vector2 posBef, Vector2 posAft, int team, int character, float delay) {
+    public CharacterMoveAction(Vector2 posBef, Vector2 posAft, int team, int character, float delay) {
         super(team, character, delay);
         LinearPath linPath = new LinearPath(posBef, posAft, 1f);
         this.path = linPath;

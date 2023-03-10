@@ -193,7 +193,7 @@ public class Tile {
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
      * oder auf anderer Box landet
      */
-    Action onDestroy(Action head) {
+    public Action onDestroy(Action head) {
         ArrayList<Tile> rightList = null;
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;

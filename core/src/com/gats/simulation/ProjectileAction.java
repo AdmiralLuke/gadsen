@@ -32,7 +32,6 @@ public class ProjectileAction extends Action{
         }
     }
 
-
     public Path getPath() {
         return path;
     }

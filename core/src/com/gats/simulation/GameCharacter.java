@@ -1,6 +1,9 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.weapons.BaseProjectile;
+import com.gats.simulation.weapons.Bounceable;
+import com.gats.simulation.weapons.Weapon;
 
 /**
  * Repräsentiert eine {@link GameCharacter Spielfigur} auf der Karte
@@ -25,7 +28,7 @@ public class GameCharacter {
     private Vector2 dir = new Vector2(1, 0);
     private float strength = 0.5f;
 
-    private Weapon[] weapons;
+    private com.gats.simulation.weapons.Weapon[] weapons;
     private int selectedWeapon = -1;
 
 
@@ -69,13 +72,13 @@ public class GameCharacter {
      */
     void selectWeapon(WeaponType type, Action head) {
         switch (type) {
-            case COOKIE:
-                selectedWeapon = 0;
-                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.COOKIE));
-                break;
             case SUGAR_CANE:
-                selectedWeapon = 1;
+                selectedWeapon = 0;
                 head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.SUGAR_CANE));
+                break;
+            case COOKIE:
+                selectedWeapon = 1;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.COOKIE));
                 break;
             default:
                 selectedWeapon = -1;
@@ -93,7 +96,7 @@ public class GameCharacter {
             return false;
         }
         if (selectedWeapon != -1) {
-            weapons[selectedWeapon].shoot(dir, strength, head);
+            weapons[selectedWeapon].shoot(head, dir, strength, this.getPlayerPos());
             alreadyShot = true;
             return true;
         } else {
@@ -128,7 +131,7 @@ public class GameCharacter {
         return this.stamina;
     }
 
-    Action setHealth(int newHealth, Action head) {
+    protected Action setHealth(int newHealth, Action head) {
         if (newHealth == this.health) return head;
         Action lastAction;
         if (newHealth < this.health) {
@@ -173,8 +176,8 @@ public class GameCharacter {
      */
     protected void initInventory() {
         this.weapons = new Weapon[2];
-        weapons[0] = new ChristmasWeapon(10, 40, 50, false, WeaponType.COOKIE, this.sim, this);
-        weapons[1] = new ChristmasWeapon(20, 40, 4, false, WeaponType.SUGAR_CANE, this.sim, this);
+        weapons[0] = new Weapon(new Bounceable(new BaseProjectile(this.getPlayerPos(), 3, 0, 0, sim, ProjectileAction.ProjectileType.CANDY_CANE), 5), 200, WeaponType.SUGAR_CANE, team, teamPos);
+        weapons[1] = new Weapon(new BaseProjectile(this.getPlayerPos(), 1, 0, 0, sim, ProjectileAction.ProjectileType.COOKIE), 200, WeaponType.COOKIE, team, teamPos);
     }
 
     /**
