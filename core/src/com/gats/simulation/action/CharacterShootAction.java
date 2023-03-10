@@ -1,4 +1,7 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
+
+import com.gats.simulation.GameCharacter;
+import com.gats.simulation.Weapon;
 
 /**
  * Beschreibt ein {@link Action Ereigniss}, bei dem die {@link GameCharacter Spielfigur} eine {@link Weapon Waffe} benutzt
@@ -6,6 +9,6 @@ package com.gats.simulation;
 public final class CharacterShootAction extends CharacterAction{
 
     public CharacterShootAction(int team, int character) {
-        super(team, character, 0);
+        super(0, team, character);
     }
 }

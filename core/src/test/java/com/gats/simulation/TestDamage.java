@@ -1,5 +1,6 @@
 package com.gats.simulation;
 
+import com.gats.simulation.action.InitAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

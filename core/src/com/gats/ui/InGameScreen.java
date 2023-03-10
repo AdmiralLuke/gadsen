@@ -3,8 +3,6 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.animation.AnimatorCamera;
@@ -12,7 +10,8 @@ import com.gats.manager.AnimationLogProcessor;
 import com.gats.manager.HumanPlayer;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.ActionLog;
+import com.gats.simulation.action.Action;
 
 import java.util.List;
 
@@ -73,7 +72,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     /**
      * Forwards the ActionLog to the Animator for processing
      *
-     * @param log Queue of all {@link com.gats.simulation.Action animation-related Actions}
+     * @param log Queue of all {@link Action animation-related Actions}
      */
     public void animate(ActionLog log) {animator.animate(log);}
 

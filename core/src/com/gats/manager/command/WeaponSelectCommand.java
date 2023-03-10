@@ -1,6 +1,6 @@
 package com.gats.manager.command;
 
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.WeaponType;
 
