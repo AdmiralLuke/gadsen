@@ -1,11 +1,16 @@
 package com.gats.ui.assets;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+
+import java.awt.*;
 
 /**
  * Contains Loaded Instances of Assets
@@ -52,6 +57,24 @@ public class AssetContainer {
 
         public static Animation<TextureRegion>[] gameCharacterAnimations;
 
+        public static TextureRegion pixel;
+
+        static {
+            Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            map.setColor(Color.WHITE);
+            map.drawPixel(0, 0);
+            pixel = new TextureRegion(new Texture(map));
+        }
+
+        public static TextureRegion cross_marker;
+
+        static {
+            Pixmap map = new Pixmap(3, 3, Pixmap.Format.RGBA8888);
+            map.setColor(Color.WHITE);
+            map.drawLine(1, 0, 1, 2);
+            map.drawLine(0, 1, 2, 1);
+            cross_marker = new TextureRegion(new Texture(map));
+        }
 
         public static ShaderProgram outlineShader;
 

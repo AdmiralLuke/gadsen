@@ -135,6 +135,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(CharacterShootAction.class, ActionConverters::convertCharacterShootAction);
                         put(CharacterHitAction.class, ActionConverters::convertCharacterHitAction);
                         put(GameOverAction.class, ActionConverters::convertGameOverAction);
+                        put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
                     }
                 };
 
@@ -366,6 +367,32 @@ public class Animator implements Screen, AnimationLogProcessor {
 
 
             return new ExpandedAction(summonWinScreen);
+        }
+
+        private static ExpandedAction convertDebugPointAction(com.gats.simulation.action.Action action, Animator animator){
+            DebugPointAction debugPointAction = (DebugPointAction) action;
+
+            DestroyAction destroyAction = new DestroyAction(debugPointAction.getDuration(), null, null, animator.root::remove);
+
+            SummonAction summonAction = new SummonAction(action.getDelay(), destroyAction::setTarget, () ->{
+                SpriteEntity entity;
+                if(debugPointAction.isCross()){
+                    entity = new SpriteEntity(IngameAssets.cross_marker);
+                    entity.setSize(new Vector2(3,3));
+                    debugPointAction.getPos().sub(1, 1);
+                }else{
+                    entity = new SpriteEntity(IngameAssets.pixel);
+                }
+                entity.setRelPos(debugPointAction.getPos());
+                entity.setColor(debugPointAction.getColor());
+                animator.root.add(entity);
+                return entity;
+            });
+
+            summonAction.setChildren(new Action[]{destroyAction});
+
+
+            return new ExpandedAction(summonAction, destroyAction);
         }
 
     }
