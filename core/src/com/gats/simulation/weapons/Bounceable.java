@@ -1,7 +1,10 @@
 package com.gats.simulation.weapons;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
 import com.gats.simulation.*;
+import com.gats.simulation.action.ParticleAction;
+import com.gats.simulation.action.ProjectileAction;
 
 public class Bounceable implements Projectile {
 
@@ -18,7 +21,7 @@ public class Bounceable implements Projectile {
     }
 
     @Override
-    public Action hitCharacter(Action head,Character character, Projectile dec, BaseProjectile bsProj) {
+    public Action hitCharacter(Action head, Character character, Projectile dec, BaseProjectile bsProj) {
         return dec == this ? proj.hitCharacter(head,character, proj, bsProj) : proj.hitCharacter(head,character, dec, bsProj);
     }
 

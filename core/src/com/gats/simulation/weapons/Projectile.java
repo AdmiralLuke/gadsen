@@ -1,7 +1,7 @@
 package com.gats.simulation.weapons;
 
 import com.badlogic.gdx.math.Vector2;
-import com.gats.simulation.Action;
+import com.gats.simulation.action.Action;
 import com.gats.simulation.Tile;
 
 enum ProjType {

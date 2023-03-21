@@ -1,7 +1,9 @@
 package com.gats.simulation.weapons;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
 import com.gats.simulation.*;
+import com.gats.simulation.action.ProjectileAction;
 
 public class BaseProjectile implements Projectile{
     ProjType projType;
@@ -41,7 +43,7 @@ public class BaseProjectile implements Projectile{
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        this.projType = type == ProjectileAction.ProjectileType.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
+        this.projType = type == ProjectileAction.ProjectileType.COOKIE.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
     }
 
 
@@ -60,7 +62,7 @@ public class BaseProjectile implements Projectile{
         }
         if (x == 900) {
             ProjectileAction action = generateAction();
-            head.getChildren().add(action);
+            head.addChild(action);
             return action;
         }
         Action log = checkForHit(head, dec);
@@ -148,11 +150,13 @@ public class BaseProjectile implements Projectile{
 
     ProjectileAction generateAction() {
         Path path = null;
+        float duration = 0;
         if (this.projType == ProjType.PARABLE) {
-            path = new ParablePath(this.startPos, this.v);
+            path = new ParablePath(this.pos.cpy().sub(this.startPos).len(), this.startPos, this.v);
+            duration = -((path.getPos(0).x - this.pos.x) / ((ParablePath)path).getStartVelocity().x);
         } else if (this.projType == ProjType.LINEAR) {
             path = new LinearPath(startPos, pos, 0.1f);
         }
-        return new ProjectileAction(path, type, this.pos.cpy().sub(this.startPos).len(), this.pos);
+        return new ProjectileAction(path, type, this.pos);
     }
 }

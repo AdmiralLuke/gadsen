@@ -1,6 +1,7 @@
-package com.gats.simulation;
+package com.gats.simulation.action;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.ParticleType;
 
 
 public class ParticleAction extends Action {
