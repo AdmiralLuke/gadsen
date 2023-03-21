@@ -17,6 +17,7 @@ public class BaseProjectile implements Projectile{
     Vector2 pos;
     Vector2 dir;
     Vector2 v;
+    int range;
 
     float strength;
 
@@ -33,6 +34,7 @@ public class BaseProjectile implements Projectile{
         this.sim = sim;
         this.type = type;
         this.projType = type == ProjectileAction.ProjectileType.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
+        this.range = 900; // ToDo: check4weapon
     }
 
     public BaseProjectile(Vector2 pos, int damage, int knockback, int recoil, Simulation sim, ProjectileAction.ProjectileType type) {
@@ -43,7 +45,8 @@ public class BaseProjectile implements Projectile{
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        this.projType = type == ProjectileAction.ProjectileType.COOKIE.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
+        this.projType = type == ProjectileAction.ProjectileType.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
+        this.range = 900; // ToDo: check4weapon
     }
 
 
@@ -60,7 +63,7 @@ public class BaseProjectile implements Projectile{
             dir.nor();
             this.v = new Vector2((dir.x * strength) * 400, (dir.y * strength) * 400);
         }
-        if (x == 900) {
+        if (this.pos.y < 0 || x >= range) {
             ProjectileAction action = generateAction();
             head.addChild(action);
             return action;
@@ -128,15 +131,9 @@ public class BaseProjectile implements Projectile{
 
     @Override
     public Action hitWall(Action head, Tile t, Projectile dec, BaseProjectile bsProj) {
-        Path path = null;
-        if (this.projType == ProjType.PARABLE) {
-            path = new ParablePath(this.startPos, this.v);
-        } else if (this.projType == ProjType.LINEAR) {
-            path = new LinearPath(startPos, pos, 0.1f);
-        }
-        ProjectileAction projAction = new ProjectileAction(path, type, this.pos.cpy().sub(this.startPos).len(), this.pos);
+        ProjectileAction projAction = generateAction();
         head.getChildren().add(projAction);
-        return t.onDestroy(projAction);
+        return t.onDestroy(projAction); // ToDo: something is wrong
     }
 
     public Action hitNothing(Action head) {
@@ -150,13 +147,11 @@ public class BaseProjectile implements Projectile{
 
     ProjectileAction generateAction() {
         Path path = null;
-        float duration = 0;
         if (this.projType == ProjType.PARABLE) {
-            path = new ParablePath(this.pos.cpy().sub(this.startPos).len(), this.startPos, this.v);
-            duration = -((path.getPos(0).x - this.pos.x) / ((ParablePath)path).getStartVelocity().x);
+            path = new ParablePath(this.startPos, this.pos, this.v);
         } else if (this.projType == ProjType.LINEAR) {
-            path = new LinearPath(startPos, pos, 0.1f);
+            path = new LinearPath(startPos, pos, 150 * this.strength);
         }
-        return new ProjectileAction(path, type, this.pos);
+        return new ProjectileAction(0,type, path);
     }
 }

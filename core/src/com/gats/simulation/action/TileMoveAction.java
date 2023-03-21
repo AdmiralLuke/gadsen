@@ -28,7 +28,7 @@ public final class TileMoveAction extends TileAction{
         super(0, posBef);
         this.posAft = posAft;
         this.path = new LinearPath(posBef.toFloat().scl(Tile.TileSizeX), posAft.toFloat().scl(Tile.TileSizeY), 0.05f);
-        this.duration = path.getEndTime();
+        this.duration = path.getDuration();
     }
 
 

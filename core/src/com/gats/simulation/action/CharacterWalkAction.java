@@ -32,7 +32,7 @@ public final class CharacterWalkAction extends CharacterAction{
         super(delay, team, character);
         LinearPath linPath = new LinearPath(posBef, posAft, V);
         this.path = linPath;
-        this.duration = linPath.getEndTime();
+        this.duration = linPath.getDuration();
     }
 
 

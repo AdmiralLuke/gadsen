@@ -27,6 +27,7 @@ public class TestGameCharacter {
     }
 
     /*
+
     @Test
     public void testMovement() {
         // generate a field of the form         x
@@ -44,10 +45,10 @@ public class TestGameCharacter {
         Assert.assertNotNull("(4,  1) sollte Tile enthalten", state.getTile(4, 1));
 
         GameCharacter character = state.getCharacterFromTeams(0,0);
-        character.setPosX(0);
+        character.setPosX(3);
         character.setPosY(1);
 
-        Assert.assertTrue("Character sollte bei (0,1) starten", character.getPlayerPos().x == 0 && character.getPlayerPos().y == 1);
+        Assert.assertTrue("Character sollte bei (3,1) starten", character.getPlayerPos().x == 3 && character.getPlayerPos().y == 1);
 
 
         // move it

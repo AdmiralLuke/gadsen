@@ -19,11 +19,12 @@ public class ParablePath implements Path {
      *
      * @param startPosition
      * @param startVelocity
+     * @param endPosition
      */
-    public ParablePath(float duration, Vector2 startPosition, Vector2 startVelocity) {
-        this.duration = duration;
+    public ParablePath(Vector2 startPosition, Vector2 endPosition, Vector2 startVelocity) {
         this.startPosition = startPosition;
         this.startVelocity = startVelocity;
+        this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
     }
 
     //ToDo: Implement
@@ -67,7 +68,7 @@ public class ParablePath implements Path {
 
     /**
      * Returns the position for the specified time.
-     * Will only give valid results between 0 and {@link #getEndTime()} (inclusive).
+     * Will only give valid results between 0 and {@link #getDuration()} (inclusive).
      * @param t time in seconds
      * @return the position at time t
      */
@@ -80,7 +81,7 @@ public class ParablePath implements Path {
 
     /**
      * Returns a tangent on the path at the specified time.
-     * Will only give valid results between 0 and {@link #getEndTime()} (inclusive).
+     * Will only give valid results between 0 and {@link #getDuration()} (inclusive).
      * @param t time in seconds
      * @return the movement direction at time t
      */
@@ -92,8 +93,8 @@ public class ParablePath implements Path {
      * @return the maximum valid input-time for this path in seconds
      */
     @Override
-    public float getEndTime() {
-        return 0;
+    public float getDuration() {
+        return this.duration;
     }
 
     /**

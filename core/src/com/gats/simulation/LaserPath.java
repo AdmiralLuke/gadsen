@@ -26,7 +26,7 @@ public class LaserPath extends LinearPath{
      * @return the duration
      */
     @Override
-    public float getEndTime() {
+    public float getDuration() {
         return 0.001f;
     }
 }

@@ -1,8 +1,8 @@
 package com.gats.simulation.weapons;
 
 import com.badlogic.gdx.math.Vector2;
-import com.gats.simulation.Action;
-import com.gats.simulation.CharacterShootAction;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.CharacterShootAction;
 import com.gats.simulation.WeaponType;
 
 public class Weapon {

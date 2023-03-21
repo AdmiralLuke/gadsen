@@ -23,9 +23,11 @@ public interface Path {
      */
     Vector2 getDir(float t);
 
-    //ToDo: rename to duration
+
     /**
      * @return the maximum valid input-time for this path in seconds
      */
-    float getEndTime();
+    float getDuration();
+
+
 }
