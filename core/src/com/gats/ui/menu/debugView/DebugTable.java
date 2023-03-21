@@ -15,26 +15,36 @@ import javax.swing.text.View;
 
 public class DebugTable extends Table {
 
+	Viewport viewport;
 
 	public DebugTable(Skin skin, Viewport viewport) {
 		super(skin);
-
-		rebuildTable();
+		this.viewport = viewport;
 	}
 
 	public void addString(String string){
 		ColoredLabelWithBackground label = new ColoredLabelWithBackground(string,this.getSkin(), Color.WHITE);
 		label.setFontScale(0.7f);
-		//label.setWrap(true);
 
+		//label.setWrap(true);
 		//if(this.getRows()*label.getHeight()> getParent().getHeight()){
 		//	clear();
 		//}
 		add(label).colspan(6).align(Align.left);//.width(this.getWidth()/2);
 		row();
+
+
+		if(this.getMinHeight()>viewport.getWorldHeight()*0.75){
+			this.clear();
+		};
+
+
 	}
 
 	public void addActionLog(ActionLog log){
+
+		//Todo make it so every action is inserted separately
+			// does not work with the current implementation i think
 		addString(log.toString());
 	}
 
@@ -43,13 +53,9 @@ public class DebugTable extends Table {
 	/**
 	 * Wird aufgerufen, wenn der Table erneuert/cleared werden soll.
  	 */
-	void rebuildTable(){
-
-	}
 
 	@Override
 	public void clear() {
 		super.clear();
-		rebuildTable();
 	}
 }
