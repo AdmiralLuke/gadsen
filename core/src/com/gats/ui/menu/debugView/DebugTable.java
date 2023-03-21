@@ -2,10 +2,8 @@ package com.gats.ui.menu.debugView;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.simulation.ActionLog;
@@ -17,9 +15,15 @@ public class DebugTable extends Table {
 
 	Viewport viewport;
 
+	private VerticalGroup vg;
+
 	public DebugTable(Skin skin, Viewport viewport) {
 		super(skin);
 		this.viewport = viewport;
+		this.vg = new VerticalGroup();
+		vg.align(Align.left);
+		vg.left();
+		vg.setFillParent(true);
 	}
 
 	public void addString(String string){
@@ -30,8 +34,13 @@ public class DebugTable extends Table {
 		//if(this.getRows()*label.getHeight()> getParent().getHeight()){
 		//	clear();
 		//}
+		vg.addActor(label);
 		add(label).colspan(6).align(Align.left);//.width(this.getWidth()/2);
 		row();
+
+		while(vg.getHeight()>viewport.getWorldHeight()*0.75){
+			vg.removeActorAt(0,false);
+		}
 
 
 		if(this.getMinHeight()>viewport.getWorldHeight()*0.75){
@@ -46,13 +55,21 @@ public class DebugTable extends Table {
 		//Todo make it so every action is inserted separately
 			// does not work with the current implementation i think
 		addString(log.toString());
+
 	}
 
 
+	@Override
+	public void draw(Batch batch, float parentAlpha) {
+		super.draw(batch, parentAlpha);
+		vg.draw(batch,parentAlpha);
+	}
 
 	/**
 	 * Wird aufgerufen, wenn der Table erneuert/cleared werden soll.
  	 */
+
+
 
 	@Override
 	public void clear() {

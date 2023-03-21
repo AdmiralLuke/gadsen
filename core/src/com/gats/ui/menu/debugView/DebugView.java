@@ -31,6 +31,11 @@ public class DebugView {
 	private Stage stage;
 	private final DebugTable layoutTable;
 
+	private final DebugTextContainer debugText;
+
+
+	private boolean isEnabled;
+
 	private LinkedBlockingQueue<ActionLog> blockingLogQueue = new LinkedBlockingQueue<>();
 
 	public DebugView(Skin skin){
@@ -38,13 +43,17 @@ public class DebugView {
 		viewport.setCamera(new OrthographicCamera(30,30*(Gdx.graphics.getHeight()*1f/Gdx.graphics.getWidth())));
 		viewport.apply();
 
+
 		this.batch = new SpriteBatch();
 
 		stage = new Stage(viewport,batch);
 
 		layoutTable = createTable(skin );
+		debugText = new DebugTextContainer(skin,viewport);
 
-		stage.addActor(layoutTable);
+		//stage.addActor(layoutTable);
+		stage.addActor(debugText);
+		isEnabled = false;
 
 	}
 
@@ -82,15 +91,17 @@ public class DebugView {
 
 	public void draw() {
 
+
 			ActionLog log = blockingLogQueue.poll();
 			if(log!=null) {
 				layoutTable.addActionLog(log);
+				debugText.addActionLog(log);
 			}
 
 		viewport.apply(true);
 		batch.setProjectionMatrix(viewport.getCamera().combined);
 
-		if(stage!=null) {
+		if(stage!=null&&isEnabled) {
 			stage.draw();
 			//	batch.begin();
 			//	font.draw(batch, currentState, 0,viewport.getWorldHeight());
@@ -101,6 +112,10 @@ public class DebugView {
 
 	public Viewport getViewport() {
 		return viewport;
+	}
+
+	public void toggleDebugView() {
+		isEnabled = !isEnabled;
 	}
 
 	//todo resize()?
