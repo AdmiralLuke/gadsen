@@ -1,5 +1,6 @@
 package com.gats.manager.command;
 
+import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.GameCharacterController;
 
 public abstract class Command {
@@ -11,7 +12,7 @@ public abstract class Command {
         this.controller = controller;
     }
 
-    public abstract void run();
+    public abstract ActionLog run();
 
     public boolean isEndTurn() {
         return isEndTurn;

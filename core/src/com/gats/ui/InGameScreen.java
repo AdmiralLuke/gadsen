@@ -10,9 +10,8 @@ import com.gats.manager.AnimationLogProcessor;
 import com.gats.manager.HumanPlayer;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
-import com.gats.simulation.ActionLog;
-import com.gats.ui.assets.AssetContainer;
-import com.gats.ui.menu.debugView.DebugView;
+import com.gats.simulation.action.ActionLog;
+import com.gats.simulation.action.Action;
 
 import java.util.List;
 
@@ -77,7 +76,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     /**
      * Forwards the ActionLog to the Animator for processing
      *
-     * @param log Queue of all {@link com.gats.simulation.Action animation-related Actions}
+     * @param log Queue of all {@link Action animation-related Actions}
      */
     public void animate(ActionLog log) {animator.animate(log);
     debugView.add(log);}

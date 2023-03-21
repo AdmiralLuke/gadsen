@@ -1,5 +1,7 @@
 package com.gats.manager.command;
 
+import com.gats.simulation.action.ActionLog;
+
 public class EndTurnCommand extends Command{
     public EndTurnCommand() {
         super(null);
@@ -7,8 +9,8 @@ public class EndTurnCommand extends Command{
     }
 
     @Override
-    public void run() {
-
+    public ActionLog run() {
+        return null;
     }
 
 }

@@ -1,7 +1,10 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.ProjectileAction;
 
+//ToDo: discuss removal/ migration to other class two so different weapons shouldn't share a single class
 /**
  * @Weihnachtsaufgabe Waffen für die Weihnachtsaufgabe (Kekse & Zuckerstange)
  */
@@ -43,11 +46,11 @@ public class ChristmasWeapon extends Weapon{
 
 
 
-    public void shoot(Vector2 dir, double strength) {
+    public void shoot(Vector2 dir, double strength, Action head) {
         if (this.getType() == WeaponType.COOKIE) {
-            super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
+            super.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE, head);
         } else {
-            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR);
+            super.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR, head);
         }
     }
 }
