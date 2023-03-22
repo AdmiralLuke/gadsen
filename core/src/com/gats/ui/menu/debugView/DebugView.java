@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.*;
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.ActionLog;
 
 import java.util.concurrent.LinkedBlockingQueue;
 

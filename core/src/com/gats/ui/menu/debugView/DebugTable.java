@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.ActionLog;
 import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
 
 import javax.swing.text.View;

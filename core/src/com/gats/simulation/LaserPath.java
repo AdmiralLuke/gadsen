@@ -30,7 +30,6 @@ public class LaserPath extends LinearPath{
         return 0.001f;
     }
     public String toString() {
-        String output = "from: " + startPos.toString()+ "to: " +endPos.toString();
-        return output;
+        return super.toString();
     }
 }

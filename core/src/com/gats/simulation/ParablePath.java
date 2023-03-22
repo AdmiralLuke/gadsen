@@ -105,7 +105,7 @@ public class ParablePath implements Path {
 
     @Override
     public String toString() {
-        String output = "from: " + getPos(0) + "to: " +getPos(endTime);
+        String output = "from: " + getPos(0) + "to: " +getPos(duration);
         return output;
     }
 }

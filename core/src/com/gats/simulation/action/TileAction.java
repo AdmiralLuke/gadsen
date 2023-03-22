@@ -27,4 +27,12 @@ abstract class TileAction extends Action{
     public IntVector2 getPos() {
         return pos;
     }
+
+    @Override
+    public String toString() {
+        String output = "Tile: " + pos.toString();
+        output+= " ";
+        return output;
+    }
+
 }

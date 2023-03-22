@@ -7,8 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gats.simulation.ActionLog;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.ActionLog;
 import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -46,7 +50,7 @@ public class DebugTextContainer extends VerticalGroup {
 	 * Adds a String to the Bottom of the TextView
 	 * @param string
 	 */
-	public void addString(String string){
+	public void add(String string){
 		//Create a ColoredLabel to set a specific Color and Background for the label
 		ColoredLabelWithBackground label = new ColoredLabelWithBackground(string,skin, textcolor);
 		label.setFontScale(fontscale);
@@ -65,9 +69,11 @@ public class DebugTextContainer extends VerticalGroup {
 	}
 
 		public void addActionLog(ActionLog log){
-			addString(log.toString());
-		}
 
-
+			Action root = log.getRootAction();
+				for (Action a: root) {
+					add(a.toString());
+				}
+			}
 
 	}
