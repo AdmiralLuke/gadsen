@@ -11,8 +11,10 @@ import com.gats.simulation.action.Action;
 import com.gats.simulation.action.ActionLog;
 import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 
 /**
@@ -55,7 +57,6 @@ public class DebugTextContainer extends VerticalGroup {
 		ColoredLabelWithBackground label = new ColoredLabelWithBackground(string,skin, textcolor);
 		label.setFontScale(fontscale);
 		addActor(label);
-
 		adjustSize();
 	}
 
@@ -64,16 +65,36 @@ public class DebugTextContainer extends VerticalGroup {
  	 */
 	private void adjustSize(){
 		while(getPrefHeight()>viewport.getWorldHeight()*maxSizePercent){
-			removeActorAt(0,false);
+		if(!this.getChildren().isEmpty()) {
+				removeActorAt(0, false);
+			}
 		}
 	}
 
-		public void addActionLog(ActionLog log){
-
+		public void addActionLog(ActionLog log) {
 			Action root = log.getRootAction();
-				for (Action a: root) {
-					add(a.toString());
+			//Iterate over the log
+			Iterator<Action> currentIterator = log.getRootAction().iterator();
+			//Stack to store the position/Iterator where we left of, after descending
+			Stack<Iterator<Action>> iteratorStack = new Stack<>();
+
+			iteratorStack.push(currentIterator);
+
+			while (!iteratorStack.isEmpty()) {
+				currentIterator = iteratorStack.pop();
+
+				while (currentIterator.hasNext()) {
+					Action currentAction = currentIterator.next();
+					add(currentAction.toString());
+					//if the current Action has children, descend into that list to iterate over them
+					if (!currentAction.getChildren().isEmpty()) {
+						//remember current position
+						iteratorStack.push(currentIterator);
+						//go to child of the action
+						currentIterator = currentAction.getChildren().iterator();
+					}
 				}
 			}
+		}
 
 	}
