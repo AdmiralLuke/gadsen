@@ -90,4 +90,10 @@ public class LinearPath implements Path {
     protected Vector2 getEnd() {
         return end;
     }
+
+    @Override
+    public String toString() {
+        String output = "from: " + getPos(0) + "to: " +getPos(endTime);
+        return output;
+    }
 }

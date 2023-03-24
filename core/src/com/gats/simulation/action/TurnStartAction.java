@@ -15,4 +15,12 @@ public class TurnStartAction extends CharacterAction {
     public TurnStartAction(long delay, int team, int character) {
         super(delay, team, character);
     }
+
+
+    @Override
+    public String toString() {
+        return "TurnStart: " + getTeam()+","+getCharacter();
+    }
+
+
 }
