@@ -29,13 +29,6 @@ public class InputHandler implements GadsenInputProcessor{
 
 	private final int KEY_EXIT_TO_MENU = Input.Keys.ESCAPE;
 
-	private final int cameraDown = Input.Keys.DOWN;
-	private final int cameraLeft = Input.Keys.LEFT;
-	private final int cameraRight = Input.Keys.RIGHT;
-
-	private final int exitToMenu = Input.Keys.ESCAPE;
-
-
 
 	private HumanPlayer currentPlayer;
 
