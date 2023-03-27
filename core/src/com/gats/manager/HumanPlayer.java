@@ -1,6 +1,7 @@
 package com.gats.manager;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
@@ -227,6 +228,16 @@ public class HumanPlayer extends Player {
             }
         }
         //ToDo implement holding keys
+    }
+
+    public void aim(int angle,float strength){
+        this.angle = angle;
+       controller.aim(angle,strength);
+    }
+    public void aimToVector(Vector2 target){
+      Vector2 playerPos = controller.getGameCharacter().getPlayerPos();
+      target.sub(playerPos);
+       controller.aim(target,1);
     }
 
 

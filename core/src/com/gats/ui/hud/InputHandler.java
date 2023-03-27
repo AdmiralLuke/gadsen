@@ -2,6 +2,8 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.gats.animation.AnimatorCamera;
 import com.gats.manager.HumanPlayer;
 import com.gats.ui.HudStage;
@@ -73,6 +75,12 @@ public class InputHandler implements GadsenInputProcessor{
 		this.humanList = humanList;
 	}
 
+
+
+	private void processMouseAim(int screenX, int screenY){
+		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX,screenY));
+		currentPlayer.aimToVector(worldCursorPos);
+	}
 	/**
 	 * Called whenever a button is just pressed.
 	 * For now it handles input from the Arrow Keys, used for the camera Movement.
@@ -196,6 +204,8 @@ public class InputHandler implements GadsenInputProcessor{
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
+
+		processMouseAim(screenX,screenY);
 		return false;
 	}
 

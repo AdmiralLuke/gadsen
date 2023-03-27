@@ -3,6 +3,8 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.animation.AnimatorCamera;
@@ -14,6 +16,7 @@ import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.Action;
 
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
@@ -121,6 +124,11 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         Gdx.input.setInputProcessor(hudStage.getInputHandler());
         hudStage.getInputHandler().setHumanPlayers(humanList);
 
+    }
+
+    public Vector2 toWorldCoordinates(Vector2 coordinates){
+        Vector3 position = gameViewport.getCamera().unproject(new Vector3(coordinates.x,coordinates.y,0));
+        return new Vector2(position.x,position.y);
     }
 
     //this section handles the input
