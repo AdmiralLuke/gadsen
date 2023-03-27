@@ -69,12 +69,6 @@ public class InputHandler implements GadsenInputProcessor{
 		}
 	}
 
-
-	void setCurrentPlayer(HumanPlayer currentHumanPlayer) {
-		this.currentPlayer = currentHumanPlayer;
-	}
-
-
 	public void setHumanPlayers(List<HumanPlayer> humanList) {
 		this.humanList = humanList;
 	}
