@@ -1,9 +1,11 @@
 package com.gats.simulation.weapons;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.*;
+import com.gats.simulation.action.DebugPointAction;
 import com.gats.simulation.action.ProjectileAction;
 
 import java.util.ArrayList;
@@ -49,7 +51,6 @@ public class BaseProjectile implements Projectile{
         this.sim = sim;
         this.type = type;
         this.projType = type == ProjectileAction.ProjectileType.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
-        this.range = 900; // ToDo: check4weapon
     }
 
 
@@ -63,9 +64,11 @@ public class BaseProjectile implements Projectile{
     public Action move(Action head, float strength, Projectile dec) {
         Action log = null;
         while (log == null) {
-            this.t += 0.1f;
+            this.t += 0.001f;
             Vector2 pos = path.getPos(t);
-            Vector2 posN = path.getPos(this.t + 0.1f);
+            Vector2 posN = path.getPos(this.t + 0.001f);
+            DebugPointAction dbAc = new DebugPointAction(0, pos, Color.BLUE, 5, true);
+            head.addChild(dbAc);
             log = checkForHit(head, dec, pos, posN);
         }
         return log;
@@ -84,17 +87,15 @@ public class BaseProjectile implements Projectile{
         if (h != null) {
             Tile tN = sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16);
             while (tN == null || !tN.equals(h)) {
-                this.t += 0.001f;
+                this.t += 0.0001f;
                 pos = path.getPos(t);
                 tN = sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16);
             }
             return dec.hitWall(head, tN, dec, this);
         }
 
-        if (t == path.getDuration()) return hitNothing(head);
+        if (t == path.getDuration() || pos.y < 0) return hitNothing(head);
         // ToDo: Character Hit
-
-
         return null;
     }
 
@@ -113,7 +114,6 @@ public class BaseProjectile implements Projectile{
 
     public Action hitNothing(Action head) {
         ProjectileAction prAc = generateAction();
-        this.path.setDuration(t);
         head.addChild(prAc);
         return prAc;
     }
@@ -124,6 +124,9 @@ public class BaseProjectile implements Projectile{
     }
 
     ProjectileAction generateAction() {
+        Path path = null;
+        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t), this.path.getDir(0));
+        if (projType == ProjType.LINEAR) path = new LinearPath(this.path.getPos(0), this.path.getPos(t), 100);
         return new ProjectileAction(0,type, path);
     }
 

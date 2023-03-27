@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Repräsentiert ein laufendes Spiel mit allen dazugehörigen Daten
  * wie z.B. Spielmodus, {@link GameCharacter Spielfiguren} und Zustand der Map.
- * Diese Daten sind meist in weiteren Klassen wie z.B. {@link Tile}, {@link GameCharacter}, {@link Weapon} etc. gekapselt.
+ * Diese Daten sind meist in weiteren Klassen wie z.B. {@link Tile}, {@link GameCharacter}, {@link com.gats.simulation.weapons.Weapon} etc. gekapselt.
  * Diese Datenstruktur (zusammen mit den weiteren Klassen, auf die ihr hier Zugriff erhaltet) bietet euch alle Daten,
  * die ihr benötigt und erhalten könnt, um Entscheidungen in eurem Spielzug zu treffen.
  * Diese Entscheidungen gebt ihr anschliessend über die {@link com.gats.manager.Controller Controller}-Instanz an,
@@ -242,7 +242,7 @@ public class GameState {
      * @return Box an der gewählten Position
      */
     public Tile getTile(int x, int y) {
-        if (x < 0 || y < 0 || x > getBoardSizeX() || y > getBoardSizeY()) return null;
+        if (x < 0 || y < 0 || x >= getBoardSizeX() || y >= getBoardSizeY()) return null;
         return board[x][y];
     }
 

@@ -58,7 +58,7 @@ public class ProjectileAction extends Action{
         return "ProjectileAction{" +
                        "type=" + type +
                        ", path=" + path +
-                       ", duration=" + duration +
+                       ", duration=" + getDuration() +
                        '}';
     }
 }

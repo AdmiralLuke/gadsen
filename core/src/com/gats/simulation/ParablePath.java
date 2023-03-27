@@ -41,7 +41,8 @@ public class ParablePath implements Path {
         this.duration = duration;
     }
 
-    //ToDo: Implement
+
+    //ToDo: Implement | no!
     /**
      * Creates a parabolic path, that connects start while peaking at the specified height.
      * The specified peak must therefore be at least as high as both start- and end-point.
@@ -127,6 +128,7 @@ public class ParablePath implements Path {
     public void setDuration(Vector2 endPosition) {
         this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
     }
+
 
     @Override
     public String toString() {

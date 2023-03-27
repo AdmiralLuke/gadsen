@@ -195,7 +195,7 @@ public class GameCharacter {
     protected void initInventory() {
         this.weapons = new Weapon[2];
         weapons[0] = new Weapon(new Bounceable(new BaseProjectile(3, 0, 0, sim, ProjectileAction.ProjectileType.CANDY_CANE), 5), 200, WeaponType.SUGAR_CANE, team, teamPos);
-        weapons[1] = new Weapon(new BaseProjectile( 1, 0, 0, sim, ProjectileAction.ProjectileType.COOKIE), 200, WeaponType.COOKIE, team, teamPos);
+        weapons[1] = new Weapon(new Bounceable(new BaseProjectile( 1, 0, 0, sim, ProjectileAction.ProjectileType.COOKIE), 5), 200, WeaponType.COOKIE, team, teamPos);
     }
 
     /**
@@ -469,15 +469,14 @@ public class GameCharacter {
 
         }
         //Movement completed for some reason, log action
-        Vector2 dir = new Vector2(boundingBox.x, boundingBox.y).cpy().sub(bef).nor();
-        CharacterWalkAction lastAction = new CharacterWalkAction(0.001f, team, teamPos, bef, dir);
-        lastAction.getPath().setDuration(new Vector2(boundingBox.x, boundingBox.y));
+        Action lastAction = new CharacterWalkAction(0.001f, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
+
 
         head.addChild(lastAction);
 
         if (falling) {
             //We detected a gap while walking, start falling after walk
-            lastAction = (CharacterWalkAction) walk(dx - moved, fall(lastAction));
+            lastAction = walk(dx - moved, fall(lastAction));
         }
         return lastAction;
     }

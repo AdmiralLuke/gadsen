@@ -23,9 +23,9 @@ public class LinearPath implements Path {
      */
     public LinearPath(Vector2 start, Vector2 end, float v) {
         this.start = start;
-        this.duration = end.cpy().sub(start).len() * v;
+        this.dir = end.cpy().sub(start);
+        this.duration = dir.len() / v;
         this.end = end;
-        this.dir = end.cpy().sub(start).nor();
         this.v = v;
     }
 
@@ -39,7 +39,7 @@ public class LinearPath implements Path {
      */
     public LinearPath(Vector2 start, Vector2 dir, float duration, float v) {
         this.start = start;
-        this.duration = duration * v;
+        this.duration = duration / v;
         this.dir = dir;
         this.end = getPos(duration);
         this.v = v;
@@ -103,7 +103,7 @@ public class LinearPath implements Path {
 
     @Override
     public String toString() {
-        String output = "from: " + getPos(0) + "to: " +getPos(endTime);
+        String output = "from: " + getPos(0) + "to: " +getPos(getDuration());
         return output;
     }
 }
