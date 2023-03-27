@@ -14,6 +14,7 @@ public class MoveAction extends Action {
     private float endTime;
 
     public MoveAction(float delay, Entity target, float duration, Path path) {
+        // ToDo: remove duration
         super(delay);
         this.target = target;
         this.path = path;

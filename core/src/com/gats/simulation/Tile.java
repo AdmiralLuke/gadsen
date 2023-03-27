@@ -7,6 +7,7 @@ import com.gats.simulation.action.TileMoveAction;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Vector;
 
 /**
  * Represents one of the Tiles the map is made of.
@@ -204,8 +205,6 @@ public class Tile {
         if (this.left != null) this.left.right = null;
         if (this.up != null) this.up.down = null;
         if (this.down != null) this.down.up = null;
-
-
     }
 
     /**
@@ -385,8 +384,8 @@ public class Tile {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
         Tile tile = (Tile) o;
         return isAnchor == tile.isAnchor && isAnchored == tile.isAnchored && getPosition().equals(tile.getPosition());
     }
@@ -395,4 +394,6 @@ public class Tile {
     public int hashCode() {
         return Objects.hash(isAnchor, isAnchored, getPosition());
     }
+
+
 }

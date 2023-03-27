@@ -1,6 +1,7 @@
 package com.gats.simulation.weapons;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.Path;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.Tile;
 
@@ -26,6 +27,6 @@ public interface Projectile {
      */
     Action shoot(Action head, Vector2 dir, float strength, Projectile dec);
 
-    void setPos(Vector2 pos);
-    Action move(Action head, float strength, int x, Projectile dec);
+    void setPath(Path path);
+    Action move(Action head, float strength, Projectile dec);
 }

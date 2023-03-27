@@ -8,9 +8,9 @@ import com.badlogic.gdx.math.Vector2;
 public class LinearPath implements Path {
 
     private final Vector2 start;
-    private final Vector2 end;
     private float duration;
-    // start time = 0
+    private final float v;
+    private final Vector2 end;
     private final Vector2 dir;
 
     /**
@@ -18,14 +18,31 @@ public class LinearPath implements Path {
      * The velocity has to be larger than zero.
      *
      * @param start Start-Vektor
-     * @param end   Ziel-Vektor
-     * @param v     velocity
+     * @param end End-Vector
+     * @param v velocity
      */
     public LinearPath(Vector2 start, Vector2 end, float v) {
         this.start = start;
+        this.duration = end.cpy().sub(start).len() * v;
         this.end = end;
-        this.duration = end.cpy().sub(start).len() / v;
-        this.dir = end.cpy().sub(start);
+        this.dir = end.cpy().sub(start).nor();
+        this.v = v;
+    }
+
+    /**
+     * Creates a Linear path from start to a duration given end that will be travelled with the specified velocity
+     * The velocity has to be larger
+     * @param start
+     * @param dir
+     * @param duration
+     * @param v
+     */
+    public LinearPath(Vector2 start, Vector2 dir, float duration, float v) {
+        this.start = start;
+        this.duration = duration * v;
+        this.dir = dir;
+        this.end = getPos(duration);
+        this.v = v;
     }
 
     /**
@@ -36,7 +53,7 @@ public class LinearPath implements Path {
      */
     @Override
     public Vector2 getPos(float t) {
-        if (duration == 0) return end.cpy();
+        if (duration == 0) return start.cpy();
         double step = t / duration;
         Vector2 addV = new Vector2((float) (dir.x * step), (float) (dir.y * step));
         return start.cpy().add(addV);
@@ -72,6 +89,15 @@ public class LinearPath implements Path {
      * @return the end position of the path
      */
     protected Vector2 getEnd() {
-        return end;
+        return getPos(duration);
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
+
+    @Override
+    public void setDuration(Vector2 endPosition) {
+        this.duration = endPosition.cpy().sub(start).len() / v;
     }
 }

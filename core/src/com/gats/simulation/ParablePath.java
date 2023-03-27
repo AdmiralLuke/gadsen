@@ -9,7 +9,7 @@ import java.security.InvalidParameterException;
  */
 public class ParablePath implements Path {
 
-    private final float duration;
+    private float duration;
     private final Vector2 startPosition;
     private final static float g = 9.81f * 16; //9.81 meter/s^2 * 16 pixel pro meter
     private final Vector2 startVelocity;
@@ -25,6 +25,20 @@ public class ParablePath implements Path {
         this.startPosition = startPosition;
         this.startVelocity = startVelocity;
         this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
+    }
+
+
+    /**
+     * Creates a parabolic path, starting at the specified position with the specified velocity and is followed for the specified duration.
+     *
+     * @param startPosition
+     * @param startVelocity
+     * @param duration
+     */
+    public ParablePath(Vector2 startPosition, float duration, Vector2 startVelocity) {
+        this.startPosition = startPosition;
+        this.startVelocity = startVelocity;
+        this.duration = duration;
     }
 
     //ToDo: Implement
@@ -97,10 +111,20 @@ public class ParablePath implements Path {
         return this.duration;
     }
 
+    @Override
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
+
     /**
      * @return the initial velocity as 2D vector
      */
     public Vector2 getStartVelocity() {
         return startVelocity;
+    }
+
+    @Override
+    public void setDuration(Vector2 endPosition) {
+        this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
     }
 }

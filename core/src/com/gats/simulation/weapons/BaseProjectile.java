@@ -1,11 +1,15 @@
 package com.gats.simulation.weapons;
 
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.*;
 import com.gats.simulation.action.ProjectileAction;
 
+import java.util.ArrayList;
+
 public class BaseProjectile implements Projectile{
+
     ProjType projType;
     int damage;
     int recoil;
@@ -14,32 +18,31 @@ public class BaseProjectile implements Projectile{
     Simulation sim;
 
     Vector2 startPos;
-    Vector2 pos;
-    Vector2 dir;
+
     Vector2 v;
     int range;
+    Path path;
 
     float strength;
 
     ProjectileAction.ProjectileType type;
+    float t = 0f;
 
     private final static float g = 9.81f * 8;
 
-    BaseProjectile(Vector2 pos, int damage, int knockback, Simulation sim, ProjectileAction.ProjectileType type) {
-        this.startPos = pos.cpy();
-        this.pos = pos.cpy();
+    BaseProjectile(Path path, int damage, int knockback, Simulation sim, ProjectileAction.ProjectileType type) {
+        this.path = path;
+        this.startPos = path.getPos(0);
         this.damage = damage;
         this.recoil = damage / 3;
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
         this.projType = type == ProjectileAction.ProjectileType.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
-        this.range = 900; // ToDo: check4weapon
     }
 
-    public BaseProjectile(Vector2 pos, int damage, int knockback, int recoil, Simulation sim, ProjectileAction.ProjectileType type) {
-        this.startPos = pos.cpy();
-        this.pos = pos.cpy();
+    public BaseProjectile(int damage, int knockback, int recoil, Simulation sim, ProjectileAction.ProjectileType type) {
+
         this.damage = damage;
         this.recoil = recoil;
         this.knockback = knockback;
@@ -52,78 +55,50 @@ public class BaseProjectile implements Projectile{
 
     @Override
     public Action shoot(Action head, Vector2 dir, float strength, Projectile dec) {
-        this.dir = dir;
         this.strength = strength;
-        return this.move(head, strength , 0, dec);
+        return this.move(head, strength , dec);
     }
 
     @Override
-    public Action move(Action head, float strength, int x, Projectile dec) {
-        if (x == 0) {
-            dir.nor();
-            this.v = new Vector2((dir.x * strength) * 400, (dir.y * strength) * 400);
+    public Action move(Action head, float strength, Projectile dec) {
+        Action log = null;
+        while (log == null) {
+            this.t += 0.1f;
+            Vector2 pos = path.getPos(t);
+            Vector2 posN = path.getPos(this.t + 0.1f);
+            log = checkForHit(head, dec, pos, posN);
         }
-        if (this.pos.y < 0 || x >= range) {
-            ProjectileAction action = generateAction();
-            head.addChild(action);
-            return action;
-        }
-        Action log = checkForHit(head, dec);
-        if (projType == ProjType.PARABLE) {
-            if (log == null) {
-                pos.x += dir.x > 0 ? 1 : -1;
-                pos.y = ((v.y * ((-this.startPos.x + pos.x) / v.x)) - (g/2) * (float)Math.pow(((-this.startPos.x + pos.x) / v.x), 2)) + this.startPos.y;
-                return move(head, strength, x + 1, dec);
-            } else {
-                return log;
-            }
-        } else if (projType == ProjType.LINEAR || projType == ProjType.LASER) {
-            if (log == null) {
-                pos.add(dir.cpy().scl(strength));
-                return move(head, strength, x + 1, dec);
-            } else {
-                return log;
-            }
-        } else {
-            // Dieser Fall sollte nie eintreffen, wenn die Decorator funktionieren würden
-            // return new ActionLog(head);
-            return null;
-        }
+        return log;
+
     }
 
-    Action checkForHit(Action head, Projectile dec) {
-        // checks if the Projectile hits a tile / wall
-        int n = sim.getState().getBoardSizeX() * 16;
-        int m = sim.getState().getBoardSizeY() * 16;
+    Action checkForHit(Action head, Projectile dec, Vector2 pos, Vector2 posN) {
+        // Mittelpunkt des Kreises (pos + posN) / 2
+        Vector2 m = pos.cpy().add(posN).cpy().scl(0.5f);
 
-        Tile t = null;
+        // Radius
+        float r = posN.cpy().sub(pos).len() / 2;
+        Circle c = new Circle(m.x, m.y, r);
 
-        if ((this.pos.x >= 0 && this.pos.x < n) && (this.pos.y >= 0 && this.pos.y < m))
-            t = sim.getState().getTile((int)(this.pos.x / 16), (int)(this.pos.y) / 16);
-        if (t != null) {
-            if (dec != this) {
-                return dec.hitWall(head, t, dec, this);
-            } else {
-                ProjectileAction ac = generateAction();
-                head.getChildren().add(ac);
-                return t.onDestroy(ac);
+        Tile h = sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16);
+        if (h != null) {
+            Tile tN = sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16);
+            while (tN == null || !tN.equals(h)) {
+                this.t += 0.001f;
+                pos = path.getPos(t);
+                tN = sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16);
             }
+            return dec.hitWall(head, tN, dec, this);
         }
 
-        // check if hits character
-        n = sim.getState().getTeamCount();
-        m = sim.getState().getCharactersPerTeam();
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
-                // ToDo: check4Hit
-            }
-        }
+        if (t == path.getDuration()) return hitNothing(head);
+        // ToDo: Character Hit
 
 
         return null;
     }
+
+
     @Override
     public Action hitCharacter(Action head, Character character, Projectile dec, BaseProjectile bsProj) {
         return null;
@@ -137,21 +112,19 @@ public class BaseProjectile implements Projectile{
     }
 
     public Action hitNothing(Action head) {
-        return null;
+        ProjectileAction prAc = generateAction();
+        this.path.setDuration(t);
+        head.addChild(prAc);
+        return prAc;
     }
 
-    public void setPos(Vector2 pos) {
-        this.pos = pos.cpy();
-        this.startPos = pos.cpy();
+    @Override
+    public void setPath(Path path) {
+        this.path = path;
     }
 
     ProjectileAction generateAction() {
-        Path path = null;
-        if (this.projType == ProjType.PARABLE) {
-            path = new ParablePath(this.startPos, this.pos, this.v);
-        } else if (this.projType == ProjType.LINEAR) {
-            path = new LinearPath(startPos, pos, 150 * this.strength);
-        }
         return new ProjectileAction(0,type, path);
     }
+
 }
