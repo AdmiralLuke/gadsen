@@ -13,6 +13,8 @@ import com.gats.ui.assets.GADSAssetManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gats.ui.HudStage.Key.KEY_TOGGLE_DEBUGVIEW;
+
 public class HudStage extends Stage {
 
 
@@ -24,7 +26,9 @@ public class HudStage extends Stage {
         KEY_CAMERA_ZOOM_IN,
         KEY_CAMERA_ZOOM_OUT,
         KEY_CAMERA_ZOOM_RESET,
-        KEY_EXIT_TO_MENU
+        KEY_EXIT_TO_MENU,
+
+        KEY_TOGGLE_DEBUGVIEW
     }
 
     private final int KEY_CAMERA_UP = Keys.UP;
@@ -38,6 +42,8 @@ public class HudStage extends Stage {
     private final int KEY_CAMERA_TOGGLE_PLAYER_FOCUS = Keys.F;
 
     private final int KEY_EXIT_TO_MENU = Keys.ESCAPE;
+
+    private final int KEY_TOGGLE_DEBUGVIEW = Keys.F3;
     private
     SpriteBatch batch;
 
@@ -117,6 +123,9 @@ public class HudStage extends Stage {
                 break;
             case KEY_CAMERA_TOGGLE_PLAYER_FOCUS:
                 ingameScreen.toggleCameraMove();
+                break;
+            case KEY_TOGGLE_DEBUGVIEW:
+                ingameScreen.toggleDebugView();
 
             default:
                 if (turnInProgress && currentPlayer != null) {

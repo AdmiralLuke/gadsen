@@ -37,4 +37,7 @@ public interface Path {
     void setDuration(float duration);
 
     void setDuration(Vector2 endPosition);
+    float getEndTime();
+
+    String toString();
 }

@@ -50,4 +50,16 @@ public final class TileMoveAction extends TileAction{
     public IntVector2 getPosAfter() {
         return posAft;
     }
+
+
+
+       @Override
+
+    public String toString() {
+
+        String output = "TileMove: "+ path.toString();
+
+        return output;
+
+    }
 }

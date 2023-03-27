@@ -29,4 +29,7 @@ public class LaserPath extends LinearPath{
     public float getDuration() {
         return 0.001f;
     }
+    public String toString() {
+        return super.toString();
+    }
 }

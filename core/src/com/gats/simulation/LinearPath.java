@@ -100,4 +100,10 @@ public class LinearPath implements Path {
     public void setDuration(Vector2 endPosition) {
         this.duration = endPosition.cpy().sub(start).len() / v;
     }
+
+    @Override
+    public String toString() {
+        String output = "from: " + getPos(0) + "to: " +getPos(endTime);
+        return output;
+    }
 }

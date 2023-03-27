@@ -8,7 +8,7 @@ import java.util.Iterator;
  * Represents a single UI-relevant Event
  * Base-Component of the asynchronous interface between the simulation and ui/animation package
  */
-public abstract class Action {
+public abstract class Action implements Iterable<Action>{
     private final float delay;
     private final ArrayList<Action> arrayList = new ArrayList<>();
 
@@ -51,6 +51,10 @@ public abstract class Action {
      */
     public Iterator<Action> iterator() {
         return this.arrayList.iterator();
+    }
+
+    public String toString(){
+        return "Action: ";
     }
 
 }

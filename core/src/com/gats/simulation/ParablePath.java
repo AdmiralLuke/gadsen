@@ -127,4 +127,10 @@ public class ParablePath implements Path {
     public void setDuration(Vector2 endPosition) {
         this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
     }
+
+    @Override
+    public String toString() {
+        String output = "from: " + getPos(0) + "to: " +getPos(duration);
+        return output;
+    }
 }

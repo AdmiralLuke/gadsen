@@ -47,4 +47,16 @@ public final class CharacterWalkAction extends CharacterAction{
     public float getDuration() {
         return path.getDuration();
     }
+    @Override
+       public String toString() {
+
+        String output=  super.toString();
+
+        output += path.toString();
+
+        output += " ";
+
+        return output;
+
+    }
 }

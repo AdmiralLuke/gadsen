@@ -52,4 +52,13 @@ public class ProjectileAction extends Action{
     public ProjectileType getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return "ProjectileAction{" +
+                       "type=" + type +
+                       ", path=" + path +
+                       ", duration=" + duration +
+                       '}';
+    }
 }
