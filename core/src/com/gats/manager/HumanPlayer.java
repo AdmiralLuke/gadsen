@@ -234,13 +234,14 @@ public class HumanPlayer extends Player {
         this.angle = angle;
        controller.aim(angle,strength);
     }
+
     public void aimToVector(Vector2 target){
       Vector2 playerPos = controller.getGameCharacter().getPlayerPos();
       target.sub(playerPos);
       float maxStrengthDistance = 80;
       float currentDistance = target.len();
       currentDistance = currentDistance>maxStrengthDistance?maxStrengthDistance:currentDistance;
-      controller.aim(target,currentDistance/maxStrengthDistance);
+     this.aim((int) target.angleDeg(),currentDistance/maxStrengthDistance);
     }
 
 
