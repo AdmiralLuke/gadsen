@@ -16,17 +16,6 @@ public class InputHandler implements GadsenInputProcessor{
 	InGameScreen ingameScreen;
 
 
-	enum Key {
-		KEY_CAMERA_UP,
-		KEY_CAMERA_DOWN,
-		KEY_CAMERA_LEFT,
-		KEY_CAMERA_RIGHT,
-		KEY_CAMERA_ZOOM_IN,
-		KEY_CAMERA_ZOOM_OUT,
-		KEY_CAMERA_ZOOM_RESET,
-		KEY_EXIT_TO_MENU
-	}
-
 
 	private final int KEY_CAMERA_UP = Input.Keys.UP;
 	private final int KEY_CAMERA_DOWN = Input.Keys.DOWN;
