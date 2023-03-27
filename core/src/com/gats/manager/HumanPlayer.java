@@ -235,15 +235,21 @@ public class HumanPlayer extends Player {
        controller.aim(angle,strength);
     }
 
+    /**
+     * Makes the controller aim to the provided position.
+     * @param target position to aim towards.
+     */
     public void aimToVector(Vector2 target){
       Vector2 playerPos = controller.getGameCharacter().getPlayerPos();
       target.sub(playerPos);
-      float maxStrengthDistance = 80;
+
+      //maximum length before strength begins to decrease
+      float maxStrengthDistance = 64; //64=4*16= 4tiles derzeit
       float currentDistance = target.len();
       currentDistance = currentDistance>maxStrengthDistance?maxStrengthDistance:currentDistance;
+     //call aim with the targetAngle and strength ratio
      this.aim((int) target.angleDeg(),currentDistance/maxStrengthDistance);
     }
-
 
     public void processKeyUp(int keycode) {
 

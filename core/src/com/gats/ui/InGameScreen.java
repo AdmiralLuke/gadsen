@@ -126,6 +126,11 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
     }
 
+    /**
+     * Converts Viewport/Screen-Coordinates to World/Ingame-Position
+     * @param coordinates to convert.
+     * @return Vector with World-Coordinate
+     */
     public Vector2 toWorldCoordinates(Vector2 coordinates){
         Vector3 position = gameViewport.getCamera().unproject(new Vector3(coordinates.x,coordinates.y,0));
         return new Vector2(position.x,position.y);
