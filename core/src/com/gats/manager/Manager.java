@@ -3,10 +3,11 @@ package com.gats.manager;
 import com.gats.manager.command.Command;
 import com.gats.manager.command.EndTurnCommand;
 import com.gats.simulation.action.ActionLog;
-import com.gats.ui.HudStage;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
+import com.gats.ui.hud.GadsenInputProcessor;
+import com.gats.ui.hud.InputHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -27,7 +28,7 @@ public class Manager {
     private static final int HUMAN_EXECUTION_TIMEOUT = 30000;
     private static final int HUMAN_INIT_TIMEOUT = 30000;
 
-    private final HudStage inputGenerator;
+    private final GadsenInputProcessor inputGenerator;
 
     private AnimationLogProcessor animationLogProcessor;
 
@@ -53,7 +54,7 @@ public class Manager {
         state = simulation.getState();
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;
-        inputGenerator = config.hud;
+        inputGenerator = config.input;
 
         players = new Player[config.teamCount];
 

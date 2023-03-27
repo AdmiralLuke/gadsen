@@ -45,7 +45,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
         runConfig.gui = true;
         runConfig.animationLogProcessor = this;
-        runConfig.hud = hudStage;
+        runConfig.input = hudStage.getInputHandler();
         manager = new Manager(runConfig);
         animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode );
         manager.start();
@@ -118,8 +118,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
         //animator als actor?
          //       simulation als actor?
-        Gdx.input.setInputProcessor(hudStage);
-        hudStage.setHumanPlayers(humanList);
+        Gdx.input.setInputProcessor(hudStage.getInputHandler());
+        hudStage.getInputHandler().setHumanPlayers(humanList);
 
     }
 

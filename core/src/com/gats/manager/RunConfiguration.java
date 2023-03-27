@@ -1,6 +1,6 @@
 package com.gats.manager;
 
-import com.gats.ui.HudStage;
+import com.gats.ui.hud.GadsenInputProcessor;
 
 import java.util.ArrayList;
 
@@ -13,7 +13,7 @@ public class RunConfiguration {
     public AnimationLogProcessor animationLogProcessor = null;
 
     //Generalize to Interface
-    public HudStage hud = null;
+    public GadsenInputProcessor input = null;
 
     public String mapName;
 
@@ -49,7 +49,7 @@ public class RunConfiguration {
       output+=  "Gui: " + gui +nl;
 
       output+= "AnimationLogProcessor: " + checkNullToString(animationLogProcessor)+nl;
-      output+= "HudStage: " + checkNullToString(hud)+nl;
+      output+= "HudStage: " + checkNullToString(input)+nl;
       output+= "mapName: " + mapName+nl;
       output+= "teamCount: " + teamCount+nl;
       output+= "teamSize: " + teamSize+nl;
