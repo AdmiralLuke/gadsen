@@ -35,7 +35,7 @@ public class InputHandler implements GadsenInputProcessor{
 	private HumanPlayer currentPlayer;
 	private Vector2 lastMousePosition;
 	private Vector2 deltaMouseMove;
-	private boolean lastPositionSet;
+	private boolean rightMousePressed;
 	private List<HumanPlayer> humanList = new ArrayList<>();
 	private boolean turnInProgress = false;
 
@@ -195,12 +195,17 @@ public class InputHandler implements GadsenInputProcessor{
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if(button==Input.Buttons.RIGHT){
 			lastMousePosition = new Vector2(screenX,screenY);
+			rightMousePressed = true;
+
 		}
 		return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		if(button==Input.Buttons.RIGHT){
+			rightMousePressed=false;
+		}
 
 		return false;
 	}
@@ -210,13 +215,17 @@ public class InputHandler implements GadsenInputProcessor{
 
 		//wenn gezogen wird, alte position nehmen, distanz zur neuen position ermitteln und die Kamera nun um diesen wert verschieben
 
+		if(rightMousePressed) {
+			deltaMouseMove = new Vector2(screenX, screenY).sub(lastMousePosition);
+			deltaMouseMove.y = deltaMouseMove.y * -1;
+			lastMousePosition = new Vector2(screenX, screenY);
 
-		deltaMouseMove = new Vector2(screenX,screenY).sub(lastMousePosition);
-		deltaMouseMove.y = deltaMouseMove.y*-1;
-		lastMousePosition = new Vector2(screenX,screenY);
+			//Todo: Bewegung auch abhängig vom zoom level machen
+			//sollte sich so anfühlen, als wenn man die welt an einem Block anfässt und sich diese dann mit der maus verschiebt
+			ingameScreen.moveCameraByOffset(deltaMouseMove.scl(1.5f));
+			return true;
+		}
 
-
-		ingameScreen.moveCameraByOffset(deltaMouseMove.nor().scl(12));
 		return false;
 	}
 

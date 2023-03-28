@@ -78,7 +78,11 @@ public class AnimatorCamera extends OrthographicCamera {
     }
     }
     public void moveByOffset(Vector2 offset){
-       this.position.set(position.add(offset.x,offset.y,0));
+
+         this.position.set(position.add(-offset.x,-offset.y,0));
+        //Todo: adjust lerp, so that it is calculated, from the beginning , idk how to describe
+        //Link: https://stackoverflow.com/questions/24047172/libgdx-camera-smooth-translation
+        //position.lerp(new Vector3(position).add(offset.x,offset.y,0),0.2f);
     }
 
     public boolean getCanMoveToVector() {
