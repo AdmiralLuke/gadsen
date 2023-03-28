@@ -77,6 +77,9 @@ public class AnimatorCamera extends OrthographicCamera {
         this.position.set(position,0);
     }
     }
+    public void moveByOffset(Vector2 offset){
+       this.position.set(position.add(offset.x,offset.y,0));
+    }
 
     public boolean getCanMoveToVector() {
         return canMoveToVector;

@@ -33,7 +33,9 @@ public class InputHandler implements GadsenInputProcessor{
 
 
 	private HumanPlayer currentPlayer;
-
+	private Vector2 lastMousePosition;
+	private Vector2 deltaMouseMove;
+	private boolean lastPositionSet;
 	private List<HumanPlayer> humanList = new ArrayList<>();
 	private boolean turnInProgress = false;
 
@@ -79,7 +81,9 @@ public class InputHandler implements GadsenInputProcessor{
 
 	private void processMouseAim(int screenX, int screenY){
 		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX,screenY));
-		currentPlayer.aimToVector(worldCursorPos);
+		if(currentPlayer!=null) {
+			currentPlayer.aimToVector(worldCursorPos);
+		}
 	}
 	/**
 	 * Called whenever a button is just pressed.
@@ -189,21 +193,36 @@ public class InputHandler implements GadsenInputProcessor{
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		if(button==Input.Buttons.RIGHT){
+			lastMousePosition = new Vector2(screenX,screenY);
+		}
 		return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+
 		return false;
 	}
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+
+		//wenn gezogen wird, alte position nehmen, distanz zur neuen position ermitteln und die Kamera nun um diesen wert verschieben
+
+
+		deltaMouseMove = new Vector2(screenX,screenY).sub(lastMousePosition);
+		deltaMouseMove.y = deltaMouseMove.y*-1;
+		lastMousePosition = new Vector2(screenX,screenY);
+
+
+		ingameScreen.moveCameraByOffset(deltaMouseMove.nor().scl(12));
 		return false;
 	}
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
+
 
 		processMouseAim(screenX,screenY);
 		return false;

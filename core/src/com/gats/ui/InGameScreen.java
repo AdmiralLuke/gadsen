@@ -149,4 +149,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     public void toggleCameraMove() {
         animator.getCamera().toggleCanMoveToVector();
     }
+    public void moveCameraByOffset(Vector2 offset){
+        animator.getCamera().moveByOffset(offset);
+    }
 }
