@@ -1,6 +1,7 @@
 package com.gats.animation;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -13,6 +14,11 @@ public class AnimatorCamera extends OrthographicCamera {
     private final Vector3 defaultPosition;
     private Vector3 cameraDirection;
     private float cameraSpeed;
+    private Vector3 targetPosition = new Vector3(0,0,0);
+
+    private Interpolation cameraInterpolation = Interpolation.linear;
+    private int lifetime = 2;
+    private float elapsed = lifetime;
 
     //1 = zoom out, 0 = no zoom, -1 = zoom in
     private float cameraZoomPressed;
@@ -23,7 +29,7 @@ public class AnimatorCamera extends OrthographicCamera {
         this.defaultPosition = new Vector3(0,0,0);
         this.cameraDirection = new Vector3(0,0,0);
         this.cameraSpeed = 200;
-        this.canMoveToVector = false;
+        this.canMoveToVector = true;
 
     }
 
@@ -36,6 +42,14 @@ public class AnimatorCamera extends OrthographicCamera {
 
         this.translate(new Vector3(cameraDirection).scl(cameraSpeed * delta));
 
+       if(elapsed<lifetime) {
+
+           elapsed += delta;
+           float progress = Math.min(1f, elapsed / lifetime);
+           float alpha = cameraInterpolation.apply(progress);
+
+           this.position.lerp(targetPosition, alpha);
+       }
     }
     private void processZoomInput(float delta){
         if(this.zoom > 0.1||cameraZoomPressed>0) {
@@ -58,6 +72,7 @@ public class AnimatorCamera extends OrthographicCamera {
     public void updateMovement(float delta) {
        processMoveInput(delta);
        processZoomInput(delta);
+
     }
 
     public void setZoomPressed(float zoomPressed) {
@@ -73,12 +88,17 @@ public class AnimatorCamera extends OrthographicCamera {
     }
 
     public void moveToVector(Vector2 position){
-    if(canMoveToVector){
-        this.position.set(position,0);
-    }
+
+        if(canMoveToVector){
+
+            targetPosition = new Vector3(position,0);
+
+            elapsed = 0;
+         //this.position.set(position,0);
+
+        }
     }
     public void moveByOffset(Vector2 offset){
-
          this.position.set(position.add(-offset.x,-offset.y,0));
         //Todo: adjust lerp, so that it is calculated, from the beginning , idk how to describe
         //Link: https://stackoverflow.com/questions/24047172/libgdx-camera-smooth-translation
