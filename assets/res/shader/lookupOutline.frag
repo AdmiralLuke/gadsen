@@ -33,8 +33,16 @@ if (a > 0){
 gl_FragColor = v_color * outline_color;
 }else{
 vec4 texColor = texture2D(u_skin, vec2(v_skinBounds[0] + v_skinCoords.r * v_skinBounds[2], v_skinBounds[1] + v_skinCoords.g * v_skinBounds[3]));
+float light = v_skinCoords[2];
+if(light>0.5){
+float tint = light - 0.5;
+texColor = texColor * (1-tint) + vec4(1,1,1,1) * tint;
+}else{
+float shade = 0.5 - light;
+texColor = (1 - shade) * texColor;
+}
 texColor.a = v_skinCoords.a;
-gl_FragColor = vec4(v_skinCoords[2], v_skinCoords[2], v_skinCoords[2], 1) * (v_color * texColor);
+gl_FragColor = v_color * texColor;
 }
 
 }

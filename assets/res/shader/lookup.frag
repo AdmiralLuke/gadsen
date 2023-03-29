@@ -14,6 +14,14 @@ uniform sampler2D u_skin;
 void main() {
     vec4 v_skinCoords = texture2D(u_texture, v_texCoords);
     vec4 texColor = texture2D(u_skin, vec2(v_skinBounds[0] + v_skinCoords.r * v_skinBounds[2], v_skinBounds[1] + v_skinCoords.g * v_skinBounds[3]));
-    texColor.a = texColor.a * v_skinCoords.a;
-    gl_FragColor = vec4(v_skinCoords[2], v_skinCoords[2], v_skinCoords[2], 1) * (v_color * texColor);
+    float light = v_skinCoords[2];
+    if(light>0.5){
+        float tint = light - 0.5;
+        texColor = texColor * (1-tint) + vec(1,1,1,1) * tint;
+    }else{
+        float shade = 0.5 - light;
+        texColor = (1 - shade) * texColor;
+    }
+    texColor.a = v_skinCoords.a;
+    gl_FragColor = v_color * texColor;
 }
