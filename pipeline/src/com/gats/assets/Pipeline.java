@@ -3,19 +3,22 @@ package com.gats.assets;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.gats.util.FileUtils;
-import org.lwjgl.Sys;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Pipeline {
 
     static final String GROUP_DESCRIPTOR_NAME = ".group";
     static final String EXCLUSIONS_NAME = ".exclude";
+
+    static final String COMPRESSED_BASE_SKIN_CONFIG_NAME = ".cbase";
+    static final String UNCOMPRESSED_BASE_SKIN_CONFIG_NAME = ".ubase";
 
     static final FileFilter FILTER_NORMAL_FILES = File::isFile;
 
@@ -60,6 +63,8 @@ public class Pipeline {
 
         //Run TexturePacker after preprocessing unless excluded
         if (!exclusionList.contains(TEXTURE_PACKER_DIR)) {
+
+
             File texturePackerSrc = new File(fileRoot, TEXTURE_PACKER_DIR);
             if (texturePackerSrc.isDirectory()) {
                 texturePacker(texturePackerSrc);
@@ -83,6 +88,8 @@ public class Pipeline {
         List<String> exclusionList = new ArrayList<>();
         exclusionList.add(GROUP_DESCRIPTOR_NAME);
         exclusionList.add(EXCLUSIONS_NAME);
+        exclusionList.add(COMPRESSED_BASE_SKIN_CONFIG_NAME);
+        exclusionList.add(UNCOMPRESSED_BASE_SKIN_CONFIG_NAME);
         if (exclusions.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(exclusions))) {
                 String line;
@@ -114,7 +121,7 @@ public class Pipeline {
         if (CLEAR_TMP_ON_EXIT) packerRoot.deleteOnExit();
 
         //Move every Texture to a directory corresponding to its group
-        moveContents("misc", input, packerRoot);
+        moveTextureContents("misc", input, packerRoot);
 
         File texturePackerOut = new File(output, "texture_atlas");
         if (!texturePackerOut.exists() && !texturePackerOut.mkdirs())
@@ -145,10 +152,11 @@ public class Pipeline {
      * @param dir                 directory to be traversed
      * @param texturePackerOutput working-directory of the TexturePacker
      */
-    private static void moveContents(String group, File dir, File texturePackerOutput) {
+    private static void moveTextureContents(String group, File dir, File texturePackerOutput) {
         if (dir == null) throw new RuntimeException("Subdirectory may not be null");
         if (!dir.exists()) throw new RuntimeException("Subdirectory at " + dir.getAbsolutePath() + " does not exist");
 
+        List<String> exclusionList = getExcludes(dir);
 
         //Change the group if the directory contains a descriptor
         File groupDescriptor = new File(dir, GROUP_DESCRIPTOR_NAME);
@@ -161,7 +169,47 @@ public class Pipeline {
             }
         }
 
-        List<String> exclusionList = getExcludes(dir);
+        File compressedBaseSkinDescriptor = new File(dir, COMPRESSED_BASE_SKIN_CONFIG_NAME);
+        File uncompressedBaseSkinDescriptor = new File(dir, UNCOMPRESSED_BASE_SKIN_CONFIG_NAME);
+        Map<RGBColor, int[]> blueprintEncoding = null;
+        int[][][] skinEncoding = null;
+        int[] compressedSkinSize = new int[2];
+        if (compressedBaseSkinDescriptor.exists()) {
+            // Load Compressed Template
+            try (BufferedReader reader = new BufferedReader(new FileReader(compressedBaseSkinDescriptor))) {
+                File compressedBaseSkinPath = new File(fileRoot, reader.readLine());
+                System.out.println(compressedBaseSkinPath.getCanonicalPath());
+                if (!isImage(compressedBaseSkinPath))
+                    throw new RuntimeException("The supplied reverse lookup file has an invalid format.");
+                try {
+                    blueprintEncoding = generateBlueprintEncoding(ImageIO.read(compressedBaseSkinPath), compressedSkinSize);
+                } catch (IOException e) {
+                    throw new RuntimeException("Unable to read the supplied reverse lookup file.");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Couldn't read lookup descriptor at: " + compressedBaseSkinDescriptor.getAbsolutePath() +
+                        "\nStacktrace: " + e.getMessage());
+            }
+            if (uncompressedBaseSkinDescriptor.exists()) {
+                //Load skin template
+                try (BufferedReader reader = new BufferedReader(new FileReader(uncompressedBaseSkinDescriptor))) {
+                    File uncompressedBaseSkinPath = new File(fileRoot, reader.readLine());
+                    if (!isImage(uncompressedBaseSkinPath))
+                        throw new RuntimeException("The supplied reverse lookup file has an invalid format.");
+                    try {
+                        skinEncoding = generateSkinEncoding(blueprintEncoding, ImageIO.read(uncompressedBaseSkinPath));
+                    } catch (IOException e) {
+                        throw new RuntimeException("Unable to read the supplied reverse lookup file.");
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("Couldn't read lookup descriptor at: " + compressedBaseSkinDescriptor.getAbsolutePath() +
+                            "\nStacktrace: " + e.getMessage());
+                }
+
+
+            }
+        }
+
 
         //Copy all files to the correct group
         File[] content = dir.listFiles(FILTER_NORMAL_FILES);
@@ -178,7 +226,13 @@ public class Pipeline {
             if (!exclusionList.contains(cur.getName()))
                 try {
                     File dest = new File(groupPath, cur.getName());
-                    Files.copy(cur.toPath(), dest.toPath());
+//                    System.out.println(cur.getName() + !isImage(cur) + "," + (blueprintEncoding == null) + "," + (skinEncoding == null));
+                    if (!isImage(cur) || blueprintEncoding == null)
+                        Files.copy(cur.toPath(), dest.toPath());
+                    else if (skinEncoding == null)
+                        blueprintPreProcess(cur, blueprintEncoding, dest);
+                    else
+                        skinPreprocess(cur, skinEncoding, compressedSkinSize, dest);
                     if (CLEAR_TMP_ON_EXIT) dest.deleteOnExit();
                 } catch (IOException e) {
                     throw new RuntimeException("Couldn't copy file at: " + cur.getAbsolutePath() +
@@ -193,8 +247,135 @@ public class Pipeline {
         for (File cur :
                 subDirs) {
             if (!exclusionList.contains(cur.getName()))
-                moveContents(group, cur, texturePackerOutput);
+                moveTextureContents(group, cur, texturePackerOutput);
         }
+    }
+
+
+    /**
+     * Generates an encoding used for converting raw blueprints to encoded blueprints, where all reference colors have been replaced by their positional encoding.
+     * @param compressedBaseSkin        a compressed skin containing reference colors
+     * @param out_compressedSkinSize    an int[2] Array where the size of the compressed skin will be written to
+     * @return
+     */
+    private static Map<RGBColor, int[]> generateBlueprintEncoding(BufferedImage compressedBaseSkin, int[] out_compressedSkinSize) {
+        Map<RGBColor, int[]> encoding = new HashMap<>();
+        int width = compressedBaseSkin.getWidth();
+        out_compressedSkinSize[0] = width;
+        int height = compressedBaseSkin.getHeight();
+        out_compressedSkinSize[0] = height;
+        if (!(isValidEncodingSize(width) | isValidEncodingSize(height))) {
+            throw new RuntimeException("The compressed base skin has to be smaller than or equal to 256 x 256 and each side needs to be a power of 2");
+        }
+
+        int xScale = 256 / width;
+        int yScale = 256 / height;
+
+        for (int x = 0; x < compressedBaseSkin.getWidth(); x++)
+            for (int y = 0; y < compressedBaseSkin.getHeight(); y++) {
+                int[] colorA = compressedBaseSkin.getRaster().getPixel(x, y, (int[]) null);
+                if (colorA[3] == 0) continue;
+                RGBColor color = new RGBColor(new int[]{colorA[0], colorA[1], colorA[2]});
+                if (encoding.get(color) == null) {
+                    encoding.put(color, new int[]{x * xScale, y * yScale});
+                } else {
+                    if (!Arrays.equals(encoding.get(color), new int[]{256 - (x+1) * xScale, y * yScale}))
+                        throw new RuntimeException("A duplicate color may only appear at the mirrored x coordinate");
+                }
+
+            }
+        return encoding;
+    }
+
+    private static boolean isValidEncodingSize(int size) {
+        return size < 257 && ((size & size - 1) == 0);
+    }
+
+    /**
+     * Generates the encoding used for compressing skins
+     * @param blueprintEncoding     Maps colors to positions
+     * @param uncompressedBaseSkin  A Skin colored with the colors of the compressed base-skin
+     * @return Maps positions on the uncompressed skin to positions on the compressed skin
+     */
+    private static int[][][] generateSkinEncoding(Map<RGBColor, int[]> blueprintEncoding, BufferedImage uncompressedBaseSkin) {
+        int[][][] skinEncoding = new int[uncompressedBaseSkin.getWidth()][uncompressedBaseSkin.getHeight()][2];
+        int[] defaultPos = new int[]{-1, -1};
+        WritableRaster raster = uncompressedBaseSkin.getRaster();
+        for (int x = 0; x < uncompressedBaseSkin.getWidth(); x++)
+            for (int y = 0; y < uncompressedBaseSkin.getHeight(); y++) {
+                int[] colorA = raster.getPixel(x, y, (int[]) null);
+                RGBColor color = new RGBColor(new int[]{colorA[0], colorA[1], colorA[2]});
+                int[] pos = blueprintEncoding.getOrDefault(color, defaultPos);
+                skinEncoding[x][y][0] = pos[0];
+                skinEncoding[x][y][1] = pos[1];
+            }
+        return skinEncoding;
+    }
+
+    /**
+     * Preprocesses a single File that utilizes Texture Lookup
+     * Replaces all Pixels in the raw blueprint with their positional encoding, based on where that color is found in the compressed base-skin.
+     * After Processing, applying the supplied compressed base-skin (specified in .lookup) on the result should give the src.
+     *
+     * @param src               Image to be transformed
+     * @param blueprintEncoding Maps colors to positions
+     * @param dest              Output Path
+     */
+    private static void blueprintPreProcess(File src, Map<RGBColor, int[]> blueprintEncoding, File dest) {
+        try {
+            BufferedImage srcImage = ImageIO.read(src);
+            String srcName = src.getName();
+            int[] defaultPos = new int[]{0, 0};
+            BufferedImage destImage = new BufferedImage(srcImage.getWidth(), srcImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+            WritableRaster srcRaster = srcImage.getRaster();
+            WritableRaster destRaster = destImage.getRaster();
+            for (int x = 0; x < srcImage.getWidth(); x++)
+                for (int y = 0; y < srcImage.getHeight(); y++) {
+                    int[] colorA = srcRaster.getPixel(x, y, (int[]) null);
+                    RGBColor color = new RGBColor(new int[]{colorA[0], colorA[1], colorA[2]});
+                    int[] posColor = blueprintEncoding.getOrDefault(color, defaultPos);
+                    //ToDo read light map
+                    int lightLevel = 127;
+                    destRaster.setPixel(x, y, new int[]{posColor[0], posColor[1], lightLevel, colorA[3]});
+                }
+
+            ImageIO.write(destImage, srcName.substring(srcName.lastIndexOf('.') + 1), dest);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Compresses a skin into the format used for lookup at runtime according to the differences between uncompressed base-skin and compressed base-skin.
+     *
+     * @param src          Uncompressed skin to be transformed
+     * @param skinEncoding Maps positions on the uncompressed skin to positions on the compressed skin
+     * @param size         Size of the compressed Skin
+     * @param dest         Output Path
+     */
+    private static void skinPreprocess(File src, int[][][] skinEncoding, int[] size, File dest) {
+        try {
+            BufferedImage srcImage = ImageIO.read(src);
+            BufferedImage resultImage = new BufferedImage(size[0], size[1], srcImage.getType());
+            String srcName = src.getName();
+            WritableRaster srcRaster = srcImage.getRaster();
+            WritableRaster resultRaster = resultImage.getRaster();
+            for (int x = 0; x < srcImage.getWidth(); x++)
+                for (int y = 0; y < srcImage.getHeight(); y++) {
+                    int[] pos = skinEncoding[x][y];
+                    if (!Arrays.equals(pos, new int[]{-1, -1}))
+                        resultRaster.setPixel(pos[0], pos[1], srcRaster.getPixel(x, y, (int[]) null));
+                }
+            ImageIO.write(resultImage, srcName.substring(srcName.lastIndexOf('.') + 1), dest);
+        } catch (
+                IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private static boolean isImage(File path) {
+        return path.isFile() && (path.getName().endsWith(".png") || path.getName().endsWith(".jpg"));
     }
 
     /**
