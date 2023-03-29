@@ -58,6 +58,8 @@ public class AssetContainer {
 
         public static ShaderProgram lookupShader;
 
+        public static ShaderProgram lookupOutlineShader;
+
         //Projectiles
         public static Array<TextureAtlas.AtlasRegion> Cookie;
         public static Array<TextureAtlas.AtlasRegion> SugarCane;

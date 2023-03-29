@@ -33,10 +33,12 @@ public class GameCharacter extends AnimatedEntity {
     private GameCharacterAnimationType currentAnimation = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
     private final Color teamColor;
 
+    private static final float OUTLINE_ALPHA = 0.5f;
+
 
     public GameCharacter(Color teamColor) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
-        this.teamColor = teamColor;
+        this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
     @Override
@@ -48,23 +50,21 @@ public class GameCharacter extends AnimatedEntity {
         if (aimingIndicator != null && aimActive) {
             aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
-        batch.setShader(IngameAssets.lookupShader);
-//        IngameAssets.outlineShader.setUniformf("outline_color", teamColor);
-//        IngameAssets.outlineShader.setUniformf("line_thickness", 1f);
-//        Texture texture = getAnimation().getKeyFrame(0).getTexture();
-//        IngameAssets.outlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
-
-        IngameAssets.lookupShader.setUniformi("u_skin", 1);
+        batch.setShader(IngameAssets.lookupOutlineShader);
+        IngameAssets.lookupOutlineShader.setUniformf("outline_color", teamColor);
+        IngameAssets.lookupOutlineShader.setUniformf("line_thickness", 1f);
+        Texture texture = getAnimation().getKeyFrame(0).getTexture();
+        IngameAssets.lookupOutlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
+        IngameAssets.lookupOutlineShader.setUniformi("u_skin", 1);
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
         Texture skin = IngameAssets.coolCatSkin.getTexture();
         skin.bind();
-        IngameAssets.lookupShader.setUniformf("v_skinBounds",
+        IngameAssets.lookupOutlineShader.setUniformf("v_skinBounds",
                 IngameAssets.coolCatSkin.getU(),
                 IngameAssets.coolCatSkin.getV(),
                 IngameAssets.coolCatSkin.getU2() - IngameAssets.coolCatSkin.getU(),
                 IngameAssets.coolCatSkin.getV2() - IngameAssets.coolCatSkin.getV());
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-        Texture texture = getAnimation().getKeyFrame(0).getTexture();
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);

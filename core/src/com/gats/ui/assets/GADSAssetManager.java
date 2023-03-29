@@ -24,6 +24,7 @@ public class GADSAssetManager {
 
     public final String outlineShader = resourceDirectory + "shader/outline.frag";
     public final String lookupShader = resourceDirectory + "shader/lookup.frag";
+    public final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
 
     private boolean finishedLoading = false;
 
@@ -73,6 +74,7 @@ public class GADSAssetManager {
     private void loadShader(){
         manager.load(outlineShader, ShaderProgram.class);
         manager.load(lookupShader, ShaderProgram.class);
+        manager.load(lookupOutlineShader, ShaderProgram.class);
     }
 
 
@@ -130,6 +132,8 @@ public class GADSAssetManager {
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
 
         IngameAssets.lookupShader = manager.get(lookupShader, ShaderProgram.class);
+
+        IngameAssets.lookupOutlineShader = manager.get(lookupOutlineShader, ShaderProgram.class);
 
         IngameAssets.coolCatSkin = atlas.findRegion("skin/coolCatSkin");
 
