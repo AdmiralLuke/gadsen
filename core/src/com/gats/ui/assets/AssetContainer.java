@@ -1,5 +1,6 @@
 package com.gats.ui.assets;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -60,6 +61,7 @@ public class AssetContainer {
         //Projectiles
         public static Array<TextureAtlas.AtlasRegion> Cookie;
         public static Array<TextureAtlas.AtlasRegion> SugarCane;
+        public static TextureAtlas.AtlasRegion coolCatSkin;
 
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,

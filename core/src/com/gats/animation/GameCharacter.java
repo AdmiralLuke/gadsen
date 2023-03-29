@@ -1,6 +1,8 @@
 package com.gats.animation;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -29,7 +31,7 @@ public class GameCharacter extends AnimatedEntity {
     private GameCharacterAnimationType idleType = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
 
     private GameCharacterAnimationType currentAnimation = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
-    private Color teamColor;
+    private final Color teamColor;
 
 
     public GameCharacter(Color teamColor) {
@@ -46,11 +48,23 @@ public class GameCharacter extends AnimatedEntity {
         if (aimingIndicator != null && aimActive) {
             aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
-        batch.setShader(IngameAssets.outlineShader);
-        IngameAssets.outlineShader.setUniformf("outline_color", teamColor);
-        IngameAssets.outlineShader.setUniformf("line_thickness", 1f);
+        batch.setShader(IngameAssets.lookupShader);
+//        IngameAssets.outlineShader.setUniformf("outline_color", teamColor);
+//        IngameAssets.outlineShader.setUniformf("line_thickness", 1f);
+//        Texture texture = getAnimation().getKeyFrame(0).getTexture();
+//        IngameAssets.outlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
+
+        IngameAssets.lookupShader.setUniformi("u_skin", 1);
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
+        Texture skin = IngameAssets.coolCatSkin.getTexture();
+        skin.bind();
+        IngameAssets.lookupShader.setUniformf("v_skinBounds",
+                IngameAssets.coolCatSkin.getU(),
+                IngameAssets.coolCatSkin.getV(),
+                IngameAssets.coolCatSkin.getU2() - IngameAssets.coolCatSkin.getU(),
+                IngameAssets.coolCatSkin.getV2() - IngameAssets.coolCatSkin.getV());
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
         Texture texture = getAnimation().getKeyFrame(0).getTexture();
-        IngameAssets.outlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);
@@ -93,7 +107,7 @@ public class GameCharacter extends AnimatedEntity {
         super.setRelPos(pos);
     }
 
-    public static float getAnimationDuration(GameCharacterAnimationType type){
+    public static float getAnimationDuration(GameCharacterAnimationType type) {
         return IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
     }
 

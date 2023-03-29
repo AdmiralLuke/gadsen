@@ -1,6 +1,7 @@
 package com.gats.ui.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -127,7 +128,11 @@ public class GADSAssetManager {
         }
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
+
         IngameAssets.lookupShader = manager.get(lookupShader, ShaderProgram.class);
+
+        IngameAssets.coolCatSkin = atlas.findRegion("skin/coolCatSkin");
+
 
         IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
 
