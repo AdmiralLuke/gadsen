@@ -246,6 +246,10 @@ public class GameState {
         return board[x][y];
     }
 
+    public Tile getTile(IntVector2 pos) {
+        return getTile(pos.x, pos.y);
+    }
+
     /**
      * @return Horizontale Größe des Spielfeldes in #Boxen
      */

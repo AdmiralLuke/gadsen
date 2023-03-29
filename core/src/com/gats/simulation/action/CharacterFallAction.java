@@ -23,7 +23,7 @@ public class CharacterFallAction extends CharacterAction {
      */
     public CharacterFallAction(float delay, int team, int character, Vector2 posBef, Vector2 posAft) {
         super(delay, team, character);
-        this.path = new LinearPath(posBef, posAft, 0.1f);
+        this.path = new LinearPath(posBef, posAft, 10f);
         this.duration = path.getDuration();
     }
 

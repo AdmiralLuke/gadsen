@@ -10,12 +10,18 @@ import com.gats.simulation.action.ProjectileAction;
 
 import java.util.ArrayList;
 
+/**
+ * Base Projectile for the {@link Projectile Projectile-Decorator}
+ * simulates the basic behavior from a Projectile, like Movement, basic tile destruction and character hit actions
+ */
 public class BaseProjectile implements Projectile{
 
     ProjType projType;
     int damage;
     int recoil;
     int knockback;
+    Tile lastTile;
+    GameCharacter lastCharacter;
 
     Simulation sim;
 
@@ -56,6 +62,7 @@ public class BaseProjectile implements Projectile{
 
     @Override
     public Action shoot(Action head, Vector2 dir, float strength, Projectile dec) {
+        this.t = 0f;
         this.strength = strength;
         return this.move(head, strength , dec);
     }
@@ -64,52 +71,75 @@ public class BaseProjectile implements Projectile{
     public Action move(Action head, float strength, Projectile dec) {
         Action log = null;
         while (log == null) {
-            this.t += 0.001f;
             Vector2 pos = path.getPos(t);
             Vector2 posN = path.getPos(this.t + 0.001f);
-            DebugPointAction dbAc = new DebugPointAction(0, pos, Color.BLUE, 5, true);
-            head.addChild(dbAc);
+            // DebugPointAction dbAc = new DebugPointAction(0, pos, Color.BLUE, 0.1f, true);
+            // head.addChild(dbAc);
             log = checkForHit(head, dec, pos, posN);
+            if (log == null) this.t += 0.001f;
         }
         return log;
-
     }
 
     Action checkForHit(Action head, Projectile dec, Vector2 pos, Vector2 posN) {
-        // Mittelpunkt des Kreises (pos + posN) / 2
-        Vector2 m = pos.cpy().add(posN).cpy().scl(0.5f);
-
-        // Radius
-        float r = posN.cpy().sub(pos).len() / 2;
-        Circle c = new Circle(m.x, m.y, r);
-
         Tile h = sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16);
         if (h != null) {
-            Tile tN = sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16);
-            while (tN == null || !tN.equals(h)) {
-                this.t += 0.0001f;
-                pos = path.getPos(t);
-                tN = sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16);
+            if (lastTile == null || !lastTile.equals(h)) {
+                Tile tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
+                while (tN == null || !tN.equals(h)) {
+                    this.t += 0.0001f;
+                    pos = path.getPos(t);
+                    if (lastTile != null && !h.equals(lastTile)) lastTile = h;
+                    tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
+                }
+                lastTile = h;
+                return dec.hitWall(head, tN, dec, this);
             }
-            return dec.hitWall(head, tN, dec, this);
+        } else {
+            lastTile = null;
         }
 
         if (t == path.getDuration() || pos.y < 0) return hitNothing(head);
-        // ToDo: Character Hit
+
+
+        for (int i = 0; i < sim.getState().getTeamCount(); i++) {
+            for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
+                GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
+                if (((int)character.getPlayerPos().x / 16 == (int)pos.x / 16) && ((int)character.getPlayerPos().y / 16 == (int)pos.y / 16)) {
+                    if (this.t == 0f) {
+                        lastCharacter = character;
+                        return null;
+                    }
+                    if (lastCharacter == null) {
+                        lastCharacter = character;
+                        return dec.hitCharacter(head, character, dec, this);
+                    }
+                    if (lastCharacter == character) return null;
+                }
+            }
+        }
+
+        lastCharacter = null;
+
         return null;
     }
 
 
     @Override
-    public Action hitCharacter(Action head, Character character, Projectile dec, BaseProjectile bsProj) {
-        return null;
+    public Action hitCharacter(Action head, GameCharacter character, Projectile dec, BaseProjectile bsProj) {
+        int health = character.getHealth();
+        int i = character.getTeam();
+        int j = character.getTeamPos();
+        Action pAc = generateAction();
+        head.addChild(pAc);
+        return sim.getWrapper().setHealth(pAc, i, j, health - damage);
     }
 
     @Override
     public Action hitWall(Action head, Tile t, Projectile dec, BaseProjectile bsProj) {
         ProjectileAction projAction = generateAction();
         head.getChildren().add(projAction);
-        return t.onDestroy(projAction); // ToDo: something is wrong
+        return t.onDestroy(projAction);
     }
 
     public Action hitNothing(Action head) {

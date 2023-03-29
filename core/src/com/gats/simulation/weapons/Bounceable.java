@@ -12,18 +12,19 @@ public class Bounceable implements Projectile {
 
     int bounces;
     int leftBounces;
-    Vector2 dir;
+    float modifier;
 
     private Projectile proj;
 
-    public Bounceable(Projectile proj, int bounces) {
+    public Bounceable(Projectile proj, int bounces, float modifier) {
         this.proj = proj;
         this.leftBounces = bounces;
         this.bounces = bounces;
+        this.modifier = modifier % 1.01f;
     }
 
     @Override
-    public Action hitCharacter(Action head, Character character, Projectile dec, BaseProjectile bsProj) {
+    public Action hitCharacter(Action head, GameCharacter character, Projectile dec, BaseProjectile bsProj) {
         return dec == this ? proj.hitCharacter(head,character, proj, bsProj) : proj.hitCharacter(head,character, dec, bsProj);
     }
 
@@ -36,45 +37,29 @@ public class Bounceable implements Projectile {
         } else {
             leftBounces--;
             Vector2 pos = bsProj.path.getPos(bsProj.t).cpy();
-            Vector2 dir = bsProj.path.getDir(0).cpy();
+            Vector2 dir = bsProj.path.getDir(bsProj.t).cpy();
             Action prAct = null;
 
-            /* this is a tile represented as corner-coordinates
-                   2
-                B --- C
-              1 |     | 3
-                A --- D
-                   4
-             */
 
-            // which side was hitted?
-            int i = 0;
+            dir = bounce(pos, dir, t, bsProj.sim.getState());
 
-            Vector2 posA = t.getWorldPosition();
-            Vector2 posB = new Vector2(posA.x, posA.y + 15);
-            Vector2 posC = new Vector2(posA.x + 15, posA.y + 15);
-            Vector2 posD = new Vector2(posA.x + 15, posA.y);
-
-            if (Math.floor(pos.x) == Math.floor(posA.x) && pos.y <= posB.y) i = 0;
-            if (Math.floor(pos.y) == Math.floor(posA.y) && pos.x <= posD.x) i = 1;
-            if (Math.floor(pos.y) == Math.floor(posB.y) && pos.x <= posC.x) i = 2;
-            if (Math.floor(pos.x) == Math.floor(posD.x) && pos.y <= posC.y) i = 3;
-
-            // if hits
             DebugPointAction dbAc = new DebugPointAction(0, pos, Color.CORAL, 5, true);
             head.addChild(dbAc);
-            if (i % 2 == 0) dir.x *= -1;
-            if (i % 2 != 0) dir.y *= -1;
+
             prAct = bsProj.generateAction();
             head.addChild(prAct);
             // new Path
             dir.nor();
             Path path = null;
-            Vector2 v = new Vector2((dir.x * bsProj.strength) * 400, (dir.y * bsProj.strength) * 400);
+            bsProj.strength *= modifier;
+            if (bsProj.strength < 0.05) {
+                return bsProj.hitWall(head, t, dec, bsProj);
+            }
+            Vector2 v = new Vector2((dir.x * (bsProj.strength)) * 400, (dir.y * (bsProj.strength)) * 400);
             if (bsProj.type == ProjectileAction.ProjectileType.COOKIE) path = new ParablePath(pos.cpy(), 10, v);
             else if(bsProj.type == ProjectileAction.ProjectileType.CANDY_CANE) path = new LinearPath(pos.cpy(), dir.cpy(), 10, 40);
             dec.setPath(path);
-            bsProj.t = 0.011f;
+            bsProj.t = 0f;
             return bsProj.move(prAct, bsProj.strength, dec);
         }
     }
@@ -94,5 +79,120 @@ public class Bounceable implements Projectile {
     @Override
     public Action move(Action head, float strength, Projectile dec) {
         return this.proj.move(head, strength, dec);
+    }
+
+    public Vector2 bounce(Vector2 pos, Vector2 dir, Tile t, GameState state) {
+        /* this is a tile represented as corner-coordinates
+                   3
+                B --- C
+              0 |     | 2
+                A --- D
+                   1
+             */
+
+        // which side was hitted?
+        int i = 0;
+
+        Vector2 posA = t.getWorldPosition();
+        Vector2 posB = new Vector2(posA.x, posA.y + 15);
+        Vector2 posC = new Vector2(posA.x + 15, posA.y + 15);
+        Vector2 posD = new Vector2(posA.x + 15, posA.y);
+
+        if (Math.floor(pos.x) == Math.floor(posA.x) && pos.y <= posB.y && pos.y >= posA.y) i = 0;
+        if (Math.floor(pos.y) == Math.floor(posA.y) && pos.x <= posD.x && pos.x >= posA.x) i = 1;
+        if (Math.floor(pos.y) == Math.floor(posB.y) && pos.x <= posC.x && pos.x >= posB.x) i = 3;
+        if (Math.floor(pos.x) == Math.floor(posD.x) && pos.y <= posC.y && pos.y >= posD.y) i = 2;
+
+
+
+        /* Possible Neighbour Tiles
+          + --- + --- + --- +
+          | lu  |  u  | ru  |
+          + --- B --- C --- +
+          |  l  |     |  r  |
+          + --- A --- D --- +
+          | ld  |  d  | rd  |
+          + --- + --- + --- +
+         */
+        IntVector2 posToTile = new IntVector2((int)pos.x / 16, (int)pos.y / 16);
+
+
+        Tile l = state.getTile(posToTile.x - 1, posToTile.y);
+        Tile d = state.getTile(posToTile.x, posToTile.y - 1);
+        Tile u = state.getTile(posToTile.x, posToTile.y + 1);
+        Tile r = state.getTile(posToTile.x + 1, posToTile.y);
+
+
+        Tile lu = state.getTile(posToTile.x - 1, posToTile.y + 1);
+        Tile ld = state.getTile(posToTile.x - 1,  posToTile.y - 1);
+        Tile ru = state.getTile(posToTile.x + 1, posToTile.y + 1);
+        Tile rd = state.getTile(posToTile.x + 1, posToTile.y - 1);
+
+        // directly hit Corner A
+        if (Math.floor(pos.x) == Math.floor(posA.x) && Math.floor(pos.y) == Math.floor(posA.y)) {
+            // we can have two Neighbored Tiles
+
+
+            if (l == null && d != null) {
+                i = 1;
+            } else if (l != null && d != null) {
+                i = 4; // back to where it comes from
+            } else if (l != null && d == null) {
+                i = 2;
+            }
+
+            if (ld != null) i = 4;
+        }
+
+        // directly hit corner B
+
+        if (Math.floor(pos.x) == Math.floor(posB.x) && Math.floor(pos.y) == Math.floor(posB.y)) {
+            if (r == null && u != null) {
+                i = 2;
+            } else if (r != null && u != null) {
+                i = 4;
+            } else if (r != null && u == null) {
+                i = 1;
+            }
+
+            if (lu != null) i = 4;
+        }
+
+        // directly hit corner C
+
+        if (Math.floor(pos.x) == Math.floor(posC.x) && Math.floor(pos.y) == Math.floor(posC.y)) {
+            if (l == null && u != null) {
+                i = 2;
+            } else if (l != null && u != null) {
+                i = 4;
+            } else if (l != null && u == null) {
+                i = 1;
+            }
+
+            if (ru != null) i = 4;
+        }
+
+        // directly hit corner D
+
+        if (Math.floor(pos.x) == Math.floor(posD.x) && Math.floor(pos.y) == Math.floor(posD.y)) {
+            if (r == null && d != null) {
+                i = 1;
+            } else if (r != null && d != null) {
+                i = 4; // back to where it comes from
+            } else if (r != null && d == null) {
+                i = 2;
+            }
+
+            if (rd != null) i = 4;
+        }
+
+        // if hits
+
+        if (i % 2 == 0) dir.x *= -1;
+        if (i % 2 != 0) dir.y *= -1;
+        if (i == 4) {
+            dir.y *= -1;
+        }
+        return dir;
     }
 }
