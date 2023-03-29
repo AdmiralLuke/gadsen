@@ -230,16 +230,14 @@ public class Pipeline {
                 try {
                     File dest = new File(groupPath, cur.getName());
 //                    System.out.println(cur.getName() + !isImage(cur) + "," + (blueprintEncoding == null) + "," + (skinEncoding == null));
-                    if (!isImage(cur))
-                        Files.copy(cur.toPath(), dest.toPath());
-                    else {
+                    if (isImage(cur))
                         if (skinEncoding != null)
                             skinPreprocess(cur, skinEncoding, compressedSkinSize, dest);
                         else if (blueprintEncoding != null)
                             blueprintPreProcess(cur, blueprintEncoding, dest);
                         else
                             Files.copy(cur.toPath(), dest.toPath());
-                    }
+
                     if (CLEAR_TMP_ON_EXIT) dest.deleteOnExit();
                 } catch (IOException e) {
                     throw new RuntimeException("Couldn't copy file at: " + cur.getAbsolutePath() +
@@ -344,6 +342,13 @@ public class Pipeline {
     private static void blueprintPreProcess(File src, Map<RGBColor, int[]> blueprintEncoding, File dest) {
         try {
             BufferedImage srcImage = ImageIO.read(src);
+            BufferedImage lightMap;
+            WritableRaster lightRaster = null;
+            File lightMapFile = new File(src.getParentFile(), src.getName() + ".light");
+            if (lightMapFile.exists()) {
+                lightMap = ImageIO.read(lightMapFile);
+                lightRaster = lightMap.getRaster();
+            }
             String srcName = src.getName();
             int[] defaultPos = new int[]{0, 0};
             BufferedImage destImage = new BufferedImage(srcImage.getWidth(), srcImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
@@ -354,9 +359,14 @@ public class Pipeline {
                     int[] colorA = srcRaster.getPixel(x, y, (int[]) null);
                     RGBColor color = new RGBColor(new int[]{colorA[0], colorA[1], colorA[2]});
                     int[] posColor = blueprintEncoding.getOrDefault(color, defaultPos);
-                    //ToDo read light map
+
                     int lightLevel = 127;
-                    destRaster.setPixel(x, y, new int[]{posColor[0], posColor[1], lightLevel, colorA[3]});
+                    if (lightRaster != null) {
+                        int[] light = lightRaster.getPixel(x, y, (int[]) null);
+                        lightLevel = (light[0] + light[1] + light[2])/3;
+                    }
+
+                        destRaster.setPixel(x, y, new int[]{posColor[0], posColor[1], lightLevel, colorA[3]});
                 }
 
             ImageIO.write(destImage, srcName.substring(srcName.lastIndexOf('.') + 1), dest);
