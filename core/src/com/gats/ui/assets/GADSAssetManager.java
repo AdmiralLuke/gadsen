@@ -102,7 +102,7 @@ public class GADSAssetManager {
         IngameAssets.gameCharacterAnimations = new Animation[GameCharacterAnimationType.values().length];
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdleL"));
+                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdle"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_WALKING.ordinal()] =
                 new Animation<>(1 / 10f, atlas.findRegions("cat/catWalkingL"));
