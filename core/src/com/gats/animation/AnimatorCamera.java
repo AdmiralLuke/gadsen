@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class AnimatorCamera extends OrthographicCamera {
 
-    //Todo Comment this class
+    //Todo Comment and refactor/clean up this class
     private final float defaultZoomValue = 1f;
     private final float zoomIncrement = 0.01f;
     private final Vector3 defaultPosition;
@@ -65,6 +65,20 @@ public class AnimatorCamera extends OrthographicCamera {
             this.zoom += zoomIncrement * cameraZoomPressed;
         }
 
+    }
+
+    /**
+     * Adjusts zoom by adding the value (in terms of percent).
+     * E.g. float of 10 would add 10 percent of zoom.
+     * @param zoomChange
+     */
+    public void addZoomPercent(float zoomChange){
+        if(this.zoom+zoomChange<0.1){
+            this.zoom = 0.1f;
+        }
+       else {
+            this.zoom += zoomChange;
+        }
     }
 
     /**

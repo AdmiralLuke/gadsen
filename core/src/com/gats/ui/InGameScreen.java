@@ -151,6 +151,14 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     }
     public void moveCameraByOffset(Vector2 offset){
         animator.getCamera().moveByOffset(offset);
+    }
 
+    /**
+     * Calls AnimatorCamera function to Zoom.
+     * @param zoom Value that shall be added to the zoom
+     */
+    public void zoomCamera(float zoom){
+        AnimatorCamera camera = animator.getCamera();
+        camera.addZoomPercent(zoom);
     }
 }

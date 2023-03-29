@@ -242,7 +242,6 @@ public class HumanPlayer extends Player {
      */
     public void aimToVector(Vector2 target){
       Vector2 playerPos = controller.getGameCharacter().getPlayerPos();
-        System.out.println(playerPos);
       //Todo get center from character sprite?
         //add characterCenteroffset currently center is at(8,8) because 16x16 sprite size
       playerPos.add(new Vector2(8.5f,8));

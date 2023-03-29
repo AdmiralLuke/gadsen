@@ -231,10 +231,8 @@ public class InputHandler implements GadsenInputProcessor{
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 
 		//wenn gezogen wird, alte position nehmen, distanz zur neuen position ermitteln und die Kamera nun um diesen wert verschieben
-
 		if(rightMousePressed) {
 			processMouseCameraMove(screenX,screenY);
-
 			return true;
 		}
 
@@ -251,6 +249,10 @@ public class InputHandler implements GadsenInputProcessor{
 
 	@Override
 	public boolean scrolled(float amountX, float amountY) {
+
+		if(amountY!=0) {
+			ingameScreen.zoomCamera(amountY / 10);
+		}
 		return false;
 	}
 
