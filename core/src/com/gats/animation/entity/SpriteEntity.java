@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 public class SpriteEntity extends Entity {
 
     private final TextureRegion textureRegion;
+    private Vector2 origin = new Vector2(0,0);
 
     private Color color = null;
     private Vector2 scale = new Vector2(1, 1);
@@ -25,6 +26,8 @@ public class SpriteEntity extends Entity {
         this.textureRegion = textureRegion;
     }
 
+
+
     public SpriteEntity(TextureRegion textureRegion, Vector2 relPos, Vector2 size) {
         super();
         this.textureRegion = textureRegion;
@@ -36,16 +39,19 @@ public class SpriteEntity extends Entity {
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         super.draw(batch, deltaTime, parentAlpha);
         if (color == null)
-            batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x,
+            batch.draw(textureRegion, getPos().x, getPos().y, origin.x, origin.y, size.x,
                     size.y, scale.x, scale.y, getRotationAngle());
         else {
             batch.setColor(color);
-            batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
+            batch.draw(textureRegion, getPos().x, getPos().y, origin.x, origin.y, size.x, size.y, scale.x, scale.y, getRotationAngle());
             batch.setColor(Color.WHITE);
         }
     }
 
-
+    public void setOrigin(float originX, float originY){
+       this.origin.x = originX;
+       this.origin.y = originY;
+    }
     public Vector2 getScale() {
         return scale;
     }

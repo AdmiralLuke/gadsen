@@ -46,7 +46,6 @@ public class InputHandler implements GadsenInputProcessor{
 	float[] ingameCameraDirection = new float[3];
 
 	float cameraZoomPressed = 0;
-	boolean cameraReset;
 
 	public InputHandler(InGameScreen ingameScreen){
 		this.ingameScreen = ingameScreen;
@@ -78,12 +77,30 @@ public class InputHandler implements GadsenInputProcessor{
 	}
 
 
-
+	/**
+	 * Converts the mouse screen-coordinates to worldPosition and calls {@link HumanPlayer#aimToVector(Vector2)} to aim the Indicator
+	 * @param screenX
+	 * @param screenY
+	 */
 	private void processMouseAim(int screenX, int screenY){
 		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX,screenY));
 		if(currentPlayer!=null) {
 			currentPlayer.aimToVector(worldCursorPos);
 		}
+	}
+
+	/**
+	 * Allows the camera to be moved with the mouse by using the position of the new and old mouse positions, to calculate the distance
+	 * to move.
+	 * @param screenX
+	 * @param screenY
+	 */
+	private void processMouseCameraMove(int screenX,int screenY){
+		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX, screenY));
+		deltaMouseMove = worldCursorPos.sub(ingameScreen.toWorldCoordinates(lastMousePosition));
+		lastMousePosition = new Vector2(screenX, screenY);
+
+		ingameScreen.moveCameraByOffset(deltaMouseMove);
 	}
 	/**
 	 * Called whenever a button is just pressed.
@@ -216,13 +233,8 @@ public class InputHandler implements GadsenInputProcessor{
 		//wenn gezogen wird, alte position nehmen, distanz zur neuen position ermitteln und die Kamera nun um diesen wert verschieben
 
 		if(rightMousePressed) {
-			deltaMouseMove = new Vector2(screenX, screenY).sub(lastMousePosition);
-			deltaMouseMove.y = deltaMouseMove.y * -1;
-			lastMousePosition = new Vector2(screenX, screenY);
+			processMouseCameraMove(screenX,screenY);
 
-			//Todo: Bewegung auch abhängig vom zoom level machen
-			//sollte sich so anfühlen, als wenn man die welt an einem Block anfässt und sich diese dann mit der maus verschiebt
-			ingameScreen.moveCameraByOffset(deltaMouseMove.scl(1.5f));
 			return true;
 		}
 

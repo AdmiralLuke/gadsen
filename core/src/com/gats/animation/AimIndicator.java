@@ -15,12 +15,14 @@ public class AimIndicator extends GameCharacterHudElement {
 
 
 
-    private Vector2 posOffset;
+    private Vector2 posOffset = new Vector2(0,0);
 
     public AimIndicator(TextureRegion hudSprite, GameCharacter gameCharacter){
         super(hudSprite,gameCharacter.getPos(),new Vector2(hudSprite.getRegionWidth(),hudSprite.getRegionHeight()),gameCharacter);
         Vector2 characterSize = gameCharacter.getSize();
-        this.posOffset = new Vector2(characterSize.x/2,characterSize.y/2);
+
+        setOrigin(0,3.5f);
+            this.posOffset = new Vector2(characterSize.x/2,characterSize.y/2 - 3.5f);
 
     }
 
