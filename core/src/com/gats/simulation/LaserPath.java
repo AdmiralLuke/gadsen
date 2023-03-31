@@ -7,13 +7,16 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class LaserPath extends LinearPath{
 
+
+    float duration;
     /**
      * Creates the path from start to end that is travelled instantaneously. E.g. the position will be equal to end for any time larger 0.
      * @param startPos the start position of the path
      * @param endPos the end position of the path
      */
-    public LaserPath(Vector2 startPos, Vector2 endPos) {
+    public LaserPath(Vector2 startPos, Vector2 endPos, float duration) {
         super(startPos, endPos, 1);
+        this.duration = duration;
     }
 
     @Override
@@ -27,7 +30,7 @@ public class LaserPath extends LinearPath{
      */
     @Override
     public float getDuration() {
-        return 0.001f;
+        return duration;
     }
     public String toString() {
         return super.toString();

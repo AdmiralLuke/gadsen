@@ -105,16 +105,18 @@ public class BaseProjectile implements Projectile{
         for (int i = 0; i < sim.getState().getTeamCount(); i++) {
             for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
                 GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
-                if (((int)character.getPlayerPos().x / 16 == (int)pos.x / 16) && ((int)character.getPlayerPos().y / 16 == (int)pos.y / 16)) {
-                    if (this.t == 0f) {
-                        lastCharacter = character;
-                        return null;
+                if (character != null) {
+                    if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
+                        if (this.t == 0f) {
+                            lastCharacter = character;
+                            return null;
+                        }
+                        if (lastCharacter == null) {
+                            lastCharacter = character;
+                            return dec.hitCharacter(head, character, dec, this);
+                        }
+                        if (lastCharacter == character) return null;
                     }
-                    if (lastCharacter == null) {
-                        lastCharacter = character;
-                        return dec.hitCharacter(head, character, dec, this);
-                    }
-                    if (lastCharacter == character) return null;
                 }
             }
         }

@@ -11,5 +11,7 @@ public class CharacterMoveAction extends CharacterAction {
         this.path = path;
     }
 
-
+    public Path getPath() {
+        return path;
+    }
 }

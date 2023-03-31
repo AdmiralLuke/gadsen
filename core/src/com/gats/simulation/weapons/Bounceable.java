@@ -43,8 +43,8 @@ public class Bounceable implements Projectile {
 
             dir = bounce(pos, dir, t, bsProj.sim.getState());
 
-            DebugPointAction dbAc = new DebugPointAction(0, pos, Color.CORAL, 5, true);
-            head.addChild(dbAc);
+            // DebugPointAction dbAc = new DebugPointAction(0, pos, Color.CORAL, 5, true);
+            // head.addChild(dbAc);
 
             prAct = bsProj.generateAction();
             head.addChild(prAct);
