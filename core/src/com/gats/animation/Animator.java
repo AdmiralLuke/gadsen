@@ -123,7 +123,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static final Map<Class<?>, ActionConverter> map =
                 new HashMap<Class<?>, ActionConverter>() {
                     {
-                        put(CharacterWalkAction.class, ActionConverters::convertCharacterMoveAction);
+                        put(CharacterWalkAction.class, ActionConverters::convertCharacterWalkAction);
                         put(ProjectileAction.class, ActionConverters::convertProjectileMoveAction);
                         put(TileMoveAction.class, ActionConverters::convertTileMoveAction);
                         put(TileDestroyAction.class, ActionConverters::convertTileDestroyAction);
@@ -136,6 +136,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(CharacterHitAction.class, ActionConverters::convertCharacterHitAction);
                         put(GameOverAction.class, ActionConverters::convertGameOverAction);
                         put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
+                        put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
                     }
                 };
 
@@ -168,7 +169,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return children;
         }
 
-        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterWalkAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterWalkAction moveAction = (CharacterWalkAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
@@ -393,6 +394,22 @@ public class Animator implements Screen, AnimationLogProcessor {
 
 
             return new ExpandedAction(summonAction, destroyAction);
+        }
+
+        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator){
+            CharacterMoveAction moveAction = (CharacterMoveAction) action;
+
+            GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            Path path = moveAction.getPath();
+            SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
+            MoveAction animMoveAction = new MoveAction(0, target, path.getDuration(), moveAction.getPath());
+            //rotateAction to set the angle/direction of movement, to flip the character sprite
+            RotateAction animRotateAction = new RotateAction(0,target,path.getDuration(),moveAction.getPath());
+            startWalking.setChildren(new Action[]{animMoveAction,animRotateAction});
+            SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
+            animMoveAction.setChildren(new Action[]{stopWalking});
+
+            return new ExpandedAction(startWalking, stopWalking);
         }
 
     }
