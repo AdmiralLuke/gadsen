@@ -139,7 +139,14 @@ public class GADSAssetManager {
 
         IngameAssets.lookupOutlineShader = manager.get(lookupOutlineShader, ShaderProgram.class);
 
-        IngameAssets.coolCatSkin = atlas.findRegion("skin/yinYangSkin");
+        IngameAssets.coolCatSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/coolCatSkin"));
+        IngameAssets.coolCatSkin.setPlayMode(Animation.PlayMode.LOOP);
+
+        IngameAssets.orangeCatSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/orangeCatSkin"));
+        IngameAssets.orangeCatSkin.setPlayMode(Animation.PlayMode.LOOP);
+
+        IngameAssets.yinYangSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/yinYangSkin"));
+        IngameAssets.yinYangSkin.setPlayMode(Animation.PlayMode.LOOP);
 
 
         IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");

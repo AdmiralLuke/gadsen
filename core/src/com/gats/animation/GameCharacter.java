@@ -16,6 +16,7 @@ import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
 /**
  * Repräsentiert eine Spielfigur auf der Karte
@@ -23,8 +24,10 @@ import java.io.InputStream;
 public class GameCharacter extends AnimatedEntity {
 
 
+    private float accSkinTime = 0;
     private boolean aimActive = false;
 
+    private Animation<TextureRegion> skin;
 
     private AimIndicator aimingIndicator;
 
@@ -38,11 +41,22 @@ public class GameCharacter extends AnimatedEntity {
 
     public GameCharacter(Color teamColor) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
+        switch (new Random().nextInt(3)){
+            case 1:
+                skin = IngameAssets.orangeCatSkin;
+                break;
+            case 2:
+                skin = IngameAssets.yinYangSkin;
+                break;
+            default:
+                skin = IngameAssets.coolCatSkin;
+        }
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
+        accSkinTime += deltaTime;
 
         batch.flush();
 
@@ -50,21 +64,23 @@ public class GameCharacter extends AnimatedEntity {
         if (aimingIndicator != null && aimActive) {
             aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
-        batch.setShader(IngameAssets.lookupOutlineShader);
-        IngameAssets.lookupOutlineShader.setUniformf("outline_color", teamColor);
-        IngameAssets.lookupOutlineShader.setUniformf("line_thickness", 1f);
+
+        ShaderProgram shader = IngameAssets.lookupOutlineShader;
+        batch.setShader(shader);
+        shader.setUniformf("outline_color", teamColor);
+        shader.setUniformf("line_thickness", 1f);
         Texture texture = getAnimation().getKeyFrame(0).getTexture();
-        IngameAssets.lookupOutlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
-        IngameAssets.lookupOutlineShader.setUniformi("u_skin", 1);
+        shader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
+        shader.setUniformi("u_skin", 1);
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
-        Texture skin = IngameAssets.coolCatSkin.getTexture();
-        skin.bind();
-        IngameAssets.lookupOutlineShader.setUniformf("flipped", isFlipped()? 1 : 0);
-        IngameAssets.lookupOutlineShader.setUniformf("v_skinBounds",
-                IngameAssets.coolCatSkin.getU(),
-                IngameAssets.coolCatSkin.getV(),
-                IngameAssets.coolCatSkin.getU2() - IngameAssets.coolCatSkin.getU(),
-                IngameAssets.coolCatSkin.getV2() - IngameAssets.coolCatSkin.getV());
+        TextureRegion skinFrame = this.skin.getKeyFrame(accSkinTime);
+        skinFrame.getTexture().bind();
+        shader.setUniformf("flipped", isFlipped()? 1 : 0);
+        shader.setUniformf("v_skinBounds",
+                skinFrame.getU(),
+                skinFrame.getV(),
+                skinFrame.getU2() - skinFrame.getU(),
+                skinFrame.getV2() - skinFrame.getV());
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
@@ -82,6 +98,14 @@ public class GameCharacter extends AnimatedEntity {
 
     public Animation<TextureRegion> getAnimation() {
         return super.getAnimation();
+    }
+
+    public Animation<TextureRegion> getSkin() {
+        return skin;
+    }
+
+    public void setSkin(Animation<TextureRegion> skin) {
+        this.skin = skin;
     }
 
     public GameCharacterAnimationType getIdleType() {
