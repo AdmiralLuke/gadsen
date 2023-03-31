@@ -64,6 +64,7 @@ public class AssetContainer {
         public static Array<TextureAtlas.AtlasRegion> Cookie;
         public static Array<TextureAtlas.AtlasRegion> SugarCane;
         public static TextureAtlas.AtlasRegion coolCatSkin;
+        public static Animation<TextureRegion> tombstoneAnimation;
 
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,

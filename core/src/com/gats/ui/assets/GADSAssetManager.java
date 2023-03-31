@@ -108,22 +108,26 @@ public class GADSAssetManager {
                 new Animation<>(1 / 10f, atlas.findRegions("cat/catIdle"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_WALKING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catWalkingL"));
+                new Animation<>(1 / 10f, atlas.findRegions("cat/catWalking"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_FALLING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catFallingL"));
+                new Animation<>(1 / 10f, atlas.findRegions("cat/catFalling"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_COOKIE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catCookieIdleL"));
+                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdle"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catSugarCaneIdleL"));
+                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdle"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_HIT.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catHitL"));
+                new Animation<>(1 / 10f, atlas.findRegions("cat/catHit"));
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_DEATH.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catDeathL"));
+                new Animation<>(1 / 10f, atlas.findRegions("cat/catDeath"));
+
+        IngameAssets.tombstoneAnimation = new Animation<>(1 / 10f, atlas.findRegions("cat/tombstone"));
+
+
         for (Animation<TextureRegion> anim : IngameAssets.gameCharacterAnimations
         ) {
             anim.setPlayMode(Animation.PlayMode.LOOP);
@@ -135,7 +139,7 @@ public class GADSAssetManager {
 
         IngameAssets.lookupOutlineShader = manager.get(lookupOutlineShader, ShaderProgram.class);
 
-        IngameAssets.coolCatSkin = atlas.findRegion("skin/coolCatSkin");
+        IngameAssets.coolCatSkin = atlas.findRegion("skin/yinYangSkin");
 
 
         IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
