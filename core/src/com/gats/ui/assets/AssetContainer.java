@@ -66,6 +66,8 @@ public class AssetContainer {
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
         public static Animation<TextureRegion> yinYangSkin;
+
+        public static Animation<TextureRegion> mioSkin;
         public static Animation<TextureRegion> tombstoneAnimation;
 
         public enum GameCharacterAnimationType {

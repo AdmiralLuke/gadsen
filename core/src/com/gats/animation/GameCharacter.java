@@ -41,12 +41,15 @@ public class GameCharacter extends AnimatedEntity {
 
     public GameCharacter(Color teamColor) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
-        switch (new Random().nextInt(3)){
+        switch (new Random().nextInt(4)){
             case 1:
                 skin = IngameAssets.orangeCatSkin;
                 break;
             case 2:
                 skin = IngameAssets.yinYangSkin;
+                break;
+            case 3:
+                skin = IngameAssets.mioSkin;
                 break;
             default:
                 skin = IngameAssets.coolCatSkin;

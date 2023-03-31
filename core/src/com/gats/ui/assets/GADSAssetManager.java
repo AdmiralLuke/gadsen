@@ -148,6 +148,9 @@ public class GADSAssetManager {
         IngameAssets.yinYangSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/yinYangSkin"));
         IngameAssets.yinYangSkin.setPlayMode(Animation.PlayMode.LOOP);
 
+        IngameAssets.mioSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/mioSkin"));
+        IngameAssets.mioSkin.setPlayMode(Animation.PlayMode.LOOP);
+
 
         IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
 
