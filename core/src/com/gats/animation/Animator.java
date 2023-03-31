@@ -429,7 +429,6 @@ public class Animator implements Screen, AnimationLogProcessor {
                 AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
                 animGameCharacter.setAimingIndicator(aimIndicator);
-                animGameCharacter.setMirror(true);
                 characterGroup.add(animGameCharacter);
             }
 

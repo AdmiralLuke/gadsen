@@ -59,6 +59,7 @@ public class GameCharacter extends AnimatedEntity {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
         Texture skin = IngameAssets.coolCatSkin.getTexture();
         skin.bind();
+        IngameAssets.lookupOutlineShader.setUniformf("flipped", isFlipped()? 1 : 0);
         IngameAssets.lookupOutlineShader.setUniformf("v_skinBounds",
                 IngameAssets.coolCatSkin.getU(),
                 IngameAssets.coolCatSkin.getV(),
