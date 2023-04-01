@@ -102,36 +102,31 @@ public class GADSAssetManager {
 
         IngameAssets.aimingIndicatorSprite = atlas.findRegion("hud/aimIndicator");
 
-        IngameAssets.gameCharacterAnimations = new Animation[GameCharacterAnimationType.values().length];
+        IngameAssets.gameCharacterAnimations = new AtlasAnimation[GameCharacterAnimationType.values().length];
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdle"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catIdle"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_WALKING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catWalking"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catWalking"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_FALLING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catFalling"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catFalling"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_COOKIE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdle"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catIdle"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdle"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catIdle"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_HIT.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catHit"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catHit"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_DEATH.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catDeath"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catDeath"), Animation.PlayMode.LOOP);
 
-        IngameAssets.tombstoneAnimation = new Animation<>(1 / 10f, atlas.findRegions("cat/tombstone"));
+        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.LOOP);
 
-
-        for (Animation<TextureRegion> anim : IngameAssets.gameCharacterAnimations
-        ) {
-            anim.setPlayMode(Animation.PlayMode.LOOP);
-        }
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
 
@@ -139,17 +134,13 @@ public class GADSAssetManager {
 
         IngameAssets.lookupOutlineShader = manager.get(lookupOutlineShader, ShaderProgram.class);
 
-        IngameAssets.coolCatSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/coolCatSkin"));
-        IngameAssets.coolCatSkin.setPlayMode(Animation.PlayMode.LOOP);
+        IngameAssets.coolCatSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/coolCatSkin"), Animation.PlayMode.LOOP);
 
-        IngameAssets.orangeCatSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/orangeCatSkin"));
-        IngameAssets.orangeCatSkin.setPlayMode(Animation.PlayMode.LOOP);
+        IngameAssets.orangeCatSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/orangeCatSkin"), Animation.PlayMode.LOOP);
 
-        IngameAssets.yinYangSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/yinYangSkin"));
-        IngameAssets.yinYangSkin.setPlayMode(Animation.PlayMode.LOOP);
+        IngameAssets.yinYangSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/yinYangSkin"), Animation.PlayMode.LOOP);
 
-        IngameAssets.mioSkin = new Animation<>(1 / 10f, atlas.findRegions("skin/mioSkin"));
-        IngameAssets.mioSkin.setPlayMode(Animation.PlayMode.LOOP);
+        IngameAssets.mioSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/mioSkin"), Animation.PlayMode.LOOP);
 
 
         IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
