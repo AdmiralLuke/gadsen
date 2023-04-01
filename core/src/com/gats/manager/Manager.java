@@ -2,7 +2,7 @@ package com.gats.manager;
 
 import com.gats.manager.command.Command;
 import com.gats.manager.command.EndTurnCommand;
-import com.gats.simulation.*;
+import com.gats.simulation.action.ActionLog;
 import com.gats.ui.HudStage;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
@@ -254,16 +254,19 @@ public class Manager {
 
             futureExecutor.start();
             if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
-                animationLogProcessor.animate(simulation.clearReturnActionLog());
+                //Contains Action produced by entering new turn
+                animationLogProcessor.animate(simulation.clearAndReturnActionLog());
             }
             try {
                 while (true) {
                     Command nextCmd = commandQueue.take();
                     if (nextCmd.isEndTurn()) break;
-                    nextCmd.run();
+                    //Contains action produced by the commands execution
+                    ActionLog log = nextCmd.run();
 
                     if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
-                        animationLogProcessor.animate(simulation.clearReturnActionLog());
+                        animationLogProcessor.animate(log);
+                        //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
                     }
                 }
             } catch (InterruptedException e) {
@@ -275,6 +278,8 @@ public class Manager {
                 throw new RuntimeException(e);
             }
             controller.deactivate();
+
+            //Contains actions produced by ending the turn (after last command is executed)
             ActionLog finalLog = simulation.endTurn();
             if (gui) {
                 animationLogProcessor.animate(finalLog);

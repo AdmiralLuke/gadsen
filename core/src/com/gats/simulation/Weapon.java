@@ -1,19 +1,22 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.CharacterShootAction;
+import com.gats.simulation.action.ProjectileAction;
 
 /**
  * Repräsentiert eine Waffe im Spiel, die durch einen {@link GameCharacter Spielfigur} benutzt werden kann.
  */
-abstract class Weapon {
+public abstract class Weapon {
 
     private final int damage;
     private final double damageLoss;
     private double projRange;
     private int shoots;
     private final boolean hitThroughBoxes;
-    private GameCharacter character;
-    private Simulation sim;
+    private final GameCharacter character;
+    private final Simulation sim;
 
     private final WeaponType type;
 
@@ -62,26 +65,25 @@ abstract class Weapon {
         return shoots;
     }
 
-    protected void shoot(Vector2 dir, double strength) {
+    protected void shoot(Vector2 dir, double strength, Action head) {
         if (this.getType() == WeaponType.COOKIE) {
-            this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE);
+            this.shoot(dir, strength,  ProjectileAction.ProjectileType.COOKIE ,Projectile.Type.PARABLE, head);
         } else {
-            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR);
+            this.shoot(dir, strength, ProjectileAction.ProjectileType.CANDY_CANE, Projectile.Type.LINEAR, head);
         }
     }
 
-    protected void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type) {
+    protected void shoot(Vector2 dir, double strength, ProjectileAction.ProjectileType AcType, Projectile.Type type, Action head) {
         if (strength > projRange) {
             projRange = strength;
         }
         if (shoots <= 0) {
             return;
         }
-        sim.getActionLog().goToNextAction();
-        sim.getActionLog().addAction(new CharacterShootAction(character.getTeam(), character.getTeamPos()));
-        sim.getActionLog().goToNextAction();
+        CharacterShootAction shootAction = new CharacterShootAction(character.getTeam(), character.getTeamPos());
+        head.addChild(shootAction);
         Projectile proj = new Projectile(damage, projRange, character.getPlayerPos(), dir, type, AcType, sim, character, strength);
-        proj.move();
+        proj.move(shootAction);
         if (this.type != WeaponType.NOT_SELECTED) shoots--;
     }
 }

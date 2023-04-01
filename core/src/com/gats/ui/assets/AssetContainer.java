@@ -1,5 +1,7 @@
 package com.gats.ui.assets;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -53,6 +55,24 @@ public class AssetContainer {
 
         public static Animation<TextureRegion>[] gameCharacterAnimations;
 
+        public static TextureRegion pixel;
+
+        static {
+            Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            map.setColor(Color.WHITE);
+            map.drawPixel(0, 0);
+            pixel = new TextureRegion(new Texture(map));
+        }
+
+        public static TextureRegion cross_marker;
+
+        static {
+            Pixmap map = new Pixmap(3, 3, Pixmap.Format.RGBA8888);
+            map.setColor(Color.WHITE);
+            map.drawLine(1, 0, 1, 2);
+            map.drawLine(0, 1, 2, 1);
+            cross_marker = new TextureRegion(new Texture(map));
+        }
 
         public static ShaderProgram outlineShader;
 
@@ -63,11 +83,12 @@ public class AssetContainer {
         //Projectiles
         public static Array<TextureAtlas.AtlasRegion> Cookie;
         public static Array<TextureAtlas.AtlasRegion> SugarCane;
+
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
         public static Animation<TextureRegion> yinYangSkin;
-
         public static Animation<TextureRegion> mioSkin;
+
         public static Animation<TextureRegion> tombstoneAnimation;
 
         public enum GameCharacterAnimationType {

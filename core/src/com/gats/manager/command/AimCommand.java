@@ -1,6 +1,7 @@
 package com.gats.manager.command;
 
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.GameCharacterController;
 
 public class AimCommand extends Command{
@@ -14,7 +15,7 @@ public class AimCommand extends Command{
     }
 
     @Override
-    public void run() {
-        controller.aim(angle, strength);
+    public ActionLog run() {
+        return controller.aim(angle, strength);
     }
 }

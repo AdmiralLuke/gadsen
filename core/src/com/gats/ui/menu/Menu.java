@@ -276,9 +276,10 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		//needs to be called to set teamSizeSlider to the correct starting range
 		teamAmountSlider.addRelatedSlider(teamSizeSlider);
 		teamAmountSlider.addBotSelector(botSelector);
+		teamSizeSlider.addRelatedSlider(teamAmountSlider);
+
 		teamAmountSlider.adjustTeamSizeToSpawnpoints(mapSelector.getSelected().getNumberOfSpawnpoints());
 
-		teamSizeSlider.addRelatedSlider(teamAmountSlider);
 
 		gameModeSelector.setItems(gameModes);
 
