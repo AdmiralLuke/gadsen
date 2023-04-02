@@ -8,7 +8,7 @@ import com.gats.simulation.action.*;
  */
 public class GameCharacter {
 
-    private static final IntVector2 SIZE = new IntVector2(16, 16);
+    private static final IntVector2 SIZE = new IntVector2(9, 15);
 
     private final IntRectangle boundingBox;
 
