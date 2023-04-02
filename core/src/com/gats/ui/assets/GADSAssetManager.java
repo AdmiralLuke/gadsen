@@ -1,10 +1,9 @@
 package com.gats.ui.assets;
 
+import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
@@ -20,6 +19,9 @@ public class GADSAssetManager {
 
     public final String skin = resourceDirectory + "ui/skin.json";
     public final String font = resourceDirectory + "ui/lsans-15.fnt";
+
+    public final String particleGroup = "particle";
+    public final String slimeParticle = "particle/slimeParticle.p";
 
     public final String outlineShader = resourceDirectory + "shader/outline.frag";
 
@@ -41,6 +43,7 @@ public class GADSAssetManager {
         loadTextures();
         loadSkin();
         loadShader();
+        loadParticles();
 
         //ToDo: Implement Loading screen and remove the 2 following statements
         manager.finishLoading();
@@ -70,6 +73,14 @@ public class GADSAssetManager {
 
     private void loadShader(){
         manager.load(outlineShader, ShaderProgram.class);
+    }
+
+    private void loadParticles(){
+        ParticleEffectLoader.ParticleEffectParameter slimeParticleParams = new ParticleEffectLoader.ParticleEffectParameter();
+        slimeParticleParams.atlasFile = atlas;
+        slimeParticleParams.atlasPrefix = particleGroup;
+
+        manager.load(slimeParticle, ParticleEffect.class, slimeParticleParams);
     }
 
 
@@ -129,6 +140,8 @@ public class GADSAssetManager {
         IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
 
         IngameAssets.SugarCane = atlas.findRegions("projectile/sugarcaneProjectileFront");
+
+        IngameAssets.slimeParticle = manager.get(slimeParticle, ParticleEffect.class);
 
         finishedLoading = true;
     }
