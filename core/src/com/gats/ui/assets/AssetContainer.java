@@ -89,6 +89,10 @@ public class AssetContainer {
         public static TextureRegion cookieIcon;
         public static TextureRegion sugarCaneIcon;
         public static HashMap<WeaponType,TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
+
+        public static TextureRegion fastForwardButton;
+        public static TextureRegion fastForwardButtonPressed;
+        public static TextureRegion fastForwardButtonChecked;
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,

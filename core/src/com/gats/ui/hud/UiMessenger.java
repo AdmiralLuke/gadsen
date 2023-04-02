@@ -2,6 +2,7 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
+import com.gats.ui.InGameScreen;
 import com.gats.ui.hud.inventory.InventoryDrawer;
 
 
@@ -14,8 +15,10 @@ public class UiMessenger {
 	InventoryDrawer inventory;
 	TurnSplashScreen turnSplashScreen;
 
+	InGameScreen inGameScreen;
 
-	public UiMessenger(InventoryDrawer inventory, TurnSplashScreen turnSplashScreen){
+	public UiMessenger(InGameScreen inGameScreen,InventoryDrawer inventory, TurnSplashScreen turnSplashScreen){
+		this.inGameScreen = inGameScreen;
 		this.inventory = inventory;
 		this.turnSplashScreen = turnSplashScreen;
 	}
@@ -45,5 +48,9 @@ public class UiMessenger {
 	 * @param gameCharacter Sprite of the current/new Player
 	 */
 	public void drawTurnSplashScreen(TextureRegion gameCharacter){}
+
+	public void changeAnimationPlaybackSpeed(float speed){
+		inGameScreen.setRenderingSpeed(speed);
+	}
 
 }

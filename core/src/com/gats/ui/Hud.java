@@ -1,22 +1,20 @@
 package com.gats.ui;
 
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.gats.manager.HumanPlayer;
 import com.gats.ui.assets.AssetContainer;
-import com.gats.ui.hud.GadsenInputProcessor;
-import com.gats.ui.hud.InputHandler;
-import com.gats.ui.hud.TurnSplashScreen;
+import com.gats.ui.hud.*;
 import com.gats.ui.hud.inventory.InventoryDrawer;
 
-import javax.swing.text.View;
+import java.util.List;
 
 /**
  * Class for taking care of the User Interface.
@@ -27,48 +25,93 @@ public class Hud {
 
     private Stage stage;
 	private InputHandler inputHandler;
+	private InputMultiplexer inputMultiplexer;
 	private InventoryDrawer inventoryDrawer;
 	private TurnSplashScreen turnSplashScreen;
 	private Table layoutTable;
 	private Viewport viewport;
 
+
+	private UiMessenger uiMessenger;
 	public Hud(InGameScreen ingameScreen) {
-		int viewportSizeX = 512;
-		int viewportSizeY = 512;
+
+		int viewportSizeX = 256;
+		int viewportSizeY = 256;
+		float animationSpeedupValue = 8;
+
 		Camera cam = new OrthographicCamera(viewportSizeX,viewportSizeY);
 
 		this.viewport = new ExtendViewport(viewportSizeX,viewportSizeY,cam);
         stage = new Stage(viewport);
 
-        setupLayoutTable();
-		setupInventory();
-		setupInputHandler(ingameScreen);
+        layoutTable = setupLayoutTable();
+		inventoryDrawer = setupInventory();
+		inputHandler = setupInputHandler(ingameScreen);
+
+
+		this.uiMessenger = new UiMessenger(ingameScreen,inventoryDrawer,turnSplashScreen);
+
+		FastForwardButton fastButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
+
+		layoutHudElements(layoutTable,inventoryDrawer,fastButton);
+
+
+		inputMultiplexer = new InputMultiplexer();
+		inputMultiplexer.addProcessor(inputHandler);
+		inputMultiplexer.addProcessor(stage);
+
+		stage.addActor(layoutTable);
 	}
 
-	private void setupInventory(){
+	private void layoutHudElements(Table table,InventoryDrawer inventoryDrawer,FastForwardButton fastForwardButton) {
+		table.add(inventoryDrawer).pad(20);
+		table.row();
+		table.add(fastForwardButton).pad(20);
+
+	}
+
+	private InventoryDrawer setupInventory(){
 		float inventoryScale = 1;
-		inventoryDrawer = new InventoryDrawer();
-		inventoryDrawer.setScale(inventoryScale);
-		layoutTable.add(inventoryDrawer).pad(20);
+		InventoryDrawer invDraw = new InventoryDrawer();
+		invDraw.setScale(inventoryScale);
+
+		return invDraw;
 	}
 
-	private void setupInputHandler(InGameScreen ingameScreen){
-		inputHandler = new InputHandler(ingameScreen);
+	private InputHandler setupInputHandler(InGameScreen ingameScreen){
+		return new InputHandler(ingameScreen);
 	}
 
-    private void setupLayoutTable(){
-        layoutTable = new Table(AssetContainer.MainMenuAssets.skin);
+    private Table setupLayoutTable(){
+       Table table = new Table(AssetContainer.MainMenuAssets.skin);
 
-        layoutTable.setFillParent(true);
+        table.setFillParent(true);
         //debug
-        layoutTable.setDebug(true);
+        table.setDebug(true);
 		//align the table to the left of the stage
-		layoutTable.left();
-        stage.addActor(layoutTable);
+		table.left();
+		return table;
     }
 
-	public GadsenInputProcessor getInputHandler() {
+	private FastForwardButton setupFastForwardButton(UiMessenger uiMessenger,float speedUp){
+
+		FastForwardButton button = new FastForwardButton(new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButton),
+				new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonPressed),
+				new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonChecked),
+				uiMessenger,speedUp);
+		return button;
+	}
+
+	public GadsenInputProcessor getGadsenInputProcessor() {
 		return inputHandler;
+	}
+
+	public InputProcessor getInputProcessor(){
+		return inputMultiplexer;
+	}
+
+	public void setHumanPlayers(List<HumanPlayer> humanPlayers){
+		inputHandler.setHumanPlayers(humanPlayers);
 	}
 
 	public void draw() {
@@ -92,5 +135,9 @@ public class Hud {
 
 	public void resizeViewport(int width, int height){
 		stage.getViewport().update(width,height,true);
+	}
+
+	public UiMessenger getUiMessenger() {
+		return uiMessenger;
 	}
 }

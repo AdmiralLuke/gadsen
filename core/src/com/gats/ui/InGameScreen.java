@@ -3,7 +3,6 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
@@ -30,6 +29,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private float worldWidth = 80*12;
     private float worldHeight = 80*12;
 
+    private float renderingSpeed = 1;
+
     //should HUD be handled by GADS
     private Hud hud;
     private Animator animator;
@@ -39,14 +40,15 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         gameManager = instance;
         gameViewport = new FillViewport(worldWidth,worldHeight);
         hud = new Hud(this);
+        UiMessenger uiMessenger=hud.getUiMessenger();
         setupInput();
 
 
         runConfig.gui = true;
         runConfig.animationLogProcessor = this;
-        runConfig.input = hud.getInputHandler();
+        runConfig.input = hud.getGadsenInputProcessor();
         manager = new Manager(runConfig);
-        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode,new UiMessenger(hud.getInventoryDrawer(), hud.getTurnSplashScreen()));
+        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode,uiMessenger);
         manager.start();
 
         humanList = manager.getHumanList();
@@ -58,11 +60,15 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     public void show() {
         animator.show();
     }
+    public void setRenderingSpeed(float speed){
+        //negative deltaTime is not allowed
+        if(speed>=0) this.renderingSpeed = speed;
+    }
 
     @Override
     public void render(float delta) {
         hud.tick(delta);
-        animator.render(delta);
+        animator.render(renderingSpeed*delta);
         hud.draw();
         //animator.animate(gameManager.simulation.getActionLog());
     }
@@ -114,8 +120,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
         //animator als actor?
          //       simulation als actor?
-        Gdx.input.setInputProcessor(hud.getInputHandler());
-        hud.getInputHandler().setHumanPlayers(humanList);
+        Gdx.input.setInputProcessor(hud.getInputProcessor());
+        hud.setHumanPlayers(humanList);
 
     }
 

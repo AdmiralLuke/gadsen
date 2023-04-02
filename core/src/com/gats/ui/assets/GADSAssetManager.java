@@ -11,6 +11,7 @@ import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 import com.gats.ui.assets.AssetContainer.MainMenuAssets;
+import com.gats.ui.hud.InputHandler;
 import com.gats.ui.hud.inventory.InventoryCell;
 
 public class GADSAssetManager {
@@ -20,9 +21,8 @@ public class GADSAssetManager {
     public final String resourceDirectory = "";
     public final String atlas = resourceDirectory + "texture_atlas/TextureAtlas.atlas";
 
-    public final String skin = resourceDirectory + "ui/skin.json";
-    public final String font = resourceDirectory + "ui/lsans-15.fnt";
-
+    public final String skin = resourceDirectory + "uiUtility/skin.json";
+    public final String font = resourceDirectory + "uiUtility/lsans-15.fnt";
     public final String outlineShader = resourceDirectory + "shader/outline.frag";
 
     private boolean finishedLoading = false;
@@ -138,6 +138,10 @@ public class GADSAssetManager {
 
         IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
         IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
+
+        IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
+        IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
+        IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");
 
         finishedLoading = true;
     }

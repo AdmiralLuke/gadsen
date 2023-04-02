@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class RunConfiguration {
 
+    //Todo add default values
     public int gameMode = 0;
 
     public boolean gui = false;
