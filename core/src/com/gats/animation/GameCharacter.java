@@ -1,6 +1,8 @@
 package com.gats.animation;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -14,6 +16,7 @@ import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
 /**
  * Repräsentiert eine Spielfigur auf der Karte
@@ -21,24 +24,42 @@ import java.io.InputStream;
 public class GameCharacter extends AnimatedEntity {
 
 
+    private float accSkinTime = 0;
     private boolean aimActive = false;
 
+    private Animation<TextureRegion> skin;
 
     private AimIndicator aimingIndicator;
 
     private GameCharacterAnimationType idleType = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
 
     private GameCharacterAnimationType currentAnimation = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
-    private Color teamColor;
+    private final Color teamColor;
+
+    private static final float OUTLINE_ALPHA = 0.5f;
 
 
     public GameCharacter(Color teamColor) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
-        this.teamColor = teamColor;
+        switch (new Random().nextInt(4)){
+            case 1:
+                skin = IngameAssets.orangeCatSkin;
+                break;
+            case 2:
+                skin = IngameAssets.yinYangSkin;
+                break;
+            case 3:
+                skin = IngameAssets.mioSkin;
+                break;
+            default:
+                skin = IngameAssets.coolCatSkin;
+        }
+        this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
+        accSkinTime += deltaTime;
 
         batch.flush();
 
@@ -46,11 +67,24 @@ public class GameCharacter extends AnimatedEntity {
         if (aimingIndicator != null && aimActive) {
             aimingIndicator.draw(batch, deltaTime, parentAlpha);
         }
-        batch.setShader(IngameAssets.outlineShader);
-        IngameAssets.outlineShader.setUniformf("outline_color", teamColor);
-        IngameAssets.outlineShader.setUniformf("line_thickness", 1f);
+
+        ShaderProgram shader = IngameAssets.lookupOutlineShader;
+        batch.setShader(shader);
+        shader.setUniformf("outline_color", teamColor);
+        shader.setUniformf("line_thickness", 1f);
         Texture texture = getAnimation().getKeyFrame(0).getTexture();
-        IngameAssets.outlineShader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
+        shader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
+        shader.setUniformi("u_skin", 1);
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
+        TextureRegion skinFrame = this.skin.getKeyFrame(accSkinTime);
+        skinFrame.getTexture().bind();
+        shader.setUniformf("flipped", isFlipped()? 1 : 0);
+        shader.setUniformf("v_skinBounds",
+                skinFrame.getU(),
+                skinFrame.getV(),
+                skinFrame.getU2() - skinFrame.getU(),
+                skinFrame.getV2() - skinFrame.getV());
+        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
         super.draw(batch, deltaTime, parentAlpha);
         batch.flush();
         batch.setShader(null);
@@ -67,6 +101,14 @@ public class GameCharacter extends AnimatedEntity {
 
     public Animation<TextureRegion> getAnimation() {
         return super.getAnimation();
+    }
+
+    public Animation<TextureRegion> getSkin() {
+        return skin;
+    }
+
+    public void setSkin(Animation<TextureRegion> skin) {
+        this.skin = skin;
     }
 
     public GameCharacterAnimationType getIdleType() {
@@ -93,7 +135,7 @@ public class GameCharacter extends AnimatedEntity {
         super.setRelPos(pos);
     }
 
-    public static float getAnimationDuration(GameCharacterAnimationType type){
+    public static float getAnimationDuration(GameCharacterAnimationType type) {
         return IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
     }
 
