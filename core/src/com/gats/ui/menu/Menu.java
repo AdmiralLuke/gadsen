@@ -226,7 +226,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 				break;
 			case 1:
 				//Todo deal with hardcoded values, might be neede for later gameModes
-				modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class).getClassRef());
+				modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
 				break;
 			default:
 				modeSettings = new NormalModeConfig(configuration);

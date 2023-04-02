@@ -67,6 +67,7 @@ public class Manager {
             }
             switch (curPlayer.getType()) {
                 case Human:
+                    if (!gui) throw new RuntimeException("HumanPlayers can't be used without GUI to capture inputs");
                     humanList.add((HumanPlayer) curPlayer);
                     break;
                 case AI:
@@ -88,12 +89,28 @@ public class Manager {
                     } catch (TimeoutException e) {
                         future.cancel(true);
 
-                        System.out.println("bot" + i + "(" + curPlayer.getName()
-                                + ") initialization surpassed timeout");
+                        System.out.println("bot" + i + "(" + curPlayer.getName() + ") initialization surpassed timeout");
                     }
                     break;
             }
         }
+    }
+
+    public static ArrayList<Class<? extends Player>> getPlayers(String[] names) {
+        NamedPlayerClass[] allPlayers = getPossiblePlayers();
+        ArrayList<Class<? extends Player>> selectedPlayers = new ArrayList<>();
+        for (String cur : names) {
+            boolean playerFound = false;
+            for (NamedPlayerClass candidate : allPlayers) {
+                if (candidate.fileName.equals(cur)) {
+                    selectedPlayers.add(candidate.classRef);
+                    playerFound = true;
+                    break;
+                }
+            }
+            if (!playerFound) throw new RuntimeException(String.format("Couldn't find bots.%s.class", cur));
+        }
+        return selectedPlayers;
     }
 
     public void start() {
@@ -106,18 +123,21 @@ public class Manager {
     public static class NamedPlayerClass {
         private String name;
         private Class<? extends Player> classRef;
+        private String fileName;
 
         @Override
         public String toString() {
             return name;
         }
 
-        public NamedPlayerClass(Class<? extends Player> classRef) {
+        public NamedPlayerClass(Class<? extends Player> classRef, String fileName) {
             try {
 
                 Player playerInstance = classRef.getConstructor(new Class[]{}).newInstance();
 
                 name = playerInstance.getName();
+
+                this.fileName = fileName;
 
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Insufficient Privileges for instantiating bots", e);
@@ -141,20 +161,20 @@ public class Manager {
 
     public static NamedPlayerClass[] getPossiblePlayers() {
         List<NamedPlayerClass> players = new ArrayList<NamedPlayerClass>();
-        players.add(new NamedPlayerClass(HumanPlayer.class));
-        players.add(new NamedPlayerClass(IdleBot.class));
-        players.add(new NamedPlayerClass(TestBot.class));
+        players.add(new NamedPlayerClass(HumanPlayer.class, "HumanPlayer"));
+        players.add(new NamedPlayerClass(IdleBot.class, "IdleBot"));
+        players.add(new NamedPlayerClass(TestBot.class, "TestBot"));
         File botDir = new File("bots");
         if (botDir.exists()) {
             try {
                 URL url = new File(".").toURI().toURL();
                 URL[] urls = new URL[]{url};
                 ClassLoader loader = new URLClassLoader(urls);
-                for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))
-                ) {
+                for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))) {
                     try {
                         Class<?> nextClass = loader.loadClass("bots." + botFile.getName().replace(".class", ""));
-                        if(Bot.class.isAssignableFrom(nextClass)) players.add(new NamedPlayerClass((Class<? extends Player>) nextClass));
+                        if (Bot.class.isAssignableFrom(nextClass))
+                            players.add(new NamedPlayerClass((Class<? extends Player>) nextClass, botFile.getName().replace(".class", "")));
 
                     } catch (ClassNotFoundException e) {
                         System.err.println("Could not find class for " + botFile.getName());
@@ -207,8 +227,7 @@ public class Manager {
                         } catch (TimeoutException e) {
                             future.cancel(true);
 
-                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
-                                    + ") computation surpassed timeout");
+                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                         }
                         inputGenerator.endTurn();
                         //Add Empty command to break command Execution
@@ -237,8 +256,7 @@ public class Manager {
                         } catch (TimeoutException e) {
                             future.cancel(true);
 
-                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
-                                    + ") computation surpassed timeout");
+                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                         }
                         //Add Empty command to break command Execution
                         try {
