@@ -172,11 +172,12 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterWalkAction moveAction = (CharacterWalkAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            Entity characterGroup = target.getParent().asEntity();
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_WALKING);
-            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, characterGroup, moveAction.getDuration(), moveAction.getPath());
             //rotateAction to set the angle/direction of movement, to flip the character sprite
-            RotateAction animRotateAction = new RotateAction(0,target,moveAction.getDuration(),moveAction.getPath());
-            startWalking.setChildren(new Action[]{animMoveAction,animRotateAction});
+            RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
+            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             animMoveAction.setChildren(new Action[]{stopWalking});
 
@@ -187,8 +188,9 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterFallAction moveAction = (CharacterFallAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            Entity characterGroup = target.getParent().asEntity();
             SetAnimationAction startFalling = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_FALLING);
-            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, characterGroup, moveAction.getDuration(), moveAction.getPath());
             startFalling.setChildren(new Action[]{animMoveAction});
             SetAnimationAction stopFalling = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             animMoveAction.setChildren(new Action[]{stopFalling});
@@ -201,7 +203,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
 
             MoveAction moveProjectile = new MoveAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
-            RotateAction rotateProjectile = new RotateAction(0,null,projectileAction.getDuration(),projectileAction.getPath());
+            RotateAction rotateProjectile = new RotateAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
 
             DestroyAction destroyProjectile = new DestroyAction(0, null, null, animator.root::remove);
 
@@ -216,7 +218,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             });
 
             //The Projectile should be moved after being summoned
-            summonProjectile.setChildren(new Action[]{moveProjectile,rotateProjectile});
+            summonProjectile.setChildren(new Action[]{moveProjectile, rotateProjectile});
 
             //The Projectile should get destroyed at the end of its path
             moveProjectile.setChildren(new Action[]{destroyProjectile});
@@ -282,7 +284,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         /**
          * Converts a {@link CharacterAimAction} to adjust the rotation and scale of its {@link AimIndicator}.
          *
-         * @param action Aim Action to be converted
+         * @param action   Aim Action to be converted
          * @param animator Current Animator
          * @return {@link ExpandedAction} with a {@link RotateAction} and {@link ScaleAction}.
          */
@@ -333,7 +335,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             Action lastAction;
             GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
             SetAnimationAction hitAnimation = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
-            if (hitAction.getHealthAft() <= 0){
+            if (hitAction.getHealthAft() <= 0) {
                 SetAnimationAction deathAnimation = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_DEATH);
                 hitAnimation.setChildren(new Action[]{deathAnimation});
                 DestroyAction destroyCharacter = new DestroyAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, null, animator.characterGroup::remove);
@@ -349,48 +351,47 @@ public class Animator implements Screen, AnimationLogProcessor {
                 IdleAction waitAnimation = new IdleAction(0, IngameAssets.tombstoneAnimation.getAnimationDuration());
                 summonTombstone.setChildren(new Action[]{waitAnimation});
                 lastAction = summonTombstone;
-            }else{
+            } else {
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
                 hitAnimation.setChildren(new Action[]{resetAnimationAction});
                 lastAction = resetAnimationAction;
             }
             return new ExpandedAction(hitAnimation, lastAction);
         }
-        private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
-           GameOverAction winAction = (GameOverAction) action;
 
-            SummonAction summonWinScreen = new SummonAction(action.getDelay(),null,()->{
+        private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
+            GameOverAction winAction = (GameOverAction) action;
+
+            SummonAction summonWinScreen = new SummonAction(action.getDelay(), null, () -> {
 
                 Vector2 pos = animator.getCamera().getScreenCenter();
                 TextureRegion display;
-                if(winAction.getTeam() == 0){
+                if (winAction.getTeam() == 0) {
                     display = IngameAssets.victoryDisplay;
-                }
-                else {
+                } else {
                     display = IngameAssets.lossDisplay;
                 }
-                Entity winSprite = new WinEntity(display,pos);
+                Entity winSprite = new WinEntity(display, pos);
                 animator.root.add(winSprite);
                 return winSprite;
-            } );
-
+            });
 
 
             return new ExpandedAction(summonWinScreen);
         }
 
-        private static ExpandedAction convertDebugPointAction(com.gats.simulation.action.Action action, Animator animator){
+        private static ExpandedAction convertDebugPointAction(com.gats.simulation.action.Action action, Animator animator) {
             DebugPointAction debugPointAction = (DebugPointAction) action;
 
             DestroyAction destroyAction = new DestroyAction(debugPointAction.getDuration(), null, null, animator.root::remove);
 
-            SummonAction summonAction = new SummonAction(action.getDelay(), destroyAction::setTarget, () ->{
+            SummonAction summonAction = new SummonAction(action.getDelay(), destroyAction::setTarget, () -> {
                 SpriteEntity entity;
-                if(debugPointAction.isCross()){
+                if (debugPointAction.isCross()) {
                     entity = new SpriteEntity(IngameAssets.cross_marker);
-                    entity.setSize(new Vector2(3,3));
+                    entity.setSize(new Vector2(3, 3));
                     debugPointAction.getPos().sub(1, 1);
-                }else{
+                } else {
                     entity = new SpriteEntity(IngameAssets.pixel);
                 }
                 entity.setRelPos(debugPointAction.getPos());
@@ -460,12 +461,16 @@ public class Animator implements Screen, AnimationLogProcessor {
                     animGameCharacter = new GameCharacter(teamColors[Math.min(1, curTeam)]);
                 else
                     animGameCharacter = new GameCharacter(teamColors[curTeam]);
-                animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
-                teams[curTeam][curCharacter] = animGameCharacter;
+
                 AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
                 animGameCharacter.setAimingIndicator(aimIndicator);
-                characterGroup.add(animGameCharacter);
+
+                aimIndicator.setRelPos(new Vector2(0.5f, 0.5f).scl(animGameCharacter.getSize()));
+                teams[curTeam][curCharacter] = animGameCharacter;
+                EntityGroup group = new EntityGroup(aimIndicator, animGameCharacter);
+                group.setRelPos(simGameCharacter.getPlayerPos().cpy());
+                characterGroup.add(group);
             }
 
     }
@@ -621,8 +626,6 @@ public class Animator implements Screen, AnimationLogProcessor {
     }
 
 
-
-
     @Override
     public void awaitNotification() {
         synchronized (notificationObject) {
@@ -633,7 +636,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         }
     }
 
-    public GameCharacter setActiveGameCharacter(GameCharacter newCharacter){
+    public GameCharacter setActiveGameCharacter(GameCharacter newCharacter) {
         GameCharacter old = activeCharacter;
         activeCharacter = newCharacter;
         return old;

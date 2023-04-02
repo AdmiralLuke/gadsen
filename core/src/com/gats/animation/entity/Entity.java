@@ -59,14 +59,20 @@ public class Entity {
     }
 
     protected void setPos(Vector2 pos) {
+        System.out.println("Setting pos to" + pos.toString());
         this.pos.set(pos);
     }
 
     public void setRelPos(Vector2 pos) {
 
         //move the absolute position by how much the relative position was altered
-        setPos(this.pos.add(new Vector2(pos).sub(relPos)));
+        this.pos.add(new Vector2(pos).sub(relPos));
         //set the new relative position
         this.relPos.set(new Vector2(pos));
     }
+
+    public Parent getParent() {
+        return parent;
+    }
+
 }

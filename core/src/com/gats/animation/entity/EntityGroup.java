@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,6 +15,12 @@ public class EntityGroup extends Entity implements Parent{
 
     private final List<Entity> children = new ArrayList<>();
 
+    public EntityGroup(Entity... children) {
+        for (Entity cur:
+             children) {
+            add(cur);
+        }
+    }
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
@@ -27,19 +34,25 @@ public class EntityGroup extends Entity implements Parent{
     public void setRelPos(Vector2 pos) {
         super.setRelPos(pos);
         for (Entity child : children) {
-            child.setPos(new Vector2(this.getPos()).add(child.getRelPos()));
+            child.setPos(getPos().cpy().add(child.getRelPos()));
         }
     }
 
-
+    @Override
     public void add(Entity child){
         if (child.parent != null) child.parent.remove(child);
         children.add(child);
+        child.setPos(getPos().cpy().add(child.getRelPos()));
         child.parent = this;
     }
 
     @Override
     public void remove(Entity child) {
         children.remove(child);
+    }
+
+    @Override
+    public Entity asEntity() {
+        return this;
     }
 }

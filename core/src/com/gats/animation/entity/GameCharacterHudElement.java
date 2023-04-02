@@ -21,10 +21,4 @@ public abstract class GameCharacterHudElement extends SpriteEntity {
         return gameCharacter;
     }
 
-
-    @Override
-    public void draw(Batch batch, float deltaTime, float parentAlpha) {
-        //this.setRelPos(gameCharacter.getPos());
-        super.draw(batch, deltaTime, parentAlpha);
-    }
 }

@@ -18,7 +18,7 @@ public class SpriteEntity extends Entity {
     private Vector2 scale = new Vector2(1, 1);
     private Vector2 size = new Vector2(1, 1);
 
-    private Vector2 relPos = Vector2.Zero;
+    private Vector2 relPos = new Vector2(0,0);
 
     public SpriteEntity(TextureRegion textureRegion) {
         super();
@@ -60,19 +60,6 @@ public class SpriteEntity extends Entity {
 
     public void setSize(Vector2 size) {
         this.size = size;
-    }
-
-    public void setRelPos(Vector2 newRelPos) {
-        this.relPos = new Vector2(newRelPos);
-    }
-
-    @Override
-    public Vector2 getRelPos() {
-        return new Vector2(relPos);
-    }
-
-    public Vector2 getPos() {
-        return new Vector2(getRelPos().add(super.getPos()));
     }
 
 

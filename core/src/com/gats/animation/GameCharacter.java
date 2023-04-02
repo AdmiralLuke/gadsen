@@ -8,14 +8,15 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.StringBuilder;
-import com.gats.animation.entity.AnimatedEntity;
+import com.gats.animation.entity.*;
 import com.gats.ui.assets.AssetContainer;
-import com.gats.animation.entity.GameCharacterHudElement;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -25,7 +26,6 @@ public class GameCharacter extends AnimatedEntity {
 
 
     private float accSkinTime = 0;
-    private boolean aimActive = false;
 
     private static final float spriteOffsetLeft = 5;
 
@@ -67,11 +67,6 @@ public class GameCharacter extends AnimatedEntity {
         accSkinTime += deltaTime;
 
         batch.flush();
-
-        //draw the aimIndicator before the character, so it is overlapped by it
-        if (aimingIndicator != null && aimActive) {
-            aimingIndicator.draw(batch, deltaTime, parentAlpha);
-        }
 
         ShaderProgram shader = IngameAssets.lookupOutlineShader;
         batch.setShader(shader);
@@ -136,7 +131,6 @@ public class GameCharacter extends AnimatedEntity {
 
     @Override
     public void setRelPos(Vector2 pos) {
-        //setFlipped(this.getPos().x < pos.x);
         super.setRelPos(pos);
     }
 
@@ -144,7 +138,4 @@ public class GameCharacter extends AnimatedEntity {
         return IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
     }
 
-    public void aimActive(boolean active) {
-        aimActive = active;
-    }
 }
