@@ -1,12 +1,9 @@
 package com.gats.ui.hud;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.gats.animation.AnimatorCamera;
 import com.gats.manager.HumanPlayer;
-import com.gats.ui.HudStage;
+import com.gats.ui.Hud;
 import com.gats.ui.InGameScreen;
 
 import java.util.ArrayList;
@@ -165,7 +162,7 @@ public class InputHandler implements GadsenInputProcessor{
 
 	/**
 	 * Called whenever a button stops getting pressed/is lifted up.
-	 * Resets the values to some Keypresses, changed in {@link HudStage#keyDown(int)}
+	 * Resets the values to some Keypresses, changed in {@link Hud#keyDown(int)}
 	 *
 	 * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
 	 * @return

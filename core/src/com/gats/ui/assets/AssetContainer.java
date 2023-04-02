@@ -9,8 +9,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.gats.simulation.Weapon;
+import com.gats.simulation.WeaponType;
 
-import java.awt.*;
+import java.util.HashMap;
 
 /**
  * Contains Loaded Instances of Assets
@@ -82,6 +84,11 @@ public class AssetContainer {
         public static Array<TextureAtlas.AtlasRegion> Cookie;
         public static Array<TextureAtlas.AtlasRegion> SugarCane;
 
+        public static TextureRegion inventoryCell;
+
+        public static TextureRegion cookieIcon;
+        public static TextureRegion sugarCaneIcon;
+        public static HashMap<WeaponType,TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,

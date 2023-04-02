@@ -3,6 +3,7 @@ package com.gats.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
@@ -14,9 +15,9 @@ import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.Action;
+import com.gats.ui.hud.UiMessenger;
 
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
@@ -26,31 +27,26 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private final Manager manager;
     private final List<HumanPlayer> humanList;
     private Viewport gameViewport;
-    private Viewport hudViewport;
-
     private float worldWidth = 80*12;
     private float worldHeight = 80*12;
 
     //should HUD be handled by GADS
-    private HudStage hudStage;
+    private Hud hud;
     private Animator animator;
     private final GADS gameManager;
     public InGameScreen(GADS instance, RunConfiguration runConfig){
 
         gameManager = instance;
         gameViewport = new FillViewport(worldWidth,worldHeight);
-        hudViewport = new FitViewport(worldWidth,worldHeight);
-
-
-        hudStage = new HudStage(hudViewport,this);
+        hud = new Hud(this);
         setupInput();
 
 
         runConfig.gui = true;
         runConfig.animationLogProcessor = this;
-        runConfig.input = hudStage.getInputHandler();
+        runConfig.input = hud.getInputHandler();
         manager = new Manager(runConfig);
-        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode );
+        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode,new UiMessenger(hud.getInventoryDrawer(), hud.getTurnSplashScreen()));
         manager.start();
 
         humanList = manager.getHumanList();
@@ -65,10 +61,9 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
     @Override
     public void render(float delta) {
-        hudStage.tick(delta);
-        hudStage.act();
+        hud.tick(delta);
         animator.render(delta);
-        hudStage.draw();
+        hud.draw();
         //animator.animate(gameManager.simulation.getActionLog());
     }
 
@@ -88,8 +83,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     @Override
     public void resize(int width, int height) {
         animator.resize(width, height);
-        hudStage.getViewport().update(width, height);
-        hudStage.getViewport().apply();
+        hud.resizeViewport(width,height);
     }
 
     @Override
@@ -113,7 +107,6 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     @Override
     public void dispose() {
         animator.dispose();
-        hudStage.dispose();
         manager.dispose();
         gameManager.setScreenMenu();
     }
@@ -121,8 +114,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
         //animator als actor?
          //       simulation als actor?
-        Gdx.input.setInputProcessor(hudStage.getInputHandler());
-        hudStage.getInputHandler().setHumanPlayers(humanList);
+        Gdx.input.setInputProcessor(hud.getInputHandler());
+        hud.getInputHandler().setHumanPlayers(humanList);
 
     }
 

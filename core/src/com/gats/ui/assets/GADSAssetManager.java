@@ -7,9 +7,11 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 import com.gats.ui.assets.AssetContainer.MainMenuAssets;
+import com.gats.ui.hud.inventory.InventoryCell;
 
 public class GADSAssetManager {
     //dedicatod to loading and mangaing assets used in the application
@@ -95,7 +97,7 @@ public class GADSAssetManager {
 
         IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("tile/16x_box01"), atlas.findRegion("tile/16x_anchor01")};
 
-        IngameAssets.aimingIndicatorSprite = atlas.findRegion("hud/aimIndicator");
+        IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicator");
 
         IngameAssets.gameCharacterAnimations = new Animation[GameCharacterAnimationType.values().length];
 
@@ -129,6 +131,13 @@ public class GADSAssetManager {
         IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
 
         IngameAssets.SugarCane = atlas.findRegions("projectile/sugarcaneProjectileFront");
+
+        IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
+        IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
+        IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
+
+        IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
+        IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
 
         finishedLoading = true;
     }

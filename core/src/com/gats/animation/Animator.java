@@ -17,6 +17,7 @@ import com.gats.simulation.*;
 import com.gats.simulation.action.*;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
+import com.gats.ui.hud.UiMessenger;
 
 
 import java.util.*;
@@ -39,6 +40,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private Viewport backgroundViewport;
 
     private SpriteEntity background;
+    private UiMessenger uiMessenger;
 
     private Batch batch;
 
@@ -301,6 +303,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             TurnStartAction startAction = (TurnStartAction) action;
             GameCharacter target = animator.teams[startAction.getTeam()][startAction.getCharacter()];
             animator.getCamera().moveToVector(target.getPos());
+            animator.uiMessenger.updateInventory(animator.state.getCharacterFromTeams(startAction.getTeam(),startAction.getCharacter()));
             return new ExpandedAction(new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter));
         }
 
@@ -404,7 +407,8 @@ public class Animator implements Screen, AnimationLogProcessor {
      * @param state    Contains the initial state of the game before any actions are played
      * @param viewport viewport used for rendering
      */
-    public Animator(GameState state, Viewport viewport, int gameMode) {
+    public Animator(GameState state, Viewport viewport, int gameMode,UiMessenger uiMessenger) {
+        this.uiMessenger= uiMessenger;
         this.state = state;
         this.batch = new SpriteBatch();
         this.root = new EntityGroup();
@@ -567,9 +571,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         batch.setProjectionMatrix(camera.combined);
         //tells the batch to render in the way specified by the camera
         // e.g. Coordinate-system and Viewport scaling
-
         viewport.apply();
-
 
         //ToDo: make one step in the scheduled actions
 
