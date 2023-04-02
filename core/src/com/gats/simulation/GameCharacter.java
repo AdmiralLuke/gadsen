@@ -471,7 +471,7 @@ public class GameCharacter {
 
         if (falling) {
             //We detected a gap while walking, start falling after walk
-            lastAction = walk(dx - moved, fall(lastAction));
+            lastAction = walk(sign * (distance - moved -1), fall(lastAction));
         }
         return lastAction;
     }
