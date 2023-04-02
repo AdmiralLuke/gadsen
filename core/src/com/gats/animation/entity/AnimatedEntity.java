@@ -22,7 +22,9 @@ public class AnimatedEntity extends Entity {
     private boolean mirror = false;
     private float accTime = 0;
 
-    private final Vector2 size;
+    private Vector2 size;
+
+    private Vector2 origin = new Vector2();
 
     public AnimatedEntity(Animation<TextureRegion> animation, Vector2 size) {
         this.animation = animation;
@@ -50,7 +52,8 @@ public class AnimatedEntity extends Entity {
         //Todo laser not drawn at the proper position when flipped
         //call draw angle to also calculate the flipped value
         float drawAngle = getRotationAngle();
-        batch.draw(animation.getKeyFrame(accTime), getPos().x + (flipped ? size.x : 0), getPos().y, 0, 0,/*scale.x*/1,/*scale.y*/1, flipped ? -size.x : size.x, size.y, drawAngle);
+        TextureRegion keyFrame = animation.getKeyFrame(accTime);
+        batch.draw(keyFrame, getPos().x + (flipped ? size.x + origin.x : -origin.x), getPos().y -origin.y, 0, 0, keyFrame.getRegionWidth() , keyFrame.getRegionHeight(), flipped ?-1:1, 1,  drawAngle);
     }
 
 
@@ -98,5 +101,17 @@ public class AnimatedEntity extends Entity {
 
     public Vector2 getSize() {
         return new Vector2(size);
+    }
+
+    public void setSize(Vector2 size) {
+        this.size = size;
+    }
+
+    public Vector2 getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(Vector2 origin) {
+        this.origin = origin;
     }
 }

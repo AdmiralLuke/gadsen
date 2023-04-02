@@ -27,6 +27,10 @@ public class GameCharacter extends AnimatedEntity {
     private float accSkinTime = 0;
     private boolean aimActive = false;
 
+    private static final float spriteOffsetLeft = 5;
+
+    private static final float spriteOffsetRight = 2;
+
     private Animation<TextureRegion> skin;
 
     private AimIndicator aimingIndicator;
@@ -40,7 +44,7 @@ public class GameCharacter extends AnimatedEntity {
 
 
     public GameCharacter(Color teamColor) {
-        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(16, 16));
+        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(9, 15));
         switch (new Random().nextInt(4)){
             case 1:
                 skin = IngameAssets.orangeCatSkin;
@@ -54,6 +58,7 @@ public class GameCharacter extends AnimatedEntity {
             default:
                 skin = IngameAssets.coolCatSkin;
         }
+        setOrigin(new Vector2(5,0));
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
