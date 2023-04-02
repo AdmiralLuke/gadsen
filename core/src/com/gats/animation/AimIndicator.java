@@ -27,6 +27,7 @@ public class AimIndicator extends GameCharacterHudElement {
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
 
+        //ToDO: yikes
         this.setRelPos(getGameCharacter().getRelPos().cpy().add(posOffset));
         super.draw(batch, deltaTime, parentAlpha);
 
