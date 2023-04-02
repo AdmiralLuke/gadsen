@@ -61,7 +61,7 @@ public class BaseProjectile implements Projectile{
 
 
     @Override
-    public Action shoot(Action head, Vector2 dir, float strength, Projectile dec) {
+    public Action shoot(Action head, Vector2 dir, float strength, Projectile dec, GameCharacter character) {
         this.t = 0f;
         this.strength = strength;
         return this.move(head, strength , dec);
@@ -99,7 +99,7 @@ public class BaseProjectile implements Projectile{
             lastTile = null;
         }
 
-        if (t == path.getDuration() || pos.y < 0) return hitNothing(head);
+        if (t >= path.getDuration() || pos.y < 0) return dec.hitNothing(head, dec, this);
 
 
         for (int i = 0; i < sim.getState().getTeamCount(); i++) {
@@ -144,7 +144,9 @@ public class BaseProjectile implements Projectile{
         return t.onDestroy(projAction);
     }
 
-    public Action hitNothing(Action head) {
+    @Override
+    public Action hitNothing(Action head, Projectile dec, BaseProjectile bsProj) {
+        t = Math.min(t, this.path.getDuration());
         ProjectileAction prAc = generateAction();
         head.addChild(prAc);
         return prAc;

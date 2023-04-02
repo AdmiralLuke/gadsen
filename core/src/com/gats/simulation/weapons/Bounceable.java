@@ -25,15 +25,14 @@ public class Bounceable implements Projectile {
 
     @Override
     public Action hitCharacter(Action head, GameCharacter character, Projectile dec, BaseProjectile bsProj) {
-        return dec == this ? proj.hitCharacter(head,character, proj, bsProj) : proj.hitCharacter(head,character, dec, bsProj);
+        return proj.hitCharacter(head,character, dec, bsProj);
     }
 
 
     @Override
     public Action hitWall(Action head, Tile t, Projectile dec, BaseProjectile bsProj) {
         if (leftBounces <= 0) {
-            leftBounces = bounces;
-            return proj.hitWall(head, t, proj, bsProj);
+            return proj.hitWall(head, t, dec, bsProj);
         } else {
             leftBounces--;
             Vector2 pos = bsProj.path.getPos(bsProj.t).cpy();
@@ -66,9 +65,9 @@ public class Bounceable implements Projectile {
 
 
     @Override
-    public Action shoot(Action head, Vector2 dir, float strength, Projectile dec) {
+    public Action shoot(Action head, Vector2 dir, float strength, Projectile dec, GameCharacter character) {
         leftBounces = bounces;
-        return this.proj.shoot(head, dir, strength, dec);
+        return this.proj.shoot(head, dir, strength, dec, character);
     }
 
     @Override
@@ -194,5 +193,9 @@ public class Bounceable implements Projectile {
             dir.y *= -1;
         }
         return dir;
+    }
+
+    public Action hitNothing(Action head, Projectile dec, BaseProjectile bsProj) {
+        return proj.hitNothing(head, dec, bsProj);
     }
 }

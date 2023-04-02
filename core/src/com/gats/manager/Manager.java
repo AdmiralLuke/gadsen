@@ -271,6 +271,7 @@ public class Manager {
                 }
             } catch (InterruptedException e) {
                 System.err.println("Interrupted while processing cmds");
+                System.err.println(e.toString());
                 if (pendingShutdown) {
                     futureExecutor.interrupt();
                     break;

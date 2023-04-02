@@ -102,7 +102,7 @@ public class GameCharacter {
             return false;
         }
         if (selectedWeapon != -1) {
-            weapons[selectedWeapon].shoot(head, dir, strength, this.getPlayerPos());
+            weapons[selectedWeapon].shoot(head, dir, strength, this.getPlayerPos(), this);
             alreadyShot = true;
             return true;
         } else {
@@ -195,8 +195,8 @@ public class GameCharacter {
      */
     protected void initInventory() {
         this.weapons = new Weapon[2];
-        weapons[0] = new Weapon(new Backnockable(new Bounceable(new BaseProjectile(3, 0, 0, sim, ProjectileAction.ProjectileType.CANDY_CANE), 5, 1f), 0.3f), 200, WeaponType.SUGAR_CANE, team, teamPos);
-        weapons[1] = new Weapon(new Bounceable(new BaseProjectile( 1, 0, 0, sim, ProjectileAction.ProjectileType.COOKIE), 5, 0.5f), 200, WeaponType.COOKIE, team, teamPos);
+        weapons[0] = new Weapon(new Backnockable(new Bounceable(new BaseProjectile(3, 0, 0, sim, ProjectileAction.ProjectileType.CANDY_CANE), 5, 1f), 1f), 200, WeaponType.SUGAR_CANE, team, teamPos);
+        weapons[1] = new Weapon(new Backnockable(new Bounceable(new BaseProjectile( 1, 0, 0, sim, ProjectileAction.ProjectileType.COOKIE),  5, 0.5f), 1f), 200, WeaponType.COOKIE, team, teamPos);
     }
 
     /**

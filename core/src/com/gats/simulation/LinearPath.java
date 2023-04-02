@@ -39,9 +39,9 @@ public class LinearPath implements Path {
      */
     public LinearPath(Vector2 start, Vector2 dir, float duration, float v) {
         this.start = start;
-        this.duration = duration / v;
-        this.dir = dir;
-        this.end = getPos(duration);
+        this.end = start.cpy().add(dir.cpy().scl(duration * v));
+        this.dir = end.cpy().sub(start);
+        this.duration = dir.len() / v;
         this.v = v;
     }
 

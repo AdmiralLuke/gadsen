@@ -39,14 +39,18 @@ public interface Projectile {
      */
     Action hitCharacter(Action head, GameCharacter character, Projectile dec, BaseProjectile bsProj);
 
+    Action hitNothing(Action head, Projectile dec, BaseProjectile bsProj);
+
     /**
      * initial shoot command to init some variables
      * @param head head-Action for chaining
      * @param dir direction of the projectile
      * @param strength strength of the projectile between 0 and 1
+     * @param dec decorator Projectile for back-tracking chaining
+     * @param character GameCharacter which called the shoot function
      * @return chained Action for Animator
      */
-    Action shoot(Action head, Vector2 dir, float strength, Projectile dec);
+    Action shoot(Action head, Vector2 dir, float strength, Projectile dec, GameCharacter character);
 
     /**
      * initial path-chaining

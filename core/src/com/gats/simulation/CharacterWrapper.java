@@ -17,4 +17,8 @@ public class CharacterWrapper {
         this.team[team][gchar].setPosX(x);
         this.team[team][gchar].setPosY(y);
     }
+
+    public Action fall(Action head, int team, int gchar) {
+        return this.team[team][gchar].fall(head);
+    }
 }
