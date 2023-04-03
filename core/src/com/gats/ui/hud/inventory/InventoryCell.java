@@ -1,5 +1,6 @@
 package com.gats.ui.hud.inventory;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -9,34 +10,40 @@ import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.TransformDrawable;
+import com.gats.simulation.GameCharacter;
+import com.gats.simulation.Weapon;
+import com.gats.simulation.WeaponType;
+import com.gats.ui.assets.AssetContainer;
 
 
 /**
  * Class representing a single inventory Slot.
  */
 public class InventoryCell extends Image {
-	private	Image item;
 
-	private int ammo;
-
+	private InventoryWeapon weapon;
 	private float scale;
+	private boolean selected;
+
+	private Color selectedColor;
 	public InventoryCell(TextureRegion background) {
 		super(background);
 		this.scale = 1;
+		Color baseColor = new Color(0.7f,0.7f,0.7f,1);
+		setColor(baseColor);
+
+		selectedColor = new Color(1, 1, 1,1);
 
 	}
 
-	public void setAmmo(int ammo) {
-		this.ammo = ammo;
-	}
-
-	public void setItem(TextureRegion itemIcon) {
-		if(itemIcon!=null) {
-			this.item = new Image(itemIcon);
-		}
+	void setWeapon(Weapon weapon){
+		this.weapon = new InventoryWeapon(weapon, AssetContainer.IngameAssets.weaponIcons.get(weapon.getType()));
 	}
 
 
+	void setSelected(boolean selected){
+		this.selected = selected;
+	}
 	@Override
 	public float getPrefHeight() {
 		return super.getPrefHeight()*scale;
@@ -55,9 +62,11 @@ public class InventoryCell extends Image {
 	public void draw(Batch batch, float parentAlpha) {
 
 
-		if(item!=null) {
-			item.setColor(getColor());
-			item.setScaleX(getScaleX());
+		Image icon = null;
+		if(weapon!=null) {
+			icon = new Image(weapon.getIcon());
+			icon.setColor(getColor());
+			icon.setScaleX(getScaleX());
 		}
 
 
@@ -72,6 +81,10 @@ public class InventoryCell extends Image {
 		validate();
 
 		Color color = getColor();
+		if(selected){
+			//highlight the cellSprite, if it is selected
+			color = selectedColor;
+		}
 		batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
 
 		float x = getX();
@@ -84,16 +97,18 @@ public class InventoryCell extends Image {
 			if (scaleX != 1 || scaleY != 1 || rotation != 0) {
 				((TransformDrawable)drawable).draw(batch, x + imageX, y + imageY, getOriginX() - imageX, getOriginY() - imageY,
 						imageWidth, imageHeight, scaleX, scaleY, rotation);
-				if(item!=null&&item.getDrawable() instanceof TransformDrawable){
+				if(icon!=null&&icon.getDrawable() instanceof TransformDrawable){
 
-					((TransformDrawable)item.getDrawable()).draw(batch, x + imageX, y + imageY, getOriginX() - imageX, getOriginY() - imageY,
+					((TransformDrawable)icon.getDrawable()).draw(batch, x + imageX, y + imageY, getOriginX() - imageX, getOriginY() - imageY,
 							imageWidth, imageHeight, scaleX, scaleY, rotation);
 				}
 				return;
 			}
 		}
 		if (drawable != null) drawable.draw(batch, x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
-		if(item != null&&item.getDrawable()!=null) item.getDrawable().draw(batch,x+imageX,y+imageY,imageWidth*scaleX,imageHeight*scaleY);
+		//color the batch white for drawing the icon
+	batch.setColor(Color.WHITE);
+		if(icon != null&&icon.getDrawable()!=null) icon.getDrawable().draw(batch,x+imageX,y+imageY,imageWidth*scaleX,imageHeight*scaleY);
 
 	}
 }

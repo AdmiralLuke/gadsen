@@ -39,7 +39,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
         gameManager = instance;
         gameViewport = new FillViewport(worldWidth,worldHeight);
-        hud = new Hud(this);
+        hud = new Hud(this, runConfig);
         UiMessenger uiMessenger=hud.getUiMessenger();
         setupInput();
 

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.manager.HumanPlayer;
+import com.gats.manager.RunConfiguration;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.hud.*;
 import com.gats.ui.hud.inventory.InventoryDrawer;
@@ -26,14 +27,14 @@ public class Hud {
     private Stage stage;
 	private InputHandler inputHandler;
 	private InputMultiplexer inputMultiplexer;
-	private InventoryDrawer inventoryDrawer;
+	private InventoryDrawer inventory;
 	private TurnSplashScreen turnSplashScreen;
 	private Table layoutTable;
 	private Viewport viewport;
 
 
 	private UiMessenger uiMessenger;
-	public Hud(InGameScreen ingameScreen) {
+	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 
 		int viewportSizeX = 256;
 		int viewportSizeY = 256;
@@ -45,15 +46,15 @@ public class Hud {
         stage = new Stage(viewport);
 
         layoutTable = setupLayoutTable();
-		inventoryDrawer = setupInventory();
+		inventory = setupInventoryDrawer(runConfig);
 		inputHandler = setupInputHandler(ingameScreen);
 
 
-		this.uiMessenger = new UiMessenger(ingameScreen,inventoryDrawer,turnSplashScreen);
+		this.uiMessenger = new UiMessenger(ingameScreen, inventory,turnSplashScreen);
 
 		FastForwardButton fastButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
 
-		layoutHudElements(layoutTable,inventoryDrawer,fastButton);
+		layoutHudElements(layoutTable, inventory,fastButton);
 
 
 		inputMultiplexer = new InputMultiplexer();
@@ -63,18 +64,19 @@ public class Hud {
 		stage.addActor(layoutTable);
 	}
 
-	private void layoutHudElements(Table table,InventoryDrawer inventoryDrawer,FastForwardButton fastForwardButton) {
-		table.add(inventoryDrawer).pad(20);
+	private void layoutHudElements(Table table, InventoryDrawer inventory, FastForwardButton fastForwardButton) {
+		table.add(this.inventory).pad(20);
 		table.row();
 		table.add(fastForwardButton).pad(20);
 
 	}
 
-	private InventoryDrawer setupInventory(){
+	private InventoryDrawer setupInventoryDrawer(RunConfiguration runConfiguration){
 		float inventoryScale = 1;
-		InventoryDrawer invDraw = new InventoryDrawer();
-		invDraw.setScale(inventoryScale);
+		//InventoryDrawerDrawerDrawer invDraw = new InventoryDrawerDrawer(runConfiguration);
+		//invDraw.setScale(inventoryScale);
 
+		InventoryDrawer invDraw = new InventoryDrawer(runConfiguration);
 		return invDraw;
 	}
 
@@ -126,7 +128,7 @@ public class Hud {
 	}
 
 	public InventoryDrawer getInventoryDrawer() {
-		return inventoryDrawer;
+		return inventory;
 	}
 
 	public TurnSplashScreen getTurnSplashScreen() {

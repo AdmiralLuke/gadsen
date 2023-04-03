@@ -303,7 +303,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             TurnStartAction startAction = (TurnStartAction) action;
             GameCharacter target = animator.teams[startAction.getTeam()][startAction.getCharacter()];
             animator.getCamera().moveToVector(target.getPos());
-            animator.uiMessenger.updateInventory(animator.state.getCharacterFromTeams(startAction.getTeam(),startAction.getCharacter()));
+            animator.uiMessenger.turnChanged(animator.state.getCharacterFromTeams(startAction.getTeam(),startAction.getCharacter()));
             return new ExpandedAction(new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter));
         }
 
@@ -321,12 +321,15 @@ public class Animator implements Screen, AnimationLogProcessor {
                 default:
                     setAnimationAction = new SetIdleAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             }
+            animator.uiMessenger.changeSelectedWeapon(switchWeaponAction.getWpType());
             return new ExpandedAction(setAnimationAction);
         }
 
 
         private static ExpandedAction convertCharacterShootAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterShootAction shootAction = (CharacterShootAction) action;
+            com.gats.simulation.GameCharacter currentPlayer = animator.state.getCharacterFromTeams(shootAction.getTeam(),shootAction.getCharacter());
+            animator.uiMessenger.playerShot(currentPlayer,currentPlayer.getSelectedWeapon());
             //ToDo play weapon animation
             return new ExpandedAction(new IdleAction(shootAction.getDelay(), 0));
         }

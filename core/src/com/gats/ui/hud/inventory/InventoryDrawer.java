@@ -1,111 +1,77 @@
 package com.gats.ui.hud.inventory;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.gats.manager.RunConfiguration;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.Weapon;
 import com.gats.simulation.WeaponType;
-import com.gats.ui.assets.AssetContainer;
-
-import java.util.HashMap;
 
 /**
  * Class responsible for Drawing the Inventory of the current GameCharacter.
  */
-public class InventoryDrawer extends VerticalGroup {
+public class InventoryDrawer extends Container<Inventory> {
 
-	//Array to keep track of every cell. This way we are able to iterate over them.
-	InventoryCell[] cells;
-	int inventorySize;
-
-	HashMap<WeaponType, TextureRegion> icons;
-
-	public InventoryDrawer() {
-		//Todo get Inventory size from sim
-		inventorySize = WeaponType.values().length;
-		cells = new InventoryCell[inventorySize];
-		icons = AssetContainer.IngameAssets.weaponIcons;
-		setupCells();
-		left();
-	}
-
-	private void setupCells() {
-		for (int i = 0; i < inventorySize; i++) {
-			InventoryCell cell = new InventoryCell(AssetContainer.IngameAssets.inventoryCell);
-			addActor(cell);
-			cells[i] = cell;
-		}
+	Inventory[][] playerInventory;
+	Inventory current;
+	public InventoryDrawer(RunConfiguration runConfiguration) {
+		playerInventory = new Inventory[runConfiguration.teamCount][runConfiguration.teamSize];
+		current = new Inventory(9);
 	}
 
 	public void setScale(float scale) {
-		for (InventoryCell cell : cells
-		) {
-			cell.scaleSizeBy(scale);
-		}
-	}
-
-	public void setInventorySize(int size) {
-		if (size != inventorySize) {
-
-			InventoryCell[] newCells;
-			newCells = new InventoryCell[size];
-			for (int i = 0; i < inventorySize; i++) {
-				newCells[i] = cells[i];
-			}
-			if (inventorySize < size) {
-				for (int i = inventorySize; i < size; i++) {
-					newCells[i] = new InventoryCell(AssetContainer.IngameAssets.inventoryCell);
-				}
-			}
-			this.inventorySize = size;
-		}
-	}
-
-	@Override
-	public void draw(Batch batch, float parentAlpha) {
-		super.draw(batch, parentAlpha);
+	//	for (InventoryCell cell : cells
+	//	) {
+	//		cell.scaleSizeBy(scale);
+	//	}
 	}
 
 	/**
 	 * gets the current weapons of a GameCharacter and stores them for drawing
 	 * Could be solved a bit more efficiently, yet our inventories are very small so it would not be worth it.
+	 * Currently working on the efficient solution.
 	 * Alternatively we could create an Inventory for every GameCharacter and store it inside an array similar to the teams Array with 2 indexes.
-	 * Then we could just get the informaation from there and update it, if necessary.
+	 * Then we could just get the information from there and update it, if necessary.
 	 *
 	 * @param character
 	 */
-	private void changeCharacterInventory(GameCharacter character) {
-		int size = character.getWeaponAmount();
-		for (int i = 0; i < size; i++) {
-			TextureRegion weaponIcon = icons.get(character.getWeapon(i).getType());
-			cells[i].setItem(weaponIcon);
+	private Inventory createCharacterInventory(GameCharacter character) {
+		return new Inventory(character);
 		}
-	}
+
 
 	/**
 	 * Updates the displayed inventory, with that of the current character.
 	 * @param character
 	 */
-	public void updateInventory(GameCharacter character) {
-		changeCharacterInventory(character);
+	public void changeInventory(GameCharacter character) {
+
+		checkPlayerInventoryExists(character);
+		current = playerInventory[character.getTeam()][character.getTeamPos()];
+		this.setActor(current);
 	}
 
 	/**
-	 * Updates only the slot i of the currently displaying inventory.
+	 * Updates only the slot with first applicable WeaponType of the currently displaying inventory.
 	 * Call whenever an Event happens, changing a characters inventory.
 	 * (e.g. shooting and reducing ammo, gaining a new Weapon)
 	 * @param character
-	 * @param i
+	 * @param weaponType
 	 */
-	public void updateInventory(GameCharacter character, int i) {
-		cells[i].setItem(icons.get(character.getWeapon(i).getType()));
 
-		//Todo Implement ammo changes once we have pickup weapon Action
+	public void updateItem(GameCharacter character, WeaponType weaponType) {
+
+		checkPlayerInventoryExists(character);
+		current = playerInventory[character.getTeam()][character.getTeamPos()];
+		current.updateItem(character,weaponType);
+	}
+
+	private void checkPlayerInventoryExists(GameCharacter character){
+		Inventory currInv = playerInventory[character.getTeam()][character.getTeamPos()];
+		if (currInv == null) {
+			playerInventory[character.getTeam()][character.getTeamPos()] = createCharacterInventory(character);
+		}
+
+	}
+	public void setSelectedItem(WeaponType weaponType) {
+		current.setSelectedItem(weaponType);
 	}
 }
