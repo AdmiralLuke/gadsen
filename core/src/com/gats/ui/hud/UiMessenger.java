@@ -2,10 +2,8 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.Weapon;
 import com.gats.simulation.WeaponType;
-import com.gats.ui.InGameScreen;
-import com.gats.ui.hud.inventory.InventoryDrawer;
+import com.gats.ui.Hud;
 
 
 /**
@@ -14,15 +12,11 @@ import com.gats.ui.hud.inventory.InventoryDrawer;
  */
 public class UiMessenger {
 
-	InventoryDrawer inventory;
-	TurnSplashScreen turnSplashScreen;
 
-	InGameScreen inGameScreen;
+	Hud hud;
 
-	public UiMessenger(InGameScreen inGameScreen, InventoryDrawer inventory, TurnSplashScreen turnSplashScreen){
-		this.inGameScreen = inGameScreen;
-		this.inventory = inventory;
-		this.turnSplashScreen = turnSplashScreen;
+	public UiMessenger(Hud hud){
+		this.hud = hud;
 	}
 
 	/**
@@ -31,7 +25,7 @@ public class UiMessenger {
 	 * (e.g. new Weapon pickup or loss of ammunition)
 	 */
 	public void updateInventoryItem(GameCharacter currentPlayer, WeaponType weaponType){
-		inventory.updateItem(currentPlayer,weaponType);
+		hud.getInventoryDrawer().updateItem(currentPlayer,weaponType);
 	};
 
 
@@ -45,25 +39,27 @@ public class UiMessenger {
 	 *
 	 */
 	public void changeInventory(GameCharacter currentPlayer){
-		inventory.changeInventory(currentPlayer);
+		hud.getInventoryDrawer().changeInventory(currentPlayer);
 	}
 	public void changeSelectedWeapon(WeaponType weaponType){
-		inventory.setSelectedItem(weaponType);
+		hud.getInventoryDrawer().setSelectedItem(weaponType);
 	}
 
 	/**
-	 * Will call the {@link TurnSplashScreen} to draw itself with the current Sprite of the Character that owns the new Turn.
-	 * @param gameCharacter Sprite of the current/new Player
+	 * Will call {@link Hud#createTurnChangePopup()} to temporarily draw it to the Hud.
+	 * @param gameCharacter Sprite/Skin of the current/new Player -> could be implemented
 	 */
-	public void drawTurnSplashScreen(TextureRegion gameCharacter){}
+	public void drawTurnChangePopup(TextureRegion gameCharacter){
+		hud.createTurnChangePopup();
+	}
 
 	public void changeAnimationPlaybackSpeed(float speed){
-		inGameScreen.setRenderingSpeed(speed);
+		hud.setRenderingSpeed(speed);
 	}
 
 	public void turnChanged(GameCharacter currentPlayer){
 		changeInventory(currentPlayer);
-		drawTurnSplashScreen(null);
+		drawTurnChangePopup(null);
 	}
 
 	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){

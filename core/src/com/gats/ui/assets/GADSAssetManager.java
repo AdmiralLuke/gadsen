@@ -142,6 +142,8 @@ public class GADSAssetManager {
         IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
         IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
         IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");
+        IngameAssets.turnChange = atlas.findRegion("ui/turnChange");
+
 
         finishedLoading = true;
     }

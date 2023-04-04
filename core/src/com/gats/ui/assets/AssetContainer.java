@@ -93,6 +93,8 @@ public class AssetContainer {
         public static TextureRegion fastForwardButton;
         public static TextureRegion fastForwardButtonPressed;
         public static TextureRegion fastForwardButtonChecked;
+
+        public static TextureRegion turnChange;
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,
