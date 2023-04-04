@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 
-import java.awt.*;
-
 /**
  * Contains Loaded Instances of Assets
  */
@@ -78,9 +76,20 @@ public class AssetContainer {
 
         public static ShaderProgram outlineShader;
 
+        public static ShaderProgram lookupShader;
+
+        public static ShaderProgram lookupOutlineShader;
+
         //Projectiles
         public static Array<TextureAtlas.AtlasRegion> Cookie;
         public static Array<TextureAtlas.AtlasRegion> SugarCane;
+
+        public static Animation<TextureRegion> coolCatSkin;
+        public static Animation<TextureRegion> orangeCatSkin;
+        public static Animation<TextureRegion> yinYangSkin;
+        public static Animation<TextureRegion> mioSkin;
+
+        public static Animation<TextureRegion> tombstoneAnimation;
 
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,

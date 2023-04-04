@@ -339,7 +339,17 @@ public class Animator implements Screen, AnimationLogProcessor {
                 hitAnimation.setChildren(new Action[]{deathAnimation});
                 DestroyAction destroyCharacter = new DestroyAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, null, animator.characterGroup::remove);
                 deathAnimation.setChildren(new Action[]{destroyCharacter});
-                lastAction = destroyCharacter;
+                SummonAction summonTombstone = new SummonAction(0, null, () -> {
+                    AnimatedEntity tombstone = new AnimatedEntity(IngameAssets.tombstoneAnimation, target.getSize());
+                    tombstone.setRelPos(target.getRelPos());
+                    animator.root.add(tombstone);
+                    return tombstone;
+
+                });
+                destroyCharacter.setChildren(new Action[]{summonTombstone});
+                IdleAction waitAnimation = new IdleAction(0, IngameAssets.tombstoneAnimation.getAnimationDuration());
+                summonTombstone.setChildren(new Action[]{waitAnimation});
+                lastAction = summonTombstone;
             }else{
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
                 hitAnimation.setChildren(new Action[]{resetAnimationAction});
@@ -472,7 +482,6 @@ public class Animator implements Screen, AnimationLogProcessor {
                 AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
                 animGameCharacter.setAimingIndicator(aimIndicator);
-                animGameCharacter.setMirror(true);
                 characterGroup.add(animGameCharacter);
             }
 

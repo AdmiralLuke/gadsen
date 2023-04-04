@@ -11,5 +11,6 @@ public class Projectile extends AnimatedEntity {
 
     public Projectile(Animation<TextureRegion> animation) {
         super(animation, new Vector2(animation.getKeyFrame(0).getRegionWidth(), animation.getKeyFrame(0).getRegionHeight()));
+        setOrigin(new Vector2(0.5f, 0.5f).scl(getSize()));
     }
 }
