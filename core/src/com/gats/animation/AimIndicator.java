@@ -20,7 +20,6 @@ public class AimIndicator extends GameCharacterHudElement {
     public AimIndicator(TextureRegion hudSprite, GameCharacter gameCharacter){
         super(hudSprite, new Vector2(0,0), new Vector2(hudSprite.getRegionWidth(), hudSprite.getRegionHeight()),gameCharacter);
         setOrigin(new Vector2(0, hudSprite.getRegionHeight()/2f));
-        setRotate(true);
         gameCharacter.setAimingIndicator(this);
     }
 

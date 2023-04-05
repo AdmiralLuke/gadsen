@@ -16,12 +16,12 @@ public class SpriteEntity extends Entity {
 
     private Color color = null;
     private Vector2 scale = new Vector2(1, 1);
-    private Vector2 size = new Vector2(1, 1);
+    private Vector2 size = null;
 
     private boolean flipped = false;
 
 
-    private boolean rotate = false;
+    private boolean rotate = true;
     /**
      * When mirror is set to true, the character will be flipped once the angle is 180 or higher on the x axis
      */
@@ -48,16 +48,28 @@ public class SpriteEntity extends Entity {
         if (color != null)
             batch.setColor(color);
 
-        batch.draw(textureRegion,
-                getPos().x -origin.x,
-                getPos().y -origin.y,
-                origin.x,
-                origin.y,
-                size.x,
-                size.y,
-                scale.x,
-                (flipped ? -1 : 1 ) * (scale.y),
-                getRotationAngle());
+        if (size == null)
+            batch.draw(textureRegion,
+                    getPos().x - origin.x,
+                    getPos().y - origin.y,
+                    origin.x,
+                    origin.y,
+                    textureRegion.getRegionWidth(),
+                    textureRegion.getRegionHeight(),
+                    scale.x,
+                    (flipped ? -1 : 1) * (scale.y),
+                    getRotationAngle());
+        else
+            batch.draw(textureRegion,
+                    getPos().x - origin.x,
+                    getPos().y - origin.y,
+                    origin.x,
+                    origin.y,
+                    size.x,
+                    size.y,
+                    scale.x,
+                    (flipped ? -1 : 1) * (scale.y),
+                    getRotationAngle());
 
         //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
 

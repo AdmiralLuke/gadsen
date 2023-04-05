@@ -12,7 +12,6 @@ import com.gats.animation.entity.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.gats.animation.entity.Weapon;
 import com.gats.manager.AnimationLogProcessor;
 import com.gats.simulation.*;
 import com.gats.simulation.action.*;
@@ -269,7 +268,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             SummonAction summonProjectile = new SummonAction(action.getDelay(), destroyProjectile::setTarget, () -> {
                 animator.map.setTile(destroyAction.getPos(), TileMap.TYLE_TYPE_NONE);
-                Entity particle = new AnimatedEntity(IngameAssets.destroyTileAnimation, new Vector2(16, 16));
+                Entity particle = new AnimatedEntity(IngameAssets.destroyTileAnimation);
                 particle.setRelPos(destroyAction.getPos().toFloat().scl(animator.map.getTileSize()));
                 animator.root.add(particle);
                 return particle;
@@ -330,7 +329,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 DestroyAction destroyCharacter = new DestroyAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, null, animator.characterGroup::remove);
                 deathAnimation.setChildren(new Action[]{destroyCharacter});
                 SummonAction summonTombstone = new SummonAction(0, null, () -> {
-                    AnimatedEntity tombstone = new AnimatedEntity(IngameAssets.tombstoneAnimation, target.getSize());
+                    AnimatedEntity tombstone = new AnimatedEntity(IngameAssets.tombstoneAnimation);
                     tombstone.setRelPos(target.getRelPos());
                     animator.root.add(tombstone);
                     return tombstone;

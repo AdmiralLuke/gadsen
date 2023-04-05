@@ -1,5 +1,7 @@
 package com.gats.animation;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,9 +15,9 @@ import com.gats.ui.assets.AssetContainer;
 public class Weapons {
 
 
-    protected static Entity summon(WeaponType type){
-        Animation<TextureRegion> animation;
-        Vector2 size;
+    protected static Weapon summon(WeaponType type){
+        Animation<TextureRegion> holdAnimation;
+        Animation<TextureRegion> carryAnimation = new Animation<>(1f, new TextureRegion(new Texture(new Pixmap(1, 1, Pixmap.Format.Alpha))));
         Vector2 offset;
         float angle = 0;
         Vector2 scale = new Vector2(1, 1);
@@ -25,14 +27,14 @@ public class Weapons {
             default:
                 offset = new Vector2(-2, -2);
                 settings = new boolean[]{/*rotate*/true,/*mirror*/false};
-                animation = AssetContainer.IngameAssets.coolCat;
-                TextureRegion firstFrame = animation.getKeyFrame(0);
-                size = new Vector2(firstFrame.getRegionWidth(), firstFrame.getRegionHeight()).scl(0.25f);
+                holdAnimation = AssetContainer.IngameAssets.coolCat;
+                TextureRegion firstFrame = holdAnimation.getKeyFrame(0);
+                scale = new Vector2(0.25f, 0.25f);
                 angle=-90;
                 System.err.println("Warning: Weapon-Type " + type + " is not Supported!");
         }
 
-        AnimatedEntity weapon = new AnimatedEntity(animation, size, settings[0],settings[1]);
+        Weapon weapon = new Weapon(holdAnimation, carryAnimation);
         weapon.setRelPos(offset);
         weapon.setScale(scale);
         weapon.setRotationAngle(angle);

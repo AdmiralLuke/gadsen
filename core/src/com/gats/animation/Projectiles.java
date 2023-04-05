@@ -42,6 +42,9 @@ public class Projectiles {
 
         }
         TextureRegion firstFrame = animation.getKeyFrame(0);
-        return new AnimatedEntity(animation, new Vector2(firstFrame.getRegionWidth(), firstFrame.getRegionHeight()), settings[0],settings[1]);
+        AnimatedEntity projectile = new AnimatedEntity(animation);
+        projectile.setRotate(settings[0]);
+        projectile.setMirror(settings[1]);
+        return projectile;
     }
 }

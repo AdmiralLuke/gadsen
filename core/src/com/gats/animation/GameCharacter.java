@@ -31,7 +31,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     private AimIndicator aimingIndicator;
 
-    private AnimatedEntity weapon;
+    private Weapon weapon;
 
     private boolean holdingWeapon = false;
 
@@ -42,9 +42,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
 
     public GameCharacter(Color teamColor) {
-        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()],
-                new Vector2(IngameAssets.gameCharacterAnimations[0].getKeyFrame(0).getRegionWidth(),
-                        IngameAssets.gameCharacterAnimations[0].getKeyFrame(0).getRegionHeight()));
+        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
         switch (new Random().nextInt(4)) {
             case 1:
                 skin = IngameAssets.orangeCatSkin;
@@ -58,7 +56,6 @@ public class GameCharacter extends AnimatedEntity implements Parent {
             default:
                 skin = IngameAssets.coolCatSkin;
         }
-        setRotate(true);
         setMirror(true);
         TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
         setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5,0));
@@ -159,31 +156,19 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     public void setHoldingWeapon(boolean holdingWeapon) {
         this.holdingWeapon = holdingWeapon;
-        if (holdingWeapon) unholsterWeapon();
-        else holsterWeapon();
-    }
-
-    private void holsterWeapon() {
         if (weapon == null) return;
-        weapon.setRotationAngle(weapon.getRotationAngle() - 90);
-        weapon.setRelPos(weapon.getRelPos().cpy().add(HOLSTER_OFFSET));
+        weapon.setHolding(holdingWeapon);
     }
 
-    private void unholsterWeapon() {
-        if (weapon == null) return;
-        weapon.setRotationAngle(weapon.getRotationAngle() + 90);
-        weapon.setRelPos(weapon.getRelPos().cpy().sub(HOLSTER_OFFSET));
-    }
-
-    public void setWeapon(AnimatedEntity weapon) {
+    public void setWeapon(Weapon weapon) {
         if (this.weapon != null && this.weapon.getParent() != null) {
-            if (holdingWeapon) holsterWeapon();
             remove(weapon);
         }
         this.weapon = weapon;
         if (weapon == null) return;
         if (weapon.getParent() != null) weapon.getParent().remove(weapon);
         weapon.setParent(this);
+        weapon.setHolding(holdingWeapon);
     }
 
     @Override
@@ -195,8 +180,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     public void add(Entity child) {
         if (child instanceof AimIndicator) {
             setAimingIndicator((AimIndicator) child);
-        } else if (child instanceof AnimatedEntity) {
-            setWeapon((AnimatedEntity) child);
+        } else if (child instanceof Weapon) {
+            setWeapon((Weapon) child);
         }
     }
 

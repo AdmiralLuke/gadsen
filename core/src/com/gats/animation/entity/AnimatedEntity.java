@@ -15,18 +15,9 @@ public class AnimatedEntity extends SpriteEntity {
 
 
 
-    public AnimatedEntity(Animation<TextureRegion> animation, Vector2 size) {
+    public AnimatedEntity(Animation<TextureRegion> animation) {
         super(null);
         this.animation = animation;
-        setSize(size);
-    }
-
-    public AnimatedEntity(Animation<TextureRegion> animation, Vector2 size, boolean rotate, boolean mirror) {
-        super(null);
-        this.animation = animation;
-        setSize(size);
-        setRotate(rotate);
-        setMirror(mirror);
     }
 
     /**
