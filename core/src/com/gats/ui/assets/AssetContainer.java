@@ -61,7 +61,7 @@ public class AssetContainer {
 
         public static TextureRegion pixel;
 
-        static {
+		static {
             Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             map.setColor(Color.WHITE);
             map.drawPixel(0, 0);
@@ -95,6 +95,8 @@ public class AssetContainer {
         public static TextureRegion fastForwardButtonChecked;
 
         public static TextureRegion turnChange;
+
+        public static TextureRegion turnTimer;
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,

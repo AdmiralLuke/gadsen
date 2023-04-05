@@ -20,7 +20,7 @@ public class UiMessenger {
 	}
 
 	/**
-	 * Will update the current Inventory Display, with Information from the player but only on item with the weaponType.
+	 * Will update the current Inventory Display, with Information from the player but only on the item with the weaponType.
 	 * Call whenever the inventory of a player is changed.
 	 * (e.g. new Weapon pickup or loss of ammunition)
 	 */
@@ -57,9 +57,21 @@ public class UiMessenger {
 		hud.setRenderingSpeed(speed);
 	}
 
+	/**
+	 * Applies the necessary changes to the Hud for a new turn.
+	 * @param currentPlayer
+	 */
 	public void turnChanged(GameCharacter currentPlayer){
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(null);
+	}
+
+	/**
+	 * Pass the remaining turnTime to the Hud for displaying it
+	 * @param time
+	 */
+	public void setTurnTimeLeft(int time){
+		hud.setTurntimeRemaining(time);
 	}
 
 	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){

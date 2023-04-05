@@ -31,10 +31,10 @@ public class Hud implements Disposable {
     private Stage stage;
 	private InputHandler inputHandler;
 	private InputMultiplexer inputMultiplexer;
-	private InventoryDrawer inventory;
-	private Table layoutTable;
-	private Viewport viewport;
 
+	private InventoryDrawer inventory;
+	private TurnTimer turnTimer;
+	private Table layoutTable;
 	private VerticalGroup turnPopupContainer;
 	private InGameScreen inGameScreen;
 
@@ -43,6 +43,8 @@ public class Hud implements Disposable {
 	private float turnChangeDuration;
 
 	private UiMessenger uiMessenger;
+
+	private FastForwardButton fastForwardButton;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 
 		this.inGameScreen = ingameScreen;
@@ -56,7 +58,7 @@ public class Hud implements Disposable {
 
 		Camera cam = new OrthographicCamera(viewportSizeX,viewportSizeY);
 		//Viewport entweder extend oder Fit -> noch nicht sicher welchen ich nehmen soll
-		this.viewport = new ExtendViewport(viewportSizeX,viewportSizeY,cam);
+		Viewport viewport= new ExtendViewport(viewportSizeX,viewportSizeY,cam);
 
 
 		stage = new Stage(viewport);
@@ -64,13 +66,15 @@ public class Hud implements Disposable {
 
 		inventory = setupInventoryDrawer(runConfig);
 		inputHandler = setupInputHandler(ingameScreen);
-
+		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer,AssetContainer.MainMenuAssets.skin);
+		turnTimer.setCurrentTime(3);
 		this.uiMessenger = new UiMessenger(this);
 
-		FastForwardButton fastButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
+		fastForwardButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
 
 		turnPopupContainer = new VerticalGroup();
-		layoutHudElements(layoutTable, inventory,fastButton,turnPopupContainer);
+
+		layoutHudElements();
 
 		//Combine input from both processors
 		inputMultiplexer = new InputMultiplexer();
@@ -82,23 +86,6 @@ public class Hud implements Disposable {
 		stage.addActor(layoutTable);
 	}
 
-	/**
-	 * Places the different Hud Elements inside the Table to define their positions on the screen.
-	 * @param table
-	 * @param inventory
-	 * @param fastForwardButton
-	 * @param turnPopupContainer
-	 */
-	private void layoutHudElements(Table table, InventoryDrawer inventory, FastForwardButton fastForwardButton,VerticalGroup turnPopupContainer) {
-		float padding = 10;
-		table.add(this.inventory).pad(padding).expandX().left();
-		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
-		table.add(turnPopupContainer).expandX().size(turnChangeSprite.getRegionWidth(),turnChangeSprite.getRegionHeight());
-
-		table.row();
-		table.add(fastForwardButton).pad(padding).expandX().left();
-
-	}
 
 	/**
 	 * Creates an {@link InventoryDrawer} with options from the {@link RunConfiguration}.
@@ -128,12 +115,28 @@ public class Hud implements Disposable {
 
         table.setFillParent(true);
         //debug
-        table.setDebug(false);
+        table.setDebug(true);
 		//align the table to the left of the stage
 		table.center();
 		return table;
     }
 
+
+	/**
+	 * Places Hud Elements inside the Table to define their positions on the screen.
+	 */
+	private void layoutHudElements() {
+		float padding = 10;
+		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left();
+		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
+		layoutTable.add(turnPopupContainer).expandX().size(turnChangeSprite.getRegionWidth(),turnChangeSprite.getRegionHeight());
+		layoutTable.add().expandX().expandY();
+		layoutTable.row();
+		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
+		layoutTable.add();
+		layoutTable.add(turnTimer).expandX().right().bottom().pad(padding);
+
+	}
 	/**
 	 * Creates a {@link FastForwardButton} with the correct sprites.
 	 * @param uiMessenger
@@ -211,6 +214,13 @@ public class Hud implements Disposable {
 		inGameScreen.setRenderingSpeed(speed);
 	}
 
+	/**
+	 * Sets the value of the remaining turn time to display.
+	 * @param time
+	 */
+	public void setTurntimeRemaining(int time){
+		turnTimer.setCurrentTime(time);
+	}
 	@Override
 	public void dispose() {
 		stage.dispose();
