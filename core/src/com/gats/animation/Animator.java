@@ -174,7 +174,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_WALKING);
-            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), new CharacterPath(moveAction.getPath()));
             //rotateAction to set the angle/direction of movement, to flip the character sprite
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
             startWalking.setChildren(new Action[]{animMoveAction, animRotateAction});
@@ -189,7 +189,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
             SetAnimationAction startFalling = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_FALLING);
-            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), new CharacterPath(moveAction.getPath()));
             startFalling.setChildren(new Action[]{animMoveAction});
             SetAnimationAction stopFalling = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             animMoveAction.setChildren(new Action[]{stopFalling});
@@ -453,12 +453,8 @@ public class Animator implements Screen, AnimationLogProcessor {
 
                 AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
-                animGameCharacter.setAimingIndicator(aimIndicator);
-
-                aimIndicator.setRelPos(new Vector2(0.5f, 0.5f).scl(animGameCharacter.getSize()));
-                animGameCharacter.add(aimIndicator);
                 teams[curTeam][curCharacter] = animGameCharacter;
-                animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
+                animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy().add(com.gats.simulation.GameCharacter.getSize().scl(0.5f)));
                 characterGroup.add(animGameCharacter);
             }
 

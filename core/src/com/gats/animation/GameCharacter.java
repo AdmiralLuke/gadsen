@@ -20,7 +20,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
 
     private float accSkinTime = 0;
-    private final static Vector2 HOLSTER_OFFSET = new Vector2(3, 12);
+    private final static Vector2 HOLSTER_OFFSET = new Vector2(1, 4);
 
     private static final float spriteOffsetLeft = 5;
 
@@ -42,7 +42,9 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
 
     public GameCharacter(Color teamColor) {
-        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(-3, 4));
+        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()],
+                new Vector2(IngameAssets.gameCharacterAnimations[0].getKeyFrame(0).getRegionWidth(),
+                        IngameAssets.gameCharacterAnimations[0].getKeyFrame(0).getRegionHeight()));
         switch (new Random().nextInt(4)) {
             case 1:
                 skin = IngameAssets.orangeCatSkin;
@@ -56,7 +58,10 @@ public class GameCharacter extends AnimatedEntity implements Parent {
             default:
                 skin = IngameAssets.coolCatSkin;
         }
-        setOrigin(new Vector2(5, 0));
+        setRotate(true);
+        setMirror(true);
+        TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
+        setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5,0));
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
@@ -160,13 +165,13 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     private void holsterWeapon() {
         if (weapon == null) return;
-        weapon.setRotationAngle(90);
+        weapon.setRotationAngle(weapon.getRotationAngle() - 90);
         weapon.setRelPos(weapon.getRelPos().cpy().add(HOLSTER_OFFSET));
     }
 
     private void unholsterWeapon() {
         if (weapon == null) return;
-        weapon.setRotationAngle(0);
+        weapon.setRotationAngle(weapon.getRotationAngle() + 90);
         weapon.setRelPos(weapon.getRelPos().cpy().sub(HOLSTER_OFFSET));
     }
 

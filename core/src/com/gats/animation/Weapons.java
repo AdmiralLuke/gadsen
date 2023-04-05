@@ -15,20 +15,27 @@ public class Weapons {
 
     protected static Entity summon(WeaponType type){
         Animation<TextureRegion> animation;
+        Vector2 size;
         Vector2 offset;
+        float angle = 0;
+        Vector2 scale = new Vector2(1, 1);
         //configuring of drawing properties [0]:AnimatedEntity.rotate [1]:AnimatedEntity.mirror
         boolean[] settings;
         switch (type){
             default:
-                offset = new Vector2(0, 5);
+                offset = new Vector2(-2, -2);
                 settings = new boolean[]{/*rotate*/true,/*mirror*/false};
                 animation = AssetContainer.IngameAssets.coolCat;
+                TextureRegion firstFrame = animation.getKeyFrame(0);
+                size = new Vector2(firstFrame.getRegionWidth(), firstFrame.getRegionHeight()).scl(0.25f);
+                angle=-90;
                 System.err.println("Warning: Weapon-Type " + type + " is not Supported!");
         }
 
-        TextureRegion firstFrame = animation.getKeyFrame(0);
-        AnimatedEntity weapon = new AnimatedEntity(animation, new Vector2(firstFrame.getRegionWidth(), firstFrame.getRegionHeight()), settings[0],settings[1]);
+        AnimatedEntity weapon = new AnimatedEntity(animation, size, settings[0],settings[1]);
         weapon.setRelPos(offset);
+        weapon.setScale(scale);
+        weapon.setRotationAngle(angle);
         return weapon;
     }
 }
