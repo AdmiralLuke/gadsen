@@ -19,8 +19,7 @@ public class CharacterSwitchWeaponAction extends CharacterAction {
     @Override
     public String toString() {
 
-        String output = "NewWeapon: " + wpType.toString();
-        return output;
+        return "NewWeapon: " + wpType.toString();
 
     }
 }

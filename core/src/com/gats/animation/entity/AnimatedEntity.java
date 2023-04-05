@@ -53,6 +53,7 @@ public class AnimatedEntity extends Entity {
         //call draw angle to also calculate the flipped value
         float drawAngle = getRotationAngle();
         TextureRegion keyFrame = animation.getKeyFrame(accTime);
+        //ToDo: fix rendering
         batch.draw(keyFrame, getPos().x + (flipped ? size.x + origin.x : -origin.x), getPos().y -origin.y, 0, 0, keyFrame.getRegionWidth() , keyFrame.getRegionHeight(), flipped ?-1:1, 1,  drawAngle);
     }
 

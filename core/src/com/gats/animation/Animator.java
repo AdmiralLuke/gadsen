@@ -12,6 +12,7 @@ import com.gats.animation.entity.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.gats.animation.entity.Weapon;
 import com.gats.manager.AnimationLogProcessor;
 import com.gats.simulation.*;
 import com.gats.simulation.action.*;
@@ -172,9 +173,8 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterWalkAction moveAction = (CharacterWalkAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
-            Entity characterGroup = target.getParent().asEntity();
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_WALKING);
-            MoveAction animMoveAction = new MoveAction(0, characterGroup, moveAction.getDuration(), moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
             //rotateAction to set the angle/direction of movement, to flip the character sprite
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
             startWalking.setChildren(new Action[]{animMoveAction, animRotateAction});
@@ -188,9 +188,8 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterFallAction moveAction = (CharacterFallAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
-            Entity characterGroup = target.getParent().asEntity();
             SetAnimationAction startFalling = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_FALLING);
-            MoveAction animMoveAction = new MoveAction(0, characterGroup, moveAction.getDuration(), moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), moveAction.getPath());
             startFalling.setChildren(new Action[]{animMoveAction});
             SetAnimationAction stopFalling = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             animMoveAction.setChildren(new Action[]{stopFalling});
@@ -309,18 +308,8 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterSwitchWeaponAction switchWeaponAction = (CharacterSwitchWeaponAction) action;
             GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
-            SetIdleAnimationAction setAnimationAction;
-            switch (switchWeaponAction.getWpType()) {
-                case COOKIE:
-                    setAnimationAction = new SetIdleAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_COOKIE);
-                    break;
-                case SUGAR_CANE:
-                    setAnimationAction = new SetIdleAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_SUGAR_CANE);
-                    break;
-                default:
-                    setAnimationAction = new SetIdleAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
-            }
-            return new ExpandedAction(setAnimationAction);
+            AddAction addAction = new AddAction(action.getDelay(), target, Weapons.summon(switchWeaponAction.getWpType()));
+            return new ExpandedAction(addAction);
         }
 
 
@@ -467,10 +456,10 @@ public class Animator implements Screen, AnimationLogProcessor {
                 animGameCharacter.setAimingIndicator(aimIndicator);
 
                 aimIndicator.setRelPos(new Vector2(0.5f, 0.5f).scl(animGameCharacter.getSize()));
+                animGameCharacter.add(aimIndicator);
                 teams[curTeam][curCharacter] = animGameCharacter;
-                EntityGroup group = new EntityGroup(aimIndicator, animGameCharacter);
-                group.setRelPos(simGameCharacter.getPlayerPos().cpy());
-                characterGroup.add(group);
+                animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy());
+                characterGroup.add(animGameCharacter);
             }
 
     }
@@ -639,6 +628,8 @@ public class Animator implements Screen, AnimationLogProcessor {
     public GameCharacter setActiveGameCharacter(GameCharacter newCharacter) {
         GameCharacter old = activeCharacter;
         activeCharacter = newCharacter;
+        if (old != null) old.setHoldingWeapon(false);
+        if (activeCharacter != null) activeCharacter.setHoldingWeapon(true);
         return old;
     }
 }

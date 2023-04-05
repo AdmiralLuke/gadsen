@@ -81,13 +81,16 @@ public class AssetContainer {
         public static ShaderProgram lookupOutlineShader;
 
         //Projectiles
-        public static Array<TextureAtlas.AtlasRegion> Cookie;
-        public static Array<TextureAtlas.AtlasRegion> SugarCane;
+        public static Animation<TextureRegion> Cookie;
+        public static Animation<TextureRegion> SugarCane;
 
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
         public static Animation<TextureRegion> yinYangSkin;
         public static Animation<TextureRegion> mioSkin;
+
+
+        public static Animation<TextureRegion> coolCat;
 
         public static Animation<TextureRegion> tombstoneAnimation;
 
@@ -95,8 +98,6 @@ public class AssetContainer {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,
             ANIMATION_TYPE_FALLING,
-            ANIMATION_TYPE_COOKIE,
-            ANIMATION_TYPE_SUGAR_CANE,
             ANIMATION_TYPE_HIT,
             ANIMATION_TYPE_DEATH
         }

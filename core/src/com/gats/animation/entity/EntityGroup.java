@@ -31,24 +31,38 @@ public class EntityGroup extends Entity implements Parent{
     }
 
     @Override
+    protected void setPos(Vector2 pos) {
+        super.setPos(pos);
+        updatePos();
+    }
+
+    @Override
     public void setRelPos(Vector2 pos) {
         super.setRelPos(pos);
+    }
+
+    @Override
+    public void updatePos() {
+        super.updatePos();
         for (Entity child : children) {
-            child.setPos(getPos().cpy().add(child.getRelPos()));
+            child.updatePos();
         }
     }
 
     @Override
     public void add(Entity child){
-        if (child.parent != null) child.parent.remove(child);
+        if (child == null) return;
+        if (child.parent != null) child.parent.remove(this);
+        child.setParent(this);
         children.add(child);
-        child.setPos(getPos().cpy().add(child.getRelPos()));
-        child.parent = this;
     }
 
     @Override
     public void remove(Entity child) {
-        children.remove(child);
+        if (child == null) return;
+        if(children.remove(child)){
+            child.setParent(null);
+        }
     }
 
     @Override

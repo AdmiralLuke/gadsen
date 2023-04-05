@@ -7,25 +7,20 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.StringBuilder;
 import com.gats.animation.entity.*;
-import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
  * Repräsentiert eine Spielfigur auf der Karte
  */
-public class GameCharacter extends AnimatedEntity {
+public class GameCharacter extends AnimatedEntity implements Parent {
 
 
     private float accSkinTime = 0;
+    private final static Vector2 HOLSTER_OFFSET = new Vector2(3, 12);
 
     private static final float spriteOffsetLeft = 5;
 
@@ -33,9 +28,12 @@ public class GameCharacter extends AnimatedEntity {
 
     private Animation<TextureRegion> skin;
 
+
     private AimIndicator aimingIndicator;
 
-    private GameCharacterAnimationType idleType = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
+    private AnimatedEntity weapon;
+
+    private boolean holdingWeapon = false;
 
     private GameCharacterAnimationType currentAnimation = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
     private final Color teamColor;
@@ -44,8 +42,8 @@ public class GameCharacter extends AnimatedEntity {
 
 
     public GameCharacter(Color teamColor) {
-        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(9, 15));
-        switch (new Random().nextInt(4)){
+        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(-3, 4));
+        switch (new Random().nextInt(4)) {
             case 1:
                 skin = IngameAssets.orangeCatSkin;
                 break;
@@ -58,7 +56,7 @@ public class GameCharacter extends AnimatedEntity {
             default:
                 skin = IngameAssets.coolCatSkin;
         }
-        setOrigin(new Vector2(5,0));
+        setOrigin(new Vector2(5, 0));
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
@@ -66,6 +64,10 @@ public class GameCharacter extends AnimatedEntity {
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         accSkinTime += deltaTime;
 
+        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
+        if (!holdingWeapon && weapon != null) {
+            weapon.draw(batch, deltaTime, parentAlpha);
+        }
         batch.flush();
 
         ShaderProgram shader = IngameAssets.lookupOutlineShader;
@@ -78,7 +80,7 @@ public class GameCharacter extends AnimatedEntity {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
         TextureRegion skinFrame = this.skin.getKeyFrame(accSkinTime);
         skinFrame.getTexture().bind();
-        shader.setUniformf("flipped", isFlipped()? 1 : 0);
+        shader.setUniformf("flipped", isFlipped() ? 1 : 0);
         shader.setUniformf("v_skinBounds",
                 skinFrame.getU(),
                 skinFrame.getV(),
@@ -89,14 +91,14 @@ public class GameCharacter extends AnimatedEntity {
         batch.flush();
         batch.setShader(null);
 
+        if (holdingWeapon && weapon != null) weapon.draw(batch, deltaTime, parentAlpha);
+
     }
 
     public void setAnimation(GameCharacterAnimationType type) {
+        if (type == currentAnimation) return;
         currentAnimation = type;
-        if (type == GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
-            super.setAnimation(IngameAssets.gameCharacterAnimations[idleType.ordinal()]);
-        else
-            super.setAnimation(IngameAssets.gameCharacterAnimations[type.ordinal()]);
+        super.setAnimation(IngameAssets.gameCharacterAnimations[type.ordinal()]);
     }
 
     public Animation<TextureRegion> getAnimation() {
@@ -111,22 +113,23 @@ public class GameCharacter extends AnimatedEntity {
         this.skin = skin;
     }
 
-    public GameCharacterAnimationType getIdleType() {
-        return idleType;
-    }
-
-    public void setIdleType(GameCharacterAnimationType idleType) {
-        this.idleType = idleType;
-        if (currentAnimation == GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
-            setAnimation(GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
-    }
 
     public AimIndicator getAimingIndicator() {
         return this.aimingIndicator;
     }
 
     public void setAimingIndicator(AimIndicator aimIndicator) {
+        if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
+        if (aimIndicator == null) return;
+        if (aimIndicator.getParent() != null) aimIndicator.getParent().remove(aimIndicator);
+        aimIndicator.setParent(this);
+    }
+
+    @Override
+    protected void setPos(Vector2 pos) {
+        super.setPos(pos);
+        updatePos();
     }
 
     @Override
@@ -134,8 +137,72 @@ public class GameCharacter extends AnimatedEntity {
         super.setRelPos(pos);
     }
 
+    @Override
+    public void updatePos() {
+        super.updatePos();
+        if (aimingIndicator != null) aimingIndicator.updatePos();
+        if (weapon != null) weapon.updatePos();
+    }
+
     public static float getAnimationDuration(GameCharacterAnimationType type) {
         return IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
     }
 
+    public boolean isHoldingWeapon() {
+        return holdingWeapon;
+    }
+
+    public void setHoldingWeapon(boolean holdingWeapon) {
+        this.holdingWeapon = holdingWeapon;
+        if (holdingWeapon) unholsterWeapon();
+        else holsterWeapon();
+    }
+
+    private void holsterWeapon() {
+        if (weapon == null) return;
+        weapon.setRotationAngle(90);
+        weapon.setRelPos(weapon.getRelPos().cpy().add(HOLSTER_OFFSET));
+    }
+
+    private void unholsterWeapon() {
+        if (weapon == null) return;
+        weapon.setRotationAngle(0);
+        weapon.setRelPos(weapon.getRelPos().cpy().sub(HOLSTER_OFFSET));
+    }
+
+    public void setWeapon(AnimatedEntity weapon) {
+        if (this.weapon != null && this.weapon.getParent() != null) {
+            if (holdingWeapon) holsterWeapon();
+            remove(weapon);
+        }
+        this.weapon = weapon;
+        if (weapon == null) return;
+        if (weapon.getParent() != null) weapon.getParent().remove(weapon);
+        weapon.setParent(this);
+    }
+
+    @Override
+    public Entity asEntity() {
+        return this;
+    }
+
+    @Override
+    public void add(Entity child) {
+        if (child instanceof AimIndicator) {
+            setAimingIndicator((AimIndicator) child);
+        } else if (child instanceof AnimatedEntity) {
+            setWeapon((AnimatedEntity) child);
+        }
+    }
+
+    @Override
+    public void remove(Entity child) {
+        if (child == weapon) {
+            weapon.setParent(null);
+            weapon = null;
+        } else if (child == aimingIndicator) {
+            aimingIndicator.setParent(null);
+            aimingIndicator = null;
+        }
+    }
 }
