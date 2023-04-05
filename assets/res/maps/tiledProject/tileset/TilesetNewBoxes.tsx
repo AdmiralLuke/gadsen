@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.0" name="TilesetWithNewBoxes" tilewidth="60" tileheight="60" tilecount="7" columns="0" objectalignment="center" tilerendersize="grid" fillmode="preserve-aspect-fit">
+<tileset version="1.10" tiledversion="1.10.1" name="TilesetWithNewBoxes" tilewidth="16" tileheight="16" tilecount="10" columns="0" objectalignment="center" tilerendersize="grid" fillmode="preserve-aspect-fit">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <properties>
@@ -15,32 +15,50 @@
  </tile>
  <tile id="2">
   <properties>
-   <property name="Beschreibung" value="Spawnpunkt"/>
+   <property name="Beschreibung" value="Spawnpunkt Team 1"/>
   </properties>
-  <image width="60" height="60" source="../../../texture/ui/cat_lowRes.png"/>
+  <image width="16" height="16" source="../tempAssets/spawpointIndicator1.png"/>
  </tile>
  <tile id="3">
   <properties>
-   <property name="Beschreibung" value="Medibox"/>
+   <property name="Beschreibung" value="Spawnpunkt Team 2"/>
   </properties>
-  <image source="../assets/healthBoxRC.png"/>
+  <image width="16" height="16" source="../tempAssets/spawpointIndicator2.png"/>
  </tile>
  <tile id="4">
   <properties>
-   <property name="Beschreibung" value="Waffenbox-Anker"/>
+   <property name="Beschreibung" value="Spawnpunkt Team 3"/>
   </properties>
-  <image source="../assets/weaponBoxAnchor.png"/>
+  <image width="16" height="16" source="../tempAssets/spawpointIndicator3.png"/>
  </tile>
  <tile id="5">
   <properties>
-   <property name="Beschreibung" value="Waffenbox-Normal"/>
+   <property name="Beschreibung" value="Spawnpunkt Team 4"/>
   </properties>
-  <image source="../assets/weaponBoxChest.png"/>
+  <image width="16" height="16" source="../tempAssets/spawpointIndicator4.png"/>
  </tile>
  <tile id="6">
   <properties>
    <property name="Beschreibung" value="Schleimbox"/>
   </properties>
-  <image source="../assets/slimeBox.png"/>
+  <image width="16" height="16" source="../tempAssets/slimeBox.png"/>
+ </tile>
+ <tile id="7">
+  <properties>
+   <property name="Beschreibung" value="Waffenbox-Normal"/>
+  </properties>
+  <image width="16" height="16" source="../tempAssets/weaponBoxChest.png"/>
+ </tile>
+ <tile id="8">
+  <properties>
+   <property name="Beschreibung" value="Waffenbox-Anker"/>
+  </properties>
+  <image width="16" height="16" source="../tempAssets/weaponBoxAnchor.png"/>
+ </tile>
+ <tile id="9">
+  <properties>
+   <property name="Beschreibung" value="Medibox"/>
+  </properties>
+  <image width="16" height="16" source="../tempAssets/healthBoxRC.png"/>
  </tile>
 </tileset>
