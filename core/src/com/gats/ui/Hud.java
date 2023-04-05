@@ -40,27 +40,30 @@ public class Hud implements Disposable {
 
 	private TextureRegion turnChangeSprite;
 
-
+	private float turnChangeDuration;
 
 	private UiMessenger uiMessenger;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 
 		this.inGameScreen = ingameScreen;
+
+
 		int viewportSizeX = 256;
 		int viewportSizeY = 256;
 		float animationSpeedupValue = 8;
+		turnChangeDuration = 1;
 		turnChangeSprite = AssetContainer.IngameAssets.turnChange;
+
 		Camera cam = new OrthographicCamera(viewportSizeX,viewportSizeY);
 		//Viewport entweder extend oder Fit -> noch nicht sicher welchen ich nehmen soll
 		this.viewport = new ExtendViewport(viewportSizeX,viewportSizeY,cam);
-        stage = new Stage(viewport);
 
 
+		stage = new Stage(viewport);
         layoutTable = setupLayoutTable();
 
 		inventory = setupInventoryDrawer(runConfig);
 		inputHandler = setupInputHandler(ingameScreen);
-
 
 		this.uiMessenger = new UiMessenger(this);
 
@@ -69,14 +72,23 @@ public class Hud implements Disposable {
 		turnPopupContainer = new VerticalGroup();
 		layoutHudElements(layoutTable, inventory,fastButton,turnPopupContainer);
 
-
+		//Combine input from both processors
 		inputMultiplexer = new InputMultiplexer();
+		//needed for input for the simulation
 		inputMultiplexer.addProcessor(inputHandler);
+		//input for the ui buttons
 		inputMultiplexer.addProcessor(stage);
 
 		stage.addActor(layoutTable);
 	}
 
+	/**
+	 * Places the different Hud Elements inside the Table to define their positions on the screen.
+	 * @param table
+	 * @param inventory
+	 * @param fastForwardButton
+	 * @param turnPopupContainer
+	 */
 	private void layoutHudElements(Table table, InventoryDrawer inventory, FastForwardButton fastForwardButton,VerticalGroup turnPopupContainer) {
 		float padding = 10;
 		table.add(this.inventory).pad(padding).expandX().left();
@@ -88,6 +100,11 @@ public class Hud implements Disposable {
 
 	}
 
+	/**
+	 * Creates an {@link InventoryDrawer} with options from the {@link RunConfiguration}.
+	 * @param runConfiguration
+	 * @return
+	 */
 	private InventoryDrawer setupInventoryDrawer(RunConfiguration runConfiguration){
 		float inventoryScale = 1;
 		//InventoryDrawerDrawerDrawer invDraw = new InventoryDrawerDrawer(runConfiguration);
@@ -101,17 +118,28 @@ public class Hud implements Disposable {
 		return new InputHandler(ingameScreen);
 	}
 
+
+	/**
+	 * Creates a Table for the Button/Element Layout and applies some Settings.
+	 * @return
+	 */
     private Table setupLayoutTable(){
        Table table = new Table(AssetContainer.MainMenuAssets.skin);
 
         table.setFillParent(true);
         //debug
-        table.setDebug(true);
+        table.setDebug(false);
 		//align the table to the left of the stage
 		table.center();
 		return table;
     }
 
+	/**
+	 * Creates a {@link FastForwardButton} with the correct sprites.
+	 * @param uiMessenger
+	 * @param speedUp
+	 * @return
+	 */
 	private FastForwardButton setupFastForwardButton(UiMessenger uiMessenger,float speedUp){
 
 		FastForwardButton button = new FastForwardButton(new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButton),
@@ -121,10 +149,18 @@ public class Hud implements Disposable {
 		return button;
 	}
 
+	/**
+	 * Input Processor handling all of the Inputs meant to be sent to {@link com.gats.simulation.Simulation} via {@link HumanPlayer}
+	 * @return
+	 */
 	public GadsenInputProcessor getGadsenInputProcessor() {
 		return inputHandler;
 	}
 
+	/**
+	 * Returns all Input Processors inside a Multiplexer.
+	 * @return
+	 */
 	public InputProcessor getInputProcessor(){
 		return inputMultiplexer;
 	}
@@ -148,11 +184,15 @@ public class Hud implements Disposable {
 		return inventory;
 	}
 
+
+	/**
+	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second
+	 */
 	public void createTurnChangePopup() {
 		if(turnPopupContainer.hasChildren()) {
 			turnPopupContainer.removeActorAt(0, false);
 		}
-		turnPopupContainer.addActor(new ImagePopup(turnChangeSprite,1));
+		turnPopupContainer.addActor(new ImagePopup(turnChangeSprite,turnChangeDuration));
 	}
 
 	public void resizeViewport(int width, int height){
@@ -163,6 +203,10 @@ public class Hud implements Disposable {
 		return uiMessenger;
 	}
 
+	/**
+	 * Changes the animation playback speed.
+	 * @param speed Will multiply with the normal playback.
+	 */
 	public void setRenderingSpeed(float speed){
 		inGameScreen.setRenderingSpeed(speed);
 	}
