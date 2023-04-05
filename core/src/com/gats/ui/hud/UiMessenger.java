@@ -2,6 +2,7 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
+import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.Hud;
 
@@ -64,7 +65,11 @@ public class UiMessenger {
 	public void turnChanged(GameCharacter currentPlayer){
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(null);
+
+
+		//Todo update/notify every element so it sets its status to that of the current player
 	}
+
 
 	/**
 	 * Pass the remaining turnTime to the Hud for displaying it
@@ -78,4 +83,11 @@ public class UiMessenger {
 		updateInventoryItem(currentPlayer,weapon);
 	}
 
+	public void playerStaminaChanged(GameCharacter currentPlayer){
+
+	}
+
+	public void playerAimed(float angle,float strength){
+
+	}
 }

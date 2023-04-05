@@ -90,6 +90,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     public void resize(int width, int height) {
         animator.resize(width, height);
         hud.resizeViewport(width,height);
+        gameViewport.update(width,height);
     }
 
     @Override
@@ -131,7 +132,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
      * @return Vector with World-Coordinate
      */
     public Vector2 toWorldCoordinates(Vector2 coordinates){
-        Vector3 position = gameViewport.getCamera().unproject(new Vector3(coordinates.x,coordinates.y,0));
+        Vector3 position = gameViewport.unproject(new Vector3(coordinates.x,coordinates.y,0));
         return new Vector2(position.x,position.y);
     }
 

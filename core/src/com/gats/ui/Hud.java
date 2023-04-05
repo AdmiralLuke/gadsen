@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -45,6 +46,8 @@ public class Hud implements Disposable {
 	private UiMessenger uiMessenger;
 
 	private FastForwardButton fastForwardButton;
+
+	private AimInformation aimInfo;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 
 		this.inGameScreen = ingameScreen;
@@ -64,6 +67,7 @@ public class Hud implements Disposable {
 		stage = new Stage(viewport);
         layoutTable = setupLayoutTable();
 
+		aimInfo = new AimInformation("W: ","S: ");
 		inventory = setupInventoryDrawer(runConfig);
 		inputHandler = setupInputHandler(ingameScreen);
 		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer,AssetContainer.MainMenuAssets.skin);
@@ -130,7 +134,7 @@ public class Hud implements Disposable {
 		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left();
 		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
 		layoutTable.add(turnPopupContainer).expandX().size(turnChangeSprite.getRegionWidth(),turnChangeSprite.getRegionHeight());
-		layoutTable.add().expandX().expandY();
+		layoutTable.add(aimInfo).expandX().expandY().right().pad(10);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
 		layoutTable.add();
@@ -220,6 +224,11 @@ public class Hud implements Disposable {
 	 */
 	public void setTurntimeRemaining(int time){
 		turnTimer.setCurrentTime(time);
+	}
+
+
+	public void setAimIndicatorValues(float angle, float strength){
+
 	}
 	@Override
 	public void dispose() {

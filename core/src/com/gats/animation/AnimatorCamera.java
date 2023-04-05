@@ -144,7 +144,7 @@ public class AnimatorCamera extends OrthographicCamera {
      * @param offset
      */
     public void moveByOffset(Vector2 offset){
-         this.position.set(position.add(-offset.x,-offset.y,0));
+         translate(-offset.x,-offset.y,0);
     }
 
     public boolean getCanMoveToVector() {
