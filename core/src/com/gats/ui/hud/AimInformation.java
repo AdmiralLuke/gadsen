@@ -2,60 +2,109 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.utils.Align;
 import com.gats.ui.assets.AssetContainer;
 
+
+/**
+ * Class for displaying the aim Values in text
+ */
 public class AimInformation extends VerticalGroup {
 
-	private HorizontalGroup aimAngleGroup;
+	private Table aimAngleGroup;
 	private Label angleValueLabel;
 	private Label angleTextLabel;
 
-	private HorizontalGroup aimStrengthGroup;
+	private Table aimStrengthGroup;
 
 	private Label strengthValueLabel;
 	private Label strengthTextLabel;
 
+
+
 	public AimInformation(String angleText,String strengthText){
 
-	 	aimAngleGroup = new HorizontalGroup();
+
+		//Todo change color of aimInformation
+	 	aimAngleGroup = new Table();
+
 		this.angleTextLabel = new Label(angleText,AssetContainer.MainMenuAssets.skin);
 		this.angleValueLabel = new Label("",AssetContainer.MainMenuAssets.skin);
 
-		aimAngleGroup.addActor(this.angleTextLabel);
-		aimAngleGroup.addActor(this.angleValueLabel);
+		aimAngleGroup.debug();
 
-		aimStrengthGroup = new HorizontalGroup();
+
+		aimStrengthGroup = new Table();
 
 		this.strengthTextLabel = new Label(strengthText,AssetContainer.MainMenuAssets.skin);
 		this.strengthValueLabel = new Label("",AssetContainer.MainMenuAssets.skin);
 
+		//setup text alignment
+		angleValueLabel.setAlignment(Align.right);
+		aimAngleGroup.add(this.angleValueLabel).width(12).right().expandX().align(Align.right);
+		aimAngleGroup.add(this.angleTextLabel).right().expandX();
 
-		aimStrengthGroup.addActor(strengthTextLabel);
-		aimStrengthGroup.addActor(strengthValueLabel);
+		aimStrengthGroup.add(strengthValueLabel).width(12).right().expandX().align(Align.right);
+		aimStrengthGroup.add(strengthTextLabel).right().expandX();
 
 
 		addActor(aimAngleGroup);
 		addActor(aimStrengthGroup);
 
-		angleTextLabel.setFontScale(0.5f);
-		strengthTextLabel.setFontScale(0.5f);
+		space(0);
 
-		space(-10);
+		setFontScale(0.5f);
 	}
 
 
-
+	/**
+	 * Change the displayed aim and strength values
+	 * @param angle
+	 * @param strength
+	 */
 	public void setValues(float angle, float strength){
 		setAimAngle(angle);
 		setAimStrength(strength);
 	}
 
-
-	public void setAimAngle(float angle){
-		angleValueLabel.setText((char)angle);
+	/**
+	 * Adjusts the font scaling of all Text Labels
+	 * @param scale
+	 */
+	public void setFontScale(float scale){
+		angleTextLabel.setFontScale(scale);
+		angleValueLabel.setFontScale(scale);
+		strengthTextLabel.setFontScale(scale);
+		strengthValueLabel.setFontScale(scale);
 	}
+
+	@Override
+	public VerticalGroup align(int align) {
+		aimAngleGroup.align(align);
+		aimStrengthGroup.align(align);
+		return super.align(align);
+
+	}
+
+	/**
+	 * Changes the displayed Angle Value. Extracts the first number after the comma and then rounds the angle value.
+	 * @param angle
+	 */
+	public void setAimAngle(float angle){
+
+		int anglePostComma = (int)(angle*10)%10;
+
+		angle = Math.round(angle);
+		angleValueLabel.setText((int)angle + "." +anglePostComma);
+	}
+
+	/**
+	 * Changes the displayed strength Value.
+	 * @param strength
+	 */
 	public void setAimStrength(float strength){
-		strengthValueLabel.setText((char)strength);
+		strengthValueLabel.setText((char)(100*strength));
 	}
 }

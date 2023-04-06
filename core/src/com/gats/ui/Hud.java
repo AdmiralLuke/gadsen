@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -67,7 +68,7 @@ public class Hud implements Disposable {
 		stage = new Stage(viewport);
         layoutTable = setupLayoutTable();
 
-		aimInfo = new AimInformation("W: ","S: ");
+		aimInfo = new AimInformation(" Grad"," %");
 		inventory = setupInventoryDrawer(runConfig);
 		inputHandler = setupInputHandler(ingameScreen);
 		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer,AssetContainer.MainMenuAssets.skin);
@@ -134,7 +135,7 @@ public class Hud implements Disposable {
 		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left();
 		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
 		layoutTable.add(turnPopupContainer).expandX().size(turnChangeSprite.getRegionWidth(),turnChangeSprite.getRegionHeight());
-		layoutTable.add(aimInfo).expandX().expandY().right().pad(10);
+		layoutTable.add(aimInfo).expandX().expandY().pad(10).right().align(Align.right).width(40);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
 		layoutTable.add();
@@ -228,7 +229,7 @@ public class Hud implements Disposable {
 
 
 	public void setAimIndicatorValues(float angle, float strength){
-
+		aimInfo.setValues(angle,strength);
 	}
 	@Override
 	public void dispose() {

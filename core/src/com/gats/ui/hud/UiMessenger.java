@@ -88,6 +88,6 @@ public class UiMessenger {
 	}
 
 	public void playerAimed(float angle,float strength){
-
+		hud.setAimIndicatorValues(angle,strength);
 	}
 }
