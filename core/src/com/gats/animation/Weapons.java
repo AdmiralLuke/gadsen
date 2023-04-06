@@ -1,14 +1,8 @@
 package com.gats.animation;
 
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.gats.animation.entity.AnimatedEntity;
-import com.gats.animation.entity.Entity;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer;
 
@@ -17,7 +11,7 @@ public class Weapons {
 
     protected static Weapon summon(WeaponType type){
         Animation<TextureRegion> holdAnimation;
-        Animation<TextureRegion> carryAnimation = new Animation<>(1f, new TextureRegion(new Texture(new Pixmap(1, 1, Pixmap.Format.Alpha))));
+        Animation<TextureRegion> carryAnimation = AssetContainer.IngameAssets.EMPTY_ANIMATION;
         Vector2 offset;
         float angle = 0;
         Vector2 scale = new Vector2(1, 1);
@@ -26,7 +20,6 @@ public class Weapons {
         switch (type){
             default:
                 offset = new Vector2(-2, -2);
-                settings = new boolean[]{/*rotate*/true,/*mirror*/false};
                 holdAnimation = AssetContainer.IngameAssets.coolCat;
                 TextureRegion firstFrame = holdAnimation.getKeyFrame(0);
                 scale = new Vector2(0.25f, 0.25f);

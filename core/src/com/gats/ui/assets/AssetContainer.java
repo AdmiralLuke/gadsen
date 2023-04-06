@@ -4,11 +4,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
 
 /**
  * Contains Loaded Instances of Assets
@@ -17,7 +15,6 @@ public class AssetContainer {
 
     /**
      * Loading Screen Assets
-     *
      * Will be Loaded immediately before other assets are finished
      */
     public static class LoadingScreenAssets{
@@ -41,6 +38,7 @@ public class AssetContainer {
      */
     public static class IngameAssets{
 
+        public static final Animation<TextureRegion> EMPTY_ANIMATION = new Animation<>(1f, new TextureRegion(new Texture(new Pixmap(1, 1, Pixmap.Format.Alpha))));;
         public static Animation<TextureRegion> destroyTileAnimation;
 
         public static TextureRegion victoryDisplay;
