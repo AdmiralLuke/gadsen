@@ -41,6 +41,9 @@ public class GADS extends Game {
 	public void dispose() {
 		if (screen != null) this.screen.dispose();
 		assetManager.unloadAtlas();
+		//apparently Gdx.app.exit() does not close the game completely
+		//probably the runtime survives and needs to be killed via System.exit
+		System.exit(0);
 	}
 
 	public void setScreenIngame(RunConfiguration runConfig) {
