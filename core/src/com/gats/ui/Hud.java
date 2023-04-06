@@ -227,6 +227,9 @@ public class Hud implements Disposable {
 		turnTimer.setCurrentTime(time);
 	}
 
+	public void reduceTurnTime(int reduceBy){
+		turnTimer.reduceTime(reduceBy);
+	}
 
 	public void setAimIndicatorValues(float angle, float strength){
 		aimInfo.setValues(angle,strength);

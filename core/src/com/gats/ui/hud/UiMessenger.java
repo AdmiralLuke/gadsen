@@ -54,6 +54,10 @@ public class UiMessenger {
 		hud.createTurnChangePopup();
 	}
 
+	/**
+	 * Changes the rendering speed of animation
+	 * @param speed
+	 */
 	public void changeAnimationPlaybackSpeed(float speed){
 		hud.setRenderingSpeed(speed);
 	}
@@ -72,21 +76,42 @@ public class UiMessenger {
 
 
 	/**
-	 * Pass the remaining turnTime to the Hud for displaying it
+	 * Pass the the turnTime to the Hud for displaying it
 	 * @param time
 	 */
 	public void setTurnTimeLeft(int time){
 		hud.setTurntimeRemaining(time);
 	}
 
+
+	/**
+	 * Reduce the current displayed turn time
+	 * @param reduceBy
+	 */
+	public void reduceTurnTime(int reduceBy){hud.reduceTurnTime(reduceBy);};
+
+	/**
+	 * Calls necessary functions to update Ui Elements after a player shot.
+	 * @param currentPlayer
+	 * @param weapon
+	 */
 	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){
 		updateInventoryItem(currentPlayer,weapon);
 	}
 
+	/**
+	 * Update the stamina of the current player
+	 * @param currentPlayer
+	 */
 	public void playerStaminaChanged(GameCharacter currentPlayer){
 
 	}
 
+	/**
+	 * Update the ui Elements when a player aimed.
+	 * @param angle
+	 * @param strength
+	 */
 	public void playerAimed(float angle,float strength){
 		hud.setAimIndicatorValues(angle,strength);
 	}

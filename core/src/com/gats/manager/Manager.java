@@ -8,6 +8,7 @@ import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
 import com.gats.ui.hud.GadsenInputProcessor;
 import com.gats.ui.hud.InputHandler;
+import com.gats.ui.hud.UiMessenger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -41,6 +42,7 @@ public class Manager {
 
     private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
     private Thread simulationThread;
+    private UiMessenger uiMessenger;
     private boolean pendingShutdown = false;
 
     /**
@@ -55,7 +57,7 @@ public class Manager {
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;
         inputGenerator = config.input;
-
+        this.uiMessenger = config.uiMessenger;
         players = new Player[config.teamCount];
 
         for (int i = 0; i < config.teamCount; i++) {
@@ -69,6 +71,7 @@ public class Manager {
             switch (curPlayer.getType()) {
                 case Human:
                     humanList.add((HumanPlayer) curPlayer);
+                    ((HumanPlayer)(curPlayer)).setUiMessenger(uiMessenger);
                     break;
                 case AI:
 

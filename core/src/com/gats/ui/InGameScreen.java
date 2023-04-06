@@ -40,7 +40,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         gameManager = instance;
         gameViewport = new FillViewport(worldWidth,worldHeight);
         hud = new Hud(this, runConfig);
-        UiMessenger uiMessenger=hud.getUiMessenger();
+       runConfig.uiMessenger=hud.getUiMessenger();
+
         setupInput();
 
 
@@ -48,7 +49,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         runConfig.animationLogProcessor = this;
         runConfig.input = hud.getGadsenInputProcessor();
         manager = new Manager(runConfig);
-        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode,uiMessenger);
+        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode,runConfig.uiMessenger);
         manager.start();
 
         humanList = manager.getHumanList();

@@ -4,11 +4,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
+import com.gats.ui.hud.UiMessenger;
 
 import java.time.Clock;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class HumanPlayer extends Player {
 
@@ -85,6 +87,7 @@ public class HumanPlayer extends Player {
     private GameState state;
     private Controller controller;
 
+    private UiMessenger uiMessenger;
     @Override
     public String getName() {
         return "Human";
@@ -109,9 +112,24 @@ public class HumanPlayer extends Player {
         this.state = state;
         this.controller = controller;
         for (int i = 0; i < lastTick.length; i++) lastTick[i] = NO_TICK;
+
+       Timer timer = new Timer();
+      if(uiMessenger!=null) {
+          uiMessenger.setTurnTimeLeft(21);
+          //how to end a timer? schedule task to kill it?
+          timer.scheduleAtFixedRate(new TimerTask() {
+              @Override
+              public void run() {
+                  //notifyUi
+                  uiMessenger.reduceTurnTime(1);
+              }
+
+          }, 0, 1000);
+      }
         synchronized (this) {
             try {
                 this.wait(20000);
+                timer.cancel();
             } catch (InterruptedException ignored) {
 //                System.out.println("Turn has been ended preemptively");
 
@@ -294,4 +312,7 @@ public class HumanPlayer extends Player {
         return PlayerType.Human;
     }
 
+    public void setUiMessenger(UiMessenger uiMessenger){
+       this.uiMessenger = uiMessenger;
+    }
 }

@@ -15,6 +15,8 @@ public class TurnTimer extends HorizontalGroup {
 	Image timerImage;
 	Label timeDisplay;
 
+	int time;
+
 	public TurnTimer(TextureRegion timer, Skin labelSkin){
 
 		this.timerImage = new Image(timer);
@@ -33,5 +35,10 @@ public class TurnTimer extends HorizontalGroup {
 
 	public void setCurrentTime(int seconds){
 		timeDisplay.setText(seconds);
+		time=seconds;
+	}
+	public void reduceTime(int reduceTimeBy){
+		time-= reduceTimeBy;
+		setCurrentTime(time);
 	}
 }

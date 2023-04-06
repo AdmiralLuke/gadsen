@@ -1,6 +1,7 @@
 package com.gats.manager;
 
 import com.gats.ui.hud.GadsenInputProcessor;
+import com.gats.ui.hud.UiMessenger;
 
 import java.util.ArrayList;
 
@@ -13,6 +14,7 @@ public class RunConfiguration {
 
     public AnimationLogProcessor animationLogProcessor = null;
 
+    public UiMessenger uiMessenger = null;
     //Generalize to Interface
     public GadsenInputProcessor input = null;
 
