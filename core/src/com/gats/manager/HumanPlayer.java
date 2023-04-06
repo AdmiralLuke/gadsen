@@ -113,10 +113,11 @@ public class HumanPlayer extends Player {
         this.controller = controller;
         for (int i = 0; i < lastTick.length; i++) lastTick[i] = NO_TICK;
 
+        //setup timer for updating the ui Time
        Timer timer = new Timer();
       if(uiMessenger!=null) {
-          uiMessenger.setTurnTimeLeft(21);
-          //how to end a timer? schedule task to kill it?
+          uiMessenger.setTurnTimeLeft(20);
+          //reduce the time by 1 everytime
           timer.scheduleAtFixedRate(new TimerTask() {
               @Override
               public void run() {
@@ -124,7 +125,7 @@ public class HumanPlayer extends Player {
                   uiMessenger.reduceTurnTime(1);
               }
 
-          }, 0, 1000);
+          }, 1000, 1000);
       }
         synchronized (this) {
             try {
