@@ -62,12 +62,9 @@ public class HumanPlayer extends Player {
     //amount of time in seconds, the turn of the human player will take
     //if the time limit is reached, the execute turn will wait for turnOverhead seconds
     // to make sure everything is calculated and no GameState inconsistency is created
-    private int turnDuration = 60;
-    private long nanoTurnDuration = turnDuration * 1000000000;
+    private int turnDuration = 20;
     private int turnEndWaitTime = 5;
 
-    private long nanoStartTime;
-    private long elapsedTime;
 
     private int angle = 0;
 
@@ -113,10 +110,11 @@ public class HumanPlayer extends Player {
         this.controller = controller;
         for (int i = 0; i < lastTick.length; i++) lastTick[i] = NO_TICK;
 
+        //Todo add 5 seconds time  between turns
         //setup timer for updating the ui Time
        Timer timer = new Timer();
       if(uiMessenger!=null) {
-          uiMessenger.setTurnTimeLeft(20);
+          uiMessenger.setTurnTimeLeft(turnDuration);
           //reduce the time by 1 everytime
           timer.scheduleAtFixedRate(new TimerTask() {
               @Override
@@ -125,11 +123,11 @@ public class HumanPlayer extends Player {
                   uiMessenger.reduceTurnTime(1);
               }
 
-          }, 1000, 1000);
+          }, 0, 1000);
       }
         synchronized (this) {
             try {
-                this.wait(20000);
+                this.wait(turnDuration* 1000L);
                 timer.cancel();
             } catch (InterruptedException ignored) {
 //                System.out.println("Turn has been ended preemptively");
