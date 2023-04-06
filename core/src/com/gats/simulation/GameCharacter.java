@@ -14,6 +14,8 @@ public class GameCharacter {
 
     private static final IntVector2 SIZE = new IntVector2(9, 15);
 
+    public static Vector2 getSize(){return SIZE.toFloat();}
+
     private final IntRectangle boundingBox;
 
 
