@@ -1,8 +1,6 @@
 package com.gats.ui.assets;
 
-import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -25,7 +23,7 @@ public class GADSAssetManager {
     public final String skin = resourceDirectory + "ui/skin.json";
     public final String font = resourceDirectory + "ui/lsans-15.fnt";
 
-    public final String particleGroup = "particle";
+    public final String particleGroup = "particle/";
     public final String slimeParticle = "particle/slimeParticle.p";
 
     public final String outlineShader = resourceDirectory + "shader/outline.frag";
