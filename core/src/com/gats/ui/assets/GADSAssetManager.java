@@ -2,11 +2,7 @@ package com.gats.ui.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
@@ -25,6 +21,7 @@ public class GADSAssetManager {
 
     public final String particleGroup = "particle/";
     public final String slimeParticle = "particle/slimeParticle.p";
+    public final String walkParticle = "particle/slimeParticle.p";
 
     public final String outlineShader = resourceDirectory + "shader/outline.frag";
     public final String lookupShader = resourceDirectory + "shader/lookup.frag";
@@ -76,18 +73,19 @@ public class GADSAssetManager {
 
     }
 
-    private void loadShader(){
+    private void loadShader() {
         manager.load(outlineShader, ShaderProgram.class);
         manager.load(lookupShader, ShaderProgram.class);
         manager.load(lookupOutlineShader, ShaderProgram.class);
     }
 
-    private void loadParticles(){
-        ParticleEffectLoader.ParticleEffectParameter slimeParticleParams = new ParticleEffectLoader.ParticleEffectParameter();
-        slimeParticleParams.atlasFile = atlas;
-        slimeParticleParams.atlasPrefix = particleGroup;
+    private void loadParticles() {
+        ParticleEffectLoader.ParticleEffectParameter particleEffectParameter = new ParticleEffectLoader.ParticleEffectParameter();
+        particleEffectParameter.atlasFile = atlas;
+        particleEffectParameter.atlasPrefix = particleGroup;
 
-        manager.load(slimeParticle, ParticleEffect.class, slimeParticleParams);
+        manager.load(slimeParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(walkParticle, ParticleEffect.class, particleEffectParameter);
     }
 
 
@@ -151,11 +149,12 @@ public class GADSAssetManager {
 
         IngameAssets.coolCat = new AtlasAnimation(1f, atlas.findRegions("cat/coolCat"), Animation.PlayMode.LOOP);
 
-        IngameAssets.Cookie = new AtlasAnimation(1/8f, atlas.findRegions("projectile/cookieTumblingCroppedR"), Animation.PlayMode.LOOP);
+        IngameAssets.Cookie = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/cookieTumblingCroppedR"), Animation.PlayMode.LOOP);
 
-        IngameAssets.SugarCane = new AtlasAnimation(1/8f, atlas.findRegions("projectile/sugarcaneProjectileFront"), Animation.PlayMode.LOOP);
+        IngameAssets.SugarCane = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/sugarcaneProjectileFront"), Animation.PlayMode.LOOP);
 
-        IngameAssets.slimeParticle = manager.get(slimeParticle, ParticleEffect.class);
+        IngameAssets.slimeParticle = new ParticleEffectPool(manager.get(slimeParticle, ParticleEffect.class), 1, 10);
+        IngameAssets.walkParticle = new ParticleEffectPool(manager.get(walkParticle, ParticleEffect.class), 1, 10);
 
         finishedLoading = true;
     }

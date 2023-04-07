@@ -26,6 +26,9 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     private static final float spriteOffsetRight = 2;
 
+    private final EntityGroup group;
+
+
     private Animation<TextureRegion> skin;
 
 
@@ -43,6 +46,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     public GameCharacter(Color teamColor) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
+        group = new EntityGroup();
+        group.setParent(this);
         switch (new Random().nextInt(4)) {
             case 1:
                 skin = IngameAssets.orangeCatSkin;
@@ -58,7 +63,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         }
         setMirror(true);
         TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
-        setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5,0));
+        setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5, 0));
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
@@ -94,6 +99,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         batch.setShader(null);
 
         if (holdingWeapon && weapon != null) weapon.draw(batch, deltaTime, parentAlpha);
+        group.draw(batch, deltaTime, parentAlpha);
 
     }
 
@@ -131,19 +137,9 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     @Override
     protected void setPos(Vector2 pos) {
         super.setPos(pos);
-        updatePos();
-    }
-
-    @Override
-    public void setRelPos(Vector2 pos) {
-        super.setRelPos(pos);
-    }
-
-    @Override
-    public void updatePos() {
-        super.updatePos();
         if (aimingIndicator != null) aimingIndicator.updatePos();
         if (weapon != null) weapon.updatePos();
+        group.updatePos();
     }
 
     public static float getAnimationDuration(GameCharacterAnimationType type) {
@@ -182,6 +178,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
             setAimingIndicator((AimIndicator) child);
         } else if (child instanceof Weapon) {
             setWeapon((Weapon) child);
+        }else {
+            group.add(child);
         }
     }
 
@@ -193,6 +191,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         } else if (child == aimingIndicator) {
             aimingIndicator.setParent(null);
             aimingIndicator = null;
+        }else {
+            group.remove(child);
         }
     }
 }

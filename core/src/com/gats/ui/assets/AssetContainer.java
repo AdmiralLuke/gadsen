@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -93,7 +93,9 @@ public class AssetContainer {
 
         public static Animation<TextureRegion> tombstoneAnimation;
 
-        public static ParticleEffect slimeParticle;
+        public static ParticleEffectPool slimeParticle;
+
+        public static ParticleEffectPool walkParticle;
 
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,

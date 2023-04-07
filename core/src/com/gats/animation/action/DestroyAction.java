@@ -2,24 +2,24 @@ package com.gats.animation.action;
 
 import com.gats.animation.entity.Entity;
 
-public class DestroyAction extends Action{
+public class DestroyAction<T> extends Action{
 
 
-    private Entity target;
-    private final DestroyListener listener;
-    private final Destroyer destroyer;
+    private T target;
+    private final DestroyListener<T> listener;
+    private final Destroyer<T> destroyer;
 
 
-    public interface DestroyListener{
-        void onDestroy(Entity destroyedEntity);
+    public interface DestroyListener<T>{
+        void onDestroy(T destroyedEntity);
 
     }
 
-    public interface Destroyer{
-        void destroy(Entity toDestroy);
+    public interface Destroyer<T>{
+        void destroy(T toDestroy);
     }
 
-    public DestroyAction(float start, Entity target, DestroyListener listener, Destroyer destroyer) {
+    public DestroyAction(float start, T target, DestroyListener<T> listener, Destroyer<T> destroyer) {
         super(start);
         this.target = target;
         this.listener = listener;
@@ -33,7 +33,7 @@ public class DestroyAction extends Action{
         endAction(oldTime);
     }
 
-    public void setTarget(Entity target) {
+    public void setTarget(T target) {
         this.target = target;
     }
 }
