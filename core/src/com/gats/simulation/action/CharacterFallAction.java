@@ -2,6 +2,7 @@ package com.gats.simulation.action;
 
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.LinearPath;
+import com.gats.simulation.ParablePath;
 import com.gats.simulation.Path;
 
 
@@ -23,7 +24,7 @@ public class CharacterFallAction extends CharacterAction {
      */
     public CharacterFallAction(float delay, int team, int character, Vector2 posBef, Vector2 posAft) {
         super(delay, team, character);
-        this.path = new LinearPath(posBef, posAft, 0.1f);
+        this.path = new LinearPath(posBef, posAft, 40f);
         this.duration = path.getEndTime();
     }
 

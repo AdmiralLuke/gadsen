@@ -8,7 +8,9 @@ import com.gats.simulation.action.*;
  */
 public class GameCharacter {
 
-    private static final IntVector2 SIZE = new IntVector2(16, 16);
+    private static final IntVector2 SIZE = new IntVector2(9, 15);
+
+    public static Vector2 getSize(){return SIZE.toFloat();}
 
     private final IntRectangle boundingBox;
 
@@ -471,7 +473,7 @@ public class GameCharacter {
 
         if (falling) {
             //We detected a gap while walking, start falling after walk
-            lastAction = walk(dx - moved, fall(lastAction));
+            lastAction = walk(sign * (distance - moved -1), fall(lastAction));
         }
         return lastAction;
     }

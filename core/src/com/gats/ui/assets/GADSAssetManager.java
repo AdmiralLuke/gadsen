@@ -2,8 +2,13 @@ package com.gats.ui.assets;
 
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
@@ -24,6 +29,8 @@ public class GADSAssetManager {
     public final String slimeParticle = "particle/slimeParticle.p";
 
     public final String outlineShader = resourceDirectory + "shader/outline.frag";
+    public final String lookupShader = resourceDirectory + "shader/lookup.frag";
+    public final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
 
     private boolean finishedLoading = false;
 
@@ -73,6 +80,8 @@ public class GADSAssetManager {
 
     private void loadShader(){
         manager.load(outlineShader, ShaderProgram.class);
+        manager.load(lookupShader, ShaderProgram.class);
+        manager.load(lookupOutlineShader, ShaderProgram.class);
     }
 
     private void loadParticles(){
@@ -108,38 +117,45 @@ public class GADSAssetManager {
 
         IngameAssets.aimingIndicatorSprite = atlas.findRegion("hud/aimIndicator");
 
-        IngameAssets.gameCharacterAnimations = new Animation[GameCharacterAnimationType.values().length];
+        IngameAssets.gameCharacterAnimations = new AtlasAnimation[GameCharacterAnimationType.values().length];
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catIdleL"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catIdle"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_WALKING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catWalkingL"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catWalking"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_FALLING.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catFallingL"));
-
-        IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_COOKIE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catCookieIdleL"));
-
-        IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catSugarCaneIdleL"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catFalling"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_HIT.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catHitL"));
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catHit"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_DEATH.ordinal()] =
-                new Animation<>(1 / 10f, atlas.findRegions("cat/catDeathL"));
-        for (Animation<TextureRegion> anim : IngameAssets.gameCharacterAnimations
-        ) {
-            anim.setPlayMode(Animation.PlayMode.LOOP);
-        }
+                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catDeath"), Animation.PlayMode.LOOP);
+
+        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.LOOP);
+
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
 
-        IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
+        IngameAssets.lookupShader = manager.get(lookupShader, ShaderProgram.class);
 
-        IngameAssets.SugarCane = atlas.findRegions("projectile/sugarcaneProjectileFront");
+        IngameAssets.lookupOutlineShader = manager.get(lookupOutlineShader, ShaderProgram.class);
+
+        IngameAssets.coolCatSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/coolCatSkin"), Animation.PlayMode.LOOP);
+
+        IngameAssets.orangeCatSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/orangeCatSkin"), Animation.PlayMode.LOOP);
+
+        IngameAssets.yinYangSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/yinYangSkin"), Animation.PlayMode.LOOP);
+
+        IngameAssets.mioSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/mioSkin"), Animation.PlayMode.LOOP);
+
+        IngameAssets.coolCat = new AtlasAnimation(1f, atlas.findRegions("cat/coolCat"), Animation.PlayMode.LOOP);
+
+        IngameAssets.Cookie = new AtlasAnimation(1/8f, atlas.findRegions("projectile/cookieTumblingCroppedR"), Animation.PlayMode.LOOP);
+
+        IngameAssets.SugarCane = new AtlasAnimation(1/8f, atlas.findRegions("projectile/sugarcaneProjectileFront"), Animation.PlayMode.LOOP);
 
         IngameAssets.slimeParticle = manager.get(slimeParticle, ParticleEffect.class);
 
