@@ -401,7 +401,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
             Path path = moveAction.getPath();
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
-            MoveAction animMoveAction = new MoveAction(0, target, path.getDuration(), moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, target, path.getDuration(), new CharacterPath(moveAction.getPath()));
             //rotateAction to set the angle/direction of movement, to flip the character sprite
             RotateAction animRotateAction = new RotateAction(0,target,path.getDuration(),moveAction.getPath());
             startWalking.setChildren(new Action[]{animMoveAction,animRotateAction});

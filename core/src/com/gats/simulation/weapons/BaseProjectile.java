@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.*;
+import com.gats.simulation.action.CharacterMoveAction;
 import com.gats.simulation.action.DebugPointAction;
 import com.gats.simulation.action.ProjectileAction;
 
@@ -18,8 +19,8 @@ public class BaseProjectile implements Projectile{
 
     ProjType projType;
     int damage;
-    int recoil;
-    int knockback;
+    float recoil;
+    float knockback;
     Tile lastTile;
     GameCharacter lastCharacter;
 
@@ -46,23 +47,26 @@ public class BaseProjectile implements Projectile{
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        this.projType = type == ProjectileAction.ProjectileType.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
+        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE) this.projType = ProjType.PARABLE;
+        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.WATERBOMB || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
     }
 
-    public BaseProjectile(int damage, int knockback, int recoil, Simulation sim, ProjectileAction.ProjectileType type) {
-
+    public BaseProjectile(int damage, float knockback, float recoil, Simulation sim, ProjectileAction.ProjectileType type) {
         this.damage = damage;
         this.recoil = recoil;
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        this.projType = type == ProjectileAction.ProjectileType.COOKIE ? ProjType.PARABLE : ProjType.LINEAR;
+        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE) this.projType = ProjType.PARABLE;
+        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.WATERBOMB || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
     }
 
 
     @Override
     public Action shoot(Action head, Vector2 dir, float strength, Projectile dec, GameCharacter character) {
         this.t = 0f;
+        this.lastCharacter = character;
+        this.lastTile = null;
         this.strength = strength;
         return this.move(head, strength , dec);
     }
@@ -107,10 +111,6 @@ public class BaseProjectile implements Projectile{
                 GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
                 if (character != null) {
                     if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
-                        if (this.t == 0f) {
-                            lastCharacter = character;
-                            return null;
-                        }
                         if (lastCharacter == null) {
                             lastCharacter = character;
                             return dec.hitCharacter(head, character, dec, this);
@@ -122,6 +122,7 @@ public class BaseProjectile implements Projectile{
         }
 
         lastCharacter = null;
+        lastTile = null;
 
         return null;
     }
@@ -134,7 +135,59 @@ public class BaseProjectile implements Projectile{
         int j = character.getTeamPos();
         Action pAc = generateAction();
         head.addChild(pAc);
-        return sim.getWrapper().setHealth(pAc, i, j, health - damage);
+        Action hAc = sim.getWrapper().setHealth(pAc, i, j, health - damage);
+        pAc.addChild(hAc);
+        Vector2 dir = bsProj.path.getDir(bsProj.t);
+        dir.nor();
+        Vector2 v = new Vector2((dir.x * (0.1f * knockback)) * 400, (dir.y * (0.1f * knockback)) * 400);
+        Path path = new ParablePath(character.getPlayerPos(),15, v);
+
+        return traverse(pAc, character, path, this.sim);
+    }
+
+    private Action traverse(Action head, GameCharacter character, Path path, Simulation sim) {
+        float t = 0.1f;
+        if (path.getDir(0).x < 0.00002f && path.getDir(0).x > -0.00002f) return head;
+
+        while (t < path.getDuration()) {
+            Vector2 pos = path.getPos(t);
+            if (pos.y <= 0) {
+
+                path = new ParablePath(character.getPlayerPos(), pos, path.getDir(0));
+                Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
+                Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), 0);
+                head.addChild(cmAc);
+                return hAc;
+            }
+            if (sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
+                t -= 0.001f;
+                break;
+            }
+            t += 0.001f;
+        }
+        Vector2 posN = path.getPos(t + 0.001f);
+        Vector2 pos = path.getPos(t);
+        Tile tile = sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16);
+        Vector2 tPos = tile.getWorldPosition();
+        Vector2 b = new Vector2(tPos.x, tPos.y + 15);
+        Vector2 c = new Vector2(b.x + 15, b.y);
+
+        // b --- c
+
+
+
+
+
+        path = new ParablePath(character.getPlayerPos(), path.getPos(t), path.getDir(0));
+        if (path.getDuration() < 0.1f) return head;
+        Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
+        sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x, (int)pos.y);
+        head.addChild(cmAc);
+        if (!(Math.floor(posN.y) == Math.floor(b.y) && Math.floor(posN.x) <= c.x && Math.floor(posN.x) >= b.x)) {
+            cmAc = sim.getWrapper().fall(cmAc, character.getTeam(), character.getTeamPos());
+        }
+        Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), character.getHealth() - (int)path.getDuration());
+        return hAc;
     }
 
     @Override
@@ -159,7 +212,7 @@ public class BaseProjectile implements Projectile{
 
     ProjectileAction generateAction() {
         Path path = null;
-        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t), this.path.getDir(0));
+        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t), this.path.getDir(t));
         if (projType == ProjType.LINEAR) path = new LinearPath(this.path.getPos(0), this.path.getPos(t), 100);
         return new ProjectileAction(0,type, path);
     }

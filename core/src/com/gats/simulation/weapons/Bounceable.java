@@ -55,8 +55,8 @@ public class Bounceable implements Projectile {
                 return bsProj.hitWall(head, t, dec, bsProj);
             }
             Vector2 v = new Vector2((dir.x * (bsProj.strength)) * 400, (dir.y * (bsProj.strength)) * 400);
-            if (bsProj.type == ProjectileAction.ProjectileType.COOKIE) path = new ParablePath(pos.cpy(), 10, v);
-            else if(bsProj.type == ProjectileAction.ProjectileType.CANDY_CANE) path = new LinearPath(pos.cpy(), dir.cpy(), 10, 40);
+            if (bsProj.type == ProjectileAction.ProjectileType.WOOL || bsProj.type == ProjectileAction.ProjectileType.WATER || bsProj.type == ProjectileAction.ProjectileType.GRENADE) path = new ParablePath(pos.cpy(), 10, v);
+            else if(bsProj.type == ProjectileAction.ProjectileType.MIOJLNIR || bsProj.type == ProjectileAction.ProjectileType.WATERBOMB || bsProj.type == ProjectileAction.ProjectileType.CLOSE_COMB) path = new LinearPath(pos.cpy(), dir.cpy(), 10, 40);
             dec.setPath(path);
             bsProj.t = 0f;
             return bsProj.move(prAct, bsProj.strength, dec);

@@ -11,8 +11,14 @@ public class ProjectileAction extends Action{
      * The possible types of Projectiles-appearances
      */
     public enum ProjectileType {
-        COOKIE,
-        CANDY_CANE
+        WATERBOMB,
+        WATER,
+        MIOJLNIR,
+        GRENADE,
+        WOOL,
+        CLOSE_COMB,
+        CANDY_CANE,
+        COOKIE
     }
 
     private final ProjectileType type;
