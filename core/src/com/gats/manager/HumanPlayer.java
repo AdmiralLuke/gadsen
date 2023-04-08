@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -71,11 +72,7 @@ public class HumanPlayer extends Player {
     private Queue<WeaponType> weaponTypeStack = new LinkedList<>();
 
     {
-        weaponTypeStack.add(WeaponType.COOKIE);
-        weaponTypeStack.add(WeaponType.SUGAR_CANE);
-
-        WeaponType nextType = weaponTypeStack.poll();
-        weaponTypeStack.add(nextType);
+        weaponTypeStack.addAll(Arrays.asList(WeaponType.values()));
     }
 
     private boolean turnInProgress;

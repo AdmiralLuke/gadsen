@@ -1,9 +1,10 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
-import com.gats.simulation.weapons.Backnockable;
+
 import com.gats.simulation.weapons.BaseProjectile;
 import com.gats.simulation.weapons.Bounceable;
+import com.gats.simulation.weapons.Explosive;
 import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.action.*;
 
@@ -13,6 +14,8 @@ import com.gats.simulation.action.*;
 public class GameCharacter {
 
     private static final IntVector2 SIZE = new IntVector2(9, 15);
+
+    public static Vector2 getSize(){return SIZE.toFloat();}
 
     private final IntRectangle boundingBox;
 
@@ -69,6 +72,8 @@ public class GameCharacter {
         }
     }
 
+
+
     /**
      * Makes the Character equip the specified weapon.
      *
@@ -77,13 +82,29 @@ public class GameCharacter {
      */
     void selectWeapon(WeaponType type, Action head) {
         switch (type) {
-            case SUGAR_CANE:
+            case WATERBOMB:
                 selectedWeapon = 0;
-                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.SUGAR_CANE));
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.WATERBOMB));
                 break;
-            case COOKIE:
+            case WATER_PISTOL:
                 selectedWeapon = 1;
-                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.COOKIE));
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.WATER_PISTOL));
+                break;
+            case MIOJLNIR:
+                selectedWeapon = 2;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.MIOJLNIR));
+                break;
+            case GRENADE:
+                selectedWeapon = 3;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.GRENADE));
+                break;
+            case WOOL:
+                selectedWeapon = 4;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.WOOL));
+                break;
+            case CLOSE_COMBAT:
+                selectedWeapon = 5;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.CLOSE_COMBAT));
                 break;
             default:
                 selectedWeapon = -1;
@@ -194,9 +215,13 @@ public class GameCharacter {
      * @Weihnachtsaufgabe Inventar wird initialisiert mit Keks (50 Schuss) und Zuckerstange (4 Schuss)
      */
     protected void initInventory() {
-        this.weapons = new Weapon[2];
-        weapons[0] = new Weapon(new Backnockable(new Bounceable(new BaseProjectile(3, 0, 0, sim, ProjectileAction.ProjectileType.CANDY_CANE), 5, 1f), 1f), 200, WeaponType.SUGAR_CANE, team, teamPos);
-        weapons[1] = new Weapon(new Backnockable(new Bounceable(new BaseProjectile( 1, 0, 0, sim, ProjectileAction.ProjectileType.COOKIE),  5, 0.5f), 1f), 200, WeaponType.COOKIE, team, teamPos);
+        this.weapons = new Weapon[6];
+        weapons[0] = new Weapon(new BaseProjectile(3, 0.1f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB), 200, WeaponType.WATERBOMB, team, teamPos, 2);
+        weapons[4] = new Weapon(new Bounceable(new BaseProjectile( 1, 0.1f, 0, sim, ProjectileAction.ProjectileType.WOOL),  10,  0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
+        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, team, teamPos, 10);
+        weapons[2] = new Weapon(new BaseProjectile(5, 0.6f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, team, teamPos, 13);
+        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, team, teamPos, 0.5f);
+        weapons[1] = new Weapon(new BaseProjectile(5, 0.3f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, team, teamPos, 9);
     }
 
     /**

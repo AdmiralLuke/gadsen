@@ -9,36 +9,42 @@ import com.gats.animation.entity.AnimatedEntity;
 import com.gats.animation.entity.Entity;
 import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer;
+import org.lwjgl.Sys;
 
 public class Projectiles {
 
 
     protected static Entity summon(ProjectileAction.ProjectileType type){
-        Array<TextureAtlas.AtlasRegion> texture;
+        Animation<TextureRegion> animation;
         //configuring of drawing properties [0]:AnimatedEntity.rotate [1]:AnimatedEntity.mirror
         boolean[] settings;
         switch (type){
             case COOKIE:
-                texture = AssetContainer.IngameAssets.Cookie;
+                animation = AssetContainer.IngameAssets.Cookie;
                 settings = new boolean[]{/*rotate*/false,/*mirror*/false};
                 break;
             case CANDY_CANE:
-                texture = AssetContainer.IngameAssets.SugarCane;
+                animation = AssetContainer.IngameAssets.SugarCane;
                 //flip the sprite so it also looks to the left
+                //ToDo: Move this code to loading
                 //ToDo declare a standard direction for Sprites to look in
                 //preferrably right?
-                for (TextureRegion sprite:texture) {
-                    sprite.flip(true,false);
-
-                }
+//                for (TextureRegion sprite:texture) {
+//                    sprite.flip(true,false);
+//
+//                }
                 settings = new boolean[]{/*rotate*/true,/*mirror*/true};
                 break;
             default:
-                throw new RuntimeException("Type " + type + " is not Supported!");
+                settings = new boolean[]{/*rotate*/true,/*mirror*/false};
+                animation = AssetContainer.IngameAssets.coolCat;
+                System.err.println("Warning: Projectile-Type " + type + " is not Supported!");
 
         }
-        Animation<TextureRegion> animation = new Animation<>(1/8f, texture);
-        animation.setPlayMode(Animation.PlayMode.LOOP);
-        return new AnimatedEntity(animation, new Vector2(texture.get(0).getRegionWidth(), texture.get(0).getRegionHeight()),settings[0],settings[1]);
+        TextureRegion firstFrame = animation.getKeyFrame(0);
+        AnimatedEntity projectile = new AnimatedEntity(animation);
+        projectile.setRotate(settings[0]);
+        projectile.setMirror(settings[1]);
+        return projectile;
     }
 }
