@@ -38,13 +38,6 @@ public class Inventory extends VerticalGroup {
 		}
 	}
 
-	public void updateInventory(GameCharacter character) {
-		int size = character.getWeaponAmount();
-		for(int i=0;i<size;i++){
-			updateItem(character,i);
-		}
-	}
-
 	public void updateItem(GameCharacter character,int index){
 
 		Weapon current = character.getWeapon(index);
