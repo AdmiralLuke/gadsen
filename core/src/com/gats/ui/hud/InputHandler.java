@@ -28,6 +28,7 @@ public class InputHandler implements GadsenInputProcessor{
 
 	private final int KEY_EXIT_TO_MENU = Input.Keys.ESCAPE;
 
+	private final int KEY_TOGGLE_DEBUG = Input.Keys.F3;
 
 	private HumanPlayer currentPlayer;
 	private Vector2 lastMousePosition;
@@ -145,6 +146,8 @@ public class InputHandler implements GadsenInputProcessor{
 				break;
 			case KEY_CAMERA_TOGGLE_PLAYER_FOCUS:
 				ingameScreen.toggleCameraMove();
+			case KEY_TOGGLE_DEBUG:
+				//Todo: ingameScreen.toggleDebugView();
 
 			default:
 				if (turnInProgress && currentPlayer != null) {

@@ -48,7 +48,14 @@ public class UiMessenger {
 	};
 
 
-
+	/**
+	 * Update the ui Elements when a player aimed.
+	 * @param angle
+	 * @param strength
+	 */
+	public void playerAimed(float angle,float strength){
+		hud.setAimIndicatorValues(angle,strength);
+	}
 
 	/**
 	 * Will update the current Inventory Display, with Information from the player.
@@ -84,7 +91,7 @@ public class UiMessenger {
 	 * Pass the the turnTime to the Hud for displaying it
 	 * @param time
 	 */
-	public void setTurnTimeLeft(int time){
+	private void setTurnTimeLeft(int time){
 		hud.setTurntimeRemaining(time);
 	}
 
@@ -92,10 +99,10 @@ public class UiMessenger {
 	/**
 	 * Start the turn Timer
 	 */
-	public void startTurnTimer(){hud.startTurnTimer();};
+	private void startTurnTimer(){hud.startTurnTimer();};
 
 
-	public void stopTurnTimer(){
+	private void stopTurnTimer(){
 		hud.stopTurnTimer();
 	}
 
@@ -114,21 +121,14 @@ public class UiMessenger {
 	/**
 	 * Update the stamina of the current player
 	 */
-	public void playerStaminaChanged(int stamina){
+	private void playerStaminaChanged(int stamina){
 			hud.updateCurrentStamina(stamina);
 	}
 
-	public void refillStaminaBar(int maxStamina){
+	private void refillStaminaBar(int maxStamina){
 		hud.setMaxStamina(maxStamina);
 		hud.updateCurrentStamina(maxStamina);
 	}
 
-	/**
-	 * Update the ui Elements when a player aimed.
-	 * @param angle
-	 * @param strength
-	 */
-	public void playerAimed(float angle,float strength){
-		hud.setAimIndicatorValues(angle,strength);
-	}
+
 }
