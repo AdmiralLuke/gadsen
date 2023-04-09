@@ -2,7 +2,6 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.Hud;
 
@@ -85,16 +84,23 @@ public class UiMessenger {
 
 
 	/**
-	 * Reduce the current displayed turn time
-	 * @param reduceBy
+	 * Start the turn Timer
 	 */
-	public void reduceTurnTime(int reduceBy){hud.reduceTurnTime(reduceBy);};
+	public void startTurnTimer(){hud.startTurnTimer();};
+
+
+	public void stopTurnTimer(){
+		hud.stopTurnTimer();
+	}
+
 
 	/**
 	 * Calls necessary functions to update Ui Elements after a player shot.
 	 * @param currentPlayer
 	 * @param weapon
 	 */
+
+
 	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){
 		updateInventoryItem(currentPlayer,weapon);
 	}
