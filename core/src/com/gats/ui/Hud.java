@@ -48,6 +48,8 @@ public class Hud implements Disposable {
 	private FastForwardButton fastForwardButton;
 
 	private AimInformation aimInfo;
+
+	private StaminaBar staminaBar;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 
 		this.inGameScreen = ingameScreen;
@@ -59,6 +61,8 @@ public class Hud implements Disposable {
 		turnChangeDuration = 1;
 		turnChangeSprite = AssetContainer.IngameAssets.turnChange;
 
+
+		staminaBar = new StaminaBar(0,0,1,false,AssetContainer.MainMenuAssets.skin);
 		Camera cam = new OrthographicCamera(viewportSizeX,viewportSizeY);
 		//Viewport entweder extend oder Fit -> noch nicht sicher welchen ich nehmen soll
 		Viewport viewport= new ExtendViewport(viewportSizeX,viewportSizeY,cam);
@@ -137,7 +141,7 @@ public class Hud implements Disposable {
 		layoutTable.add(aimInfo).expandX().expandY().pad(10).right().align(Align.right).width(40);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
-		layoutTable.add();
+		layoutTable.add(staminaBar).pad(padding).expandX().center().width(32);
 		layoutTable.add(turnTimer).expandX().right().bottom().pad(padding);
 
 	}
@@ -237,8 +241,17 @@ public class Hud implements Disposable {
 	public void setAimIndicatorValues(float angle, float strength){
 		aimInfo.setValues(angle,strength);
 	}
+
 	@Override
 	public void dispose() {
 		stage.dispose();
+	}
+
+	public void setMaxStamina(int stamina){
+		staminaBar.setMaxStamina(stamina);
+	}
+
+	public void updateCurrentStamina(int currentStamina){
+		staminaBar.updateCurrentStamina(currentStamina);
 	}
 }

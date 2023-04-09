@@ -4,11 +4,14 @@ import com.gats.simulation.GameCharacter;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.hud.UiMessenger;
 
-public class UpdateInventoryItem extends NotifyUiAction{
+/**
+ * Animator Action meant to communicate changes in regards to an Item, to the ui.
+ */
+public class MessageItemUpdateAction extends MessageUiAction {
 
 	GameCharacter currentPlayer;
 	WeaponType weaponType;
-	public UpdateInventoryItem(float start, UiMessenger uiMessenger, GameCharacter currentPlayer, WeaponType type) {
+	public MessageItemUpdateAction(float start, UiMessenger uiMessenger, GameCharacter currentPlayer, WeaponType type) {
 		super(start, uiMessenger);
 		this.currentPlayer = currentPlayer;
 		this.weaponType = type;
