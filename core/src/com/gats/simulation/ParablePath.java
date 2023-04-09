@@ -24,7 +24,12 @@ public class ParablePath implements Path {
     public ParablePath(Vector2 startPosition, Vector2 endPosition, Vector2 startVelocity) {
         this.startPosition = startPosition;
         this.startVelocity = startVelocity;
-        this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
+        if (startVelocity.cpy().nor().epsilonEquals(0,1, 0.001f)) {
+            float t = startVelocity.y / g * 2;
+            this.duration = startPosition.epsilonEquals(endPosition, 0.001f) ? t * 2 : t;
+        } else {
+            this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
+        }
     }
 
 

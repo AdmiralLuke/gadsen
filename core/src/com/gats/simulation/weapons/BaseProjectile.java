@@ -68,6 +68,12 @@ public class BaseProjectile implements Projectile{
         this.lastCharacter = character;
         this.lastTile = null;
         this.strength = strength;
+        // recoil
+        if (recoil > 0) {
+            Vector2 v = new Vector2((dir.x * (-1) * (0.1f * recoil)) * 400, (dir.y * (-1) * (0.1f * recoil)) * 400);
+            Path path = new ParablePath(character.getPlayerPos(), 15, v);
+            head = traverse(head, character, path, sim);
+        }
         return this.move(head, strength , dec);
     }
 
@@ -103,7 +109,9 @@ public class BaseProjectile implements Projectile{
             lastTile = null;
         }
 
-        if (t >= path.getDuration() || pos.y < 0) return dec.hitNothing(head, dec, this);
+        if (t >= path.getDuration() || pos.y < 0) {
+            return dec.hitNothing(head, dec, this);
+        }
 
 
         for (int i = 0; i < sim.getState().getTeamCount(); i++) {
@@ -212,9 +220,8 @@ public class BaseProjectile implements Projectile{
 
     ProjectileAction generateAction() {
         Path path = null;
-        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t), this.path.getDir(t));
+        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t),  this.path.getDir(0));
         if (projType == ProjType.LINEAR) path = new LinearPath(this.path.getPos(0), this.path.getPos(t), 100);
         return new ProjectileAction(0,type, path);
     }
-
 }
