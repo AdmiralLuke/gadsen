@@ -91,7 +91,7 @@ public class UiMessenger {
 	 * Pass the the turnTime to the Hud for displaying it
 	 * @param time
 	 */
-	private void setTurnTimeLeft(int time){
+	public void setTurnTimeLeft(int time){
 		hud.setTurntimeRemaining(time);
 	}
 
@@ -99,10 +99,10 @@ public class UiMessenger {
 	/**
 	 * Start the turn Timer
 	 */
-	private void startTurnTimer(){hud.startTurnTimer();};
+	public void startTurnTimer(){hud.startTurnTimer();};
 
 
-	private void stopTurnTimer(){
+	public void stopTurnTimer(){
 		hud.stopTurnTimer();
 	}
 
