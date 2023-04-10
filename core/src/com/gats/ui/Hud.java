@@ -123,7 +123,7 @@ public class Hud implements Disposable {
 
         table.setFillParent(true);
         //debug
-        table.setDebug(true);
+        table.setDebug(false);
 		//align the table to the left of the stage
 		table.center();
 		return table;
