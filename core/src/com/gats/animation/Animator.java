@@ -41,6 +41,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private Viewport backgroundViewport;
 
     private SpriteEntity background;
+    private UiMessenger uiMessenger;
 
     private Batch batch;
 
@@ -51,7 +52,6 @@ public class Animator implements Screen, AnimationLogProcessor {
     private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
 
-    private UiMessenger uiMessenger;
     private GameCharacter[][] teams;
 
     private final Object notificationObject = new Object();

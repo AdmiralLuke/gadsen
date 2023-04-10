@@ -147,6 +147,7 @@ public class InputHandler implements GadsenInputProcessor{
 				break;
 			case KEY_CAMERA_TOGGLE_PLAYER_FOCUS:
 				ingameScreen.toggleCameraMove();
+				break;
 			case KEY_TOGGLE_DEBUG:
 				ingameScreen.toggleDebugView();
 				break;
