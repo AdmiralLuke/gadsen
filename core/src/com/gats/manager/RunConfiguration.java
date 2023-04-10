@@ -1,6 +1,7 @@
 package com.gats.manager;
 
 import com.gats.ui.HudStage;
+import sun.tools.jar.CommandLine;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,7 @@ public class RunConfiguration {
 
     public int teamCount;
     public int teamSize;
+
 
     public ArrayList<Class<? extends Player>> players;
 

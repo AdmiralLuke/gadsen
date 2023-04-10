@@ -49,6 +49,9 @@ public class Manager {
      * @param config The execution-parameters of the simulation
      */
     public Manager(RunConfiguration config) {
+
+        //ToDo test for tournament
+
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
         gui = config.gui;
@@ -96,13 +99,14 @@ public class Manager {
         }
     }
 
-    public static ArrayList<Class<? extends Player>> getPlayers(String[] names) {
+    public static ArrayList<Class<? extends Player>> getPlayers(String[] names, boolean noGUI) {
         NamedPlayerClass[] allPlayers = getPossiblePlayers();
         ArrayList<Class<? extends Player>> selectedPlayers = new ArrayList<>();
         for (String cur : names) {
             boolean playerFound = false;
             for (NamedPlayerClass candidate : allPlayers) {
                 if (candidate.fileName.equals(cur)) {
+                    if (noGUI && candidate.classRef.equals(HumanPlayer.class)) throw new RuntimeException("Human Players cannot be used with option --nogui");
                     selectedPlayers.add(candidate.classRef);
                     playerFound = true;
                     break;
