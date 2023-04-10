@@ -14,6 +14,8 @@ import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.Action;
+import com.gats.ui.assets.AssetContainer;
+import com.gats.ui.menu.debugView.DebugView;
 import com.gats.ui.hud.UiMessenger;
 
 import java.util.List;
@@ -35,12 +37,16 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private Hud hud;
     private Animator animator;
     private final GADS gameManager;
+
+    private DebugView debugView;
     public InGameScreen(GADS instance, RunConfiguration runConfig){
 
         gameManager = instance;
         gameViewport = new FillViewport(worldWidth,worldHeight);
         hud = new Hud(this, runConfig);
        runConfig.uiMessenger=hud.getUiMessenger();
+
+        debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
         setupInput();
 
@@ -71,6 +77,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         hud.tick(delta);
         animator.render(renderingSpeed*delta);
         hud.draw();
+        debugView.draw();
         //animator.animate(gameManager.simulation.getActionLog());
     }
 
@@ -79,7 +86,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
      *
      * @param log Queue of all {@link Action animation-related Actions}
      */
-    public void animate(ActionLog log) {animator.animate(log);}
+    public void animate(ActionLog log) {animator.animate(log);
+    debugView.add(log);}
 
 
     @Override
@@ -92,6 +100,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         animator.resize(width, height);
         hud.resizeViewport(width,height);
         gameViewport.update(width,height);
+        debugView.getViewport().update(width,height);
     }
 
     @Override
@@ -149,6 +158,10 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
 
     public void toggleCameraMove() {
         animator.getCamera().toggleCanMoveToVector();
+    }
+
+    public void toggleDebugView() {
+        debugView.toggleDebugView();
     }
     public void moveCameraByOffset(Vector2 offset){
         animator.getCamera().moveByOffset(offset);

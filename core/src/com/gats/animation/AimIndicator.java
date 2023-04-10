@@ -13,24 +13,24 @@ import com.gats.animation.GameCharacter;
 public class AimIndicator extends GameCharacterHudElement {
 
 
+    private boolean aimActive = false;
 
-
-    private Vector2 posOffset = new Vector2(0,0);
+    private Vector2 posOffset;
 
     public AimIndicator(TextureRegion hudSprite, GameCharacter gameCharacter){
-        super(hudSprite,gameCharacter.getPos(),new Vector2(hudSprite.getRegionWidth(),hudSprite.getRegionHeight()),gameCharacter);
-        Vector2 characterSize = gameCharacter.getSize();
-
-        setOrigin(0,3.5f);
-            this.posOffset = new Vector2(characterSize.x/2,characterSize.y/2 - 3.5f);
-
+        super(hudSprite, new Vector2(0,0), new Vector2(hudSprite.getRegionWidth(), hudSprite.getRegionHeight()),gameCharacter);
+        setOrigin(new Vector2(0, hudSprite.getRegionHeight()/2f));
+        gameCharacter.setAimingIndicator(this);
     }
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
 
-        this.setRelPos(getGameCharacter().getRelPos().cpy().add(posOffset));
-        super.draw(batch, deltaTime, parentAlpha);
+        if (aimActive) super.draw(batch, deltaTime, parentAlpha);
 
+    }
+
+    public void aimActive(boolean active) {
+        aimActive = active;
     }
 }

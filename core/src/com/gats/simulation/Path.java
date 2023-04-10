@@ -28,4 +28,6 @@ public interface Path {
      * @return the maximum valid input-time for this path in seconds
      */
     float getEndTime();
+
+    String toString();
 }

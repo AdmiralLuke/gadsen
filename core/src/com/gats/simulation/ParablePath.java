@@ -102,4 +102,10 @@ public class ParablePath implements Path {
     public Vector2 getStartVelocity() {
         return startVelocity;
     }
+
+    @Override
+    public String toString() {
+        String output = "from: " + getPos(0) + "to: " +getPos(duration);
+        return output;
+    }
 }
