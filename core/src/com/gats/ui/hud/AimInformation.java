@@ -33,8 +33,6 @@ public class AimInformation extends VerticalGroup {
 		this.angleTextLabel = new Label(angleText,AssetContainer.MainMenuAssets.skin);
 		this.angleValueLabel = new Label("",AssetContainer.MainMenuAssets.skin);
 
-		aimAngleGroup.debug();
-
 
 		aimStrengthGroup = new Table();
 

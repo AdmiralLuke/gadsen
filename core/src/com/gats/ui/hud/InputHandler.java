@@ -112,6 +112,7 @@ public class InputHandler implements GadsenInputProcessor{
 	 * @return was the input handled
 	 */
 
+	//todo, pass input to hud, instead of ingameScreen
 	@Override
 	public boolean keyDown(int keycode) {
 
@@ -147,8 +148,8 @@ public class InputHandler implements GadsenInputProcessor{
 			case KEY_CAMERA_TOGGLE_PLAYER_FOCUS:
 				ingameScreen.toggleCameraMove();
 			case KEY_TOGGLE_DEBUG:
-				//Todo: ingameScreen.toggleDebugView();
-
+				ingameScreen.toggleDebugView();
+				break;
 			default:
 				if (turnInProgress && currentPlayer != null) {
 					currentPlayer.processKeyDown(keycode);
@@ -165,7 +166,7 @@ public class InputHandler implements GadsenInputProcessor{
 
 	/**
 	 * Called whenever a button stops getting pressed/is lifted up.
-	 * Resets the values to some Keypresses, changed in {@link Hud#keyDown(int)}
+	 * Resets the values to some Keypresses.
 	 *
 	 * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
 	 * @return

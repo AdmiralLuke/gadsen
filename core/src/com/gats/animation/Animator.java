@@ -51,6 +51,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
 
+    private UiMessenger uiMessenger;
     private GameCharacter[][] teams;
 
     private final Object notificationObject = new Object();
@@ -323,13 +324,12 @@ public class Animator implements Screen, AnimationLogProcessor {
             GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
             AddAction addAction = new AddAction(action.getDelay(), target, Weapons.summon(switchWeaponAction.getWpType()));
 
-            //notifyUi
-            UpdateSelectedWeaponAction selectedWeaponAction = new UpdateSelectedWeaponAction(0,animator.uiMessenger,switchWeaponAction.getWpType());
-            addAction.setChildren(new Action[]{selectedWeaponAction});
-            MessageUiWeaponSelectAction selectedWeaponAction = new MessageUiWeaponSelectAction(0,animator.uiMessenger,switchWeaponAction.getWpType());
-            setAnimationAction.setChildren(new Action[]{selectedWeaponAction});
+            //notifyUhab nachdem du gerade gepusht hast noch ein 2.tes mal gemergt
 
-            return new ExpandedAction(setAnimationAction,selectedWeaponAction);
+            MessageUiWeaponSelectAction selectedWeaponAction = new MessageUiWeaponSelectAction(0,animator.uiMessenger,switchWeaponAction.getWpType());
+            addAction.setChildren(new Action[]{selectedWeaponAction});
+
+            return new ExpandedAction(addAction,selectedWeaponAction);
         }
 
 

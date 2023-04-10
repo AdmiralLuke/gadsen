@@ -50,6 +50,8 @@ public class Hud implements Disposable {
 	private AimInformation aimInfo;
 
 	private StaminaBar staminaBar;
+
+	private boolean debugVisible;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 
 		this.inGameScreen = ingameScreen;
@@ -253,5 +255,11 @@ public class Hud implements Disposable {
 
 	public void updateCurrentStamina(int currentStamina){
 		staminaBar.updateCurrentStamina(currentStamina);
+	}
+
+	public void toggleDebugOutlines() {
+		this.debugVisible = !debugVisible;
+
+		this.layoutTable.setDebug(debugVisible);
 	}
 }
