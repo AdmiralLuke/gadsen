@@ -8,10 +8,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.animation.action.*;
 import com.gats.animation.action.Action;
-import com.gats.animation.action.uiActions.ChangeAimValuesAction;
-import com.gats.animation.action.uiActions.ChangeInventoryAction;
-import com.gats.animation.action.uiActions.UpdateInventoryItem;
-import com.gats.animation.action.uiActions.UpdateSelectedWeaponAction;
+import com.gats.animation.action.uiActions.*;
 import com.gats.animation.entity.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -183,9 +180,10 @@ public class Animator implements Screen, AnimationLogProcessor {
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
             startWalking.setChildren(new Action[]{animMoveAction, animRotateAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
-            animMoveAction.setChildren(new Action[]{stopWalking});
-
-            return new ExpandedAction(startWalking, stopWalking);
+            //notify ui
+            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0,animator.uiMessenger,animator.state.getCharacterFromTeams(moveAction.getTeam(),moveAction.getCharacter()));
+            animMoveAction.setChildren(new Action[]{stopWalking,messageUiPlayerMoveAction});
+            return new ExpandedAction(startWalking, messageUiPlayerMoveAction);
         }
 
         private static ExpandedAction convertCharacterFallAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -300,7 +298,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             ScaleAction scaleAction = new ScaleAction(0, currentAimIndicator, new Vector2(aimAction.getStrength(), 1));
 
             //notify Ui
-            ChangeAimValuesAction aimValuesAction = new ChangeAimValuesAction(0,animator.uiMessenger,aimAction.getAngle().angleDeg(),aimAction.getStrength());
+            MessageUiPlayerAimAction aimValuesAction = new MessageUiPlayerAimAction(0,animator.uiMessenger,aimAction.getAngle().angleDeg(),aimAction.getStrength());
             rotateAction.setChildren(new Action[]{scaleAction,aimValuesAction});
 
             return new ExpandedAction(rotateAction, aimValuesAction);
@@ -314,10 +312,10 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterSelectAction characterSelectAction = new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter);
 
             //ui Action
-            ChangeInventoryAction inventoryAction = new ChangeInventoryAction(startAction.getDelay(),animator.uiMessenger,animator.state.getCharacterFromTeams(startAction.getTeam(),startAction.getCharacter()));
+            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0,animator.uiMessenger,animator.state.getCharacterFromTeams(startAction.getTeam(),startAction.getCharacter()));
 
-            characterSelectAction.setChildren(new Action[]{inventoryAction});
-            return new ExpandedAction(characterSelectAction,inventoryAction);
+            characterSelectAction.setChildren(new Action[]{indicateTurnStartAction});
+            return new ExpandedAction(characterSelectAction,indicateTurnStartAction);
         }
 
         private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -328,6 +326,8 @@ public class Animator implements Screen, AnimationLogProcessor {
             //notifyUi
             UpdateSelectedWeaponAction selectedWeaponAction = new UpdateSelectedWeaponAction(0,animator.uiMessenger,switchWeaponAction.getWpType());
             addAction.setChildren(new Action[]{selectedWeaponAction});
+            MessageUiWeaponSelectAction selectedWeaponAction = new MessageUiWeaponSelectAction(0,animator.uiMessenger,switchWeaponAction.getWpType());
+            setAnimationAction.setChildren(new Action[]{selectedWeaponAction});
 
             return new ExpandedAction(setAnimationAction,selectedWeaponAction);
         }
@@ -340,7 +340,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             IdleAction idleAction = new IdleAction(shootAction.getDelay(), 0);
 
             //uiaction
-            UpdateInventoryItem updateInventoryItem = new UpdateInventoryItem(0,animator.uiMessenger,currentPlayer,currentPlayer.getSelectedWeapon());
+            MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0,animator.uiMessenger,currentPlayer,currentPlayer.getSelectedWeapon());
             idleAction.setChildren(new Action[]{updateInventoryItem});
             return new ExpandedAction(idleAction,updateInventoryItem);
         }

@@ -112,23 +112,15 @@ public class HumanPlayer extends Player {
 
         //Todo add 5 seconds time  between turns
         //setup timer for updating the ui Time
-       Timer timer = new Timer();
       if(uiMessenger!=null) {
           uiMessenger.setTurnTimeLeft(turnDuration);
-          //reduce the time by 1 everytime
-          timer.scheduleAtFixedRate(new TimerTask() {
-              @Override
-              public void run() {
-                  //notifyUi
-                  uiMessenger.reduceTurnTime(1);
-              }
+          uiMessenger.startTurnTimer();
 
-          }, 0, 1000);
       }
         synchronized (this) {
             try {
                 this.wait(turnDuration* 1000L);
-                timer.cancel();
+                uiMessenger.stopTurnTimer();
             } catch (InterruptedException ignored) {
 //                System.out.println("Turn has been ended preemptively");
 

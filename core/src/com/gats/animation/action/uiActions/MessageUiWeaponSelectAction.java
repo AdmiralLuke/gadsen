@@ -3,10 +3,13 @@ package com.gats.animation.action.uiActions;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.hud.UiMessenger;
 
-public class UpdateSelectedWeaponAction extends NotifyUiAction{
+/**
+ * Action to Signal a WeaponSelect via the Type of the new Weapon to the Ui
+ */
+public class MessageUiWeaponSelectAction extends MessageUiAction {
 
 	WeaponType type;
-	public UpdateSelectedWeaponAction(float start, UiMessenger uiMessenger, WeaponType type) {
+	public MessageUiWeaponSelectAction(float start, UiMessenger uiMessenger, WeaponType type) {
 		super(start, uiMessenger);
 		this.type = type;
 	}

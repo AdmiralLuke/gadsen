@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -49,6 +48,8 @@ public class Hud implements Disposable {
 	private FastForwardButton fastForwardButton;
 
 	private AimInformation aimInfo;
+
+	private StaminaBar staminaBar;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 
 		this.inGameScreen = ingameScreen;
@@ -60,6 +61,8 @@ public class Hud implements Disposable {
 		turnChangeDuration = 1;
 		turnChangeSprite = AssetContainer.IngameAssets.turnChange;
 
+
+		staminaBar = new StaminaBar(0,0,1,false,AssetContainer.MainMenuAssets.skin);
 		Camera cam = new OrthographicCamera(viewportSizeX,viewportSizeY);
 		//Viewport entweder extend oder Fit -> noch nicht sicher welchen ich nehmen soll
 		Viewport viewport= new ExtendViewport(viewportSizeX,viewportSizeY,cam);
@@ -120,7 +123,7 @@ public class Hud implements Disposable {
 
         table.setFillParent(true);
         //debug
-        table.setDebug(true);
+        table.setDebug(false);
 		//align the table to the left of the stage
 		table.center();
 		return table;
@@ -138,7 +141,7 @@ public class Hud implements Disposable {
 		layoutTable.add(aimInfo).expandX().expandY().pad(10).right().align(Align.right).width(40);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
-		layoutTable.add();
+		layoutTable.add(staminaBar).pad(padding).expandX().center().width(32);
 		layoutTable.add(turnTimer).expandX().right().bottom().pad(padding);
 
 	}
@@ -227,15 +230,28 @@ public class Hud implements Disposable {
 		turnTimer.setCurrentTime(time);
 	}
 
-	public void reduceTurnTime(int reduceBy){
-		turnTimer.reduceTime(reduceBy);
+	public void startTurnTimer(){
+		turnTimer.startTimer();
+	}
+
+	public void stopTurnTimer(){
+		turnTimer.stopTimer();
 	}
 
 	public void setAimIndicatorValues(float angle, float strength){
 		aimInfo.setValues(angle,strength);
 	}
+
 	@Override
 	public void dispose() {
 		stage.dispose();
+	}
+
+	public void setMaxStamina(int stamina){
+		staminaBar.setMaxStamina(stamina);
+	}
+
+	public void updateCurrentStamina(int currentStamina){
+		staminaBar.updateCurrentStamina(currentStamina);
 	}
 }

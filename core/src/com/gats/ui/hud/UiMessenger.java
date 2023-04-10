@@ -2,7 +2,6 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.Hud;
 
@@ -21,16 +20,42 @@ public class UiMessenger {
 	}
 
 	/**
+	 * Applies the necessary changes to the Hud for a new turn.
+	 * @param currentPlayer
+	 */
+	public void turnChanged(GameCharacter currentPlayer){
+		changeInventory(currentPlayer);
+		drawTurnChangePopup(null);
+		refillStaminaBar(currentPlayer.getStamina());
+
+
+		//Todo update/notify every element so it sets its status to that of the current player
+	}
+
+	public void playerMoved(GameCharacter currentPlayer){
+		playerStaminaChanged(currentPlayer.getStamina());
+	}
+	/**
 	 * Will update the current Inventory Display, with Information from the player but only on the item with the weaponType.
 	 * Call whenever the inventory of a player is changed.
 	 * (e.g. new Weapon pickup or loss of ammunition)
 	 */
+	public void changeSelectedWeapon(WeaponType weaponType){
+		hud.getInventoryDrawer().setSelectedItem(weaponType);
+	}
 	public void updateInventoryItem(GameCharacter currentPlayer, WeaponType weaponType){
 		hud.getInventoryDrawer().updateItem(currentPlayer,weaponType);
 	};
 
 
-
+	/**
+	 * Update the ui Elements when a player aimed.
+	 * @param angle
+	 * @param strength
+	 */
+	public void playerAimed(float angle,float strength){
+		hud.setAimIndicatorValues(angle,strength);
+	}
 
 	/**
 	 * Will update the current Inventory Display, with Information from the player.
@@ -39,18 +64,16 @@ public class UiMessenger {
 	 * (e.g. new Weapon pickup or loss of ammunition)
 	 *
 	 */
-	public void changeInventory(GameCharacter currentPlayer){
+	private void changeInventory(GameCharacter currentPlayer){
 		hud.getInventoryDrawer().changeInventory(currentPlayer);
 	}
-	public void changeSelectedWeapon(WeaponType weaponType){
-		hud.getInventoryDrawer().setSelectedItem(weaponType);
-	}
+
 
 	/**
 	 * Will call {@link Hud#createTurnChangePopup()} to temporarily draw it to the Hud.
 	 * @param gameCharacter Sprite/Skin of the current/new Player -> could be implemented
 	 */
-	public void drawTurnChangePopup(TextureRegion gameCharacter){
+	private void drawTurnChangePopup(TextureRegion gameCharacter){
 		hud.createTurnChangePopup();
 	}
 
@@ -62,17 +85,6 @@ public class UiMessenger {
 		hud.setRenderingSpeed(speed);
 	}
 
-	/**
-	 * Applies the necessary changes to the Hud for a new turn.
-	 * @param currentPlayer
-	 */
-	public void turnChanged(GameCharacter currentPlayer){
-		changeInventory(currentPlayer);
-		drawTurnChangePopup(null);
-
-
-		//Todo update/notify every element so it sets its status to that of the current player
-	}
 
 
 	/**
@@ -85,34 +97,38 @@ public class UiMessenger {
 
 
 	/**
-	 * Reduce the current displayed turn time
-	 * @param reduceBy
+	 * Start the turn Timer
 	 */
-	public void reduceTurnTime(int reduceBy){hud.reduceTurnTime(reduceBy);};
+	public void startTurnTimer(){hud.startTurnTimer();};
+
+
+	public void stopTurnTimer(){
+		hud.stopTurnTimer();
+	}
+
 
 	/**
 	 * Calls necessary functions to update Ui Elements after a player shot.
 	 * @param currentPlayer
 	 * @param weapon
 	 */
+
+
 	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){
 		updateInventoryItem(currentPlayer,weapon);
 	}
 
 	/**
 	 * Update the stamina of the current player
-	 * @param currentPlayer
 	 */
-	public void playerStaminaChanged(GameCharacter currentPlayer){
-
+	private void playerStaminaChanged(int stamina){
+			hud.updateCurrentStamina(stamina);
 	}
 
-	/**
-	 * Update the ui Elements when a player aimed.
-	 * @param angle
-	 * @param strength
-	 */
-	public void playerAimed(float angle,float strength){
-		hud.setAimIndicatorValues(angle,strength);
+	private void refillStaminaBar(int maxStamina){
+		hud.setMaxStamina(maxStamina);
+		hud.updateCurrentStamina(maxStamina);
 	}
+
+
 }
