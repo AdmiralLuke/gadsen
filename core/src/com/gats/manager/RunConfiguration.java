@@ -1,8 +1,6 @@
 package com.gats.manager;
 
-import com.gats.ui.hud.GadsenInputProcessor;
 import com.gats.ui.hud.UiMessenger;
-import sun.tools.jar.CommandLine;
 
 import java.util.ArrayList;
 
@@ -16,8 +14,8 @@ public class RunConfiguration {
     public AnimationLogProcessor animationLogProcessor = null;
 
     public UiMessenger uiMessenger = null;
-    //Generalize to Interface
-    public GadsenInputProcessor input = null;
+
+    public InputProcessor inputProcessor = null;
 
     public String mapName;
 
@@ -53,7 +51,7 @@ public class RunConfiguration {
       output+=  "Gui: " + gui +nl;
 
       output+= "AnimationLogProcessor: " + checkNullToString(animationLogProcessor)+nl;
-      output+= "InputProcessor: " + checkNullToString(input)+nl;
+      output+= "InputProcessor: " + checkNullToString(inputProcessor)+nl;
       output+= "mapName: " + mapName+nl;
       output+= "teamCount: " + teamCount+nl;
       output+= "teamSize: " + teamSize+nl;

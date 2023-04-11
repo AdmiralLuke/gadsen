@@ -41,6 +41,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private Viewport backgroundViewport;
 
     private SpriteEntity background;
+    private int gameMode;
     private UiMessenger uiMessenger;
 
     private Batch batch;
@@ -429,36 +430,26 @@ public class Animator implements Screen, AnimationLogProcessor {
     /**
      * Setzt eine Welt basierend auf den Daten in state auf und bereitet diese für nachfolgende Animationen vor
      *
-     * @param state    Contains the initial state of the game before any actions are played
      * @param viewport viewport used for rendering
      */
-    public Animator(GameState state, Viewport viewport, int gameMode,UiMessenger uiMessenger) {
+    public Animator(Viewport viewport, int gameMode, UiMessenger uiMessenger) {
+        this.gameMode = gameMode;
         this.uiMessenger= uiMessenger;
-        this.state = state;
         this.batch = new SpriteBatch();
         this.root = new EntityGroup();
 
         setupView(viewport);
 
-        setup(state, gameMode);
+        setup();
         // assign textures to tiles after processing game Stage
         //put sprite information into gameStage?
     }
 
-    private void setup(GameState state, int gameMode) {
-
-
-        background = new SpriteEntity(
-                IngameAssets.background,
-                new Vector2(-backgroundViewport.getWorldWidth() / 2, -backgroundViewport.getWorldHeight() / 2),
-                new Vector2(259, 128));
-        //root.add(background);
-
-        //backgroundTexture.setWrap();
-
+    @Override
+    public void init(GameState state) {
+        this.state = state;
         map = new TileMap(IngameAssets.tileTextures, state);
         root.add(map);
-
 
         teamCount = state.getTeamCount();
         charactersPerTeam = state.getCharactersPerTeam();
@@ -469,7 +460,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
         Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth() / 2f, animationFrame.getRegionHeight() / 2f);
         characterGroup = new EntityGroup();
-//        characterGroup.setRelPos(new Vector2(45 * 12, 45 * 12));
+
         root.add(characterGroup);
         for (int curTeam = 0; curTeam < teamCount; curTeam++)
             for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
@@ -486,6 +477,16 @@ public class Animator implements Screen, AnimationLogProcessor {
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy().add(com.gats.simulation.GameCharacter.getSize().scl(0.5f)));
                 characterGroup.add(animGameCharacter);
             }
+    }
+
+    private void setup() {
+
+
+        background = new SpriteEntity(
+                IngameAssets.background,
+                new Vector2(-backgroundViewport.getWorldWidth() / 2, -backgroundViewport.getWorldHeight() / 2),
+                new Vector2(259, 128));
+
 
     }
 

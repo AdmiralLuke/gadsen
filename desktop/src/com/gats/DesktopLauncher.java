@@ -1,18 +1,12 @@
 package com.gats;
 
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
-import com.gats.simulation.Tile;
 import com.gats.ui.GADS;
 import org.apache.commons.cli.*;
-
-import java.util.Arrays;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
@@ -106,8 +100,8 @@ public class DesktopLauncher {
                 printHelp();
                 return;
             }
-            Manager manager = new Manager(runConfig);
-            manager.start();
+            Manager manager = Manager.getManager();
+            manager.schedule(runConfig);
             //ToDo: wait for and print results to console
         }
     }

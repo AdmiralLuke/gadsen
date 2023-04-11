@@ -1,15 +1,12 @@
 package com.gats.ui.hud;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.manager.HumanPlayer;
-import com.gats.ui.Hud;
 import com.gats.ui.InGameScreen;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class InputHandler implements GadsenInputProcessor{
+public class InputHandler implements InputProcessor, com.gats.manager.InputProcessor {
 
 
 	InGameScreen ingameScreen;
@@ -34,7 +31,6 @@ public class InputHandler implements GadsenInputProcessor{
 	private Vector2 lastMousePosition;
 	private Vector2 deltaMouseMove;
 	private boolean rightMousePressed;
-	private List<HumanPlayer> humanList = new ArrayList<>();
 	private boolean turnInProgress = false;
 
 
@@ -69,11 +65,6 @@ public class InputHandler implements GadsenInputProcessor{
 			currentPlayer.tick(delta);
 		}
 	}
-
-	public void setHumanPlayers(List<HumanPlayer> humanList) {
-		this.humanList = humanList;
-	}
-
 
 	/**
 	 * Converts the mouse screen-coordinates to worldPosition and calls {@link HumanPlayer#aimToVector(Vector2)} to aim the Indicator

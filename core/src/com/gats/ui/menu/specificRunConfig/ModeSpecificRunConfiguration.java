@@ -29,8 +29,8 @@ public abstract class ModeSpecificRunConfiguration extends RunConfiguration {
 			animationLogProcessor=settings.animationLogProcessor;
 		}
 
-		if(input ==null){
-			input = settings.input;
+		if(inputProcessor ==null){
+			inputProcessor = settings.inputProcessor;
 		}
 
 		if(mapName==null){

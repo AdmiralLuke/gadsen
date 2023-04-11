@@ -8,17 +8,14 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.animation.AnimatorCamera;
-import com.gats.manager.AnimationLogProcessor;
-import com.gats.manager.HumanPlayer;
-import com.gats.manager.Manager;
-import com.gats.manager.RunConfiguration;
+import com.gats.manager.*;
+import com.gats.simulation.GameState;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.Action;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.menu.debugView.DebugView;
-import com.gats.ui.hud.UiMessenger;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
@@ -26,7 +23,6 @@ import java.util.List;
 public class InGameScreen implements Screen, AnimationLogProcessor {
 
     private final Manager manager;
-    private final List<HumanPlayer> humanList;
     private Viewport gameViewport;
     private float worldWidth = 80*12;
     private float worldHeight = 80*12;
@@ -45,7 +41,6 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         gameViewport = new FillViewport(worldWidth,worldHeight);
 
         hud = new Hud(this, runConfig);
-        runConfig.uiMessenger=hud.getUiMessenger();
 
         debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
@@ -54,13 +49,16 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         //update runconfig
         runConfig.gui = true;
         runConfig.animationLogProcessor = this;
-        runConfig.input = hud.getGadsenInputProcessor();
+        runConfig.uiMessenger = hud.getUiMessenger();
+        runConfig.inputProcessor = hud.getInputHandler();
 
-        manager = new Manager(runConfig);
-        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode,runConfig.uiMessenger);
-        manager.start();
-
-        humanList = manager.getHumanList();
+        manager = Manager.getManager();
+        //ToDo this should be happening in Menu
+        ArrayList<Game> games = manager.schedule(runConfig);
+        if (games.size() > 1) System.err.println("Warning: RunConfig produced more than one game: Only showing the first game!");
+        Game game = games.get(0);
+        animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
+        game.start();
 
     }
 
@@ -80,6 +78,12 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         animator.render(renderingSpeed*delta);
         hud.draw();
         debugView.draw();
+    }
+
+    @Override
+    public void init(GameState state) {
+        //ToDo the game is starting remove waiting screen etc.
+        animator.init(state);
     }
 
     /**
@@ -134,7 +138,6 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         //animator als actor?
          //       simulation als actor?
         Gdx.input.setInputProcessor(hud.getInputProcessor());
-        hud.setHumanPlayers(humanList);
 
     }
 
