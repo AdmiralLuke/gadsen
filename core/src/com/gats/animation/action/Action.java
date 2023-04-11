@@ -16,6 +16,19 @@ public abstract class Action {
     public void setChildren(Action[] children) {
         this.children = children;
     }
+    public void addChild(Action child){
+        if(children!=null) {
+            Action[] newChildren = new Action[children.length + 1];
+            int i = 0;
+            for (Action action : children) {
+                newChildren[i] = action;
+                i++;
+            }
+            newChildren[children.length] = child;
+            children = newChildren;
+        }
+        else {setChildren(new Action[]{child});}
+    }
 
     public Action[] getChildren() {
         return children;

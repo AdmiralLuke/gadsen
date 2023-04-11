@@ -3,6 +3,7 @@ package com.gats.animation;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -365,12 +366,15 @@ public class Animator implements Screen, AnimationLogProcessor {
                 destroyCharacter.setChildren(new Action[]{summonTombstone});
                 IdleAction waitAnimation = new IdleAction(0, IngameAssets.tombstoneAnimation.getAnimationDuration());
                 summonTombstone.setChildren(new Action[]{waitAnimation});
-                lastAction = summonTombstone;
+
             } else {
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
                 hitAnimation.setChildren(new Action[]{resetAnimationAction});
-                lastAction = resetAnimationAction;
             }
+           UpdateHealthBarAction updateHealthBarAction  = new UpdateHealthBarAction(0,hitAction.getHealthAft(),target.getHealthbar());
+            hitAnimation.addChild(updateHealthBarAction);
+            lastAction=updateHealthBarAction;
+
             return new ExpandedAction(hitAnimation, lastAction);
         }
 
@@ -480,8 +484,11 @@ public class Animator implements Screen, AnimationLogProcessor {
                 else
                     animGameCharacter = new GameCharacter(teamColors[curTeam]);
 
-                AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
+                AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite);
                 aimIndicator.setScale(new Vector2(0.5f, 1));
+                animGameCharacter.setAimingIndicator(aimIndicator);
+
+                animGameCharacter.setHealthbar(new Healthbar(new NinePatch(IngameAssets.healthBarBackground,1,1,1,1),new Vector2(0,10), simGameCharacter.getHealth()));
                 teams[curTeam][curCharacter] = animGameCharacter;
                 animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy().add(com.gats.simulation.GameCharacter.getSize().scl(0.5f)));
                 characterGroup.add(animGameCharacter);

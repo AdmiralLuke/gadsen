@@ -109,6 +109,7 @@ public class AssetContainer {
         public static TextureRegion turnChange;
 
         public static TextureRegion turnTimer;
+        public static TextureRegion healthBarBackground;
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,

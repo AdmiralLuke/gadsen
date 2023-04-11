@@ -156,7 +156,7 @@ public class GADSAssetManager {
         IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");
         IngameAssets.turnChange = atlas.findRegion("ui/turnChange");
         IngameAssets.turnTimer = atlas.findRegion("ui/clockSprite");
-
+        IngameAssets.healthBarBackground = atlas.findRegion("ui/healthbarBackground");
 
         finishedLoading = true;
     }

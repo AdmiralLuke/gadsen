@@ -32,6 +32,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     private AimIndicator aimingIndicator;
 
     private Weapon weapon;
+    private Healthbar healthbar;
 
     private boolean holdingWeapon = false;
 
@@ -69,6 +70,9 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
         if (!holdingWeapon && weapon != null) {
             weapon.draw(batch, deltaTime, parentAlpha);
+        }
+        if (healthbar!=null){
+            healthbar.draw(batch,deltaTime,parentAlpha);
         }
         batch.flush();
 
@@ -120,6 +124,10 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         return this.aimingIndicator;
     }
 
+    public Healthbar getHealthbar(){
+        return this.healthbar;
+    }
+
     public void setAimingIndicator(AimIndicator aimIndicator) {
         if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
@@ -144,6 +152,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         super.updatePos();
         if (aimingIndicator != null) aimingIndicator.updatePos();
         if (weapon != null) weapon.updatePos();
+        if (healthbar!=null)healthbar.updatePos();
     }
 
     public static float getAnimationDuration(GameCharacterAnimationType type) {
@@ -171,6 +180,12 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         weapon.setHolding(holdingWeapon);
     }
 
+
+    public void setHealthbar(Healthbar healthbar){
+        if(healthbar==null) {return;}
+        this.healthbar = healthbar;
+        this.healthbar.setParent(this);
+    }
     @Override
     public Entity asEntity() {
         return this;
@@ -182,6 +197,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
             setAimingIndicator((AimIndicator) child);
         } else if (child instanceof Weapon) {
             setWeapon((Weapon) child);
+        } else if (child instanceof Healthbar) {
+           setHealthbar((Healthbar)child);
         }
     }
 
