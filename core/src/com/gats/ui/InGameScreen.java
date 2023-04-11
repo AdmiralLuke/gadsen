@@ -53,12 +53,11 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         runConfig.inputProcessor = hud.getInputHandler();
 
         manager = Manager.getManager();
+        animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
         //ToDo this should be happening in Menu
         ArrayList<Game> games = manager.schedule(runConfig);
         if (games.size() > 1) System.err.println("Warning: RunConfig produced more than one game: Only showing the first game!");
         Game game = games.get(0);
-        animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
-        game.start();
 
     }
 

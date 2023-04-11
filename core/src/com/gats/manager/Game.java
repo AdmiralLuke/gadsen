@@ -47,7 +47,7 @@ public class Game {
         uiMessenger = config.uiMessenger;
     }
 
-    protected void create(){
+    private void create(){
 
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();

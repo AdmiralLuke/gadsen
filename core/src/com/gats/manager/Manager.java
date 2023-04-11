@@ -32,6 +32,9 @@ public class Manager {
             games.add(new Game(config));
         }
         this.games.addAll(games);
+        games.forEach(game ->{
+            game.start();
+        });
         return games;
     }
 
