@@ -3,10 +3,12 @@ package com.gats.manager;
 import com.gats.manager.command.Command;
 import com.gats.manager.command.EndTurnCommand;
 import com.gats.simulation.action.ActionLog;
-import com.gats.ui.HudStage;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
+import com.gats.ui.hud.GadsenInputProcessor;
+import com.gats.ui.hud.InputHandler;
+import com.gats.ui.hud.UiMessenger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -27,7 +29,7 @@ public class Manager {
     private static final int HUMAN_EXECUTION_TIMEOUT = 30000;
     private static final int HUMAN_INIT_TIMEOUT = 30000;
 
-    private final HudStage inputGenerator;
+    private final GadsenInputProcessor inputGenerator;
 
     private AnimationLogProcessor animationLogProcessor;
 
@@ -40,6 +42,7 @@ public class Manager {
 
     private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
     private Thread simulationThread;
+    private UiMessenger uiMessenger;
     private boolean pendingShutdown = false;
 
     /**
@@ -56,8 +59,8 @@ public class Manager {
         state = simulation.getState();
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;
-        inputGenerator = config.hud;
-
+        inputGenerator = config.input;
+        this.uiMessenger = config.uiMessenger;
         players = new Player[config.teamCount];
 
         for (int i = 0; i < config.teamCount; i++) {
@@ -72,6 +75,7 @@ public class Manager {
                 case Human:
                     if (!gui) throw new RuntimeException("HumanPlayers can't be used without GUI to capture inputs");
                     humanList.add((HumanPlayer) curPlayer);
+                    ((HumanPlayer)(curPlayer)).setUiMessenger(uiMessenger);
                     break;
                 case AI:
 

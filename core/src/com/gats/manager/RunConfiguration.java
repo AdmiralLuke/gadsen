@@ -1,26 +1,28 @@
 package com.gats.manager;
 
-import com.gats.ui.HudStage;
+import com.gats.ui.hud.GadsenInputProcessor;
+import com.gats.ui.hud.UiMessenger;
 import sun.tools.jar.CommandLine;
 
 import java.util.ArrayList;
 
 public class RunConfiguration {
 
+    //Todo add default values
     public int gameMode = 0;
 
     public boolean gui = false;
 
     public AnimationLogProcessor animationLogProcessor = null;
 
+    public UiMessenger uiMessenger = null;
     //Generalize to Interface
-    public HudStage hud = null;
+    public GadsenInputProcessor input = null;
 
     public String mapName;
 
     public int teamCount;
     public int teamSize;
-
 
     public ArrayList<Class<? extends Player>> players;
 
@@ -51,7 +53,7 @@ public class RunConfiguration {
       output+=  "Gui: " + gui +nl;
 
       output+= "AnimationLogProcessor: " + checkNullToString(animationLogProcessor)+nl;
-      output+= "HudStage: " + checkNullToString(hud)+nl;
+      output+= "InputProcessor: " + checkNullToString(input)+nl;
       output+= "mapName: " + mapName+nl;
       output+= "teamCount: " + teamCount+nl;
       output+= "teamSize: " + teamSize+nl;
