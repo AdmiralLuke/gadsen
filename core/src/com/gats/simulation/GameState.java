@@ -33,10 +33,17 @@ public class GameState {
     private int height;
 
     //ToDo: use enums
-    public static final int GAME_MODE_NORMAL = 0;
-    public static final int GAME_MODE_CHRISTMAS = 1;
+    public enum GameMode{
+        Normal,
+        Campaign,
 
-    private int gameMode = GAME_MODE_NORMAL;
+        Exam_Admission,
+        Tournament_Phase_1,
+        Tournament_Phase_2,
+        Christmas
+    }
+
+    private GameMode gameMode = GameMode.Normal;
 
     // Teams   Anzahl Teams x Anzahl Player
     private GameCharacter[][] teams;
@@ -49,7 +56,7 @@ public class GameState {
 
 
     //Deprecated ToDo: remove
-    GameState(int gameMode, String mapName, Simulation sim) {
+    GameState(GameMode gameMode, String mapName, Simulation sim) {
         new GameState(gameMode, mapName, 2, 1, sim);
     }
 
@@ -62,7 +69,7 @@ public class GameState {
      * @param charactersPerTeam number of Characters per team
      * @param sim the respective simulation instance
      */
-    GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
+    GameState(GameMode gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
         List<IntVector2> spawnpoints = loadMap(mapName);
         this.teamCount = teamCount;
@@ -78,7 +85,7 @@ public class GameState {
      * Gibt den Spiel-Modus des laufenden Spiels zurück.
      * @return Spiel-Modus als int
      */
-    public int getGameMode() {
+    public GameMode getGameMode() {
         return gameMode;
     }
 
@@ -86,7 +93,8 @@ public class GameState {
      * Spawns players randomly distributed over the possible spawn-location, specified by the map.
      */
     void initTeam(List<IntVector2> spawnpoints) {
-        if (gameMode == GAME_MODE_CHRISTMAS) {
+        if (gameMode == GameMode.Christmas) {
+            //ToDo: remove Christmas Mode
             spawnpoints.sort(Comparator.comparingInt(v -> v.x));
             for (int i = 0; i < 4; i++) {
                 IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);

@@ -1,5 +1,8 @@
 package com.gats.manager;
 
+import com.gats.simulation.GameState;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.io.File;
@@ -24,17 +27,24 @@ public class Manager {
     public ArrayList<Game> schedule(RunConfiguration runConfiguration) {
         ArrayList<Game> games = new ArrayList<>();
 
-        //ToDo Replace with static ref
-        if (runConfiguration.gameMode == 0) {
-            GameConfig config = new GameConfig(runConfiguration);
-            //ToDo Replace with static ref
-            config.gameMode = 0;
-            games.add(new Game(config));
+        switch (runConfiguration.gameMode){
+            case Normal:
+            case Christmas:
+                //ToDo implement differences
+            case Campaign:
+            case Exam_Admission:
+                GameConfig config = new GameConfig(runConfiguration);
+                games.add(new Game(config));
+                break;
+            case Tournament_Phase_1:
+
+                break;
+            case Tournament_Phase_2:
+            default:
+                throw new NotImplementedException();
         }
         this.games.addAll(games);
-        games.forEach(game ->{
-            game.start();
-        });
+        games.forEach(Game::start);
         return games;
     }
 

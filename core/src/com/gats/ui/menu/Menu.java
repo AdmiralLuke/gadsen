@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.gats.manager.IdleBot;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
+import com.gats.simulation.GameState;
 import com.gats.ui.MenuScreen;
 import com.gats.ui.menu.buttons.*;
 import com.gats.ui.menu.gamemodeLayouts.ChristmasLayout;
@@ -207,7 +208,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		configuration.gui = true;
 
 		//Todo make sure the gamemodes are in correct order
-		configuration.gameMode = gameModeSelector.getSelectedIndex();
+		configuration.gameMode = GameState.GameMode.values()[gameModeSelector.getSelectedIndex()];
 		configuration.mapName = this.mapSelector.getSelected().getName();
 		configuration.teamCount = (int)this.teamAmountSlider.getValue();
 		configuration.teamSize = (int)this.teamSizeSlider.getValue();
@@ -221,10 +222,10 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		RunConfiguration modeSettings;
 
 		switch (configuration.gameMode){
-			case 0:
+			case Normal:
 				modeSettings = new NormalModeConfig(configuration);
 				break;
-			case 1:
+			case Christmas:
 				//Todo deal with hardcoded values, might be neede for later gameModes
 				modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
 				break;

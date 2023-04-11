@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.gats.simulation.GameState.GameMode;
 
 /**
  * Kernklasse für die Visualisierung des Spielgeschehens.
@@ -41,7 +42,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private Viewport backgroundViewport;
 
     private SpriteEntity background;
-    private int gameMode;
+    private GameMode gameMode;
     private UiMessenger uiMessenger;
 
     private Batch batch;
@@ -432,7 +433,7 @@ public class Animator implements Screen, AnimationLogProcessor {
      *
      * @param viewport viewport used for rendering
      */
-    public Animator(Viewport viewport, int gameMode, UiMessenger uiMessenger) {
+    public Animator(Viewport viewport, GameMode gameMode, UiMessenger uiMessenger) {
         this.gameMode = gameMode;
         this.uiMessenger= uiMessenger;
         this.batch = new SpriteBatch();
@@ -466,7 +467,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                 com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                 GameCharacter animGameCharacter;
-                if (gameMode == GameState.GAME_MODE_CHRISTMAS)
+                if (gameMode == GameMode.Christmas)
                     animGameCharacter = new GameCharacter(teamColors[Math.min(1, curTeam)]);
                 else
                     animGameCharacter = new GameCharacter(teamColors[curTeam]);

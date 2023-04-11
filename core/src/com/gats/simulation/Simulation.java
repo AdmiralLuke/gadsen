@@ -4,6 +4,7 @@ import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.GameOverAction;
 import com.gats.simulation.action.InitAction;
 import com.gats.simulation.action.TurnStartAction;
+import com.gats.simulation.GameState.GameMode;
 
 /**
  * Enthält die Logik, welche die Spielmechaniken bestimmt.
@@ -20,12 +21,12 @@ public class Simulation {
      * @param teamAm Anzahl Teams
      * @param teamSize Anzahl Charaktere pro Team
      */
-    public Simulation(int gameMode,String mapName, int teamAm, int teamSize){
+    public Simulation(GameMode gameMode, String mapName, int teamAm, int teamSize){
         gameState = new GameState(gameMode,mapName, teamAm, teamSize, this);
         IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
-        if (gameMode == GameState.GAME_MODE_CHRISTMAS) {
+        if (gameMode == GameMode.Christmas) {
             gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction());
             gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction());
             gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction());
@@ -64,7 +65,7 @@ public class Simulation {
 
 
     public ActionLog endTurn() {
-        if (this.gameState.getGameMode() == GameState.GAME_MODE_CHRISTMAS && this.gameState.getTeams()[0][0].getHealth() <= 0) {
+        if (this.gameState.getGameMode() == GameMode.Christmas && this.gameState.getTeams()[0][0].getHealth() <= 0) {
             this.actionLog.getRootAction().addChild(new GameOverAction(1));
             gameState.setActive(false);
             return this.actionLog;

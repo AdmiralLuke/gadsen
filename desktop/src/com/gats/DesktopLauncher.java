@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
+import com.gats.simulation.GameState;
 import com.gats.ui.GADS;
 import org.apache.commons.cli.*;
 
@@ -75,7 +76,13 @@ public class DesktopLauncher {
         runConfig.gui = !params.hasOption("n");
         runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p")) runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
-        runConfig.gameMode = Integer.parseInt(params.getOptionValue("g", "0"));
+        int gameMode = Integer.parseInt(params.getOptionValue("g", "0"));
+        if (gameMode<0 || gameMode>= GameState.GameMode.values().length) {
+            System.err.println("Valid GameModes range from 0 to 4");
+            printHelp();
+            return;
+        }
+        runConfig.gameMode = GameState.GameMode.values()[gameMode];
         runConfig.teamSize = Integer.parseInt(params.getOptionValue("s", "3"));
         if (runConfig.gui) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
