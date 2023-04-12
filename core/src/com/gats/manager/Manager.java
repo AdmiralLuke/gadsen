@@ -37,7 +37,13 @@ public class Manager {
                 games.add(new Game(config));
                 break;
             case Tournament_Phase_1:
-
+                List<List<Class<? extends Player>>> listOfMatchUps = GameConfig.subsetK(runConfiguration.players, runConfiguration.teamCount);
+                for (List<Class<? extends Player>> matchup: listOfMatchUps
+                     ) {
+                    GameConfig cur = new GameConfig(runConfiguration);
+                    cur.players = matchup;
+                    games.add(new Game(cur));
+                }
                 break;
             case Tournament_Phase_2:
             default:

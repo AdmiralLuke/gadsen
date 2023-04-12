@@ -40,7 +40,7 @@ class GameConfig {
     public int teamCount;
     public int teamSize;
 
-    public ArrayList<Class<? extends Player>> players;
+    public List<Class<? extends Player>> players;
 
     public static <T> List<List<T>> subsetK(List<T> list, int subSetSize) {
         ArrayList<List<T>> results = new ArrayList<>();
