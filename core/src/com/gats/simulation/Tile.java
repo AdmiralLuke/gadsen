@@ -23,13 +23,13 @@ public class Tile {
 
 
     // Box als Ankerpunkt
-    private final boolean isAnchor;
+    private boolean isAnchor;
 
     private final boolean isSolid;
 
     // Box hängt an einer Box oder an Verkettung von Boxen die an Anker hängt
     //ToDo: box should always be anchored, or removed from the map otherwise
-    private final boolean isAnchored;
+    private boolean isAnchored;
 
 
     // Haltbarkeit der Box
@@ -296,6 +296,14 @@ public class Tile {
         return tileDestAction;
     }
 
+    public Action destroyTileDirect(Action head) {
+        this.deleteFromGraph();
+        state.getBoard()[this.getPosition().x][this.getPosition().y] = null;
+        Action tileDestAction = new TileDestroyAction(this.getPosition());
+        head.addChild(tileDestAction);
+        return tileDestAction;
+    }
+
     /**
      * @param tiles ArrayList mit rekursiv aufbauend verbundenen Tiles
      * @param map   lookup-map um bereits besuchte Tiles zu markieren
@@ -395,5 +403,7 @@ public class Tile {
         return Objects.hash(isAnchor, isAnchored, getPosition());
     }
 
-
+    void setAnchor(boolean anchor) {
+        this.isAnchor = anchor;
+    }
 }

@@ -153,7 +153,7 @@ public class BaseProjectile implements Projectile{
         return traverse(pAc, character, path, this.sim);
     }
 
-    private Action traverse(Action head, GameCharacter character, Path path, Simulation sim) {
+    static Action traverse(Action head, GameCharacter character, Path path, Simulation sim) {
         float t = 0.1f;
         if (path.getDir(0).x < 0.00002f && path.getDir(0).x > -0.00002f) return head;
 

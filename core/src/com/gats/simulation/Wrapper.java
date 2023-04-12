@@ -2,10 +2,10 @@ package com.gats.simulation;
 
 import com.gats.simulation.action.Action;
 
-public class CharacterWrapper {
+public class Wrapper {
 
     private GameCharacter[][] team;
-    CharacterWrapper(GameCharacter[][] team) {
+    Wrapper(GameCharacter[][] team) {
         this.team = team;
     }
 
@@ -20,5 +20,9 @@ public class CharacterWrapper {
 
     public Action fall(Action head, int team, int gchar) {
         return this.team[team][gchar].fall(head);
+    }
+
+    public void tileSetAnchored(Tile t) {
+        t.setAnchor(true);
     }
 }
