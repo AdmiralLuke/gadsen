@@ -3,6 +3,8 @@ package com.gats.manager;
 import com.gats.ui.hud.UiMessenger;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 import com.gats.simulation.GameState.GameMode;
@@ -40,32 +42,33 @@ class GameConfig {
 
     public ArrayList<Class<? extends Player>> players;
 
-    public static <T> ArrayList<ArrayList<T>> subsets(T[] elements, int subSetSize) {
-        ArrayList<ArrayList<T>> results = new ArrayList<>();
+    public static <T> List<List<T>> subsetK(List<T> list, int subSetSize) {
+        ArrayList<List<T>> results = new ArrayList<>();
 
-        int size = elements.length;
-
-        int curDecided = 0;
-        boolean[] inclusionMask = new boolean[size];
-
-        int inclusionCount = 0;
-
-        while (inclusionCount < subSetSize) {
-            while (curDecided < subSetSize) {
-                if (size - curDecided + inclusionCount == subSetSize) {
-                    ArrayList<T> subSet = new ArrayList<>(subSetSize);
-                    for (int i = 0; i < subSetSize; i++) {
-                        if (i < curDecided) {
-                            if (inclusionMask[i]) subSet.add(elements[i]);
-                        } else subSet.add(elements[i]);
-                    }
-                    results.add(subSet);
-                }
-            }
-
+        int listSize = list.size();
+        if (subSetSize > listSize) return results;
+        if (subSetSize <= 0) return results;
+        if (subSetSize == listSize) {
+            results.add(list);
+            return results;
         }
 
+        T head = list.remove(0);
 
+        List<List<T>> results1 = subsetK(new ArrayList<>(list), subSetSize);
+        results.addAll(results1);
+        if (subSetSize == 1) {
+            List<T> elemList = new ArrayList<>();
+            elemList.add(head);
+            results.add(elemList);
+        }else {
+            List<List<T>> results2 = subsetK(list, subSetSize - 1);
+            for (List<T> cur :
+                    results2) {
+                cur.add(head);
+                results.add(cur);
+            }
+        }
         return results;
     }
 }
