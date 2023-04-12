@@ -1,12 +1,16 @@
 package com.gats.manager;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
+import com.gats.ui.hud.UiMessenger;
 
-import java.util.Arrays;
+import java.time.Clock;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class HumanPlayer extends Player {
 
@@ -58,12 +62,9 @@ public class HumanPlayer extends Player {
     //amount of time in seconds, the turn of the human player will take
     //if the time limit is reached, the execute turn will wait for turnOverhead seconds
     // to make sure everything is calculated and no GameState inconsistency is created
-    private int turnDuration = 60;
-    private long nanoTurnDuration = turnDuration * 1000000000;
+    private int turnDuration = 20;
     private int turnEndWaitTime = 5;
 
-    private long nanoStartTime;
-    private long elapsedTime;
 
     private int angle = 0;
 
@@ -79,6 +80,7 @@ public class HumanPlayer extends Player {
     private GameState state;
     private Controller controller;
 
+    private UiMessenger uiMessenger;
     @Override
     public String getName() {
         return "Human";
@@ -100,13 +102,21 @@ public class HumanPlayer extends Player {
 
     @Override
     protected void executeTurn(GameState state, Controller controller) {
-        //ToDo move input processing to UI package
         this.state = state;
         this.controller = controller;
         for (int i = 0; i < lastTick.length; i++) lastTick[i] = NO_TICK;
+
+        //Todo add 5 seconds time  between turns
+        //setup timer for updating the ui Time
+      if(uiMessenger!=null) {
+          uiMessenger.setTurnTimeLeft(turnDuration);
+          uiMessenger.startTurnTimer();
+
+      }
         synchronized (this) {
             try {
-                this.wait(20000);
+                this.wait(turnDuration* 1000L);
+                uiMessenger.stopTurnTimer();
             } catch (InterruptedException ignored) {
 //                System.out.println("Turn has been ended preemptively");
 
@@ -226,6 +236,30 @@ public class HumanPlayer extends Player {
         //ToDo implement holding keys
     }
 
+    public void aim(int angle,float strength){
+        this.angle = angle;
+        this.strength = strength;
+       controller.aim(angle,strength);
+    }
+
+    /**
+     * Makes the controller aim to the provided position in regards to the center of the Character.
+     * @param target position to aim towards.
+     */
+    public void aimToVector(Vector2 target){
+      Vector2 playerPos = controller.getGameCharacter().getPlayerPos();
+      //Todo get center from character sprite?
+        //add characterCenteroffset currently center is at(8,8) because 16x16 sprite size
+      playerPos.add(new Vector2(8.5f,8));
+      target.sub(playerPos);
+
+      //maximum length before strength begins to decrease
+      float maxStrengthDistance = 64; //64=4*16= 4tiles derzeit
+      float currentDistance = target.len();
+      currentDistance = currentDistance>maxStrengthDistance?maxStrengthDistance:currentDistance;
+     //call aim with the targetAngle and strength ratio
+     this.aim((int) target.angleDeg(),currentDistance/maxStrengthDistance);
+    }
 
     public void processKeyUp(int keycode) {
 
@@ -265,4 +299,7 @@ public class HumanPlayer extends Player {
         return PlayerType.Human;
     }
 
+    public void setUiMessenger(UiMessenger uiMessenger){
+       this.uiMessenger = uiMessenger;
+    }
 }

@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.gats.simulation.Weapon;
+import com.gats.simulation.WeaponType;
+
+import java.util.HashMap;
 
 /**
  * Contains Loaded Instances of Assets
@@ -55,7 +59,7 @@ public class AssetContainer {
 
         public static TextureRegion pixel;
 
-        static {
+		static {
             Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             map.setColor(Color.WHITE);
             map.drawPixel(0, 0);
@@ -92,6 +96,19 @@ public class AssetContainer {
 
         public static Animation<TextureRegion> tombstoneAnimation;
 
+        public static TextureRegion inventoryCell;
+
+        public static TextureRegion cookieIcon;
+        public static TextureRegion sugarCaneIcon;
+        public static HashMap<WeaponType,TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
+
+        public static TextureRegion fastForwardButton;
+        public static TextureRegion fastForwardButtonPressed;
+        public static TextureRegion fastForwardButtonChecked;
+
+        public static TextureRegion turnChange;
+
+        public static TextureRegion turnTimer;
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,
