@@ -50,7 +50,7 @@ public class Healthbar extends Entity implements Toggleable {
 		pixmap.dispose();
 
 
-		this.healthProgressBar = new ProgressBar(0,100,1,false,progStyle);
+		this.healthProgressBar = new ProgressBar(0,maxHealth,1,false,progStyle);
 		healthProgressBar.setValue(maxHealth);
 
 
