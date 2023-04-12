@@ -22,6 +22,7 @@ public class CharacterPath implements Path {
 
     @Override
     public Vector2 getDir(float t) {
+        if (t >= path.getDuration()) return path.getDir(path.getDuration()).x <0 ? new Vector2(-1,0):new Vector2(1,0);
         return path.getDir(t);
     }
 

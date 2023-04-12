@@ -25,7 +25,7 @@ public class MoveAction extends Action {
     protected void runAction(float oldTime, float current) {
         if (target != null) {
             float time = Math.min(endTime,current);
-            target.setRelPos(path.getPos(time));
+            target.setRelPos(path.getPos(time - super.delay));
         }
         if (current > endTime) endAction(endTime);
     }
