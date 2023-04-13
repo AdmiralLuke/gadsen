@@ -33,6 +33,7 @@ public class InputHandler implements GadsenInputProcessor{
 	private HumanPlayer currentPlayer;
 	private Vector2 lastMousePosition;
 	private Vector2 deltaMouseMove;
+	private boolean leftMousePressed;
 	private boolean rightMousePressed;
 	private List<HumanPlayer> humanList = new ArrayList<>();
 	private boolean turnInProgress = false;
@@ -217,6 +218,10 @@ public class InputHandler implements GadsenInputProcessor{
 			rightMousePressed = true;
 
 		}
+		if(button==Input.Buttons.LEFT){
+			leftMousePressed = true;
+			processMouseAim(screenX,screenY);
+		}
 		return false;
 	}
 
@@ -224,6 +229,9 @@ public class InputHandler implements GadsenInputProcessor{
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		if(button==Input.Buttons.RIGHT){
 			rightMousePressed=false;
+		}
+		if(button==Input.Buttons.LEFT){
+			leftMousePressed=false;
 		}
 
 		return false;
@@ -238,6 +246,11 @@ public class InputHandler implements GadsenInputProcessor{
 			return true;
 		}
 
+		//only change the aim values, when leftmouse is pressed
+		if(leftMousePressed){
+			processMouseAim(screenX,screenY);
+			return true;
+		}
 		return false;
 	}
 
@@ -245,7 +258,6 @@ public class InputHandler implements GadsenInputProcessor{
 	public boolean mouseMoved(int screenX, int screenY) {
 
 
-		processMouseAim(screenX,screenY);
 		return false;
 	}
 
