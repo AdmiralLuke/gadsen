@@ -32,7 +32,11 @@ public class GameState {
     private int width;
     private int height;
 
-    //ToDo: use enums
+    public Float[] getScores() {
+        //ToDo implement
+        return new Float[4];
+    }
+
     public enum GameMode{
         Normal,
         Campaign,

@@ -8,15 +8,14 @@ import org.junit.runners.Parameterized;
 import java.util.*;
 
 @RunWith(Parameterized.class)
-public class TestSubsetK<T> {
+public class TestPermutations<T> {
 
     private final TestExample<T> testSet;
 
     static class TestExample<T> {
-        public TestExample(int subsetSize, boolean positive, T[]... sets) {
-            this.subsetSize = subsetSize;
+        public TestExample(boolean positive, T[]... sets) {
             this.positive = positive;
-            this.expectedSubsets = new HashSet<>();
+            this.expected = new HashSet<>();
             boolean first = true;
             for (T[] cur :
                     sets) {
@@ -25,67 +24,70 @@ public class TestSubsetK<T> {
                 if (first) {
                     this.list = list;
                     first = false;
-                } else expectedSubsets.add(new HashSet<>(list));
+                } else expected.add(list);
             }
         }
 
         public boolean positive;
         public List<T> list;
-        public int subsetSize;
-        public Set<Set<T>> expectedSubsets;
+        public Set<List<T>> expected;
     }
 
-    public TestSubsetK(TestExample<T> testSet) {
+    public TestPermutations(TestExample<T> testSet) {
         this.testSet = testSet;
     }
 
     @Parameterized.Parameters
     public static Collection<TestExample<Object>> data() {
         Collection<TestExample<Object>> samples = new ArrayList<>();
-        samples.add(new TestExample<>(0, false,
+        samples.add(new TestExample<>(false,
                 new Integer[]{1, 2, 3},
                 new Integer[]{1, 2, 3}
         ));
-        samples.add(new TestExample<>(0, true,
-                new Integer[]{1, 2, 3}
+        samples.add(new TestExample<>( false,
+                new String[]{"a", "ab"},
+                new String[]{"a", "b"},
+                new String[]{"b", "a"}
         ));
-        samples.add(new TestExample<>(1, true,
-                new Integer[]{1, 2, 3},
+        samples.add(new TestExample<>( true,
                 new Integer[]{1},
-                new Integer[]{2},
-                new Integer[]{3}
+                new Integer[]{1}
         ));
-        samples.add(new TestExample<>(2, true,
-                new Integer[]{1, 2, 3},
-                new Integer[]{2, 3},
+        samples.add(new TestExample<>( true,
+                new Integer[]{}
+        ));
+        samples.add(new TestExample<>(true,
                 new Integer[]{1, 2},
-                new Integer[]{1, 3}
+                new Integer[]{1, 2},
+                new Integer[]{2, 1}
         ));
-        samples.add(new TestExample<>(3, true,
+        samples.add(new TestExample<>(true,
                 new Integer[]{1, 2, 3},
-                new Integer[]{1, 2, 3}
+                new Integer[]{1, 2, 3},
+                new Integer[]{1, 3, 2},
+                new Integer[]{2, 1, 3},
+                new Integer[]{2, 3, 1},
+                new Integer[]{3, 1, 2},
+                new Integer[]{3, 2, 1}
         ));
-        samples.add(new TestExample<>(3, true,
-                new String[]{"a", "ab", "abc"},
-                new String[]{"a", "ab", "abc"}
+        samples.add(new TestExample<>( true,
+                new String[]{"a", "ab"},
+                new String[]{"a", "ab"},
+                new String[]{"ab", "a"}
         ));
         return samples;
     }
 
     @Test
     public void test() {
-        List<List<T>> actualList = ParallelMultiGameRun.subsetK(testSet.list, testSet.subsetSize);
-        HashSet<HashSet<T>> actualSet = new HashSet<>();
-        for (List<T> cur : actualList
-             ) {
-            actualSet.add(new HashSet<>(cur));
-        }
+        List<List<T>> actualList = ParallelMultiGameRun.permutations(testSet.list);
+        HashSet<List<T>> actualSet = new HashSet<>(actualList);
         if (testSet.positive)
             Assert.assertEquals("Actual subsets aren't equal to expected subsets:\n",
-                    testSet.expectedSubsets, actualSet);
+                    testSet.expected, actualSet);
         else
             Assert.assertNotEquals("Actual subsets is equal to expected subsets even tho it shouldn't be:\n",
-                    testSet.expectedSubsets, actualSet);
+                    testSet.expected, actualSet);
     }
 
 

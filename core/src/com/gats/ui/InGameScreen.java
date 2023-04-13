@@ -15,8 +15,6 @@ import com.gats.simulation.action.Action;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.menu.debugView.DebugView;
 
-import java.util.ArrayList;
-
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.
  */
@@ -55,10 +53,10 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         manager = Manager.getManager();
         animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
         //ToDo this should be happening in Menu
-        ArrayList<Game> games = manager.schedule(runConfig);
-        if (games.size() > 1) System.err.println("Warning: RunConfig produced more than one game: Only showing the first game!");
-        Game game = games.get(0);
-
+        Run run = manager.startRun(runConfig);
+        //ToDo Handle case size >= 1
+        if (run.getGames().size() > 1) System.err.println("Warning: RunConfig produced more than one game: Only showing the first game!");
+        Game game = run.getGames().get(0);
     }
 
     //gets called when the screen becomes the main screen of GADS

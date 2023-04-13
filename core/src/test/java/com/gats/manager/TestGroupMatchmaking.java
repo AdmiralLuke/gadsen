@@ -1,0 +1,13 @@
+package com.gats.manager;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+@RunWith(Parameterized.class)
+public class TestGroupMatchmaking {
+
+
+
+
+
+}

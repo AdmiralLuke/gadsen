@@ -42,33 +42,4 @@ class GameConfig {
 
     public List<Class<? extends Player>> players;
 
-    public static <T> List<List<T>> subsetK(List<T> list, int subSetSize) {
-        ArrayList<List<T>> results = new ArrayList<>();
-
-        int listSize = list.size();
-        if (subSetSize > listSize) return results;
-        if (subSetSize <= 0) return results;
-        if (subSetSize == listSize) {
-            results.add(list);
-            return results;
-        }
-
-        T head = list.remove(0);
-
-        List<List<T>> results1 = subsetK(new ArrayList<>(list), subSetSize);
-        results.addAll(results1);
-        if (subSetSize == 1) {
-            List<T> elemList = new ArrayList<>();
-            elemList.add(head);
-            results.add(elemList);
-        }else {
-            List<List<T>> results2 = subsetK(list, subSetSize - 1);
-            for (List<T> cur :
-                    results2) {
-                cur.add(head);
-                results.add(cur);
-            }
-        }
-        return results;
-    }
 }

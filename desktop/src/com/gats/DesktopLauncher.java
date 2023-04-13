@@ -108,7 +108,7 @@ public class DesktopLauncher {
                 return;
             }
             Manager manager = Manager.getManager();
-            manager.schedule(runConfig);
+            manager.startRun(runConfig);
             //ToDo: wait for and print results to console
         }
     }

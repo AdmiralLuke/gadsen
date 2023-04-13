@@ -14,6 +14,14 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class Game {
+
+    public interface CompletionHandler{
+        void onComplete(Game game);
+    }
+
+    private boolean completed = false;
+
+    private ArrayList<CompletionHandler> completionListeners = new ArrayList<>();
     private static final int AI_EXECUTION_TIMEOUT = 500;
     private static final int AI_INIT_TIMEOUT = 1000;
 
@@ -235,7 +243,16 @@ public class Game {
                 throw new RuntimeException(e);
             }
         }
+        completed = true;
+        for (CompletionHandler completionListener : completionListeners) {
+            completionListener.onComplete(this);
+        }
 //        System.out.println("Shutdown complete");
+    }
+
+    public void addCompletionListener(CompletionHandler handler){
+        completionListeners.add(handler);
+        if (completed) handler.onComplete(this);
     }
 
     public void dispose() {

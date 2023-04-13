@@ -1,8 +1,5 @@
 package com.gats.manager;
 
-import com.gats.simulation.GameState;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.io.File;
@@ -11,6 +8,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class Manager {
@@ -18,40 +16,46 @@ public class Manager {
     private static final Manager singleton = new Manager();
     private boolean pendingShutdown = false;
 
-    private ArrayList<Game> games = new ArrayList<>();
+    private final Thread executionManager;
+
+    private ThreadPoolExecutor threadPoolExecutor;
+
+    private final ArrayList<Game> games = new ArrayList<>();
+    private final ArrayList<Game> scheduledGames = new ArrayList<>();
+
+    private final ArrayList<Game> activeGames = new ArrayList<>();
+
+    private final ArrayList<Game> completedGames = new ArrayList<>();
+
+
+
+
 
     public static Manager getManager() {
         return singleton;
     }
 
-    public ArrayList<Game> schedule(RunConfiguration runConfiguration) {
-        ArrayList<Game> games = new ArrayList<>();
+    public Run startRun(RunConfiguration runConfiguration) {
+        return Run.getRun(this, runConfiguration);
+    }
 
-        switch (runConfiguration.gameMode){
-            case Normal:
-            case Christmas:
-                //ToDo implement differences
-            case Campaign:
-            case Exam_Admission:
-                GameConfig config = new GameConfig(runConfiguration);
-                games.add(new Game(config));
-                break;
-            case Tournament_Phase_1:
-                List<List<Class<? extends Player>>> listOfMatchUps = GameConfig.subsetK(runConfiguration.players, runConfiguration.teamCount);
-                for (List<Class<? extends Player>> matchup: listOfMatchUps
-                     ) {
-                    GameConfig cur = new GameConfig(runConfiguration);
-                    cur.players = matchup;
-                    games.add(new Game(cur));
-                }
-                break;
-            case Tournament_Phase_2:
-            default:
-                throw new NotImplementedException();
+    void executionManager(){
+
+    }
+
+    protected void schedule(Game game){
+        synchronized (games){
+            if (pendingShutdown) return;
+            game.addCompletionListener(this::notifyExecutionManager);
+            games.add(game);
         }
-        this.games.addAll(games);
-        games.forEach(Game::start);
-        return games;
+        synchronized (scheduledGames){
+            scheduledGames.add(game);
+        }
+    }
+
+    private void notifyExecutionManager(Game game) {
+
     }
 
     public static class NamedPlayerClass {
@@ -143,15 +147,19 @@ public class Manager {
     }
 
     private Manager() {
+        executionManager = new Thread(this::executionManager);
     }
 
     public void dispose() {
         //Shutdown all running threads
         pendingShutdown = true;
+        synchronized (games){
         for (Game cur :
                 games) {
             cur.dispose();
         }
+        }
+        executionManager.interrupt();
     }
 
 }
