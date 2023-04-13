@@ -1,11 +1,17 @@
 package com.gats.ui.hud;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.gats.ui.assets.AssetContainer;
+import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
 
 
 /**
@@ -13,35 +19,38 @@ import com.gats.ui.assets.AssetContainer;
  */
 public class AimInformation extends VerticalGroup {
 
+
+	private Color textColor;
 	private Table aimAngleGroup;
-	private Label angleValueLabel;
-	private Label angleTextLabel;
+	private ColoredLabelWithBackground angleValueLabel;
+	private ColoredLabelWithBackground angleTextLabel;
 
 	private Table aimStrengthGroup;
 
-	private Label strengthValueLabel;
-	private Label strengthTextLabel;
+	private ColoredLabelWithBackground strengthValueLabel;
+	private  ColoredLabelWithBackground strengthTextLabel;
 
 
 
 	public AimInformation(String angleText,String strengthText){
 
+		TextureRegionDrawable background = new TextureRegionDrawable(AssetContainer.IngameAssets.pixel);
 
 		//Todo change color of aimInformation
+		textColor = new Color(Color.SCARLET);
 	 	aimAngleGroup = new Table();
 
-		this.angleTextLabel = new Label(angleText,AssetContainer.MainMenuAssets.skin);
-		this.angleValueLabel = new Label("",AssetContainer.MainMenuAssets.skin);
-
+		this.angleTextLabel = new ColoredLabelWithBackground(angleText,AssetContainer.MainMenuAssets.skin,textColor,background);
+		this.angleValueLabel = new ColoredLabelWithBackground("",AssetContainer.MainMenuAssets.skin,textColor,background);
 
 		aimStrengthGroup = new Table();
 
-		this.strengthTextLabel = new Label(strengthText,AssetContainer.MainMenuAssets.skin);
-		this.strengthValueLabel = new Label("",AssetContainer.MainMenuAssets.skin);
+		this.strengthTextLabel = new ColoredLabelWithBackground(strengthText,AssetContainer.MainMenuAssets.skin,textColor,background);
+		this.strengthValueLabel = new ColoredLabelWithBackground("",AssetContainer.MainMenuAssets.skin,textColor,background);
 
 		//setup text alignment
 		angleValueLabel.setAlignment(Align.right);
-		aimAngleGroup.add(this.angleValueLabel).width(12).right().expandX().align(Align.right);
+		aimAngleGroup.add(this.angleValueLabel).width(18).right().expandX().align(Align.right);
 		aimAngleGroup.add(this.angleTextLabel).right().expandX();
 
 		aimStrengthGroup.add(strengthValueLabel).width(12).right().expandX().align(Align.right);

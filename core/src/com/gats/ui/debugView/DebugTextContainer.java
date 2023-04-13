@@ -1,4 +1,4 @@
-package com.gats.ui.menu.debugView;
+package com.gats.ui.debugView;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
