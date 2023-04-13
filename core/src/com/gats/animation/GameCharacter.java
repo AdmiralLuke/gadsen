@@ -134,6 +134,21 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         if (aimIndicator == null) return;
         if (aimIndicator.getParent() != null) aimIndicator.getParent().remove(aimIndicator);
         aimIndicator.setParent(this);
+
+
+        Color c;
+        //Todo meinung einholen, ob der aim Indicator an die Teamfarbe angepasst werden soll
+        //-> dann aber evtl rand weiß machen
+        // -> können/wollen wir dem AImIndicator mithilfe des outline shaders einen weißen rand geben?
+
+        if(this.teamColor==null){
+            c = teamColor;
+        }
+        else {
+            c = new Color(Color.WHITE);
+        }
+        c.a=0.75f;
+        aimIndicator.setColor(c);
     }
 
     @Override
