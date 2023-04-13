@@ -67,7 +67,6 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         accSkinTime += deltaTime;
 
-        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
         if (!holdingWeapon && weapon != null) {
             weapon.draw(batch, deltaTime, parentAlpha);
         }
@@ -97,6 +96,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         batch.flush();
         batch.setShader(null);
 
+        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
         if (holdingWeapon && weapon != null) weapon.draw(batch, deltaTime, parentAlpha);
 
     }
