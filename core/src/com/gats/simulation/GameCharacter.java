@@ -495,7 +495,7 @@ public class GameCharacter {
 
         }
         //Movement completed for some reason, log action
-        Action lastAction = new CharacterWalkAction(0.001f, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
+        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
 
 
         head.addChild(lastAction);

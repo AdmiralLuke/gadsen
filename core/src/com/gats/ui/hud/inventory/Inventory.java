@@ -2,11 +2,10 @@ package com.gats.ui.hud.inventory;
 
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.Weapon;
+import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Inventory extends VerticalGroup {

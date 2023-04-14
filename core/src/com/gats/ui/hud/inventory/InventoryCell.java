@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.TransformDrawable;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.Weapon;
+import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer;
 
@@ -108,6 +108,7 @@ public class InventoryCell extends Image {
 		if (drawable != null) drawable.draw(batch, x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
 		//color the batch white for drawing the icon
 	batch.setColor(Color.WHITE);
+
 		if(icon != null&&icon.getDrawable()!=null) icon.getDrawable().draw(batch,x+imageX,y+imageY,imageWidth*scaleX,imageHeight*scaleY);
 
 	}
