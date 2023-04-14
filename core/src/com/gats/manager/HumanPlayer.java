@@ -2,6 +2,7 @@ package com.gats.manager;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.hud.UiMessenger;
@@ -66,6 +67,8 @@ public class HumanPlayer extends Player {
     private int turnEndWaitTime = 5;
 
 
+    private Vector2 playerCenterOffset = new Vector2(GameCharacter.getSize()).scl(0.5f);
+    private int aimIndicatorLength = 4*16;
     private int angle = 0;
 
     private float strength = 0.5f;
@@ -251,18 +254,15 @@ public class HumanPlayer extends Player {
      * @param target position to aim towards.
      */
     public void aimToVector(Vector2 target){
-      Vector2 playerPos = controller.getGameCharacter().getPlayerPos();
-      //Todo get center from character sprite?
-        //add characterCenteroffset currently center is at(8,8) because 16x16 sprite size
-      playerPos.add(new Vector2(8.5f,8));
-      target.sub(playerPos);
+        GameCharacter currentChar =controller.getGameCharacter();
+        Vector2 playerPos = currentChar.getPlayerPos();
+        //add characterCenteroffset defined at top of class
+        playerPos.add(playerCenterOffset);
+        target.sub(playerPos);
 
-      //maximum length before strength begins to decrease
-      float maxStrengthDistance = 64; //64=4*16= 4tiles derzeit
-      float currentDistance = target.len();
-      currentDistance = currentDistance>maxStrengthDistance?maxStrengthDistance:currentDistance;
-     //call aim with the targetAngle and strength ratio
-     this.aim((int) target.angleDeg(),currentDistance/maxStrengthDistance);
+        float currentDistance = target.len();
+        //call aim with the targetAngle and strength ratio(maximum distance before strenght decreases -> is relativ to the indicator length)
+        this.aim((int) target.angleDeg(),currentDistance/aimIndicatorLength);
     }
 
     public void processKeyUp(int keycode) {

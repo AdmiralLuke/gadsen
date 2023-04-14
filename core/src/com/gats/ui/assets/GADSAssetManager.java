@@ -102,7 +102,7 @@ public class GADSAssetManager {
 
         IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("tile/16x_box01"), atlas.findRegion("tile/16x_anchor01")};
 
-        IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicator");
+        IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicatorNinepatchColorless");
 
         IngameAssets.gameCharacterAnimations = new AtlasAnimation[GameCharacterAnimationType.values().length];
 

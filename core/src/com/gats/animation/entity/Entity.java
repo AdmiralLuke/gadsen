@@ -16,6 +16,9 @@ import com.badlogic.gdx.math.Vector2;
 public class Entity {
     private Vector2 pos = new Vector2(0, 0);
     private Vector2 relPos = new Vector2(0, 0);
+
+    //Todo maybe move to interface?
+    private Vector2 scale = new Vector2(1, 1);
 /**
      * rotation angle of the Entity from 0 - 360
      */
@@ -76,6 +79,14 @@ public class Entity {
     public void setParent(Parent parent){
         this.parent = parent;
         updatePos();
+    }
+
+
+    public void setScale(Vector2 scale){
+       this.scale = scale;
+    }
+    public Vector2 getScale(){
+        return scale;
     }
 
     public Parent getParent() {
