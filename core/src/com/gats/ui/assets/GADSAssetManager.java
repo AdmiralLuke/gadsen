@@ -151,6 +151,7 @@ public class GADSAssetManager {
         //IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
       //  IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
 
+        IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED,null);
         IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
         IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
         IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");
