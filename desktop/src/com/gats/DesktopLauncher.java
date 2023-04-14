@@ -111,6 +111,7 @@ public class DesktopLauncher {
             manager.startRun(runConfig);
             //ToDo: wait for and print results to console
         }
+        Manager.getManager().dispose();
     }
 
     private static void printHelp() {

@@ -7,6 +7,7 @@ import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
 import com.gats.ui.hud.UiMessenger;
+import sun.nio.ch.ThreadPool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -15,11 +16,27 @@ import java.util.concurrent.*;
 
 public class Game {
 
-    public interface CompletionHandler{
+
+    protected static final int REQUIRED_THREAD_COUNT = 2;
+
+
+    public interface CompletionHandler {
         void onComplete(Game game);
     }
 
-    private boolean completed = false;
+    enum Status {
+        CREATED,
+
+        SCHEDULED,
+        ACTIVE,
+        PAUSED,
+        COMPLETED,
+        ABORTED
+    }
+
+    protected final Object schedulingLock = new Object();
+
+    private Status status = Status.CREATED;
 
     private ArrayList<CompletionHandler> completionListeners = new ArrayList<>();
     private static final int AI_EXECUTION_TIMEOUT = 500;
@@ -55,7 +72,7 @@ public class Game {
         uiMessenger = config.uiMessenger;
     }
 
-    private void create(){
+    private void create() {
 
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
@@ -74,7 +91,7 @@ public class Game {
                 case Human:
                     if (!gui) throw new RuntimeException("HumanPlayers can't be used without GUI to capture inputs");
                     humanList.add((HumanPlayer) curPlayer);
-                    ((HumanPlayer)(curPlayer)).setUiMessenger(uiMessenger);
+                    ((HumanPlayer) (curPlayer)).setUiMessenger(uiMessenger);
                     break;
                 case AI:
 
@@ -104,6 +121,7 @@ public class Game {
     }
 
     public void start() {
+        status = Status.ACTIVE;
         create();
         //Init the Log Processor
         animationLogProcessor.init(state);
@@ -125,6 +143,16 @@ public class Game {
      */
     private void run() {
         while (!pendingShutdown && state.isActive()) {
+            synchronized (schedulingLock) {
+                if (status == Status.PAUSED)
+                    try {
+                        schedulingLock.wait();
+
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+            }
+
             GameCharacterController gcController = simulation.getController();
             int currentPlayerIndex = gcController.getGameCharacter().getTeam();
             int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
@@ -243,16 +271,16 @@ public class Game {
                 throw new RuntimeException(e);
             }
         }
-        completed = true;
+        status = Status.COMPLETED;
         for (CompletionHandler completionListener : completionListeners) {
             completionListener.onComplete(this);
         }
 //        System.out.println("Shutdown complete");
     }
 
-    public void addCompletionListener(CompletionHandler handler){
+    public void addCompletionListener(CompletionHandler handler) {
         completionListeners.add(handler);
-        if (completed) handler.onComplete(this);
+        if (status == Status.COMPLETED) handler.onComplete(this);
     }
 
     public void dispose() {
@@ -271,5 +299,38 @@ public class Game {
 
     protected void queueCommand(Command cmd) {
         commandQueue.add(cmd);
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    protected void schedule() {
+        synchronized (schedulingLock) {
+            if (status == Status.CREATED)
+                status = Status.SCHEDULED;
+        }
+    }
+
+    protected void pause() {
+        synchronized (schedulingLock) {
+            if (status == Status.ACTIVE)
+            status = Status.PAUSED;
+        }
+    }
+
+    protected void resume() {
+        synchronized (schedulingLock) {
+            if (status != Status.PAUSED) return;
+            status = Status.ACTIVE;
+            schedulingLock.notify();
+        }
+    }
+
+    protected void abort() {
+        synchronized (schedulingLock) {
+            status = Status.ABORTED;
+            dispose();
+        }
     }
 }

@@ -32,6 +32,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private Animator animator;
     private final GADS gameManager;
 
+    private Run run;
+
     private DebugView debugView;
     public InGameScreen(GADS instance, RunConfiguration runConfig){
 
@@ -53,7 +55,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         manager = Manager.getManager();
         animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
         //ToDo this should be happening in Menu
-        Run run = manager.startRun(runConfig);
+        run = manager.startRun(runConfig);
         //ToDo Handle case size >= 1
         if (run.getGames().size() > 1) System.err.println("Warning: RunConfig produced more than one game: Only showing the first game!");
         Game game = run.getGames().get(0);
@@ -126,7 +128,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     @Override
     public void dispose() {
         animator.dispose();
-        manager.dispose();
+        manager.stop(run);
         hud.dispose();
         gameManager.setScreenMenu();
     }

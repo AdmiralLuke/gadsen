@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class Manager {
 
+    private static int systemReservedProcessorCount = 2;
     private static final Manager singleton = new Manager();
     private boolean pendingShutdown = false;
 
@@ -25,10 +26,11 @@ public class Manager {
 
     private final ArrayList<Game> activeGames = new ArrayList<>();
 
+    private final ArrayList<Game> pausedGames = new ArrayList<>();
+
     private final ArrayList<Game> completedGames = new ArrayList<>();
 
-
-
+    private final Object schedulingLock = new Object();
 
 
     public static Manager getManager() {
@@ -39,23 +41,94 @@ public class Manager {
         return Run.getRun(this, runConfiguration);
     }
 
-    void executionManager(){
-
+    private void executionManager() {
+        while (!Thread.interrupted()) {
+            try {
+                synchronized (executionManager) {
+                    executionManager.wait(5000);
+                }
+            } catch (InterruptedException e) {
+                System.out.println("ExecutionManager shutting down");
+                break;
+            }
+            int threadLimit = Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount;
+            synchronized (schedulingLock) {
+                int runningThreads = activeGames.size() * Game.REQUIRED_THREAD_COUNT;
+                if (runningThreads > threadLimit) {
+                    while (runningThreads > threadLimit) {
+                        if (activeGames.size() == 0) {
+                            System.err.println("Warning: System-reserved Processor Count exceeds physical limit. Simulation offline!");
+                            break;
+                        }
+                        Game game = activeGames.remove(activeGames.size() - 1);
+                        game.pause();
+                        pausedGames.add(game);
+                        runningThreads -= 2;
+                    }
+                } else while (runningThreads + 2 <= threadLimit) {
+                    if (pausedGames.size() > 0) {
+                        Game game = pausedGames.remove(pausedGames.size() - 1);
+                        game.resume();
+                        activeGames.add(game);
+                    } else if (scheduledGames.size() > 0) {
+                        Game game = scheduledGames.remove(scheduledGames.size() - 1);
+                        game.start();
+                        activeGames.add(game);
+                    } else {
+                        break;
+                    }
+                    runningThreads += 2;
+                }
+            }
+        }
     }
 
-    protected void schedule(Game game){
-        synchronized (games){
+    protected void schedule(Game game) {
+        synchronized (schedulingLock) {
             if (pendingShutdown) return;
             game.addCompletionListener(this::notifyExecutionManager);
             games.add(game);
-        }
-        synchronized (scheduledGames){
+            game.schedule();
             scheduledGames.add(game);
+        }
+        synchronized (executionManager) {
+            executionManager.notify();
         }
     }
 
-    private void notifyExecutionManager(Game game) {
 
+    private void notifyExecutionManager(Game game) {
+        synchronized (schedulingLock) {
+            activeGames.remove(game);
+            completedGames.add(game);
+        }
+        executionManager.notify();
+    }
+
+    public void stop(Run run) {
+        for (Game game : run.getGames()) {
+            stop(game);
+        }
+    }
+
+    protected void stop(Game game) {
+        synchronized (schedulingLock) {
+            synchronized (game.schedulingLock) {
+                switch (game.getStatus()) {
+                    case SCHEDULED:
+                        scheduledGames.remove(game);
+                        break;
+                    case ACTIVE:
+                        activeGames.remove(game);
+                        break;
+                    case PAUSED:
+                        pausedGames.remove(game);
+                        break;
+                }
+                completedGames.add(game);
+                game.abort();
+            }
+        }
     }
 
     public static class NamedPlayerClass {
@@ -148,18 +221,27 @@ public class Manager {
 
     private Manager() {
         executionManager = new Thread(this::executionManager);
+        executionManager.start();
     }
 
     public void dispose() {
         //Shutdown all running threads
         pendingShutdown = true;
-        synchronized (games){
-        for (Game cur :
-                games) {
-            cur.dispose();
-        }
-        }
         executionManager.interrupt();
+        synchronized (games) {
+            for (Game cur :
+                    games) {
+                cur.dispose();
+            }
+        }
     }
 
+    public static int getSystemReservedProcessorCount() {
+        return systemReservedProcessorCount;
+    }
+
+    public static void setSystemReservedProcessorCount(int systemReservedProcessorCount) {
+        Manager.systemReservedProcessorCount = systemReservedProcessorCount;
+        getManager().executionManager.notify();
+    }
 }
