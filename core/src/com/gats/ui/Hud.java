@@ -143,7 +143,7 @@ public class Hud implements Disposable {
 		layoutTable.add(aimInfo).expandX().expandY().pad(10).right().align(Align.right).width(40);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
-		layoutTable.add(staminaBar).pad(padding).expandX().center().width(32);
+		layoutTable.add(staminaBar).pad(padding).expandX().center().width(64);
 		layoutTable.add(turnTimer).expandX().right().bottom().pad(padding);
 
 	}
