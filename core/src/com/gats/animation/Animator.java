@@ -48,7 +48,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private Batch batch;
 
-    private EntityGroup root;
+    private final EntityGroup root;
 
     private TileMap map;
 

@@ -4,10 +4,15 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.gats.manager.Manager;
+import com.gats.manager.Player;
+import com.gats.manager.Run;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.GameState;
 import com.gats.ui.GADS;
 import org.apache.commons.cli.*;
+
+import java.lang.management.ManagementFactory;
+import java.util.Arrays;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
@@ -55,6 +60,11 @@ public class DesktopLauncher {
                 .hasArg()
                 .desc("Number of players per team, Default: 3").build());
 
+        cliOptions.addOption(Option
+                .builder("k")
+                .longOpt("key")
+                .hasArg()
+                .desc("When printing results, they will be encased by the given key, ensuring authenticity").build());
 
     }
 
@@ -75,9 +85,10 @@ public class DesktopLauncher {
         RunConfiguration runConfig = new RunConfiguration();
         runConfig.gui = !params.hasOption("n");
         runConfig.mapName = params.getOptionValue("m", null);
-        if (params.hasOption("p")) runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
+        if (params.hasOption("p"))
+            runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
         int gameMode = Integer.parseInt(params.getOptionValue("g", "0"));
-        if (gameMode<0 || gameMode>= GameState.GameMode.values().length) {
+        if (gameMode < 0 || gameMode >= GameState.GameMode.values().length) {
             System.err.println("Valid GameModes range from 0 to 4");
             printHelp();
             return;
@@ -92,27 +103,68 @@ public class DesktopLauncher {
             new Lwjgl3Application(new GADS(runConfig), config);
         } else {
             boolean invalidConfig = false;
-            if (runConfig.mapName == null){
+            if (runConfig.mapName == null) {
                 System.err.println("Param -m is required for no GUI mode");
                 invalidConfig = true;
             }
-            if (runConfig.players == null){
+            if (runConfig.players == null) {
                 System.err.println("Param -m is required for no GUI mode");
                 invalidConfig = true;
             } else if (runConfig.players.size() < 2) {
                 System.err.println("At least two players are required");
                 invalidConfig = true;
             }
-            if (invalidConfig){
+            if (invalidConfig) {
                 printHelp();
                 return;
             }
             Manager manager = Manager.getManager();
-            manager.startRun(runConfig);
-            //ToDo: wait for and print results to console
+            Run run = manager.startRun(runConfig);
+            Object lock = new Object();
+            synchronized (lock) {
+                run.addCompletionListener((tmp) -> {
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                });
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            printResults(run, params.getOptionValue("k",""));
         }
         Manager.getManager().dispose();
     }
+
+    private static void printResults(Run run, String key) {
+        StringBuilder builder = new StringBuilder();
+        if (key!= null && key.length()>0) builder.append("<").append(key).append(">");
+        switch (run.getGameMode()) {
+            case Normal:
+            case Tournament_Phase_1:
+                builder.append("\nScores:\n");
+                int i=0;
+                for (Class<? extends Player> cur : run.getPlayers()) {
+                    builder.append(String.format("%-10s : %-6f", cur.getName(), run.getScores()[i++]));
+                }
+                break;
+            case Campaign:
+            case Exam_Admission:
+                if (run.getScores()[0] > 0) builder.append("Bot completed the challenge");
+                else builder.append("Bot failed the challenge");
+                break;
+            default:
+                builder.append(Arrays.toString(run.getPlayers().toArray()));
+                builder.append("\n");
+                builder.append(Arrays.toString(run.getScores()));
+        }
+        if (key!= null && key.length()>0) builder.append("<").append(key).append(">");
+        System.out.println(builder.toString());
+    }
+
 
     private static void printHelp() {
         String header = "\n\n";

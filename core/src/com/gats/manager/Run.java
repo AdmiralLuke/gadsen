@@ -8,10 +8,13 @@ import java.util.List;
 
 public abstract class Run {
 
-    interface CompletionHandler{
+    public interface CompletionHandler {
         void onComplete(Run run);
     }
+
     private boolean completed = false;
+
+    private final Object schedulingLock = new Object();
     private ArrayList<CompletionHandler> completionListeners = new ArrayList<>();
 
     protected final Manager manager;
@@ -26,8 +29,8 @@ public abstract class Run {
         this.manager = manager;
     }
 
-    public static Run getRun(Manager manager, RunConfiguration runConfig){
-        switch (runConfig.gameMode){
+    public static Run getRun(Manager manager, RunConfiguration runConfig) {
+        switch (runConfig.gameMode) {
             case Normal:
             case Christmas:
                 //ToDo implement differences
@@ -46,31 +49,38 @@ public abstract class Run {
         return games;
     }
 
-    protected void addGame(Game game){
+    protected void addGame(Game game) {
         games.add(game);
         manager.schedule(game);
     }
 
+    public GameState.GameMode getGameMode() {
+        return gameMode;
+    }
 
     public boolean isCompleted() {
         return completed;
     }
 
-    public ArrayList<Class<? extends Player>> getPlayers(){
+    public ArrayList<Class<? extends Player>> getPlayers() {
         return players;
     }
 
-    protected void complete(){
-        completed = true;
-        for (CompletionHandler completionListener : completionListeners) {
-            completionListener.onComplete(this);
+    protected void complete() {
+        synchronized (schedulingLock) {
+            completed = true;
+            for (CompletionHandler completionListener : completionListeners) {
+                completionListener.onComplete(this);
+            }
         }
     }
 
     public abstract Float[] getScores();
 
-    public void addCompletionListener(CompletionHandler handler){
-        completionListeners.add(handler);
-        if (completed) handler.onComplete(this);
+    public void addCompletionListener(CompletionHandler handler) {
+        synchronized (schedulingLock) {
+            completionListeners.add(handler);
+            if (completed) new Thread(() -> handler.onComplete(this)).start();
+        }
     }
 }
