@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.Vector2;
 public class DebugPointAction extends Action{
 
     private final Vector2 pos;
-    private final Color color;
+    private final float[] color;
     private final float duration;
-    private boolean isCross;
+    private final boolean isCross;
 
     /**
      * Creates an Action that will place a point on screen for debugging-purposes.
@@ -24,7 +24,7 @@ public class DebugPointAction extends Action{
     public DebugPointAction(float delay, Vector2 pos, Color color, float duration, boolean isCross) {
         super(delay);
         this.pos = pos;
-        this.color = color;
+        this.color = new float[]{color.r, color.g, color.b, color.a};
         this.duration = duration;
         this.isCross = isCross;
     }
@@ -39,7 +39,7 @@ public class DebugPointAction extends Action{
      * @return the color of the point
      */
     public Color getColor() {
-        return color;
+        return new Color(color[0], color[1], color[2], color[3]);
     }
 
     /**

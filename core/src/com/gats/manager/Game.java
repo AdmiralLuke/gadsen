@@ -45,6 +45,8 @@ public class Game {
     private final AnimationLogProcessor animationLogProcessor;
 
     private final boolean gui;
+
+    private final ArrayList<ActionLog> actionLogs = new ArrayList<>();
     private Simulation simulation;
     private GameState state;
     private Player[] players;
@@ -215,17 +217,19 @@ public class Game {
             }
 
             futureExecutor.start();
+            ActionLog log = simulation.clearAndReturnActionLog();
+            actionLogs.add(log);
             if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                 //Contains Action produced by entering new turn
-                animationLogProcessor.animate(simulation.clearAndReturnActionLog());
+                animationLogProcessor.animate(log);
             }
             try {
                 while (true) {
                     Command nextCmd = commandQueue.take();
                     if (nextCmd.isEndTurn()) break;
                     //Contains action produced by the commands execution
-                    ActionLog log = nextCmd.run();
-
+                    log = nextCmd.run();
+                    actionLogs.add(log);
                     if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                         animationLogProcessor.animate(log);
                         //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
@@ -243,6 +247,7 @@ public class Game {
 
             //Contains actions produced by ending the turn (after last command is executed)
             ActionLog finalLog = simulation.endTurn();
+            actionLogs.add(finalLog);
             if (gui) {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
@@ -324,5 +329,9 @@ public class Game {
             status = Status.ABORTED;
             dispose();
         }
+    }
+
+    public ArrayList<ActionLog> getActionLogs() {
+        return actionLogs;
     }
 }
