@@ -10,16 +10,16 @@ public class ParallelMultiGameRun extends Run {
 
     int gameCount =0;
 
-    private final Float[] scores;
+    private final float[] scores;
     private final Map<Game, Integer[]> playerIndices = new HashMap<>();
 
-    public ParallelMultiGameRun(Manager manager, RunConfiguration runConfig) {
+    protected ParallelMultiGameRun(Manager manager, RunConfiguration runConfig) {
         super(manager, runConfig);
         ArrayList<Integer> indices = new ArrayList<>();
         for (int i = 0; i < runConfig.players.size(); i++) {
             indices.add(i);
         }
-        scores = new Float[runConfig.players.size()];
+        scores = new float[runConfig.players.size()];
         List<List<Integer>> listOfMatchUps = subsetK(indices, runConfig.teamCount);
         List<List<Integer>> permListOfMatchUps = new ArrayList<>();
         for (List<Integer> matchUp : listOfMatchUps) {
@@ -66,7 +66,7 @@ public class ParallelMultiGameRun extends Run {
     }
 
     @Override
-    public Float[] getScores() {
+    public float[] getScores() {
         return scores;
     }
 

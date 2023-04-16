@@ -67,7 +67,7 @@ public class Simulation {
     public ActionLog endTurn() {
         if (this.gameState.getGameMode() == GameMode.Christmas && this.gameState.getTeams()[0][0].getHealth() <= 0) {
             this.actionLog.getRootAction().addChild(new GameOverAction(1));
-            gameState.setActive(false);
+            gameState.deactivate();
             return this.actionLog;
         }
 
@@ -76,7 +76,7 @@ public class Simulation {
             //If no players are alive the game crashes
             //If a team survives with multiple characters, the game doesnt end
             this.actionLog.getRootAction().addChild(new GameOverAction(this.gameState.getTurn().peek().y));
-            gameState.setActive(false);
+            gameState.deactivate();
             return this.actionLog;
         }
 

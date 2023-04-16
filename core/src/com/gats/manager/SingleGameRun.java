@@ -1,12 +1,8 @@
 package com.gats.manager;
 
-import com.gats.simulation.GameState;
-
-import java.util.ArrayList;
-
 public class SingleGameRun extends Run{
 
-    private Float[] scores;
+    private float[] scores;
 
 
     public SingleGameRun(Manager manager, RunConfiguration runConfig) {
@@ -24,7 +20,7 @@ public class SingleGameRun extends Run{
 
 
     @Override
-    public Float[] getScores() {
+    public float[] getScores() {
         return scores;
     }
 

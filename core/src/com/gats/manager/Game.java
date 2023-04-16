@@ -7,7 +7,6 @@ import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
 import com.gats.ui.hud.UiMessenger;
-import sun.nio.ch.ThreadPool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -19,10 +18,6 @@ public class Game {
 
     protected static final int REQUIRED_THREAD_COUNT = 2;
 
-
-    public interface CompletionHandler {
-        void onComplete(Game game);
-    }
 
     enum Status {
         CREATED,
@@ -38,7 +33,7 @@ public class Game {
 
     private Status status = Status.CREATED;
 
-    private ArrayList<CompletionHandler> completionListeners = new ArrayList<>();
+    private final ArrayList<CompletionHandler<Game>> completionListeners = new ArrayList<>();
     private static final int AI_EXECUTION_TIMEOUT = 500;
     private static final int AI_INIT_TIMEOUT = 1000;
 
@@ -49,17 +44,17 @@ public class Game {
 
     private final AnimationLogProcessor animationLogProcessor;
 
-    private boolean gui = false;
+    private final boolean gui;
     private Simulation simulation;
     private GameState state;
     private Player[] players;
 
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private List<HumanPlayer> humanList = new ArrayList<>();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final List<HumanPlayer> humanList = new ArrayList<>();
 
-    private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
+    private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
     private Thread simulationThread;
-    private UiMessenger uiMessenger;
+    private final UiMessenger uiMessenger;
     private boolean pendingShutdown = false;
     private GameConfig config;
 
@@ -95,12 +90,9 @@ public class Game {
                     break;
                 case AI:
 
-                    Future<?> future = executor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
-                            curPlayer.init(state);
-                        }
+                    Future<?> future = executor.submit(() -> {
+                        Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
+                        curPlayer.init(state);
                     });
 
                     try {
@@ -263,7 +255,7 @@ public class Game {
             try {
                 futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
             } catch (InterruptedException e) {
-                System.out.printf("Interrupted while shutting down future executor\n");
+                System.out.print("Interrupted while shutting down future executor\n");
                 if (pendingShutdown) {
                     futureExecutor.interrupt();
                     break;
@@ -272,13 +264,13 @@ public class Game {
             }
         }
         status = Status.COMPLETED;
-        for (CompletionHandler completionListener : completionListeners) {
+        for (CompletionHandler<Game> completionListener : completionListeners) {
             completionListener.onComplete(this);
         }
 //        System.out.println("Shutdown complete");
     }
 
-    public void addCompletionListener(CompletionHandler handler) {
+    public void addCompletionListener(CompletionHandler<Game> handler) {
         completionListeners.add(handler);
         if (status == Status.COMPLETED) handler.onComplete(this);
     }
@@ -315,7 +307,7 @@ public class Game {
     protected void pause() {
         synchronized (schedulingLock) {
             if (status == Status.ACTIVE)
-            status = Status.PAUSED;
+                status = Status.PAUSED;
         }
     }
 

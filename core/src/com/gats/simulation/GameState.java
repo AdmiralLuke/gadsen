@@ -32,9 +32,9 @@ public class GameState {
     private int width;
     private int height;
 
-    public Float[] getScores() {
+    public float[] getScores() {
         //ToDo implement
-        return new Float[4];
+        return new float[4];
     }
 
     public enum GameMode{
@@ -138,8 +138,8 @@ public class GameState {
     }
 
     //ToDo migrate to Simulation
-    protected void setActive(boolean active) {
-        this.active = active;
+    protected void deactivate() {
+        this.active = false;
     }
 
     /**
