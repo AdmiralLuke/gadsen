@@ -244,4 +244,18 @@ public class Manager {
         Manager.systemReservedProcessorCount = systemReservedProcessorCount;
         getManager().executionManager.notify();
     }
+
+    @Override
+    public String toString() {
+        return "Manager{" +
+                "pendingShutdown=" + pendingShutdown +
+                ", executionManager=" + executionManager +
+                ", threadPoolExecutor=" + threadPoolExecutor +
+                ", games=" + games +
+                ", scheduledGames=" + scheduledGames +
+                ", activeGames=" + activeGames +
+                ", pausedGames=" + pausedGames +
+                ", completedGames=" + completedGames +
+                '}';
+    }
 }

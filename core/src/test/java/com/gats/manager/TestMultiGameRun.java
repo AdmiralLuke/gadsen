@@ -13,10 +13,14 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class TestMultiGameRun {
 
+    private final long COMPLETION_TIMEOUT = 100000;
 
     private final RunConfiguration runConfig;
-    private Run run;
-    private Manager manager;
+    private final Run run;
+    private final Manager manager;
+
+    private boolean completed = false;
+    private final Object lock = new Object();
 
     static class TestExample{
         private RunConfiguration config;
@@ -31,6 +35,12 @@ public class TestMultiGameRun {
         this.runConfig = testSet.config;
         manager = Manager.getManager();
         run = manager.startRun(testSet.config);
+        synchronized (lock){
+            run.addCompletionListener(run ->{
+                completed = true;
+                lock.notify();
+            });
+        }
     }
 
 
@@ -242,6 +252,30 @@ public class TestMultiGameRun {
         Assert.assertEquals("Player aren't equal to the list specified in config", run.getPlayers(), runConfig.players);
         Assert.assertEquals("Run implementation", run.getClass(), ParallelMultiGameRun.class);
         Assert.assertEquals("Wrong Game mode", run.gameMode, runConfig.gameMode);
+    }
+
+
+    @Test
+    public void testCompletion(){
+        synchronized (lock){
+            try {
+                lock.wait(COMPLETION_TIMEOUT);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
+                "Var-Dump:%s", COMPLETION_TIMEOUT, this), completed);
+    }
+
+    @Override
+    public String toString() {
+        return "TestMultiGameRun{" +
+                "runConfig=" + runConfig +
+                ", run=" + run +
+                ", manager=" + manager +
+                ", completed=" + completed +
+                '}';
     }
 
     private int binCoeff(int n, int k){

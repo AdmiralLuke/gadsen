@@ -1,5 +1,7 @@
 package com.gats.manager;
 
+import java.util.Arrays;
+
 public class SingleGameRun extends Run{
 
     private float[] scores;
@@ -24,5 +26,11 @@ public class SingleGameRun extends Run{
         return scores;
     }
 
-
+    @Override
+    public String toString() {
+        return "SingleGameRun{" +
+                "super=" + super.toString() +
+                ", scores=" + Arrays.toString(scores) +
+                '}';
+    }
 }

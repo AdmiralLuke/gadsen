@@ -80,4 +80,15 @@ public abstract class Run {
             if (completed) new Thread(() -> handler.onComplete(this)).start();
         }
     }
+
+    @Override
+    public String toString() {
+        return "Run{" +
+                "completed=" + completed +
+                ", completionListeners=" + completionListeners +
+                ", gameMode=" + gameMode +
+                ", games=" + games +
+                ", players=" + players +
+                '}';
+    }
 }

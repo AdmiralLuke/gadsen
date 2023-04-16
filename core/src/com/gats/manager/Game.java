@@ -10,6 +10,7 @@ import com.gats.ui.hud.UiMessenger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -340,5 +341,27 @@ public class Game {
 
     public ArrayList<ActionLog> getActionLogs() {
         return actionLogs;
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "status=" + status +
+                ", completionListeners=" + completionListeners +
+                ", inputGenerator=" + inputGenerator +
+                ", animationLogProcessor=" + animationLogProcessor +
+                ", gui=" + gui +
+                ", actionLogs=" + actionLogs +
+                ", simulation=" + simulation +
+                ", state=" + state +
+                ", players=" + Arrays.toString(players) +
+                ", executor=" + executor +
+                ", humanList=" + humanList +
+                ", commandQueue=" + commandQueue +
+                ", simulationThread=" + simulationThread +
+                ", uiMessenger=" + uiMessenger +
+                ", pendingShutdown=" + pendingShutdown +
+                ", config=" + config +
+                '}';
     }
 }

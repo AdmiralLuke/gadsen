@@ -141,4 +141,15 @@ public class ParallelMultiGameRun extends Run {
         }
         return copy;
     }
+
+    @Override
+    public String toString() {
+        return "ParallelMultiGameRun{" +
+                "super=" + super.toString() +
+                ", completed=" + completed +
+                ", gameCount=" + gameCount +
+                ", scores=" + Arrays.toString(scores) +
+                ", playerIndices=" + playerIndices +
+                '}';
+    }
 }

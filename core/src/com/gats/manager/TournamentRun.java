@@ -236,4 +236,16 @@ public class TournamentRun extends Run {
     public float[] getScores() {
         return scores;
     }
+
+    @Override
+    public String toString() {
+        return "TournamentRun{" +
+                "super=" + super.toString() +
+                ", players=" + players +
+                ", completedGames=" + completedGames +
+                ", finalGame=" + finalGame +
+                ", looserBracket=" + looserBracket +
+                ", scores=" + Arrays.toString(scores) +
+                '}';
+    }
 }
