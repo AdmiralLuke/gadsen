@@ -16,7 +16,7 @@ public abstract class Weapon {
     private int shoots;
     private final boolean hitThroughBoxes;
     private final GameCharacter character;
-    private final Simulation sim;
+    private transient final Simulation sim;
 
     private final WeaponType type;
 

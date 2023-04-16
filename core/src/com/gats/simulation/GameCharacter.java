@@ -3,10 +3,12 @@ package com.gats.simulation;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.action.*;
 
+import java.io.Serializable;
+
 /**
  * Repräsentiert eine {@link GameCharacter Spielfigur} auf der Karte
  */
-public class GameCharacter {
+public class GameCharacter implements Serializable {
 
     private static final IntVector2 SIZE = new IntVector2(9, 15);
 

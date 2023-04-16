@@ -5,6 +5,7 @@ import com.gats.simulation.action.Action;
 import com.gats.simulation.action.TileDestroyAction;
 import com.gats.simulation.action.TileMoveAction;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -12,7 +13,7 @@ import java.util.Objects;
  * Represents one of the Tiles the map is made of.
  * Special behaviors of certain Tile-Types will be implemented by sub-classes
  */
-public class Tile {
+public class Tile implements Serializable {
 
     public static final int TileSizeX = 16;
     public static final int TileSizeY = 16;

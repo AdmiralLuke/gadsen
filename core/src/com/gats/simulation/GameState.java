@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gats.manager.Timer;
 
+import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -23,7 +24,7 @@ import java.util.*;
  * Natürlich könnt ihr diese trotzdem durchlesen, wenn euch interessiert wie unser Spiel von innen
  * funktioniert oder ihr euch anschauen möchtet, wie wir bestimmte Probleme gelöst haben.
  */
-public class GameState {
+public class GameState implements Serializable {
 
     // Spielbrett
     // x - Spalten
@@ -50,7 +51,8 @@ public class GameState {
 
     private GameMode gameMode = GameMode.Normal;
 
-    private Timer turnTimer;
+
+    private transient Timer turnTimer;
 
     // Teams   Anzahl Teams x Anzahl Player
     private GameCharacter[][] teams;
@@ -59,7 +61,7 @@ public class GameState {
     private int charactersPerTeam;
     private final ArrayDeque<IntVector2> turn = new ArrayDeque<>();
     private boolean active;
-    private Simulation sim;
+    private transient Simulation sim;
 
 
     //Deprecated ToDo: remove
