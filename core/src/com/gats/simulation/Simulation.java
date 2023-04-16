@@ -1,10 +1,13 @@
 package com.gats.simulation;
 
+import com.gats.manager.Timer;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.GameOverAction;
 import com.gats.simulation.action.InitAction;
 import com.gats.simulation.action.TurnStartAction;
 import com.gats.simulation.GameState.GameMode;
+
+import java.util.Objects;
 
 /**
  * Enthält die Logik, welche die Spielmechaniken bestimmt.
@@ -56,6 +59,10 @@ public class Simulation {
         return actionLog;
     }
 
+    public
+    void setTurnTimer(Timer timer){
+        gameState.setTurnTimer(timer);
+    }
 
     public GameCharacterController getController() {
         IntVector2 turnChar = gameState.getTurn().peek();
@@ -75,7 +82,7 @@ public class Simulation {
             //ToDo: Fix edge cases:
             //If no players are alive the game crashes
             //If a team survives with multiple characters, the game doesnt end
-            this.actionLog.getRootAction().addChild(new GameOverAction(this.gameState.getTurn().peek().y));
+            this.actionLog.getRootAction().addChild(new GameOverAction(Objects.requireNonNull(this.gameState.getTurn().peek()).y));
             gameState.deactivate();
             return this.actionLog;
         }

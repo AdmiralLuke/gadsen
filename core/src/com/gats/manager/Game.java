@@ -35,9 +35,11 @@ public class Game {
 
     private final ArrayList<CompletionHandler<Game>> completionListeners = new ArrayList<>();
     private static final int AI_EXECUTION_TIMEOUT = 500;
+    private static final int AI_EXECUTION_GRACE_PERIODE = 100;
     private static final int AI_INIT_TIMEOUT = 1000;
 
     private static final int HUMAN_EXECUTION_TIMEOUT = 30000;
+    private static final int HUMAN_EXECUTION_GRACE_PERIODE = 5000;
     private static final int HUMAN_INIT_TIMEOUT = 30000;
 
     private final InputProcessor inputGenerator;
@@ -158,12 +160,16 @@ public class Game {
             Future<?> future;
             switch (currentPlayer.getType()) {
                 case Human:
-                    future = executor.submit(() -> currentPlayer.executeTurn(state, controller));
+                    future = executor.submit(() -> {
+                        Thread.currentThread().setName("Run_Thread_Player_Human");
+                        simulation.setTurnTimer(new Timer(1000 * HUMAN_EXECUTION_TIMEOUT));
+                        currentPlayer.executeTurn(state, controller);
+                    });
                     futureExecutor = new Thread(() -> {
                         inputGenerator.activateTurn((HumanPlayer) currentPlayer);
                         try {
-                            Thread.currentThread().setName("Run_Thread_Player_Human");
-                            future.get(HUMAN_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
+                            Thread.currentThread().setName("Future_Executor_Player_Human");
+                            future.get(HUMAN_EXECUTION_TIMEOUT + HUMAN_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Player
                             System.out.println("bot was interrupted");
@@ -187,12 +193,13 @@ public class Game {
                 case AI:
                     future = executor.submit(() -> {
                         Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
+                        simulation.setTurnTimer(new Timer(1000 * AI_EXECUTION_TIMEOUT));
                         currentPlayer.executeTurn(state, controller);
                     });
                     futureExecutor = new Thread(() -> {
                         Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
                         try {
-                            future.get(AI_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
+                            future.get(AI_EXECUTION_TIMEOUT + AI_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Bot
                             System.out.println("bot was interrupted");

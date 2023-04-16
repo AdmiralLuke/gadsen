@@ -3,6 +3,7 @@ package com.gats.simulation;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.gats.manager.Timer;
 
 import java.nio.file.Paths;
 import java.util.*;
@@ -48,6 +49,8 @@ public class GameState {
     }
 
     private GameMode gameMode = GameMode.Normal;
+
+    private Timer turnTimer;
 
     // Teams   Anzahl Teams x Anzahl Player
     private GameCharacter[][] teams;
@@ -294,5 +297,13 @@ public class GameState {
             }
         }
         return characters;
+    }
+
+    public Timer getTurnTimer() {
+        return turnTimer;
+    }
+
+    protected void setTurnTimer(Timer turnTimer) {
+        this.turnTimer = turnTimer;
     }
 }
