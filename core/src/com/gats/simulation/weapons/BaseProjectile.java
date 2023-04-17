@@ -103,6 +103,7 @@ public class BaseProjectile implements Projectile{
                     tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
                 }
                 lastTile = h;
+                lastCharacter = null;
                 return dec.hitWall(head, tN, dec, this);
             }
         } else {

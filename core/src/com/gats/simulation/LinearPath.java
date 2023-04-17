@@ -41,7 +41,7 @@ public class LinearPath implements Path {
         this.start = start;
         this.end = start.cpy().add(dir.cpy().scl(duration * v));
         this.dir = end.cpy().sub(start);
-        this.duration = dir.len() / v;
+        this.duration = dir.len();
         this.v = v;
     }
 
