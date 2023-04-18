@@ -8,6 +8,7 @@ import com.gats.simulation.action.TileMoveAction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Vector;
 
 /**
  * Represents one of the Tiles the map is made of.
@@ -23,13 +24,13 @@ public class Tile implements Serializable {
 
 
     // Box als Ankerpunkt
-    private final boolean isAnchor;
+    private boolean isAnchor;
 
     private final boolean isSolid;
 
     // Box hängt an einer Box oder an Verkettung von Boxen die an Anker hängt
     //ToDo: box should always be anchored, or removed from the map otherwise
-    private final boolean isAnchored;
+    private boolean isAnchored;
 
 
     // Haltbarkeit der Box
@@ -205,15 +206,13 @@ public class Tile implements Serializable {
         if (this.left != null) this.left.right = null;
         if (this.up != null) this.up.down = null;
         if (this.down != null) this.down.up = null;
-
-
     }
 
     /**
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
      * oder auf anderer Box landet
      */
-    Action onDestroy(Action head) {
+    public Action onDestroy(Action head) {
         ArrayList<Tile> rightList = null;
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;
@@ -295,6 +294,14 @@ public class Tile implements Serializable {
         Action tileDestAction = new TileDestroyAction(this.getPosition());
         tileMoveAction.addChild(tileDestAction);
 
+        return tileDestAction;
+    }
+
+    public Action destroyTileDirect(Action head) {
+        this.deleteFromGraph();
+        state.getBoard()[this.getPosition().x][this.getPosition().y] = null;
+        Action tileDestAction = new TileDestroyAction(this.getPosition());
+        head.addChild(tileDestAction);
         return tileDestAction;
     }
 
@@ -386,8 +393,8 @@ public class Tile implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
         Tile tile = (Tile) o;
         return isAnchor == tile.isAnchor && isAnchored == tile.isAnchored && getPosition().equals(tile.getPosition());
     }
@@ -395,5 +402,9 @@ public class Tile implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(isAnchor, isAnchored, getPosition());
+    }
+
+    void setAnchor(boolean anchor) {
+        this.isAnchor = anchor;
     }
 }

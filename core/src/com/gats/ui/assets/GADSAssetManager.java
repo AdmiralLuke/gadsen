@@ -121,7 +121,7 @@ public class GADSAssetManager {
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_DEATH.ordinal()] =
                 new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catDeath"), Animation.PlayMode.LOOP);
 
-        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.LOOP);
+        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.NORMAL);
 
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
@@ -148,9 +148,10 @@ public class GADSAssetManager {
         IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
         IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
 
-        IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
-        IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
+        //IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
+      //  IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
 
+        IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED,null);
         IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
         IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
         IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");

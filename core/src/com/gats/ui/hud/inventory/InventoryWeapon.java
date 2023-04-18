@@ -3,7 +3,7 @@ package com.gats.ui.hud.inventory;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.Weapon;
+import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer;
 
