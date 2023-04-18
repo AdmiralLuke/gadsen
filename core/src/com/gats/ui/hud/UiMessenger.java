@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.Hud;
+import com.gats.ui.assets.AssetContainer;
 
 
 /**
@@ -27,8 +28,7 @@ public class UiMessenger {
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(null);
 		refillStaminaBar(currentPlayer.getStamina());
-
-
+		gameEnded();
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
 
@@ -106,12 +106,17 @@ public class UiMessenger {
 		hud.stopTurnTimer();
 	}
 
+	public void gameEnded(){
+		ImagePopup lose = new ImagePopup(AssetContainer.IngameAssets.lossDisplay,-1);
+	//	hud.drawImagePopup(lose);
+	}
 
 	/**
 	 * Calls necessary functions to update Ui Elements after a player shot.
 	 * @param currentPlayer
 	 * @param weapon
 	 */
+
 
 
 	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){

@@ -70,7 +70,6 @@ public class AimIndicator extends NinePatchEntity implements Toggleable {
         circle.setColor(color);
         //draw circle at
         circle.drawCircle(circleSize, circleSize, circleSize);
-        System.out.println(circleSize);
         circleTexture = new TextureRegion(new Texture(circle));
         int circleTextureRegionHeight = circleTexture.getRegionHeight();
         aimCircle = new SpriteEntity(circleTexture,new Vector2(circleTextureRegionHeight/2f,circleTextureRegionHeight/2f),new Vector2(circleTextureRegionHeight,circleTextureRegionHeight));
@@ -92,10 +91,6 @@ public class AimIndicator extends NinePatchEntity implements Toggleable {
         Vector2 size = getSize();
         drawCircle= circleDrawMinLength < size.x;
         if(drawCircle) {
-            System.out.println(lengthPercent);
-            System.out.println(size.x);
-            System.out.println(maxSize.x);
-
             lengthPercent =(getSize().x - circleDrawMinLength) / (maxSize.x - circleDrawMinLength);
         }
     }

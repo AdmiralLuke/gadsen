@@ -39,7 +39,6 @@ public class AimInformation extends VerticalGroup {
 		//Todo change color of aimInformation
 		textColor = new Color(Color.SCARLET);
 	 	aimAngleGroup = new Table();
-
 		this.angleTextLabel = new ColoredLabelWithBackground(angleText,AssetContainer.MainMenuAssets.skin,textColor,background);
 		this.angleValueLabel = new ColoredLabelWithBackground("",AssetContainer.MainMenuAssets.skin,textColor,background);
 
@@ -49,11 +48,13 @@ public class AimInformation extends VerticalGroup {
 		this.strengthValueLabel = new ColoredLabelWithBackground("",AssetContainer.MainMenuAssets.skin,textColor,background);
 
 		//setup text alignment
+		//size currently hardcoded, easier to adjust without creating new methods, ui does not change much
+		//still adjusts size based on screen size change
 		angleValueLabel.setAlignment(Align.right);
-		aimAngleGroup.add(this.angleValueLabel).width(18).right().expandX().align(Align.right);
+		aimAngleGroup.add(this.angleValueLabel).width(68).right().expandX().align(Align.right);
 		aimAngleGroup.add(this.angleTextLabel).right().expandX();
 
-		aimStrengthGroup.add(strengthValueLabel).width(12).right().expandX().align(Align.right);
+		aimStrengthGroup.add(strengthValueLabel).width(44).right().expandX().align(Align.right);
 		aimStrengthGroup.add(strengthTextLabel).right().expandX();
 
 
@@ -62,7 +63,7 @@ public class AimInformation extends VerticalGroup {
 
 		space(0);
 
-		setFontScale(0.5f);
+		setFontScale(2);
 	}
 
 

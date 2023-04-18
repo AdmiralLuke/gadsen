@@ -2,11 +2,9 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
@@ -14,7 +12,7 @@ import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
 /**
  * Class representing and drawing the TimerSprite and the remaining time.
  */
-public class TurnTimer extends HorizontalGroup {
+public class TurnTimer extends Table {
 
 	Image timerImage;
 	Label timeDisplay;
@@ -37,10 +35,9 @@ public class TurnTimer extends HorizontalGroup {
 
 
 		//add both to the horizontal group for drawing them next to each other
-		addActor(timeDisplay);
-
-		space(5);
-		addActor(timerImage);
+		add(timeDisplay).width(44);
+		timeDisplay.setFontScale(3);
+		add(timerImage).width(64).height(64).fill();
 	}
 
 

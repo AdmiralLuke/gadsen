@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
@@ -36,7 +35,7 @@ public class Hud implements Disposable {
 	private InventoryDrawer inventory;
 	private TurnTimer turnTimer;
 	private Table layoutTable;
-	private VerticalGroup turnPopupContainer;
+	private Container<ImagePopup> turnPopupContainer;
 	private InGameScreen inGameScreen;
 
 	private TextureRegion turnChangeSprite;
@@ -57,8 +56,8 @@ public class Hud implements Disposable {
 		this.inGameScreen = ingameScreen;
 
 
-		int viewportSizeX = 256;
-		int viewportSizeY = 256;
+		int viewportSizeX = 1028;
+		int viewportSizeY = 1028;
 		float animationSpeedupValue = 8;
 		turnChangeDuration = 1;
 		turnChangeSprite = AssetContainer.IngameAssets.turnChange;
@@ -82,8 +81,7 @@ public class Hud implements Disposable {
 
 		fastForwardButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
 
-		turnPopupContainer = new VerticalGroup();
-
+		turnPopupContainer = new Container<ImagePopup>();
 		layoutHudElements();
 
 		//Combine input from both processors
@@ -124,8 +122,6 @@ public class Hud implements Disposable {
        Table table = new Table(AssetContainer.MainMenuAssets.skin);
 
         table.setFillParent(true);
-        //debug
-        table.setDebug(false);
 		//align the table to the left of the stage
 		table.center();
 		return table;
@@ -137,16 +133,28 @@ public class Hud implements Disposable {
 	 */
 	private void layoutHudElements() {
 		float padding = 10;
-		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left();
-		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
-		layoutTable.add(turnPopupContainer).expandX().size(turnChangeSprite.getRegionWidth(),turnChangeSprite.getRegionHeight());
-		layoutTable.add(aimInfo).expandX().expandY().pad(10).right().align(Align.right).width(40);
-		layoutTable.row();
-		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
-		layoutTable.add(staminaBar).pad(padding).expandX().center().width(64);
-		layoutTable.add(turnTimer).expandX().right().bottom().pad(padding);
 
+		//currently setting the element size of elements in their class file: hardcoded
+		//changing the size via the table/actor methods does not really work. could be a fault of not implementing the ui elementparents correctly
+		//-> yet it is a bit too much work for now
+		//Todo Refactor resizing of every Ui element
+
+
+
+		staminaBar.setSize(1,48);
+
+		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left().width(aimInfo.getPrefWidth());
+		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
+		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(200,200);
+		layoutTable.add(aimInfo).expandX().expandY().pad(padding).right().align(Align.right);
+		layoutTable.row();
+		layoutTable.add(fastForwardButton).pad(padding).left().bottom().size(64,64);
+
+		layoutTable.add(staminaBar).pad(padding).center().bottom().width(384);
+		layoutTable.add(turnTimer).pad(padding).right().bottom();
 	}
+
+
 	/**
 	 * Creates a {@link FastForwardButton} with the correct sprites.
 	 * @param uiMessenger
@@ -202,10 +210,16 @@ public class Hud implements Disposable {
 	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second
 	 */
 	public void createTurnChangePopup() {
+		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration));
+	}
+
+	public void drawImagePopup(ImagePopup image){
 		if(turnPopupContainer.hasChildren()) {
-			turnPopupContainer.removeActorAt(0, false);
+			turnPopupContainer.removeActorAt(0,false);
 		}
-		turnPopupContainer.addActor(new ImagePopup(turnChangeSprite,turnChangeDuration));
+		turnPopupContainer.setActor(image);
+		turnPopupContainer.bottom().left();
+		turnPopupContainer.fill();
 	}
 
 	public void resizeViewport(int width, int height){
