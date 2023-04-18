@@ -45,9 +45,9 @@ public class RotateAction extends Action{
 
         if(target!=null) {
             if (path != null) {
-                float time = Math.min(endTime,current);
+                float time = Math.min(endTime, current);
                 if (!path.getDir(time - delay).isZero())
-                    this.target.setRotationAngle(path.getDir(time -delay).angleDeg());
+                    this.target.setRotationAngle(path.getDir(time - delay).angleDeg());
             } else {
                 target.setRotationAngle(this.angle.angleDeg());
                 endAction(oldTime);

@@ -359,6 +359,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 SummonAction summonTombstone = new SummonAction(0, null, () -> {
                     AnimatedEntity tombstone = new AnimatedEntity(IngameAssets.tombstoneAnimation);
                     tombstone.setRelPos(target.getRelPos());
+                    tombstone.setOrigin(new Vector2(IngameAssets.tombstoneAnimation.getKeyFrame(0).getRegionWidth()/2f, target.getOrigin().y));
                     animator.root.add(tombstone);
                     return tombstone;
 
@@ -430,9 +431,10 @@ public class Animator implements Screen, AnimationLogProcessor {
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
             Path path = moveAction.getPath();
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
-            MoveAction animMoveAction = new MoveAction(0, target, path.getDuration(), new CharacterPath(moveAction.getPath()));
+            CharacterPath characterPath = new CharacterPath(moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, target, characterPath.getDuration(), characterPath);
             //rotateAction to set the angle/direction of movement, to flip the character sprite
-            RotateAction animRotateAction = new RotateAction(0,target,path.getDuration(),moveAction.getPath());
+            RotateAction animRotateAction = new RotateAction(0,target, characterPath.getDuration(), characterPath);
             startWalking.setChildren(new Action[]{animMoveAction,animRotateAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             animMoveAction.setChildren(new Action[]{stopWalking});
