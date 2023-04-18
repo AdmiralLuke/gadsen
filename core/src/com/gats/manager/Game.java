@@ -49,7 +49,7 @@ public class Game {
 
     private final boolean gui;
 
-    private final ArrayList<ActionLog> actionLogs = new ArrayList<>();
+    private final GameResults gameResults;
     private Simulation simulation;
     private GameState state;
     private Player[] players;
@@ -70,12 +70,14 @@ public class Game {
         animationLogProcessor = config.animationLogProcessor;
         inputGenerator = config.inputProcessor;
         uiMessenger = config.uiMessenger;
+        gameResults = new GameResults(config);
     }
 
     private void create() {
 
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
+        gameResults.setInitialState(state);
 
         players = new Player[config.teamCount];
 
@@ -174,6 +176,7 @@ public class Game {
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Player
                             System.out.println("bot was interrupted");
+                            System.err.println(e.toString());
                         } catch (ExecutionException e) {
                             System.out.println("human player failed with exception: " + e.getCause());
                             e.printStackTrace();
@@ -204,6 +207,7 @@ public class Game {
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Bot
                             System.out.println("bot was interrupted");
+                            System.err.println(e.toString());
                         } catch (ExecutionException e) {
                             System.out.println("bot failed with exception: " + e.getCause());
                             e.printStackTrace();
@@ -226,7 +230,7 @@ public class Game {
 
             futureExecutor.start();
             ActionLog log = simulation.clearAndReturnActionLog();
-            actionLogs.add(log);
+            gameResults.addActionLog(log);
             if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                 //Contains Action produced by entering new turn
                 animationLogProcessor.animate(log);
@@ -237,7 +241,7 @@ public class Game {
                     if (nextCmd.isEndTurn()) break;
                     //Contains action produced by the commands execution
                     log = nextCmd.run();
-                    actionLogs.add(log);
+                    gameResults.addActionLog(log);
                     if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                         animationLogProcessor.animate(log);
                         //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
@@ -245,6 +249,7 @@ public class Game {
                 }
             } catch (InterruptedException e) {
                 System.err.println("Interrupted while processing cmds");
+                System.err.println(e.toString());
                 if (pendingShutdown) {
                     futureExecutor.interrupt();
                     break;
@@ -255,7 +260,7 @@ public class Game {
 
             //Contains actions produced by ending the turn (after last command is executed)
             ActionLog finalLog = simulation.endTurn();
-            actionLogs.add(finalLog);
+            gameResults.addActionLog(finalLog);
             if (gui) {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
@@ -269,6 +274,7 @@ public class Game {
                 futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
             } catch (InterruptedException e) {
                 System.out.print("Interrupted while shutting down future executor\n");
+                System.err.println(e.toString());
                 if (pendingShutdown) {
                     futureExecutor.interrupt();
                     break;
@@ -339,8 +345,8 @@ public class Game {
         }
     }
 
-    public ArrayList<ActionLog> getActionLogs() {
-        return actionLogs;
+    public GameResults getGameResults() {
+        return gameResults;
     }
 
     @Override
@@ -351,7 +357,7 @@ public class Game {
                 ", inputGenerator=" + inputGenerator +
                 ", animationLogProcessor=" + animationLogProcessor +
                 ", gui=" + gui +
-                ", actionLogs=" + actionLogs +
+                ", gameResults=" + gameResults +
                 ", simulation=" + simulation +
                 ", state=" + state +
                 ", players=" + Arrays.toString(players) +

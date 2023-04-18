@@ -2,14 +2,12 @@ package com.gats.manager;
 
 import com.gats.ui.hud.UiMessenger;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
+import java.io.Serializable;
+import java.util.*;
 
 import com.gats.simulation.GameState.GameMode;
 
-class GameConfig {
+class GameConfig implements Serializable {
 
     public GameConfig() {
     }
@@ -41,5 +39,19 @@ class GameConfig {
     public int teamSize;
 
     public List<Class<? extends Player>> players;
+
+    public GameConfig copy(){
+        GameConfig copy = new GameConfig();
+        copy.gui = gui;
+        copy.animationLogProcessor = animationLogProcessor;
+        copy.inputProcessor = inputProcessor;
+        copy.uiMessenger = uiMessenger;
+        copy.gameMode = gameMode;
+        copy.players = new ArrayList<>(players);
+        copy.mapName = mapName;
+        copy.teamSize = teamSize;
+        copy.teamCount = teamCount;
+        return copy;
+    }
 
 }

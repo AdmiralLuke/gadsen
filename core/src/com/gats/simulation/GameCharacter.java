@@ -31,7 +31,7 @@ public class GameCharacter implements Serializable {
     private final int team;
     private final int teamPos;
     private final GameState state;
-    private final Simulation sim;
+    private transient final Simulation sim;
     private Vector2 dir = new Vector2(1, 0);
     private float strength = 0.5f;
 
@@ -57,6 +57,24 @@ public class GameCharacter implements Serializable {
         this.sim = sim;
         resetStamina();
         initInventory();
+    }
+
+    private GameCharacter(GameCharacter original, GameState newState){
+        boundingBox = new IntRectangle(original.boundingBox);
+        health = original.health;
+        stamina = original.stamina;
+        alreadyShot = original.alreadyShot;
+        team = original.team;
+        teamPos = original.teamPos;
+        state = newState;
+        sim = null;
+        dir = original.dir.cpy();
+        strength = original.strength;
+        weapons = new Weapon[original.weapons.length];
+        for (int i = 0; i < original.weapons.length; i++) {
+            weapons[i] = original.weapons[i].copy();
+        }
+        selectedWeapon = original.selectedWeapon;
     }
 
     /**
@@ -544,5 +562,9 @@ public class GameCharacter implements Serializable {
      */
     Vector2 getDir() {
         return dir;
+    }
+
+    protected GameCharacter copy(GameState state){
+        return new GameCharacter(this, state);
     }
 }

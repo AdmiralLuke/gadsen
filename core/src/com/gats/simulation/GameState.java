@@ -39,7 +39,39 @@ public class GameState implements Serializable {
         return new float[4];
     }
 
-    public enum GameMode{
+    public GameState copy() {
+        return new GameState(this);
+    }
+
+    private GameState(GameState original) {
+        board = new Tile[original.width][original.height];
+        Tile[][] tiles = original.board;
+        for (int i = 0; i < tiles.length; i++) {
+            Tile[] row = tiles[i];
+            for (int j = 0; j < row.length; j++) {
+                board[i][j] = row[j].copy(this);
+            }
+        }
+        width = original.width;
+        height = original.height;
+        gameMode = original.gameMode;
+        turnTimer = null;
+        teams = new GameCharacter[original.teamCount][original.charactersPerTeam];
+        GameCharacter[][] gameCharacters = original.teams;
+        for (int i = 0; i < gameCharacters.length; i++) {
+            GameCharacter[] team = gameCharacters[i];
+            for (int j = 0; j < team.length; j++) {
+                teams[i][j] = team[j].copy(this);
+            }
+        }
+        teamCount = original.teamCount;
+        charactersPerTeam = original.charactersPerTeam;
+        turn = null;
+        active = original.active;
+        sim = null;
+    }
+
+    public enum GameMode {
         Normal,
         Campaign,
 
@@ -59,24 +91,19 @@ public class GameState implements Serializable {
 
     private int teamCount;
     private int charactersPerTeam;
-    private final ArrayDeque<IntVector2> turn = new ArrayDeque<>();
+    private ArrayDeque<IntVector2> turn;
     private boolean active;
     private transient Simulation sim;
 
 
-    //Deprecated ToDo: remove
-    GameState(GameMode gameMode, String mapName, Simulation sim) {
-        new GameState(gameMode, mapName, 2, 1, sim);
-    }
-
     /**
      * Creates a new GameState for the specified attributes.
      *
-     * @param gameMode selected game mode
-     * @param mapName name of the selected map as String
-     * @param teamCount number of teams/players
+     * @param gameMode          selected game mode
+     * @param mapName           name of the selected map as String
+     * @param teamCount         number of teams/players
      * @param charactersPerTeam number of Characters per team
-     * @param sim the respective simulation instance
+     * @param sim               the respective simulation instance
      */
     GameState(GameMode gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
@@ -87,11 +114,12 @@ public class GameState implements Serializable {
         this.sim = sim;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
         this.initTeam(spawnpoints);
-
+        this.turn = new ArrayDeque<>();
     }
 
     /**
      * Gibt den Spiel-Modus des laufenden Spiels zurück.
+     *
      * @return Spiel-Modus als int
      */
     public GameMode getGameMode() {
@@ -134,8 +162,10 @@ public class GameState implements Serializable {
     }
 
     //ToDo migrate to Simulation
+
     /**
      * Return whether the Game is still active.
+     *
      * @return True, if the game is still in progress.
      */
     public boolean isActive() {
@@ -153,6 +183,7 @@ public class GameState implements Serializable {
     protected ArrayDeque<IntVector2> getTurn() {
         return turn;
     }
+
     /**
      * @return the respective simulation instance
      */
@@ -172,24 +203,25 @@ public class GameState implements Serializable {
      * Loads a Map from the asset-directory
      * Assumes that all Tiles on the map are directly or indirectly anchored.
      * The Map file has t be encoded in JSON.
+     *
      * @param mapName Name of the map without type as String
      */
     private List<IntVector2> loadMap(String mapName) {
         JsonReader reader = new JsonReader();
         JsonValue map;
-        try{
+        try {
             //attempt to load map from jar
             map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
-        }catch (Exception e){
-            map =null;
+        } catch (Exception e) {
+            map = null;
         }
-        if(map ==null){
-           try {
-               //attempt to load map from external maps dir
-               map = reader.parse(new FileHandle(Paths.get("./maps/"+mapName+".json").toFile()));
-           }catch (Exception e){
-             throw new RuntimeException("Could not find or load map:"+mapName);
-           }
+        if (map == null) {
+            try {
+                //attempt to load map from external maps dir
+                map = reader.parse(new FileHandle(Paths.get("./maps/" + mapName + ".json").toFile()));
+            } catch (Exception e) {
+                throw new RuntimeException("Could not find or load map:" + mapName);
+            }
         }
 
         width = map.get("width").asInt();
@@ -282,6 +314,7 @@ public class GameState implements Serializable {
     }
 
     //ToDo: discuss removal
+
     /**
      * Spawnt Spieler an zufälligen Positionen
      *
@@ -312,4 +345,6 @@ public class GameState implements Serializable {
     protected void setTurnTimer(Timer turnTimer) {
         this.turnTimer = turnTimer;
     }
+
+
 }

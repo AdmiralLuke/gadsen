@@ -7,9 +7,11 @@ import com.gats.simulation.action.Action;
 import com.gats.simulation.action.CharacterShootAction;
 import com.gats.simulation.action.ProjectileAction;
 
-public class Weapon {
+import java.io.Serializable;
 
-    private Projectile projectile;
+public class Weapon implements Serializable {
+
+    private transient Projectile projectile;
     private int ammo;
     private WeaponType type;
     int team;
@@ -23,6 +25,14 @@ public class Weapon {
         this.team = team;
         this.teamN = teamN;
         this.duration = duration;
+    }
+
+    private Weapon(Weapon original){
+        this.ammo = original.ammo;
+        this.type = original.type;
+        this.team = original.team;
+        this.teamN = original.teamN;
+        this.duration = original.duration;
     }
 
 
@@ -44,5 +54,9 @@ public class Weapon {
 
     public WeaponType getType() {
         return type;
+    }
+
+    public Weapon copy(){
+        return new Weapon(this);
     }
 }
