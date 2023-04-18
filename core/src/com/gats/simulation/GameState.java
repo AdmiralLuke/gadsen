@@ -55,7 +55,7 @@ public class GameState implements Serializable {
         width = original.width;
         height = original.height;
         gameMode = original.gameMode;
-        turnTimer = null;
+        turnTimer = original.turnTimer;
         teams = new GameCharacter[original.teamCount][original.charactersPerTeam];
         GameCharacter[][] gameCharacters = original.teams;
         for (int i = 0; i < gameCharacters.length; i++) {

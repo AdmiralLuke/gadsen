@@ -161,12 +161,13 @@ public class Game {
 
             Thread futureExecutor;
             Future<?> future;
+            GameState stateCopy = state.copy();
             switch (currentPlayer.getType()) {
                 case Human:
                     future = executor.submit(() -> {
                         Thread.currentThread().setName("Run_Thread_Player_Human");
                         simulation.setTurnTimer(new Timer(1000 * HUMAN_EXECUTION_TIMEOUT));
-                        currentPlayer.executeTurn(state, controller);
+                        currentPlayer.executeTurn(stateCopy, controller);
                     });
                     futureExecutor = new Thread(() -> {
                         inputGenerator.activateTurn((HumanPlayer) currentPlayer);
@@ -198,7 +199,7 @@ public class Game {
                     future = executor.submit(() -> {
                         Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
                         simulation.setTurnTimer(new Timer(1000 * AI_EXECUTION_TIMEOUT));
-                        currentPlayer.executeTurn(state, controller);
+                        currentPlayer.executeTurn(stateCopy, controller);
                     });
                     futureExecutor = new Thread(() -> {
                         Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
