@@ -1,6 +1,11 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
+
+import com.gats.simulation.weapons.BaseProjectile;
+import com.gats.simulation.weapons.Bounceable;
+import com.gats.simulation.weapons.Explosive;
+import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.action.*;
 
 /**
@@ -28,7 +33,7 @@ public class GameCharacter {
     private Vector2 dir = new Vector2(1, 0);
     private float strength = 0.5f;
 
-    private Weapon[] weapons;
+    private com.gats.simulation.weapons.Weapon[] weapons;
     private int selectedWeapon = -1;
 
 
@@ -67,6 +72,8 @@ public class GameCharacter {
         }
     }
 
+
+
     /**
      * Makes the Character equip the specified weapon.
      *
@@ -75,13 +82,29 @@ public class GameCharacter {
      */
     void selectWeapon(WeaponType type, Action head) {
         switch (type) {
-            case COOKIE:
+            case WATERBOMB:
                 selectedWeapon = 0;
-                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.COOKIE));
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.WATERBOMB));
                 break;
-            case SUGAR_CANE:
+            case WATER_PISTOL:
                 selectedWeapon = 1;
-                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.SUGAR_CANE));
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.WATER_PISTOL));
+                break;
+            case MIOJLNIR:
+                selectedWeapon = 2;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.MIOJLNIR));
+                break;
+            case GRENADE:
+                selectedWeapon = 3;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.GRENADE));
+                break;
+            case WOOL:
+                selectedWeapon = 4;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.WOOL));
+                break;
+            case CLOSE_COMBAT:
+                selectedWeapon = 5;
+                head.addChild(new CharacterSwitchWeaponAction(team, teamPos, WeaponType.CLOSE_COMBAT));
                 break;
             default:
                 selectedWeapon = -1;
@@ -100,7 +123,7 @@ public class GameCharacter {
             return false;
         }
         if (selectedWeapon != -1) {
-            weapons[selectedWeapon].shoot(dir, strength, head);
+            weapons[selectedWeapon].shoot(head, dir, strength, this.getPlayerPos(), this);
             alreadyShot = true;
             return true;
         } else {
@@ -192,9 +215,13 @@ public class GameCharacter {
      * @Weihnachtsaufgabe Inventar wird initialisiert mit Keks (50 Schuss) und Zuckerstange (4 Schuss)
      */
     protected void initInventory() {
-        this.weapons = new Weapon[2];
-        weapons[0] = new ChristmasWeapon(10, 40, 50, false, WeaponType.COOKIE, this.sim, this);
-        weapons[1] = new ChristmasWeapon(20, 40, 4, false, WeaponType.SUGAR_CANE, this.sim, this);
+        this.weapons = new Weapon[6];
+        weapons[0] = new Weapon(new BaseProjectile(3, 0.1f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB), 200, WeaponType.WATERBOMB, team, teamPos, 2);
+        weapons[4] = new Weapon(new Bounceable(new BaseProjectile( 1, 0.1f, 0, sim, ProjectileAction.ProjectileType.WOOL),  10,  0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
+        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, team, teamPos, 10);
+        weapons[2] = new Weapon(new BaseProjectile(5, 0.6f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, team, teamPos, 13);
+        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, team, teamPos, 0.5f);
+        weapons[1] = new Weapon(new BaseProjectile(5, 0.3f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, team, teamPos, 9);
     }
 
     /**
@@ -468,7 +495,9 @@ public class GameCharacter {
 
         }
         //Movement completed for some reason, log action
-        Action lastAction = new CharacterWalkAction(0.001f, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
+        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
+
+
         head.addChild(lastAction);
 
         if (falling) {

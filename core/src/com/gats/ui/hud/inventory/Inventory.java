@@ -2,11 +2,10 @@ package com.gats.ui.hud.inventory;
 
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.gats.simulation.GameCharacter;
-import com.gats.simulation.Weapon;
+import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Inventory extends VerticalGroup {
@@ -50,17 +49,40 @@ public class Inventory extends VerticalGroup {
 		updateItem(character,itemsIndex.get(weaponType));
 	}
 
+	/**
+	 * Sets the selected weapon in the inventory, to draw the outline
+	 * @param newSelected
+	 */
 	public void setSelectedItem(WeaponType newSelected){
-			int	newSelectedIndex = itemsIndex.get(newSelected);
-			if(selectedItemIndex >=0) {
-				items.get(selectedItemIndex).setSelected(false);
-			}
-			if((newSelectedIndex>=0)&&(newSelectedIndex < items.size())){
 
-				items.get(newSelectedIndex).setSelected(true);
-			}
+		//Todo remove not-selected/-1 if it is removed
+		InventoryCell selectedweapon;
 
-			selectedItemIndex = newSelectedIndex;
+		int	newSelectedIndex = -1;
+		//only try to get item from the map, if one is selected
+
+		if(selectedItemIndex>=0) {
+			 selectedweapon = items.get(selectedItemIndex);
+		}
+		//check if the selected weapon exitst/has a sprite
+		if(itemsIndex.get(newSelected)!= null){
+			newSelectedIndex = itemsIndex.get(newSelected);
+		}
+		//if current weapon was selected, set to false
+		if(selectedItemIndex >=0) {
+			items.get(selectedItemIndex).setSelected(false);
+		}
+
+		//if new selected is a selectable weapon type, set selected
+		if((newSelectedIndex>=0)&&(newSelectedIndex < items.size())){
+
+			items.get(newSelectedIndex).setSelected(true);
+		}
+		//otherwise dont select any weapon
+		else {
+			items.get(selectedItemIndex).setSelected(false);
+		}
+		selectedItemIndex = newSelectedIndex;
 
 	}
 	/**
