@@ -2,14 +2,14 @@ package com.gats.ui;
 
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.manager.HumanPlayer;
@@ -145,7 +145,7 @@ public class Hud implements Disposable {
 
 		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left().width(aimInfo.getPrefWidth());
 		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
-		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(200,200);
+		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(700,700).fill();
 		layoutTable.add(aimInfo).expandX().expandY().pad(padding).right().align(Align.right);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).left().bottom().size(64,64);
@@ -192,6 +192,7 @@ public class Hud implements Disposable {
 
 	public void draw() {
 		//apply the viewport, so the glViewport is using the correct settings for drawing
+
 		stage.getViewport().apply(true);
        	stage.draw();
 	}
@@ -207,10 +208,10 @@ public class Hud implements Disposable {
 
 
 	/**
-	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second
+	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second, with a hardcoded height of 300,300
 	 */
 	public void createTurnChangePopup() {
-		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration));
+		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8));
 	}
 
 	public void drawImagePopup(ImagePopup image){
@@ -218,8 +219,10 @@ public class Hud implements Disposable {
 			turnPopupContainer.removeActorAt(0,false);
 		}
 		turnPopupContainer.setActor(image);
-		turnPopupContainer.bottom().left();
+		turnPopupContainer.center();
+		image.setScaling(Scaling.fit);
 		turnPopupContainer.fill();
+		turnPopupContainer.maxSize(image.getWidthForContainer(),image.getHeightForContainer());
 	}
 
 	public void resizeViewport(int width, int height){
@@ -276,4 +279,36 @@ public class Hud implements Disposable {
 
 		this.layoutTable.setDebug(debugVisible);
 	}
+
+	/**
+	 * Creates a popup Display for displaying the GameOver Situation and Tints the Screen in a semi-Transparent Black
+	 * @param won
+	 * @param team
+	 */
+	public void gameEnded(boolean won,int team){
+
+		//create a pixel with a set color that will be used as Background
+		Pixmap pixmap = new Pixmap(1,1, Pixmap.Format.RGBA8888);
+		//set the color to black
+		pixmap.setColor(0,0,0,0.5f);
+		pixmap.fill();
+		layoutTable.setBackground( new TextureRegionDrawable(new Texture(pixmap)));
+		pixmap.dispose();
+
+		ImagePopup display;
+		//determine sprite
+		if(won){
+			display= new ImagePopup(AssetContainer.IngameAssets.victoryDisplay,-1,
+					AssetContainer.IngameAssets.victoryDisplay.getRegionWidth(),
+					AssetContainer.IngameAssets.victoryDisplay.getRegionHeight());
+		}
+		else {
+			display = new ImagePopup(AssetContainer.IngameAssets.lossDisplay, -1,
+					AssetContainer.IngameAssets.lossDisplay.getRegionWidth(),
+					AssetContainer.IngameAssets.lossDisplay.getRegionHeight());
+		}
+		drawImagePopup(display);
+
+	}
+
 }

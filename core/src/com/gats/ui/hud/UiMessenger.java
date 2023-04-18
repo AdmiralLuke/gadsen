@@ -28,7 +28,6 @@ public class UiMessenger {
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(null);
 		refillStaminaBar(currentPlayer.getStamina());
-		gameEnded();
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
 
@@ -106,9 +105,9 @@ public class UiMessenger {
 		hud.stopTurnTimer();
 	}
 
-	public void gameEnded(){
-		ImagePopup lose = new ImagePopup(AssetContainer.IngameAssets.lossDisplay,-1);
-	//	hud.drawImagePopup(lose);
+	public void gameEnded(boolean won, int team){
+		hud.gameEnded(won,team);
+
 	}
 
 	/**

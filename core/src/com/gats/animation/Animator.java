@@ -381,24 +381,15 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
             GameOverAction winAction = (GameOverAction) action;
 
-            SummonAction summonWinScreen = new SummonAction(action.getDelay(), null, () -> {
-
-                Vector2 pos = animator.getCamera().getScreenCenter();
-                TextureRegion display;
+                MessageUiGameEndedAction gameEndedAction;
                 if (winAction.getTeam() == 0) {
-                    display = IngameAssets.victoryDisplay;
+                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
                 } else {
-                    display = IngameAssets.lossDisplay;
+                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,false, winAction.getTeam());
                 }
-                Entity winSprite = new WinEntity(display, pos);
-                animator.root.add(winSprite);
-                return winSprite;
-            });
 
 
-            //Todo pass to ui
-
-            return new ExpandedAction(summonWinScreen);
+            return new ExpandedAction(gameEndedAction);
         }
 
         private static ExpandedAction convertDebugPointAction(com.gats.simulation.action.Action action, Animator animator) {
