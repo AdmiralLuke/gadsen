@@ -9,7 +9,7 @@ import java.security.InvalidParameterException;
  */
 public class ParablePath implements Path {
 
-    private final float duration;
+    private float duration;
     private final Vector2 startPosition;
     private final static float g = 9.81f * 16; //9.81 meter/s^2 * 16 pixel pro meter
     private final Vector2 startVelocity;
@@ -19,14 +19,35 @@ public class ParablePath implements Path {
      *
      * @param startPosition
      * @param startVelocity
+     * @param endPosition
      */
-    public ParablePath(float duration, Vector2 startPosition, Vector2 startVelocity) {
-        this.duration = duration;
+    public ParablePath(Vector2 startPosition, Vector2 endPosition, Vector2 startVelocity) {
         this.startPosition = startPosition;
         this.startVelocity = startVelocity;
+        if (startVelocity.cpy().nor().epsilonEquals(0,1, 0.001f)) {
+            float t = startVelocity.y / g * 2;
+            this.duration = startPosition.epsilonEquals(endPosition, 0.001f) ? t * 2 : t;
+        } else {
+            this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
+        }
     }
 
-    //ToDo: Implement
+
+    /**
+     * Creates a parabolic path, starting at the specified position with the specified velocity and is followed for the specified duration.
+     *
+     * @param startPosition
+     * @param startVelocity
+     * @param duration
+     */
+    public ParablePath(Vector2 startPosition, float duration, Vector2 startVelocity) {
+        this.startPosition = startPosition;
+        this.startVelocity = startVelocity;
+        this.duration = duration;
+    }
+
+
+    //ToDo: Implement | no!
     /**
      * Creates a parabolic path, that connects start while peaking at the specified height.
      * The specified peak must therefore be at least as high as both start- and end-point.
@@ -67,7 +88,7 @@ public class ParablePath implements Path {
 
     /**
      * Returns the position for the specified time.
-     * Will only give valid results between 0 and {@link #getEndTime()} (inclusive).
+     * Will only give valid results between 0 and {@link #getDuration()} (inclusive).
      * @param t time in seconds
      * @return the position at time t
      */
@@ -80,7 +101,7 @@ public class ParablePath implements Path {
 
     /**
      * Returns a tangent on the path at the specified time.
-     * Will only give valid results between 0 and {@link #getEndTime()} (inclusive).
+     * Will only give valid results between 0 and {@link #getDuration()} (inclusive).
      * @param t time in seconds
      * @return the movement direction at time t
      */
@@ -92,8 +113,13 @@ public class ParablePath implements Path {
      * @return the maximum valid input-time for this path in seconds
      */
     @Override
-    public float getEndTime() {
-        return 0;
+    public float getDuration() {
+        return this.duration;
+    }
+
+    @Override
+    public void setDuration(float duration) {
+        this.duration = duration;
     }
 
     /**
@@ -102,6 +128,12 @@ public class ParablePath implements Path {
     public Vector2 getStartVelocity() {
         return startVelocity;
     }
+
+    @Override
+    public void setDuration(Vector2 endPosition) {
+        this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
+    }
+
 
     @Override
     public String toString() {

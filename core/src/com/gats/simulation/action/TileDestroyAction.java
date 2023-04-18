@@ -12,7 +12,7 @@ public final class TileDestroyAction extends TileAction{
      * @param tilePos   position of the related {@link Tile} in tile-coordinates
      */
     public TileDestroyAction(IntVector2 tilePos) {
-        super(0.005f, tilePos);
+        super(0f, tilePos);
     }
 
 

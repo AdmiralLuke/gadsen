@@ -56,8 +56,8 @@ public class SpriteEntity extends Entity {
                     origin.y,
                     textureRegion.getRegionWidth(),
                     textureRegion.getRegionHeight(),
-                    scale.x,
-                    (flipped ? -1 : 1) * (scale.y),
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
                     getRotationAngle());
         else
             batch.draw(textureRegion,
@@ -67,8 +67,8 @@ public class SpriteEntity extends Entity {
                     origin.y,
                     size.x,
                     size.y,
-                    scale.x,
-                    (flipped ? -1 : 1) * (scale.y),
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
                     getRotationAngle());
 
         //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
@@ -168,6 +168,7 @@ public class SpriteEntity extends Entity {
         angle = ((angle % 360) + 360) % 360;
         super.setRotationAngle(rotate ? angle : 0);
         if (angle >= 90f && angle <= 270f) {
+            super.setRotationAngle(mirror ? angle-180 : angle);
             setFlipped(mirror);
         } else {
             setFlipped(false);

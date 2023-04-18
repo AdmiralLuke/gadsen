@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Arrays;
 
 public class HumanPlayer extends Player {
 
@@ -73,11 +74,7 @@ public class HumanPlayer extends Player {
     private Queue<WeaponType> weaponTypeStack = new LinkedList<>();
 
     {
-        weaponTypeStack.add(WeaponType.COOKIE);
-        weaponTypeStack.add(WeaponType.SUGAR_CANE);
-
-        WeaponType nextType = weaponTypeStack.poll();
-        weaponTypeStack.add(nextType);
+        weaponTypeStack.addAll(Arrays.asList(WeaponType.values()));
     }
 
     private boolean turnInProgress;

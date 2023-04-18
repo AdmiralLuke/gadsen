@@ -12,6 +12,7 @@ import com.gats.simulation.action.TurnStartAction;
 public class Simulation {
     private final GameState gameState;
     private ActionLog actionLog;
+    private Wrapper wrapper;
 
     /**
      * erstellt eine neue Simulation
@@ -30,10 +31,15 @@ public class Simulation {
             gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction());
             gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction());
         }
+        this.wrapper = new Wrapper(gameState.getTeams());
     }
 
     public static IntVector2 convertToTileCoords(IntVector2 worldCoords) {
         return new IntVector2(convertToTileCoordsX(worldCoords.x), convertToTileCoordsY(worldCoords.y));
+    }
+
+    public Wrapper getWrapper() {
+        return this.wrapper;
     }
 
     public static int convertToTileCoordsX(int x) {
