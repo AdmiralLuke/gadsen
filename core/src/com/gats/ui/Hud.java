@@ -59,7 +59,7 @@ public class Hud implements Disposable {
 		int viewportSizeX = 1028;
 		int viewportSizeY = 1028;
 		float animationSpeedupValue = 8;
-		turnChangeDuration = 1;
+		turnChangeDuration = 2;
 		turnChangeSprite = AssetContainer.IngameAssets.turnChange;
 
 
@@ -251,6 +251,10 @@ public class Hud implements Disposable {
 
 	public void startTurnTimer(){
 		turnTimer.startTimer();
+	}
+
+	public void startTurnTimer(int seconds){
+		turnTimer.startTimer(seconds);
 	}
 
 	public void stopTurnTimer(){

@@ -56,7 +56,14 @@ public class InputHandler implements GadsenInputProcessor{
 
 
 	public void activateTurn(HumanPlayer humanPlayer) {
+
 		currentPlayer = humanPlayer;
+		//wait for the turnstart/change to finish
+		synchronized (this) {
+			try {
+				wait(2000);
+			} catch (InterruptedException ignored) {}
+		}
 //        System.out.printf("Activating turn for player %s\n", humanPlayer.toString());
 		turnInProgress = true;
 	}
@@ -193,7 +200,6 @@ public class InputHandler implements GadsenInputProcessor{
                 break;
             case KEY_CAMERA_ZOOM_OUT:
                 cameraZoomPressed -= 1;
-
                 break;
             default:
                 if (turnInProgress && currentPlayer != null) {

@@ -49,6 +49,11 @@ public class TurnTimer extends Table {
 		timer.start();
 	}
 
+	public void startTimer(int seconds){
+		setCurrentTime(seconds);
+		timer.start();
+	}
+
 	public void stopTimer(){
 		timer.stop();
 	}

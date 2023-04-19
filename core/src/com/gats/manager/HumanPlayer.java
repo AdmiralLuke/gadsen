@@ -63,8 +63,8 @@ public class HumanPlayer extends Player {
     //amount of time in seconds, the turn of the human player will take
     //if the time limit is reached, the execute turn will wait for turnOverhead seconds
     // to make sure everything is calculated and no GameState inconsistency is created
-    private int turnDuration = 20;
-    private int turnEndWaitTime = 5;
+    private int turnDuration = 60;
+    private int turnStartWaitTime = 2;
 
 
     private Vector2 playerCenterOffset = new Vector2(GameCharacter.getSize()).scl(0.5f);
@@ -101,7 +101,7 @@ public class HumanPlayer extends Player {
     /**
      * Started den Zug des {@link HumanPlayer} und erlaubt es diesem mithilfe von Tasteneingaben, zu bewegen.
      * Der Zug dauert {@link HumanPlayer#turnDuration} Sekunden, danach wird für
-     * {@link HumanPlayer#turnEndWaitTime} gewartet und dann die Methode beendet.
+     * {@link HumanPlayer#turnStartWaitTime} gewartet und dann die Methode beendet.
      *
      * @param state      Der {@link GameState Spielzustand} während des Zuges
      * @param controller Der {@link Controller Controller}, der zum Charakter gehört
@@ -116,8 +116,7 @@ public class HumanPlayer extends Player {
         //Todo add 5 seconds time  between turns
         //setup timer for updating the ui Time
       if(uiMessenger!=null) {
-          uiMessenger.setTurnTimeLeft(turnDuration);
-          uiMessenger.startTurnTimer();
+          uiMessenger.startTurnTimer(turnDuration+turnStartWaitTime);
 
       }
         synchronized (this) {

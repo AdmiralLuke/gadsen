@@ -100,6 +100,14 @@ public class UiMessenger {
 	 */
 	public void startTurnTimer(){hud.startTurnTimer();};
 
+	/**
+	 * Starts the turn timer for specified time.
+	 * @param seconds
+	 */
+	public void startTurnTimer(int seconds){
+		hud.startTurnTimer(seconds);
+	}
+
 
 	public void stopTurnTimer(){
 		hud.stopTurnTimer();
