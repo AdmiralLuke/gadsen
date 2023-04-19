@@ -10,6 +10,8 @@ public class GameResults implements Serializable {
     private final ArrayList<ActionLog> actionLogs = new ArrayList<>();
     private final GameConfig config;
     private GameState initialState;
+
+    private Game.Status status;
     private float[] scores;
 
     protected GameResults(GameConfig config) {
@@ -38,5 +40,13 @@ public class GameResults implements Serializable {
 
     public float[] getScores() {
         return scores;
+    }
+
+    public Game.Status getStatus() {
+        return status;
+    }
+
+    protected void setStatus(Game.Status status) {
+        this.status = status;
     }
 }

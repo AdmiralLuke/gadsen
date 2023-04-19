@@ -29,9 +29,9 @@ class GameConfig implements Serializable {
 
     public boolean gui = false;
 
-    public AnimationLogProcessor animationLogProcessor = null;
-    public InputProcessor inputProcessor = null;
-    public UiMessenger uiMessenger = null;
+    public transient AnimationLogProcessor animationLogProcessor = null;
+    public transient InputProcessor inputProcessor = null;
+    public transient UiMessenger uiMessenger = null;
 
     public String mapName;
 
@@ -40,7 +40,7 @@ class GameConfig implements Serializable {
 
     public List<Class<? extends Player>> players;
 
-    public GameConfig copy(){
+    public GameConfig copy() {
         GameConfig copy = new GameConfig();
         copy.gui = gui;
         copy.animationLogProcessor = animationLogProcessor;

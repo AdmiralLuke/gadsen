@@ -21,6 +21,7 @@ public class Game {
 
 
     enum Status {
+        INITIALIZED,
         CREATED,
 
         SCHEDULED,
@@ -32,7 +33,7 @@ public class Game {
 
     protected final Object schedulingLock = new Object();
 
-    private Status status = Status.CREATED;
+    private Status status = Status.INITIALIZED;
 
     private final ArrayList<CompletionHandler<Game>> completionListeners = new ArrayList<>();
     private static final int AI_EXECUTION_TIMEOUT = 500;
@@ -71,6 +72,7 @@ public class Game {
         inputGenerator = config.inputProcessor;
         uiMessenger = config.uiMessenger;
         gameResults = new GameResults(config);
+        gameResults.setStatus(status);
     }
 
     private void create() {
@@ -117,10 +119,11 @@ public class Game {
             }
         }
         config = null;
+        setStatus(Status.CREATED);
     }
 
     public void start() {
-        status = Status.ACTIVE;
+        setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
         animationLogProcessor.init(state);
@@ -128,6 +131,11 @@ public class Game {
         simulationThread = new Thread(this::run);
         simulationThread.setName("Manager_Simulation_Thread");
         simulationThread.start();
+    }
+
+    private void setStatus(Status newStatus){
+        status = newStatus;
+        gameResults.setStatus(status);
     }
 
     /**
@@ -177,7 +185,7 @@ public class Game {
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Player
                             System.out.println("bot was interrupted");
-                            System.err.println(e.toString());
+                            e.printStackTrace(System.err);
                         } catch (ExecutionException e) {
                             System.out.println("human player failed with exception: " + e.getCause());
                             e.printStackTrace();
@@ -208,7 +216,7 @@ public class Game {
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Bot
                             System.out.println("bot was interrupted");
-                            System.err.println(e.toString());
+                            e.printStackTrace(System.err);
                         } catch (ExecutionException e) {
                             System.out.println("bot failed with exception: " + e.getCause());
                             e.printStackTrace();
@@ -250,7 +258,7 @@ public class Game {
                 }
             } catch (InterruptedException e) {
                 System.err.println("Interrupted while processing cmds");
-                System.err.println(e.toString());
+                e.printStackTrace(System.err);
                 if (pendingShutdown) {
                     futureExecutor.interrupt();
                     break;
@@ -275,7 +283,7 @@ public class Game {
                 futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
             } catch (InterruptedException e) {
                 System.out.print("Interrupted while shutting down future executor\n");
-                System.err.println(e.toString());
+                e.printStackTrace(System.err);
                 if (pendingShutdown) {
                     futureExecutor.interrupt();
                     break;
@@ -283,7 +291,7 @@ public class Game {
                 throw new RuntimeException(e);
             }
         }
-        status = Status.COMPLETED;
+        setStatus(Status.COMPLETED);
         for (CompletionHandler<Game> completionListener : completionListeners) {
             completionListener.onComplete(this);
         }
@@ -320,28 +328,28 @@ public class Game {
     protected void schedule() {
         synchronized (schedulingLock) {
             if (status == Status.CREATED)
-                status = Status.SCHEDULED;
+                setStatus(Status.SCHEDULED);
         }
     }
 
     protected void pause() {
         synchronized (schedulingLock) {
             if (status == Status.ACTIVE)
-                status = Status.PAUSED;
+                setStatus(Status.PAUSED);
         }
     }
 
     protected void resume() {
         synchronized (schedulingLock) {
             if (status != Status.PAUSED) return;
-            status = Status.ACTIVE;
+            setStatus(Status.ACTIVE);
             schedulingLock.notify();
         }
     }
 
     protected void abort() {
         synchronized (schedulingLock) {
-            status = Status.ABORTED;
+            setStatus(Status.ABORTED);
             dispose();
         }
     }

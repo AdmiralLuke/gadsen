@@ -49,7 +49,7 @@ public class GameState implements Serializable {
         for (int i = 0; i < tiles.length; i++) {
             Tile[] row = tiles[i];
             for (int j = 0; j < row.length; j++) {
-                board[i][j] = row[j].copy(this);
+                board[i][j] = row[j]==null?null:row[j].copy(this);
             }
         }
         width = original.width;
@@ -61,7 +61,7 @@ public class GameState implements Serializable {
         for (int i = 0; i < gameCharacters.length; i++) {
             GameCharacter[] team = gameCharacters[i];
             for (int j = 0; j < team.length; j++) {
-                teams[i][j] = team[j].copy(this);
+                teams[i][j] = team[j]==null?null:team[j].copy(this);
             }
         }
         teamCount = original.teamCount;
@@ -81,19 +81,19 @@ public class GameState implements Serializable {
         Christmas
     }
 
-    private GameMode gameMode = GameMode.Normal;
+    private final GameMode gameMode;
 
 
     private transient Timer turnTimer;
 
     // Teams   Anzahl Teams x Anzahl Player
-    private GameCharacter[][] teams;
+    private final GameCharacter[][] teams;
 
-    private int teamCount;
-    private int charactersPerTeam;
-    private ArrayDeque<IntVector2> turn;
+    private final int teamCount;
+    private final int charactersPerTeam;
+    private final ArrayDeque<IntVector2> turn;
     private boolean active;
-    private transient Simulation sim;
+    private final transient Simulation sim;
 
 
     /**
@@ -113,8 +113,8 @@ public class GameState implements Serializable {
         this.active = true;
         this.sim = sim;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
-        this.initTeam(spawnpoints);
         this.turn = new ArrayDeque<>();
+        this.initTeam(spawnpoints);
     }
 
     /**

@@ -1,13 +1,15 @@
 package com.gats.manager;
 
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
@@ -16,6 +18,7 @@ public class Manager {
     private static int systemReservedProcessorCount = 2;
     private static final Manager singleton = new Manager();
     private boolean pendingShutdown = false;
+    private int writtenFiles = 0;
 
     private final Thread executionManager;
 
@@ -29,6 +32,8 @@ public class Manager {
     private final ArrayList<Game> pausedGames = new ArrayList<>();
 
     private final ArrayList<Game> completedGames = new ArrayList<>();
+
+    private final BlockingQueue<GameResults> pendingSaves = new LinkedBlockingQueue<>();
 
     private final Object schedulingLock = new Object();
 
@@ -80,6 +85,14 @@ public class Manager {
                     runningThreads += 2;
                 }
             }
+            while (!pendingSaves.isEmpty()){
+                GameResults results = pendingSaves.poll();
+                try(FileOutputStream fs = new FileOutputStream(String.format("results/%s_%d_%d.replay", results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles++))) {
+                    new ObjectOutputStream(fs).writeObject(results);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -99,10 +112,13 @@ public class Manager {
 
     private void notifyExecutionManager(Game game) {
         synchronized (schedulingLock) {
-            activeGames.remove(game);
+            if(!activeGames.remove(game) && !pausedGames.remove(game)) System.err.printf("Warning unsuccessfully attempted to complete Game %s\nInstance: %s", game, this);
+            pendingSaves.add(game.getGameResults());
             completedGames.add(game);
         }
-        executionManager.notify();
+        synchronized (executionManager) {
+            executionManager.notify();
+        }
     }
 
     public void stop(Run run) {
@@ -125,6 +141,7 @@ public class Manager {
                         pausedGames.remove(game);
                         break;
                 }
+                pendingSaves.add(game.getGameResults());
                 completedGames.add(game);
                 game.abort();
             }
@@ -132,9 +149,9 @@ public class Manager {
     }
 
     public static class NamedPlayerClass {
-        private String name;
-        private Class<? extends Player> classRef;
-        private String fileName;
+        private final String name;
+        private final Class<? extends Player> classRef;
+        private final String fileName;
 
         @Override
         public String toString() {
@@ -171,7 +188,7 @@ public class Manager {
     }
 
     public static NamedPlayerClass[] getPossiblePlayers() {
-        List<NamedPlayerClass> players = new ArrayList<NamedPlayerClass>();
+        List<NamedPlayerClass> players = new ArrayList<>();
         players.add(new NamedPlayerClass(HumanPlayer.class, "HumanPlayer"));
         players.add(new NamedPlayerClass(IdleBot.class, "IdleBot"));
         players.add(new NamedPlayerClass(TestBot.class, "TestBot"));
