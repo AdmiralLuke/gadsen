@@ -167,7 +167,7 @@ public class GameCharacter {
      * @return the leading action for this function
      */
     Action setHealth(int newHealth, Action head) {
-        if (newHealth == this.health) return head;
+        if (newHealth == this.health || this.health <= 0) return head;
         Action lastAction;
         if (newHealth < this.health) {
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
@@ -216,12 +216,12 @@ public class GameCharacter {
      */
     protected void initInventory() {
         this.weapons = new Weapon[6];
-        weapons[0] = new Weapon(new BaseProjectile(3, 0.1f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB), 200, WeaponType.WATERBOMB, team, teamPos, 2);
-        weapons[4] = new Weapon(new Bounceable(new BaseProjectile( 1, 0.1f, 0, sim, ProjectileAction.ProjectileType.WOOL),  10,  0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
-        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, team, teamPos, 10);
+        weapons[0] = new Weapon(new BaseProjectile(3, 0, 0, sim, ProjectileAction.ProjectileType.WATERBOMB), 200, WeaponType.WATERBOMB, team, teamPos, 2);
+        weapons[4] = new Weapon(new Bounceable(new BaseProjectile( 8, 0f, 0, sim, ProjectileAction.ProjectileType.WOOL),  10,  0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
+        weapons[3] = new Weapon(new Bounceable(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3) , 3 ,0.2f), 200, WeaponType.GRENADE, team, teamPos, 2);
         weapons[2] = new Weapon(new BaseProjectile(5, 0.6f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, team, teamPos, 13);
-        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, team, teamPos, 0.5f);
-        weapons[1] = new Weapon(new BaseProjectile(5, 0.3f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, team, teamPos, 9);
+        weapons[5] = new Weapon(new BaseProjectile(10, 4f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, team, teamPos, 0.2f);
+        weapons[1] = new Weapon(new BaseProjectile(5, 6f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, team, teamPos, 2);
     }
 
     /**
