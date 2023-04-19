@@ -17,7 +17,11 @@ public class GameCharacter implements Serializable {
 
     private static final IntVector2 SIZE = new IntVector2(9, 15);
 
-    public static Vector2 getSize(){return SIZE.toFloat();}
+    private int[] damageDealt;
+
+    public static Vector2 getSize() {
+        return SIZE.toFloat();
+    }
 
     private final IntRectangle boundingBox;
 
@@ -55,11 +59,12 @@ public class GameCharacter implements Serializable {
         this.team = team;
         this.teamPos = teamPos;
         this.sim = sim;
+        this.damageDealt = new int[state.getTeamCount()];
         resetStamina();
         initInventory();
     }
 
-    private GameCharacter(GameCharacter original, GameState newState){
+    private GameCharacter(GameCharacter original, GameState newState) {
         boundingBox = new IntRectangle(original.boundingBox);
         health = original.health;
         stamina = original.stamina;
@@ -91,7 +96,6 @@ public class GameCharacter implements Serializable {
             return WeaponType.NOT_SELECTED;
         }
     }
-
 
 
     /**
@@ -186,12 +190,25 @@ public class GameCharacter implements Serializable {
      * @param head      the leading action of the caller
      * @return the leading action for this function
      */
-    Action setHealth(int newHealth, Action head) {
+    Action setHealth(int newHealth, Action head, boolean environmental) {
         if (newHealth == this.health) return head;
         Action lastAction;
         if (newHealth < this.health) {
+            int activeTeam = sim.getActiveTeam();
+            damageDealt[activeTeam] += health - newHealth;
+            if (activeTeam != team) {
+                state.addScore(activeTeam, environmental ? 1.5f : 1.0f * (health - Math.max(newHealth, 0)));
+                if (newHealth <= 0 && health > 0) {
+                    state.addScore(activeTeam, Simulation.SCORE_KILL);
+                    for (int i =0; i<damageDealt.length; i++){
+                        if (i!=activeTeam && damageDealt[i]>=50)
+                            state.addScore(activeTeam, Simulation.SCORE_ASSIST);
+                    }
+                }
+            }
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
+            state.addScore(team, (newHealth - health));
             lastAction = new CharacterAction(0, team, teamPos) {
             };
             //ToDo implement healAction
@@ -237,7 +254,7 @@ public class GameCharacter implements Serializable {
     protected void initInventory() {
         this.weapons = new Weapon[6];
         weapons[0] = new Weapon(new BaseProjectile(3, 0.1f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB), 200, WeaponType.WATERBOMB, team, teamPos, 2);
-        weapons[4] = new Weapon(new Bounceable(new BaseProjectile( 1, 0.1f, 0, sim, ProjectileAction.ProjectileType.WOOL),  10,  0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
+        weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0.1f, 0, sim, ProjectileAction.ProjectileType.WOOL), 10, 0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
         weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, team, teamPos, 10);
         weapons[2] = new Weapon(new BaseProjectile(5, 0.6f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, team, teamPos, 13);
         weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, team, teamPos, 0.5f);
@@ -400,9 +417,9 @@ public class GameCharacter implements Serializable {
         Action fallAction = new CharacterFallAction(0.001f, team, teamPos, posBef, this.getPlayerPos());
         head.addChild(fallAction);
         if (collision) {
-            return this.setHealth(getHealth() - getFallDmg(fallen), fallAction);
+            return this.setHealth(getHealth() - getFallDmg(fallen), fallAction, true);
         }
-        return this.setHealth(0, fallAction);
+        return this.setHealth(0, fallAction, true);
     }
 
     /**
@@ -522,7 +539,7 @@ public class GameCharacter implements Serializable {
 
         if (falling) {
             //We detected a gap while walking, start falling after walk
-            lastAction = walk(sign * (distance - moved -1), fall(lastAction));
+            lastAction = walk(sign * (distance - moved - 1), fall(lastAction));
         }
         return lastAction;
     }
@@ -564,7 +581,7 @@ public class GameCharacter implements Serializable {
         return dir;
     }
 
-    protected GameCharacter copy(GameState state){
+    protected GameCharacter copy(GameState state) {
         return new GameCharacter(this, state);
     }
 }

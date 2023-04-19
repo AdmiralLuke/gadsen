@@ -34,9 +34,10 @@ public class GameState implements Serializable {
     private int width;
     private int height;
 
+    private final float[] scores;
+
     public float[] getScores() {
-        //ToDo implement
-        return new float[4];
+        return scores;
     }
 
     public GameState copy() {
@@ -69,6 +70,7 @@ public class GameState implements Serializable {
         turn = null;
         active = original.active;
         sim = null;
+        scores = Arrays.copyOf(original.scores, original.scores.length);
     }
 
     public enum GameMode {
@@ -114,6 +116,7 @@ public class GameState implements Serializable {
         this.sim = sim;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
         this.turn = new ArrayDeque<>();
+        this.scores = new float[teamCount];
         this.initTeam(spawnpoints);
     }
 
@@ -170,6 +173,10 @@ public class GameState implements Serializable {
      */
     public boolean isActive() {
         return active;
+    }
+
+    protected void addScore(int team, float score){
+        scores[team] += score;
     }
 
     //ToDo migrate to Simulation

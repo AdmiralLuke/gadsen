@@ -14,6 +14,13 @@ import java.util.Objects;
  * Während die Simulation läuft werden alle Ereignisse in ActionLogs festgehalten, die anschließend durch das animation package dargestellt werden können.
  */
 public class Simulation {
+
+    public static final float SCORE_KILL = 50;
+    public static final float SCORE_ELIMINATION = 50;
+    public static final float SCORE_WIN = 200;
+    public static final float SCORE_SECOND = 100;
+    public static final float SCORE_THIRD = 50;
+    public static final float SCORE_ASSIST = 25;
     private final GameState gameState;
     private ActionLog actionLog;
     private Wrapper wrapper;
@@ -31,9 +38,9 @@ public class Simulation {
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         if (gameMode == GameMode.Christmas) {
-            gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction());
-            gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction());
-            gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction());
+            gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction(), false);
+            gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction(), false);
+            gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction(), false);
         }
         this.wrapper = new Wrapper(gameState.getTeams());
     }
@@ -78,6 +85,14 @@ public class Simulation {
 
 
     public ActionLog endTurn() {
+        int activeTeam = getActiveTeam();
+        //ToDo: find eliminated teams and reward points to active team
+        //ToDo: Determine if a winner, second or third was determined and reward respective score or split points between drawing teams
+        //Example 1: 2 remaining teams; both die in the same round => each team receives (SCORE_WIN + SCORE_SECOND)/2f
+        //Example 2: 3 remaining teams; 2 die in the same round; one remains => eliminates teams receive (SCORE_SECOND + SCORE_THIRD)/2f each; winning Team receives SCORE_WIN
+        //Example 3: 3 remaining teams; all die in the same round => each team receives (SCORE_WIN + SCORE_SECOND + SCORE_THIRD)/3f
+        //Example 4: 4 remaining teams; 2 die in the same round => each eliminated team receives (SCORE_THIRD)/2f; remaining teams continue playing
+
         if (this.gameState.getGameMode() == GameMode.Christmas && this.gameState.getTeams()[0][0].getHealth() <= 0) {
             this.actionLog.getRootAction().addChild(new GameOverAction(1));
             gameState.deactivate();
@@ -124,6 +139,10 @@ public class Simulation {
         ActionLog tmp = this.actionLog;
         this.actionLog = new ActionLog(new InitAction());
         return tmp;
+    }
+
+    public int getActiveTeam(){
+        return Objects.requireNonNull(gameState.getTurn().peek()).x;
     }
 
 }

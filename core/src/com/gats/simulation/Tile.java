@@ -296,7 +296,7 @@ public class Tile implements Serializable, Cloneable {
                         Action moveAction = new TileMoveAction(posBef, this.position, 1f);
                         head.addChild(moveAction);
                         Action destroyAction = new TileDestroyAction(this.getPosition());
-                        character.setHealth(oldHealth - fallen * 4, moveAction);
+                        character.setHealth(oldHealth - fallen * 4, moveAction, true);
                         moveAction.addChild(destroyAction);
                         return destroyAction;
                     }
