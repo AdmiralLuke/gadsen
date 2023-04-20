@@ -83,7 +83,7 @@ public class GameCharacterController {
         return endCommand();
     }
     /**
-     * Makes the Character shoot its equipped {@link Weapon}.
+     * Makes the Character shoot its equipped {@link com.gats.simulation.weapons.Weapon}.
      * Will only trigger for the first Weapon each turn, that can currently be used by this Character
      *
      * @return the ActionLog produced when executing this command
