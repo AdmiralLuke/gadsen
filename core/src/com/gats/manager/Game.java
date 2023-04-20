@@ -197,7 +197,7 @@ public class Game {
                         inputGenerator.endTurn();
                         //Add Empty command to break command Execution
                         try {
-                            commandQueue.put(new EndTurnCommand());
+                            commandQueue.put(new EndTurnCommand(gcController));
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -227,7 +227,7 @@ public class Game {
                         }
                         //Add Empty command to break command Execution
                         try {
-                            commandQueue.put(new EndTurnCommand());
+                            commandQueue.put(new EndTurnCommand(gcController));
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -246,10 +246,15 @@ public class Game {
             }
             try {
                 while (true) {
+                    if (!simulation.isActingCharacterAlive()){
+                        if(currentPlayer.getType() == Player.PlayerType.Human) inputGenerator.endTurn();
+                        break;
+                    }
                     Command nextCmd = commandQueue.take();
                     if (nextCmd.isEndTurn()) break;
                     //Contains action produced by the commands execution
                     log = nextCmd.run();
+                    if (log == null) continue;
                     gameResults.addActionLog(log);
                     if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                         animationLogProcessor.animate(log);

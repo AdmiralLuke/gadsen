@@ -9,176 +9,175 @@ import com.gats.ui.InGameScreen;
 public class InputHandler implements InputProcessor, com.gats.manager.InputProcessor {
 
 
-	InGameScreen ingameScreen;
+    InGameScreen ingameScreen;
 
 
+    private final int KEY_CAMERA_UP = Input.Keys.UP;
+    private final int KEY_CAMERA_DOWN = Input.Keys.DOWN;
+    private final int KEY_CAMERA_LEFT = Input.Keys.LEFT;
+    private final int KEY_CAMERA_RIGHT = Input.Keys.RIGHT;
+    private final int KEY_CAMERA_ZOOM_IN = Input.Keys.I;
+    private final int KEY_CAMERA_ZOOM_OUT = Input.Keys.O;
+    private final int KEY_CAMERA_ZOOM_RESET = Input.Keys.R;
 
-	private final int KEY_CAMERA_UP = Input.Keys.UP;
-	private final int KEY_CAMERA_DOWN = Input.Keys.DOWN;
-	private final int KEY_CAMERA_LEFT = Input.Keys.LEFT;
-	private final int KEY_CAMERA_RIGHT = Input.Keys.RIGHT;
-	private final int KEY_CAMERA_ZOOM_IN = Input.Keys.I;
-	private final int KEY_CAMERA_ZOOM_OUT = Input.Keys.O;
-	private final int KEY_CAMERA_ZOOM_RESET = Input.Keys.R;
+    private final int KEY_CAMERA_TOGGLE_PLAYER_FOCUS = Input.Keys.F;
 
-	private final int KEY_CAMERA_TOGGLE_PLAYER_FOCUS = Input.Keys.F;
+    private final int KEY_EXIT_TO_MENU = Input.Keys.ESCAPE;
 
-	private final int KEY_EXIT_TO_MENU = Input.Keys.ESCAPE;
+    private final int KEY_TOGGLE_DEBUG = Input.Keys.F3;
 
-	private final int KEY_TOGGLE_DEBUG = Input.Keys.F3;
-
-	private HumanPlayer currentPlayer;
-	private Vector2 lastMousePosition;
-	private Vector2 deltaMouseMove;
-	private boolean rightMousePressed;
-	private boolean turnInProgress = false;
-
-
-	//used for storing arrow key input -> for now used for camera
-	//first index for x Axis, second for y
-	//length 3 because the cameraposition is 3d
-	float[] ingameCameraDirection = new float[3];
-
-	float cameraZoomPressed = 0;
-
-	public InputHandler(InGameScreen ingameScreen){
-		this.ingameScreen = ingameScreen;
-	}
+    private HumanPlayer currentPlayer;
+    private Vector2 lastMousePosition;
+    private Vector2 deltaMouseMove;
+    private boolean rightMousePressed;
+    private boolean turnInProgress = false;
 
 
+    //used for storing arrow key input -> for now used for camera
+    //first index for x Axis, second for y
+    //length 3 because the cameraposition is 3d
+    float[] ingameCameraDirection = new float[3];
+
+    float cameraZoomPressed = 0;
+
+    public InputHandler(InGameScreen ingameScreen) {
+        this.ingameScreen = ingameScreen;
+    }
 
 
-
-
-	public void activateTurn(HumanPlayer humanPlayer) {
-		currentPlayer = humanPlayer;
+    public void activateTurn(HumanPlayer humanPlayer) {
+        currentPlayer = humanPlayer;
 //        System.out.printf("Activating turn for player %s\n", humanPlayer.toString());
-		turnInProgress = true;
-	}
+        turnInProgress = true;
+    }
 
-	public void endTurn() {
-		turnInProgress = false;
-	}
+    public void endTurn() {
+        turnInProgress = false;
+        currentPlayer.endCurrentTurn();
+    }
 
-	public void tick(float delta) {
-		if (turnInProgress && currentPlayer != null) {
-			currentPlayer.tick(delta);
-		}
-	}
+    public void tick(float delta) {
+        if (turnInProgress && currentPlayer != null) {
+            currentPlayer.tick(delta);
+        }
+    }
 
-	/**
-	 * Converts the mouse screen-coordinates to worldPosition and calls {@link HumanPlayer#aimToVector(Vector2)} to aim the Indicator
-	 * @param screenX
-	 * @param screenY
-	 */
-	private void processMouseAim(int screenX, int screenY){
-		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX,screenY));
-		if(currentPlayer!=null) {
-			currentPlayer.aimToVector(worldCursorPos);
-		}
-	}
+    /**
+     * Converts the mouse screen-coordinates to worldPosition and calls {@link HumanPlayer#aimToVector(Vector2)} to aim the Indicator
+     *
+     * @param screenX
+     * @param screenY
+     */
+    private void processMouseAim(int screenX, int screenY) {
+        Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX, screenY));
+        if (currentPlayer != null) {
+            currentPlayer.aimToVector(worldCursorPos);
+        }
+    }
 
-	/**
-	 * Allows the camera to be moved with the mouse by using the position of the new and old mouse positions, to calculate the distance
-	 * to move.
-	 * @param screenX
-	 * @param screenY
-	 */
-	private void processMouseCameraMove(int screenX,int screenY){
-		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX, screenY));
-		deltaMouseMove = worldCursorPos.sub(ingameScreen.toWorldCoordinates(lastMousePosition));
-		lastMousePosition = new Vector2(screenX, screenY);
+    /**
+     * Allows the camera to be moved with the mouse by using the position of the new and old mouse positions, to calculate the distance
+     * to move.
+     *
+     * @param screenX
+     * @param screenY
+     */
+    private void processMouseCameraMove(int screenX, int screenY) {
+        Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX, screenY));
+        deltaMouseMove = worldCursorPos.sub(ingameScreen.toWorldCoordinates(lastMousePosition));
+        lastMousePosition = new Vector2(screenX, screenY);
 
-		ingameScreen.moveCameraByOffset(deltaMouseMove);
-	}
-	/**
-	 * Called whenever a button is just pressed.
-	 * For now it handles input from the Arrow Keys, used for the camera Movement.
-	 * This is done by storing the direction in {@link InputHandler#ingameCameraDirection}.
-	 *
-	 * Also calls {@link HumanPlayer#processKeyDown(int keycode)} for user input.
-	 * Currently is the default case.
-	 *
-	 * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
-	 * @return was the input handled
-	 */
+        ingameScreen.moveCameraByOffset(deltaMouseMove);
+    }
 
-	//todo, pass input to hud, instead of ingameScreen
-	@Override
-	public boolean keyDown(int keycode) {
+    /**
+     * Called whenever a button is just pressed.
+     * For now it handles input from the Arrow Keys, used for the camera Movement.
+     * This is done by storing the direction in {@link InputHandler#ingameCameraDirection}.
+     * <p>
+     * Also calls {@link HumanPlayer#processKeyDown(int keycode)} for user input.
+     * Currently is the default case.
+     *
+     * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
+     * @return was the input handled
+     */
 
-
-		//input handling for the camera and ui
-		switch (keycode) {
-			case KEY_CAMERA_UP:
-				ingameCameraDirection[1] += 1;
-				break;
-			case KEY_CAMERA_DOWN:
-				ingameCameraDirection[1] -= 1;
-				break;
-			case KEY_CAMERA_LEFT:
-				ingameCameraDirection[0] -= 1;
-				break;
-			case KEY_CAMERA_RIGHT:
-				ingameCameraDirection[0] += 1;
-				break;
-			case KEY_EXIT_TO_MENU:
-				ingameScreen.dispose();
-				break;
-			case KEY_CAMERA_ZOOM_IN:
-				cameraZoomPressed -= 1;
-				break;
-			case KEY_CAMERA_ZOOM_OUT:
-				cameraZoomPressed += 1;
-
-				break;
-			case KEY_CAMERA_ZOOM_RESET:
-				ingameScreen.resetCamera();
-				//Todo: Zoom Reset
-				break;
-			case KEY_CAMERA_TOGGLE_PLAYER_FOCUS:
-				ingameScreen.toggleCameraMove();
-				break;
-			case KEY_TOGGLE_DEBUG:
-				ingameScreen.toggleDebugView();
-				break;
-			default:
-				if (turnInProgress && currentPlayer != null) {
-					currentPlayer.processKeyDown(keycode);
-				}
-				break;
-		}
-		ingameScreen.processInputs(ingameCameraDirection,cameraZoomPressed);
+    //todo, pass input to hud, instead of ingameScreen
+    @Override
+    public boolean keyDown(int keycode) {
 
 
-		return true;
+        //input handling for the camera and ui
+        switch (keycode) {
+            case KEY_CAMERA_UP:
+                ingameCameraDirection[1] += 1;
+                break;
+            case KEY_CAMERA_DOWN:
+                ingameCameraDirection[1] -= 1;
+                break;
+            case KEY_CAMERA_LEFT:
+                ingameCameraDirection[0] -= 1;
+                break;
+            case KEY_CAMERA_RIGHT:
+                ingameCameraDirection[0] += 1;
+                break;
+            case KEY_EXIT_TO_MENU:
+                ingameScreen.dispose();
+                break;
+            case KEY_CAMERA_ZOOM_IN:
+                cameraZoomPressed -= 1;
+                break;
+            case KEY_CAMERA_ZOOM_OUT:
+                cameraZoomPressed += 1;
 
-	}
+                break;
+            case KEY_CAMERA_ZOOM_RESET:
+                ingameScreen.resetCamera();
+                //Todo: Zoom Reset
+                break;
+            case KEY_CAMERA_TOGGLE_PLAYER_FOCUS:
+                ingameScreen.toggleCameraMove();
+                break;
+            case KEY_TOGGLE_DEBUG:
+                ingameScreen.toggleDebugView();
+                break;
+            default:
+                if (turnInProgress && currentPlayer != null) {
+                    currentPlayer.processKeyDown(keycode);
+                }
+                break;
+        }
+        ingameScreen.processInputs(ingameCameraDirection, cameraZoomPressed);
 
 
-	/**
-	 * Called whenever a button stops getting pressed/is lifted up.
-	 * Resets the values to some Keypresses.
-	 *
-	 * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
-	 * @return
-	 */
-	@Override
-	public boolean keyUp(int keycode) {
-		  switch (keycode) {
+        return true;
+
+    }
+
+
+    /**
+     * Called whenever a button stops getting pressed/is lifted up.
+     * Resets the values to some Keypresses.
+     *
+     * @param keycode one of the constants in {@link com.badlogic.gdx.Input.Keys}
+     * @return
+     */
+    @Override
+    public boolean keyUp(int keycode) {
+        switch (keycode) {
             case Input.Keys.UP:
                 ingameCameraDirection[1] -= 1;
                 break;
             case Input.Keys.DOWN:
-               ingameCameraDirection[1] += 1;
+                ingameCameraDirection[1] += 1;
                 break;
             case Input.Keys.LEFT:
-               ingameCameraDirection[0] += 1;
+                ingameCameraDirection[0] += 1;
                 break;
             case Input.Keys.RIGHT:
                 ingameCameraDirection[0] -= 1;
                 break;
-             case KEY_CAMERA_ZOOM_IN:
+            case KEY_CAMERA_ZOOM_IN:
                 cameraZoomPressed += 1;
                 break;
             case KEY_CAMERA_ZOOM_OUT:
@@ -191,63 +190,63 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
                 }
                 break;
         }
-        ingameScreen.processInputs(ingameCameraDirection,cameraZoomPressed);
+        ingameScreen.processInputs(ingameCameraDirection, cameraZoomPressed);
 
         return true;
-	}
+    }
 
-	@Override
-	public boolean keyTyped(char character) {
-		return false;
-	}
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
 
-	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		if(button==Input.Buttons.RIGHT){
-			lastMousePosition = new Vector2(screenX,screenY);
-			rightMousePressed = true;
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (button == Input.Buttons.RIGHT) {
+            lastMousePosition = new Vector2(screenX, screenY);
+            rightMousePressed = true;
 
-		}
-		return false;
-	}
+        }
+        return false;
+    }
 
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if(button==Input.Buttons.RIGHT){
-			rightMousePressed=false;
-		}
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (button == Input.Buttons.RIGHT) {
+            rightMousePressed = false;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
 
-		//wenn gezogen wird, alte position nehmen, distanz zur neuen position ermitteln und die Kamera nun um diesen wert verschieben
-		if(rightMousePressed) {
-			processMouseCameraMove(screenX,screenY);
-			return true;
-		}
+        //wenn gezogen wird, alte position nehmen, distanz zur neuen position ermitteln und die Kamera nun um diesen wert verschieben
+        if (rightMousePressed) {
+            processMouseCameraMove(screenX, screenY);
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
 
 
-		processMouseAim(screenX,screenY);
-		return false;
-	}
+        processMouseAim(screenX, screenY);
+        return false;
+    }
 
-	@Override
-	public boolean scrolled(float amountX, float amountY) {
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
 
-		if(amountY!=0) {
-			ingameScreen.zoomCamera(amountY / 10);
-		}
-		return false;
-	}
+        if (amountY != 0) {
+            ingameScreen.zoomCamera(amountY / 10);
+        }
+        return false;
+    }
 
 
 }

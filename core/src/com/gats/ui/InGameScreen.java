@@ -90,8 +90,10 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
      *
      * @param log Queue of all {@link Action animation-related Actions}
      */
-    public void animate(ActionLog log) {animator.animate(log);
-    debugView.add(log);}
+    public void animate(ActionLog log) {
+        animator.animate(log);
+    debugView.add(log);
+    }
 
 
     @Override

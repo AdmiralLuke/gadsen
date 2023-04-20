@@ -43,16 +43,16 @@ public class Animator implements Screen, AnimationLogProcessor {
     private Viewport backgroundViewport;
 
     private SpriteEntity background;
-    private GameMode gameMode;
-    private UiMessenger uiMessenger;
+    private final GameMode gameMode;
+    private final UiMessenger uiMessenger;
 
-    private Batch batch;
+    private final Batch batch;
 
     private final EntityGroup root;
 
     private TileMap map;
 
-    private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
+    private final BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
 
     private GameCharacter[][] teams;
@@ -74,9 +74,8 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private int teamCount;
     private int charactersPerTeam;
-    private List<Action> actionList = new LinkedList<>();
+    private final List<Action> actionList = new LinkedList<>();
 
-    private Map<Class<?>, ActionConverter> actionConverters = ActionConverters.map;
     private EntityGroup characterGroup;
 
     public AnimatorCamera getCamera() {
@@ -386,10 +385,12 @@ public class Animator implements Screen, AnimationLogProcessor {
 
                 Vector2 pos = animator.getCamera().getScreenCenter();
                 TextureRegion display;
-                if (winAction.getTeam() == 0) {
-                    display = IngameAssets.victoryDisplay;
-                } else {
+                if (winAction.getTeam() < 0) {
+                    //ToDo replace with draw display
                     display = IngameAssets.lossDisplay;
+                } else {
+                    //ToDo display winner
+                    display = IngameAssets.victoryDisplay;
                 }
                 Entity winSprite = new WinEntity(display, pos);
                 animator.root.add(winSprite);

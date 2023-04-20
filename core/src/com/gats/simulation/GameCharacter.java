@@ -9,6 +9,7 @@ import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.action.*;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Repräsentiert eine {@link GameCharacter Spielfigur} auf der Karte
@@ -17,7 +18,7 @@ public class GameCharacter implements Serializable {
 
     private static final IntVector2 SIZE = new IntVector2(9, 15);
 
-    private int[] damageDealt;
+    private int[] damageReceived;
 
     public static Vector2 getSize() {
         return SIZE.toFloat();
@@ -59,7 +60,7 @@ public class GameCharacter implements Serializable {
         this.team = team;
         this.teamPos = teamPos;
         this.sim = sim;
-        this.damageDealt = new int[state.getTeamCount()];
+        this.damageReceived = new int[state.getTeamCount()];
         resetStamina();
         initInventory();
     }
@@ -195,13 +196,13 @@ public class GameCharacter implements Serializable {
         Action lastAction;
         if (newHealth < this.health) {
             int activeTeam = sim.getActiveTeam();
-            damageDealt[activeTeam] += health - newHealth;
+            damageReceived[activeTeam] += health - newHealth;
             if (activeTeam != team) {
                 state.addScore(activeTeam, environmental ? 1.5f : 1.0f * (health - Math.max(newHealth, 0)));
                 if (newHealth <= 0 && health > 0) {
                     state.addScore(activeTeam, Simulation.SCORE_KILL);
-                    for (int i =0; i<damageDealt.length; i++){
-                        if (i!=activeTeam && damageDealt[i]>=50)
+                    for (int i = 0; i< damageReceived.length; i++){
+                        if (i!=activeTeam && damageReceived[i]>=50)
                             state.addScore(activeTeam, Simulation.SCORE_ASSIST);
                     }
                 }
@@ -583,5 +584,26 @@ public class GameCharacter implements Serializable {
 
     protected GameCharacter copy(GameState state) {
         return new GameCharacter(this, state);
+    }
+
+    @Override
+    public String toString() {
+        return "GameCharacter{" +
+                "damageDealt=" + Arrays.toString(damageReceived) +
+                ", boundingBox=" + boundingBox +
+                ", health=" + health +
+                ", stamina=" + stamina +
+                ", alreadyShot=" + alreadyShot +
+                ", team=" + team +
+                ", teamPos=" + teamPos +
+                ", dir=" + dir +
+                ", strength=" + strength +
+                ", weapons=" + Arrays.toString(weapons) +
+                ", selectedWeapon=" + selectedWeapon +
+                '}';
+    }
+
+    public boolean isAlive() {
+        return health>0;
     }
 }

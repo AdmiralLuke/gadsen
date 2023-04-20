@@ -2,6 +2,7 @@ package com.gats.simulation;
 
 import com.gats.manager.Timer;
 import com.gats.simulation.action.ActionLog;
+import com.gats.simulation.action.GameOverAction;
 import com.gats.simulation.action.InitAction;
 import com.gats.simulation.action.TurnStartAction;
 import com.gats.simulation.GameState.GameMode;
@@ -98,7 +99,7 @@ public class Simulation {
 
         for (Iterator<IntVector2> iterator = turn.iterator(); iterator.hasNext(); ) {
             IntVector2 cur = iterator.next();
-            if (gameState.getCharacterFromTeams(cur.x, cur.y).getHealth() > 0) {
+            if (gameState.getCharacterFromTeams(cur.x, cur.y).isAlive()) {
                 remainingCharacters[cur.x]++;
             } else {
                 iterator.remove();
@@ -145,13 +146,15 @@ public class Simulation {
                 for (int i = 0; i < teamCount; i++) {
                     if (remainingCharacters[i] > 0) {
                         gameState.addScore(i, SCORE_WIN[0]);
+                        actionLog.getRootAction().addChild(new GameOverAction(i));
                         break;
                     }
                 }
+            }else{
+                actionLog.getRootAction().addChild(new GameOverAction(-1));
             }
             //End game
             gameState.deactivate();
-            ActionLog lastTurn = this.actionLog;
             return this.actionLog;
         }
 
@@ -173,4 +176,9 @@ public class Simulation {
         return Objects.requireNonNull(gameState.getTurn().peek()).x;
     }
 
+    public boolean isActingCharacterAlive() {
+        IntVector2 character = gameState.getTurn().peek();
+        if (character == null) return false;
+        return gameState.getCharacterFromTeams(character.x, character.y).isAlive();
+    }
 }

@@ -117,6 +117,7 @@ public class Controller {
      */
     protected void deactivate() {
         active = false;
+        gcController.deactivate();
     }
 
 }
