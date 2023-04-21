@@ -337,9 +337,22 @@ public class Animator implements Screen, AnimationLogProcessor {
             Action lastAction;
             GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
             SetAnimationAction hitAnimation = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
+            DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(2f, null, null, (entity) -> {
+                target.remove(entity);
+                entity.free();
+            });
+
+            SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.walkParticle);
+                target.add(particleEntity);
+                particleEntity.setLoop(false);
+                particleEntity.setRelPos(0, 5);
+                return particleEntity;
+            });
+            summonParticle.setChildren(new Action[]{destroyParticle});
             if (hitAction.getHealthAft() <= 0) {
-                SetAnimationAction deathAnimation = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_DEATH);
-                hitAnimation.setChildren(new Action[]{deathAnimation});
+                SetAnimationAction deathAnimation = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, GameCharacterAnimationType.ANIMATION_TYPE_DEATH);
+                hitAnimation.setChildren(new Action[]{summonParticle, deathAnimation});
                 DestroyAction<Entity> destroyCharacter = new DestroyAction<Entity>(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, null, animator.characterGroup::remove);
                 deathAnimation.setChildren(new Action[]{destroyCharacter});
                 SummonAction<Entity> summonTombstone = new SummonAction<Entity>(0, null, () -> {
@@ -355,7 +368,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 lastAction = summonTombstone;
             } else {
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
-                hitAnimation.setChildren(new Action[]{resetAnimationAction});
+                hitAnimation.setChildren(new Action[]{summonParticle, resetAnimationAction});
                 lastAction = resetAnimationAction;
             }
             return new ExpandedAction(hitAnimation, lastAction);

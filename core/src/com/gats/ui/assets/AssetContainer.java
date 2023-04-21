@@ -97,6 +97,10 @@ public class AssetContainer {
 
         public static ParticleEffectPool walkParticle;
 
+        public static ParticleEffectPool damageParticle;
+        public static ParticleEffectPool explosionParticle;
+
+
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,

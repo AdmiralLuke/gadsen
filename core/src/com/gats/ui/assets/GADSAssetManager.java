@@ -13,19 +13,23 @@ public class GADSAssetManager {
     //dedicatod to loading and mangaing assets used in the application
 
     //Pfad an dem sich der Textureatlas mit Assets relevant für das Spiel
-    public final String resourceDirectory = "";
-    public final String atlas = resourceDirectory + "texture_atlas/TextureAtlas.atlas";
+    public static final String resourceDirectory = "";
+    public static final String atlas = resourceDirectory + "texture_atlas/TextureAtlas.atlas";
 
-    public final String skin = resourceDirectory + "ui/skin.json";
-    public final String font = resourceDirectory + "ui/lsans-15.fnt";
+    public static final String skin = resourceDirectory + "ui/skin.json";
+    public static final String font = resourceDirectory + "ui/lsans-15.fnt";
 
-    public final String particleGroup = "particle/";
-    public final String slimeParticle = "particle/slimeParticle.p";
-    public final String walkParticle = "particle/slimeParticle.p";
+    public static final String particleGroup = "particle/";
+    public static final String slimeParticle = "particle/slimeParticle.p";
+    public static final String walkParticle = "particle/slimeParticle.p";
 
-    public final String outlineShader = resourceDirectory + "shader/outline.frag";
-    public final String lookupShader = resourceDirectory + "shader/lookup.frag";
-    public final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
+    public static final String damageParticle = "particle/damageParticle.p";
+
+    public static final String explosionParticle = "particle/explosionParticle.p";
+
+    public static final String outlineShader = resourceDirectory + "shader/outline.frag";
+    public static final String lookupShader = resourceDirectory + "shader/lookup.frag";
+    public static final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
 
     private boolean finishedLoading = false;
 
@@ -86,6 +90,8 @@ public class GADSAssetManager {
 
         manager.load(slimeParticle, ParticleEffect.class, particleEffectParameter);
         manager.load(walkParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(damageParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(explosionParticle, ParticleEffect.class, particleEffectParameter);
     }
 
 
@@ -154,7 +160,12 @@ public class GADSAssetManager {
         IngameAssets.SugarCane = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/sugarcaneProjectileFront"), Animation.PlayMode.LOOP);
 
         IngameAssets.slimeParticle = new ParticleEffectPool(manager.get(slimeParticle, ParticleEffect.class), 1, 10);
-        IngameAssets.walkParticle = new ParticleEffectPool(manager.get(walkParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.walkParticle = new ParticleEffectPool(manager.get(walkParticle, ParticleEffect.class), 1, 10);//ToDo replace
+
+        IngameAssets.damageParticle = new ParticleEffectPool(manager.get(damageParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.explosionParticle = new ParticleEffectPool(manager.get(explosionParticle, ParticleEffect.class), 1, 10);
 
         finishedLoading = true;
     }
