@@ -144,6 +144,8 @@ public class GADSAssetManager {
 
         IngameAssets.SugarCane = new AtlasAnimation(1/8f, atlas.findRegions("projectile/sugarcaneProjectileFront"), Animation.PlayMode.LOOP);
 
+        IngameAssets.WaterPistol = new AtlasAnimation(1/8f, atlas.findRegions("weapon/watergun"), Animation.PlayMode.LOOP);
+
         IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
         IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
         IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");

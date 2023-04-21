@@ -19,6 +19,10 @@ public class Projectiles {
         //configuring of drawing properties [0]:AnimatedEntity.rotate [1]:AnimatedEntity.mirror
         boolean[] settings;
         switch (type){
+            case WATER:
+                animation = AssetContainer.IngameAssets.coolCat;
+                settings = new boolean[]{/*rotate*/false,/*mirror*/false};
+                break;
             case COOKIE:
                 animation = AssetContainer.IngameAssets.Cookie;
                 settings = new boolean[]{/*rotate*/false,/*mirror*/false};

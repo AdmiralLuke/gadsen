@@ -58,7 +58,7 @@ public class AssetContainer {
 
         public static TextureRegion pixel;
 
-		static {
+        static {
             Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             map.setColor(Color.WHITE);
             map.drawPixel(0, 0);
@@ -84,6 +84,8 @@ public class AssetContainer {
         //Projectiles
         public static Animation<TextureRegion> Cookie;
         public static Animation<TextureRegion> SugarCane;
+
+        public static Animation<TextureRegion> WaterPistol;
 
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
