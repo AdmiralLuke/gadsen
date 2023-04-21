@@ -22,9 +22,9 @@ public class CharacterSelectAction extends Action {
     protected void runAction(float oldTime, float current) {
         if (changer != null){
             GameCharacter oldTarget = changer.setNewCharacter(target);
-            if (oldTarget != null) oldTarget.aimActive(false);
+            if (oldTarget != null) oldTarget.getAimingIndicator().aimActive(false);
         }
-        target.aimActive(true);
+        target.getAimingIndicator().aimActive(true);
         endAction(oldTime);
     }
 }
