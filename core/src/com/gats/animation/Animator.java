@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.animation.action.*;
@@ -32,8 +35,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  * des {@link com.gats.simulation Simulation-Package} in für libGDX renderbare Objekte
  */
 public class Animator implements Screen, AnimationLogProcessor {
+
+    private static final float PHYSICS_TIME_STEP = 1/60f;
+    private static final int PHYSICS_VELOCITY_ITERATIONS = 6;
+    private static final int PHYSICS_POSITION_ITERATIONS = 2;
+    private final World tilesWorld;
     private AnimatorCamera camera;
     private GameState state;
+
+    private boolean debug = false;
+
+    private float accPhysicsTime = 0;
 
     private GameCharacter activeCharacter;
 
@@ -48,6 +60,8 @@ public class Animator implements Screen, AnimationLogProcessor {
     private EntityGroup root;
 
     private TileMap map;
+
+    private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 
     private BlockingQueue<ActionLog> pendingLogs = new LinkedBlockingQueue<>();
 
@@ -249,8 +263,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                 destroyTileEntity.setTarget(target);
             }, () -> {
                 tileType.set(animator.map.getTile(IntPos));
-                animator.map.setTile(IntPos, TileMap.TYLE_TYPE_NONE);
-                if (tileType.intValue() != TileMap.TYLE_TYPE_NONE) {
+                animator.map.setTile(IntPos, TileMap.TILE_TYPE_NONE);
+                if (tileType.intValue() != TileMap.TILE_TYPE_NONE) {
                     TextureRegion tex = IngameAssets.tileTextures[tileType.intValue()];
                     SpriteEntity projectile = new SpriteEntity(tex);//tileType.intValue()]);
                     projectile.setSize(new Vector2(tex.getRegionWidth(), tex.getRegionHeight()));
@@ -272,7 +286,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             DestroyAction destroyProjectile = new DestroyAction(IngameAssets.destroyTileAnimation.getAnimationDuration(), null, null, animator.root::remove);
 
             SummonAction summonProjectile = new SummonAction(action.getDelay(), destroyProjectile::setTarget, () -> {
-                animator.map.setTile(destroyAction.getPos(), TileMap.TYLE_TYPE_NONE);
+                animator.map.setTile(destroyAction.getPos(), TileMap.TILE_TYPE_NONE);
                 Entity particle = new AnimatedEntity(IngameAssets.destroyTileAnimation);
                 particle.setRelPos(destroyAction.getPos().toFloat().scl(animator.map.getTileSize()));
                 animator.root.add(particle);
@@ -456,7 +470,8 @@ public class Animator implements Screen, AnimationLogProcessor {
         this.state = state;
         this.batch = new SpriteBatch();
         this.root = new EntityGroup();
-
+        this.tilesWorld = new World(new Vector2(0, -16 * 9.81f), true);
+        Box2D.init();
         setupView(viewport);
 
         setup(state, gameMode);
@@ -475,7 +490,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         //backgroundTexture.setWrap();
 
-        map = new TileMap(IngameAssets.tileTextures, state);
+        map = new TileMap(IngameAssets.tileTextures, state, tilesWorld);
         root.add(map);
 
 
@@ -558,6 +573,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     @Override
     public void render(float delta) {
 
+
         if (actionList.isEmpty()) {
             if (!pendingLogs.isEmpty()) {
                 actionList.add(convertAction(pendingLogs.poll().getRootAction()));
@@ -600,6 +616,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             }
         }
 
+        doPhysicsStep(delta);
 
         camera.updateMovement(delta);
         camera.update();
@@ -622,6 +639,19 @@ public class Animator implements Screen, AnimationLogProcessor {
         //recursively draw all entities by calling the root group
         root.draw(batch, delta, 1);
         batch.end();
+        if (debug) debugRenderer.render(tilesWorld, camera.combined);
+    }
+
+
+    private void doPhysicsStep(float deltaTime) {
+        // fixed time step
+        // max frame time to avoid spiral of death (on slow devices)
+        float frameTime = Math.min(deltaTime, 0.25f);
+        accPhysicsTime += frameTime;
+        while (accPhysicsTime >= PHYSICS_TIME_STEP) {
+            tilesWorld.step(PHYSICS_TIME_STEP, PHYSICS_VELOCITY_ITERATIONS, PHYSICS_POSITION_ITERATIONS);
+            accPhysicsTime -= PHYSICS_TIME_STEP;
+        }
     }
 
     @Override
