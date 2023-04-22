@@ -13,6 +13,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Arrays;
 
+//ToDo migrate to UI
 public class HumanPlayer extends Player {
 
     private static final float NO_TICK = -10000.0f;
@@ -125,12 +126,13 @@ public class HumanPlayer extends Player {
         }
     }
 
+    //ToDo: make protected after migration to UI
     /**
      * Ends the current turn of the player preemptively.
      * Callen when pressing {@link HumanPlayer#KEY_CHARACTER_END_TURN}.
      * notifies itself, so the wait will end.
      */
-    protected void endCurrentTurn() {
+    public void endCurrentTurn() {
         synchronized (this) {
             this.notify();
         }
