@@ -5,13 +5,14 @@ import com.gats.simulation.action.Action;
 import com.gats.simulation.action.TileDestroyAction;
 import com.gats.simulation.action.TileMoveAction;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Vector;
 
 /**
  * Represents one of the Tiles the map is made of.
- * Special behaviors of certain Tile-Types will be implemented by sub-classes
+ * Special behaviors of certain Tile-Types will be implemented by the {@link Wrapper Wrapper}
  */
 public class Tile {
 
@@ -43,11 +44,21 @@ public class Tile {
     Tile down;
     Tile left;
 
+    enum TileType  {
+            STANDARD,
+            WEAPON_BOX,
+            HEALTH_BOX
+    }
+
+    TileType tileType;
 
     public int getType() {
         return isAnchor ? 1 : 0;
     }
 
+    public TileType getTileType() {
+        return this.tileType;
+    }
     /**
      * @return Position der Box im Spielbrett-Grid
      */
@@ -129,6 +140,29 @@ public class Tile {
     }
 
     /**
+     * erweiterte Erstellung von Boxen inklusive Boxtyp
+     *
+     * @param x        Position X auf dem Spielbrett
+     * @param y        Position Y auf dem Spielbrett
+     * @param isAnchor Box kann als Anker makiert werden, sonst wird geschaut ob Nachbar Ankerpunkt ist
+     */
+    Tile(int x, int y, boolean isAnchor, GameState state, TileType tileType) {
+        this.isAnchor = isAnchor;
+        this.isAnchored = isAnchor || checkIfAnchored(x, y, state);
+        this.position = new IntVector2(x, y);
+        this.state = state;
+        this.isSolid = true;
+        if (isAnchored) {
+            state.getBoard()[x][y] = this;
+            sortIntoTree();
+        } else {
+            // Die Garbage Collection wird das schon löschen
+            state.getBoard()[x][y] = null;
+        }
+        this.tileType = tileType;
+    }
+
+    /**
      * fügt eine Tile in die Graphenstruktur aus Tiles an
      */
     void sortIntoTree() {
@@ -157,18 +191,17 @@ public class Tile {
         if (this.down != null) {
             this.down.up = this;
         }
-
-
     }
 
     /**
      * Konstruktor zum Klonen von Tiles
      */
-    Tile(boolean isAnchor, boolean isAnchored, int health) {
+    Tile(boolean isAnchor, boolean isAnchored, int health, TileType tileType) {
         this.isAnchor = isAnchor;
         this.isAnchored = isAnchored;
         this.isSolid = true;
         this.health = health;
+        this.tileType = tileType;
     }
 
     /**
@@ -346,7 +379,7 @@ public class Tile {
     @Override
     protected Tile clone() throws CloneNotSupportedException {
         super.clone();
-        return new Tile(this.isAnchor, this.isAnchored, this.health);
+        return new Tile(this.isAnchor, this.isAnchored, this.health, this.tileType);
     }
 
     /**

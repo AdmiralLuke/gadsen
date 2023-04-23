@@ -35,6 +35,8 @@ public class BaseProjectile implements Projectile{
     float strength;
 
     ProjectileAction.ProjectileType type;
+
+    GameCharacter shootedBy;
     float t = 0f;
 
     private final static float g = 9.81f * 8;
@@ -68,6 +70,7 @@ public class BaseProjectile implements Projectile{
         this.lastCharacter = character;
         this.lastTile = null;
         this.strength = strength;
+        this.shootedBy = character;
         // recoil
         if (recoil > 0) {
             Vector2 v = new Vector2((dir.x * (-1) * (0.1f * recoil)) * 400, (dir.y * (-1) * (0.1f * recoil)) * 400);
@@ -203,7 +206,7 @@ public class BaseProjectile implements Projectile{
     public Action hitWall(Action head, Tile t, Projectile dec, BaseProjectile bsProj) {
         ProjectileAction projAction = generateAction();
         head.getChildren().add(projAction);
-        return t.onDestroy(projAction);
+        return sim.getWrapper().destroyTile(t, shootedBy, head);
     }
 
     @Override

@@ -45,4 +45,16 @@ public class Weapon {
     public WeaponType getType() {
         return type;
     }
+
+    protected void setAmmo(int ammo) {
+        this.ammo = ammo;
+    }
+
+    public int getAmmo() {
+        return ammo;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
 }

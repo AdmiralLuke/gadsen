@@ -172,9 +172,8 @@ public class GameCharacter {
         if (newHealth < this.health) {
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
-            lastAction = new CharacterAction(0, team, teamPos) {
+            lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth) {
             };
-            //ToDo implement healAction
         }
         this.health = newHealth;
         head.addChild(lastAction);
