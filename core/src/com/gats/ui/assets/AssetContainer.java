@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gats.simulation.WeaponType;
+import com.gats.simulation.action.ProjectileAction;
 
 import java.util.HashMap;
 
@@ -101,7 +102,9 @@ public class AssetContainer {
 
         public static TextureRegion cookieIcon;
         public static TextureRegion sugarCaneIcon;
-        public static HashMap<WeaponType,TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
+        public static HashMap<WeaponType, TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
+
+        public static HashMap<ProjectileAction.ProjectileType, AtlasAnimation> projectiles = new HashMap<ProjectileAction.ProjectileType, AtlasAnimation>() {};
 
         public static TextureRegion fastForwardButton;
         public static TextureRegion fastForwardButtonPressed;
