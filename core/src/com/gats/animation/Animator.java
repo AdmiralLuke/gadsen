@@ -219,10 +219,11 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertProjectileMoveAction(com.gats.simulation.action.Action action, Animator animator) {
             ProjectileAction projectileAction = (ProjectileAction) action;
+            Path path = projectileAction.getPath();
 
 
-            MoveAction moveProjectile = new MoveAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
-            RotateAction rotateProjectile = new RotateAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
+            MoveAction moveProjectile = new MoveAction(0, null, path.getDuration(), path);
+            RotateAction rotateProjectile = new RotateAction(0, null, path.getDuration(), path);
 
             DestroyAction<Entity> destroyProjectile = new DestroyAction<Entity>(0, null, null, animator.root::remove);
 
@@ -239,8 +240,25 @@ public class Animator implements Screen, AnimationLogProcessor {
             //The Projectile should be moved after being summoned
             summonProjectile.setChildren(new Action[]{moveProjectile, rotateProjectile});
 
+            if (projectileAction.getType() == ProjectileAction.ProjectileType.GRENADE){
+                //ToDo fix first explosion
+                DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(5f, null, null, (entity) -> {
+                    animator.root.remove(entity);
+                    entity.free();
+                });
+
+                SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
+                    ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.explosionParticle);
+                    animator.root.add(particleEntity);
+                    particleEntity.setLoop(false);
+                    particleEntity.setRelPos(path.getPos(path.getDuration()));
+                    return particleEntity;
+                });
+                summonParticle.setChildren(new Action[]{destroyParticle});
+                moveProjectile.setChildren(new Action[]{destroyProjectile, summonParticle});
+            }else
             //The Projectile should get destroyed at the end of its path
-            moveProjectile.setChildren(new Action[]{destroyProjectile});
+                moveProjectile.setChildren(new Action[]{destroyProjectile});
 
             //We sliced the projectile Action: Summon is now the first and Destroy the last Action with Move in between
             return new ExpandedAction(summonProjectile, destroyProjectile);

@@ -24,6 +24,7 @@ public class Projectiles {
         Animation<TextureRegion> animation;
         AnimatedEntity animatedEntity;
         switch (type){
+            case GRENADE:
             case WOOL:
                 animation = AssetContainer.IngameAssets.projectiles.get(type);
                 animatedEntity = new AnimatedEntity(animation);
