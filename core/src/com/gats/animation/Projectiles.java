@@ -11,6 +11,7 @@ import com.gats.animation.entity.EntityGroup;
 import com.gats.animation.entity.ParticleEntity;
 import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer;
+import com.gats.ui.assets.AtlasAnimation;
 import org.lwjgl.Sys;
 
 public class Projectiles {
@@ -24,7 +25,9 @@ public class Projectiles {
         AnimatedEntity animatedEntity;
         switch (type){
             case WATER:
-                animatedEntity = new AnimatedEntity(AssetContainer.IngameAssets.projectiles.get(type));
+                animation = AssetContainer.IngameAssets.projectiles.get(type);
+                animatedEntity = new AnimatedEntity(animation);
+                animatedEntity.setOrigin(new Vector2(animation.getKeyFrame(0).getRegionWidth()/2f, animation.getKeyFrame(0).getRegionHeight()/2f));
                 ParticleEntity particleEntity = ParticleEntity.getParticleEntity(AssetContainer.IngameAssets.waterParticle);
                 particleEntity.setLoop(true);
                 projectile = new EntityGroup(animatedEntity, particleEntity);
