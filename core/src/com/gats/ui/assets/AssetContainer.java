@@ -105,6 +105,7 @@ public class AssetContainer {
 
         public static ParticleEffectPool damageParticle;
         public static ParticleEffectPool explosionParticle;
+        public static ParticleEffectPool waterParticle;
 
 
         public static TextureRegion inventoryCell;

@@ -31,6 +31,10 @@ public class GADSAssetManager {
 
     public static final String explosionParticle = "particle/explosionParticle.p";
 
+
+    //ToDo load different effect (not splash)
+    public static final String waterParticle = "particle/waterSplashParticle.p";
+
     public static final String outlineShader = resourceDirectory + "shader/outline.frag";
     public static final String lookupShader = resourceDirectory + "shader/lookup.frag";
     public static final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
@@ -96,6 +100,7 @@ public class GADSAssetManager {
         manager.load(walkParticle, ParticleEffect.class, particleEffectParameter);
         manager.load(damageParticle, ParticleEffect.class, particleEffectParameter);
         manager.load(explosionParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(waterParticle, ParticleEffect.class, particleEffectParameter);
     }
 
 
@@ -170,6 +175,8 @@ public class GADSAssetManager {
         IngameAssets.damageParticle = new ParticleEffectPool(manager.get(damageParticle, ParticleEffect.class), 1, 10);
 
         IngameAssets.explosionParticle = new ParticleEffectPool(manager.get(explosionParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.waterParticle = new ParticleEffectPool(manager.get(waterParticle, ParticleEffect.class), 1, 10);
 
         IngameAssets.WaterPistol = new AtlasAnimation(1/8f, atlas.findRegions("weapon/watergun"), Animation.PlayMode.LOOP);
 

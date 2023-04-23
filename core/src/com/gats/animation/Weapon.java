@@ -69,18 +69,9 @@ public class Weapon extends AnimatedEntity implements Parent {
     @Override
     protected void setPos(Vector2 pos) {
         super.setPos(pos);
-        updatePos();
-    }
-
-    @Override
-    public void setRelPos(Vector2 pos) {
-        super.setRelPos(pos);
-    }
-
-    @Override
-    public void updatePos() {
-            super.updatePos();
         if (carryEntity != null) carryEntity.updatePos();
     }
+
+
 
 }

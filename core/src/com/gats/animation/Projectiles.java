@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.gats.animation.entity.AnimatedEntity;
 import com.gats.animation.entity.Entity;
 import com.gats.animation.entity.EntityGroup;
+import com.gats.animation.entity.ParticleEntity;
 import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer;
 import org.lwjgl.Sys;
@@ -24,8 +25,9 @@ public class Projectiles {
         switch (type){
             case WATER:
                 animatedEntity = new AnimatedEntity(AssetContainer.IngameAssets.projectiles.get(type));
-
-                projectile = new EntityGroup(animatedEntity);
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(AssetContainer.IngameAssets.waterParticle);
+                particleEntity.setLoop(true);
+                projectile = new EntityGroup(animatedEntity, particleEntity);
                 break;
             default:
                 animation = AssetContainer.IngameAssets.coolCat;
