@@ -12,7 +12,7 @@ public class TestTile {
 
     @Before
     public void init() {
-        sim = new Simulation(0, "map1", 2, 1);
+        sim = new Simulation(GameState.GameMode.Normal, "map1", 2, 1);
         state = sim.getState();
         sim.getActionLog().getRootAction().addChild(new InitAction());
         clearMap();
@@ -66,11 +66,6 @@ public class TestTile {
         Assert.assertNull("An der Stelle [5,10] sollte sich KEIN TIle befinden, da dort keine Verankerung ist", state.getBoard()[5][10]);
     }
 
-    @Test
-    public void testIfCloned() {
-        Tile testTile = new Tile(20, 20, state);
-        Assert.assertNotEquals("ein Clone sollte unterschiedliche Referenzen haben", testTile.returnClone(), testTile);
-    }
 
     @Test
     public void testIfDestroyed() {

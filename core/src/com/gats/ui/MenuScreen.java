@@ -31,7 +31,7 @@ public class MenuScreen implements Screen {
 private TextureRegion background;
 private SpriteBatch menuBatch;
 
-    public MenuScreen(GADS gameInstance) {
+    public MenuScreen(GADS gameInstance, RunConfiguration runConfig) {
 
         this.gameInstance = gameInstance;
         TextureRegion titleSprite = AssetContainer.MainMenuAssets.titleSprite;
@@ -47,7 +47,7 @@ private SpriteBatch menuBatch;
         menuBatch = new SpriteBatch();
         //create a table, holds ui widgets like buttons and textfields
 
-        setupMenuScreen(mainMenu);
+        setupMenuScreen(mainMenu, runConfig);
     }
 
     public void startGame(RunConfiguration config){
@@ -66,8 +66,9 @@ private SpriteBatch menuBatch;
      *
      * @param menuStage is the Stage that is supposed to receive the buttons.
      */
-    public void setupMenuScreen(Stage menuStage) {
+    public void setupMenuScreen(Stage menuStage, RunConfiguration runConfig) {
 
+        //ToDo forward runconfig and process
         this.menuBuilder = new Menu(AssetContainer.MainMenuAssets.skin, AssetContainer.MainMenuAssets.titleSprite, Manager.getPossiblePlayers(),gameInstance.getGameModes(),this);
 
         menuStage.addActor(menuBuilder.buildMenuLayout(AssetContainer.MainMenuAssets.skin));

@@ -1,5 +1,6 @@
 package com.gats.simulation.action;
 
+import java.io.Serializable;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,7 +9,7 @@ import java.util.Iterator;
  * Represents a single UI-relevant Event
  * Base-Component of the asynchronous interface between the simulation and ui/animation package
  */
-public abstract class Action implements Iterable<Action>{
+public abstract class Action implements Iterable<Action>, Serializable {
     private final float delay;
     private final ArrayList<Action> arrayList = new ArrayList<>();
 
