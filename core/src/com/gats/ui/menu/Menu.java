@@ -300,7 +300,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 
 	private SelectBox<GameMap> createMapSelector(Skin skin) {
 		SelectBox<GameMap> mapSelector = new SelectBox<>(skin);
-		mapSelector.setItems(new MapRetriever().listMaps());
+		mapSelector.setItems(new MapRetriever().getMaps());
 
 		mapSelector.addListener(new ChangeListener() {
 			@Override
