@@ -371,7 +371,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             });
 
             SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
-                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.walkParticle);
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.damageParticle);
                 target.add(particleEntity);
                 particleEntity.setLoop(false);
                 particleEntity.setRelPos(0, 5);

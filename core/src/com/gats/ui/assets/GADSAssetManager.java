@@ -19,8 +19,8 @@ public class GADSAssetManager {
     public static final String resourceDirectory = "";
     public static final String atlas = resourceDirectory + "texture_atlas/TextureAtlas.atlas";
 
-    public static final String skin = resourceDirectory + "ui/skin.json";
-    public static final String font = resourceDirectory + "ui/lsans-15.fnt";
+    public final String skin = resourceDirectory + "uiUtility/skin.json";
+    public final String font = resourceDirectory + "uiUtility/lsans-15.fnt";
 
     public static final String particleGroup = "particle/";
     public static final String slimeParticle = "particle/slimeParticle.p";
@@ -33,11 +33,6 @@ public class GADSAssetManager {
     public static final String outlineShader = resourceDirectory + "shader/outline.frag";
     public static final String lookupShader = resourceDirectory + "shader/lookup.frag";
     public static final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
-    public final String skin = resourceDirectory + "uiUtility/skin.json";
-    public final String font = resourceDirectory + "uiUtility/lsans-15.fnt";
-    public final String outlineShader = resourceDirectory + "shader/outline.frag";
-    public final String lookupShader = resourceDirectory + "shader/lookup.frag";
-    public final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
 
     private boolean finishedLoading = false;
 
