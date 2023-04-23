@@ -1,6 +1,6 @@
 package com.gats.manager;
 
-import com.gats.ui.hud.GadsenInputProcessor;
+import com.gats.simulation.GameState.GameMode;
 import com.gats.ui.hud.UiMessenger;
 
 import java.util.ArrayList;
@@ -8,15 +8,15 @@ import java.util.ArrayList;
 public class RunConfiguration {
 
     //Todo add default values
-    public int gameMode = 0;
+    public GameMode gameMode = GameMode.Normal;
 
     public boolean gui = false;
 
     public AnimationLogProcessor animationLogProcessor = null;
 
     public UiMessenger uiMessenger = null;
-    //Generalize to Interface
-    public GadsenInputProcessor input = null;
+
+    public InputProcessor inputProcessor = null;
 
     public String mapName;
 
@@ -37,7 +37,7 @@ public class RunConfiguration {
         if(players==null){
             return false;
         }
-        if(gameMode<0){
+        if(gameMode == null){
             return false;
         }
 
@@ -52,7 +52,7 @@ public class RunConfiguration {
       output+=  "Gui: " + gui +nl;
 
       output+= "AnimationLogProcessor: " + checkNullToString(animationLogProcessor)+nl;
-      output+= "HudStage: " + checkNullToString(input)+nl;
+      output+= "InputProcessor: " + checkNullToString(inputProcessor)+nl;
       output+= "mapName: " + mapName+nl;
       output+= "teamCount: " + teamCount+nl;
       output+= "teamSize: " + teamSize+nl;

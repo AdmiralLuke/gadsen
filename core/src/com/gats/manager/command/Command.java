@@ -12,9 +12,14 @@ public abstract class Command {
         this.controller = controller;
     }
 
-    public abstract ActionLog run();
+    public abstract ActionLog onExecute();
+
+    public ActionLog run(){
+        if (controller.isActive()) return onExecute();
+        return null;
+    }
 
     public boolean isEndTurn() {
-        return isEndTurn;
+        return controller.isActive() && isEndTurn;
     }
 }

@@ -1,22 +1,176 @@
 package com.gats;
 
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
-import com.gats.simulation.Tile;
+import com.gats.manager.Manager;
+import com.gats.manager.Player;
+import com.gats.manager.Run;
+import com.gats.manager.RunConfiguration;
+import com.gats.simulation.GameState;
 import com.gats.ui.GADS;
+import org.apache.commons.cli.*;
+
+import java.lang.management.ManagementFactory;
+import java.util.Arrays;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
-	public static void main (String[] arg) {
 
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(60);
-		config.setTitle("G.A.D.S.E.N.");
-		config.setWindowIcon(Files.FileType.Classpath, "icon/icon.png");
-		new Lwjgl3Application(new GADS(), config);
-	}
+    private static final Options cliOptions = new Options();
+
+    static {
+
+        cliOptions.addOption(Option
+                .builder("?")
+                .longOpt("help")
+                .desc("Prints this list").build());
+
+        cliOptions.addOption(Option
+                .builder("m")
+                .longOpt("map")
+                .hasArg()
+                .desc("(Required for -n) String name of the map without extension").build());
+
+        cliOptions.addOption(Option
+                .builder("p")
+                .longOpt("players")
+                .hasArg()
+                .desc("(Required for -n) Names of the bots class files without extension in format \"Bot1 Bot2 Bot3\" \n Attention: Case-sensitive!").build());
+
+        cliOptions.addOption(Option
+                .builder("g")
+                .longOpt("gamemode")
+                .hasArg()
+                .type(Number.class)
+                .desc("GameMode to be played (Default: 0)\n" +
+                        "  0 - Normal\n" +
+                        "  1 - Campaign\n" +
+                        "  2 - Exam Admission\n" +
+                        "  3 - Tournament: Phase 1\n" +
+                        "  4 - Tournament: Phase 2").build());
+
+        cliOptions.addOption(Option.builder("n")
+                .longOpt("nogui")
+                .desc("Runs the simulation without animation").build());
+
+        cliOptions.addOption(Option
+                .builder("s")
+                .longOpt("teamsize")
+                .hasArg()
+                .desc("Number of players per team, Default: 3").build());
+
+        cliOptions.addOption(Option
+                .builder("k")
+                .longOpt("key")
+                .hasArg()
+                .desc("When printing results, they will be encased by the given key, ensuring authenticity").build());
+
+    }
+
+    public static void main(String[] args) {
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine params;
+        try {
+            if (parser.parse(new Options().addOption("?", "help", false, "Prints this list"), args).hasOption("?")) {
+                printHelp();
+                return;
+            }
+            params = parser.parse(cliOptions, args);
+        } catch (ParseException e) {
+            printHelp();
+            return;
+        }
+        RunConfiguration runConfig = new RunConfiguration();
+        runConfig.gui = !params.hasOption("n");
+        runConfig.mapName = params.getOptionValue("m", null);
+        if (params.hasOption("p"))
+            runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
+        int gameMode = Integer.parseInt(params.getOptionValue("g", "0"));
+        if (gameMode < 0 || gameMode >= GameState.GameMode.values().length) {
+            System.err.println("Valid GameModes range from 0 to 4");
+            printHelp();
+            return;
+        }
+        runConfig.gameMode = GameState.GameMode.values()[gameMode];
+        runConfig.teamSize = Integer.parseInt(params.getOptionValue("s", "3"));
+        if (runConfig.gui) {
+            Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+            config.setForegroundFPS(60);
+            config.setTitle("G.A.D.S.E.N.");
+            config.setWindowIcon(Files.FileType.Classpath, "icon/icon.png");
+            new Lwjgl3Application(new GADS(runConfig), config);
+        } else {
+            boolean invalidConfig = false;
+            if (runConfig.mapName == null) {
+                System.err.println("Param -m is required for no GUI mode");
+                invalidConfig = true;
+            }
+            if (runConfig.players == null) {
+                System.err.println("Param -m is required for no GUI mode");
+                invalidConfig = true;
+            } else if (runConfig.players.size() < 2) {
+                System.err.println("At least two players are required");
+                invalidConfig = true;
+            }
+            if (invalidConfig) {
+                printHelp();
+                return;
+            }
+            Manager manager = Manager.getManager();
+            Run run = manager.startRun(runConfig);
+            Object lock = new Object();
+            synchronized (lock) {
+                run.addCompletionListener((tmp) -> {
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                });
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            printResults(run, params.getOptionValue("k",""));
+        }
+        Manager.getManager().dispose();
+    }
+
+    private static void printResults(Run run, String key) {
+        StringBuilder builder = new StringBuilder();
+        if (key!= null && key.length()>0) builder.append("<").append(key).append(">");
+        switch (run.getGameMode()) {
+            case Normal:
+            case Tournament_Phase_1:
+                builder.append("\nScores:\n");
+                int i=0;
+                for (Class<? extends Player> cur : run.getPlayers()) {
+                    builder.append(String.format("%-10s : %-6f", cur.getName(), run.getScores()[i++]));
+                }
+                break;
+            case Campaign:
+            case Exam_Admission:
+                if (run.getScores()[0] > 0) builder.append("Bot completed the challenge");
+                else builder.append("Bot failed the challenge");
+                break;
+            default:
+                builder.append(Arrays.toString(run.getPlayers().toArray()));
+                builder.append("\n");
+                builder.append(Arrays.toString(run.getScores()));
+        }
+        if (key!= null && key.length()>0) builder.append("<").append(key).append(">");
+        System.out.println(builder.toString());
+    }
+
+
+    private static void printHelp() {
+        String header = "\n\n";
+        String footer = "\nPlease report issues at wettbewerb@acagamics.de";
+
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("java -jar gadsen-1.1.jar", header, cliOptions, footer, true);
+    }
 }

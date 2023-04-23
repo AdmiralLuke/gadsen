@@ -15,7 +15,7 @@ public class AimCommand extends Command{
     }
 
     @Override
-    public ActionLog run() {
+    public ActionLog onExecute() {
         return controller.aim(angle, strength);
     }
 }

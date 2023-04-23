@@ -18,13 +18,13 @@ import com.gats.simulation.WeaponType;
 public class Controller {
 
     private boolean active = true;
-    private Manager manager;
+    private Game game;
     private GameCharacterController gcController;
     private GameCharacter gameCharacter;
 
-    protected Controller(Manager manager, GameCharacterController gcController) {
+    protected Controller(Game game, GameCharacterController gcController) {
 //        System.out.println("Created new Controller: " + this);
-        this.manager = manager;
+        this.game = game;
         this.gcController = gcController;
         this.gameCharacter = gcController.getGameCharacter();
     }
@@ -41,7 +41,7 @@ public class Controller {
      * Positive Werte bewegen den Charakter nach rechts, Negative nach links.
      */
     public void move(int dx) {
-        if (active) manager.queueCommand(new MoveCommand(gcController, dx));
+        if (active) game.queueCommand(new MoveCommand(gcController, dx));
 
     }
 
@@ -86,7 +86,7 @@ public class Controller {
      * @param strength Stärke des Schusses zwischen 0 und 1 (inklusive).
      */
     public void aim(Vector2 angle, float strength) {
-        if (active) manager.queueCommand(new AimCommand(gcController, angle, strength));
+        if (active) game.queueCommand(new AimCommand(gcController, angle, strength));
     }
 
     /**
@@ -94,7 +94,7 @@ public class Controller {
      * @param type Die Waffe die gewählt werden soll.
      */
     public void selectWeapon(WeaponType type) {
-        if (active) manager.queueCommand(new WeaponSelectCommand(gcController, type));
+        if (active) game.queueCommand(new WeaponSelectCommand(gcController, type));
     }
 
     /**
@@ -102,7 +102,7 @@ public class Controller {
      * Es kann nur einmal pro Zug geschossen werden.
      */
     public void shoot() {
-        if (active) manager.queueCommand(new ShootCommand(gcController));
+        if (active) game.queueCommand(new ShootCommand(gcController));
     }
 
     /**
@@ -117,6 +117,7 @@ public class Controller {
      */
     protected void deactivate() {
         active = false;
+        gcController.deactivate();
     }
 
 }

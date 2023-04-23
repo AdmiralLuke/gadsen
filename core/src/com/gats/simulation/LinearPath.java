@@ -103,7 +103,6 @@ public class LinearPath implements Path {
 
     @Override
     public String toString() {
-        String output = "from: " + getPos(0) + "to: " +getPos(getDuration());
-        return output;
+        return "from: " + getPos(0) + "to: " +getPos(getDuration());
     }
 }
