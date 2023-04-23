@@ -14,9 +14,9 @@ public class SpriteEntity extends Entity {
 
     private TextureRegion textureRegion;
 
-    protected Vector2 size = null;
-
     private Color color = null;
+    private Vector2 scale = new Vector2(1, 1);
+    private Vector2 size = null;
 
     private boolean flipped = false;
 
@@ -56,8 +56,8 @@ public class SpriteEntity extends Entity {
                     origin.y,
                     textureRegion.getRegionWidth(),
                     textureRegion.getRegionHeight(),
-                    getScale().x,
-                    (flipped ? -1 : 1) * (getScale().y),
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
                     getRotationAngle());
         else
             batch.draw(textureRegion,
@@ -67,14 +67,31 @@ public class SpriteEntity extends Entity {
                     origin.y,
                     size.x,
                     size.y,
-                    getScale().x,
-                    (flipped ? -1 : 1) * (getScale().y),
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
                     getRotationAngle());
 
         //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
 
         if (color != null)
             batch.setColor(Color.WHITE);
+    }
+
+
+    public Vector2 getScale() {
+        return scale;
+    }
+
+    public void setScale(Vector2 scale) {
+        this.scale = scale;
+    }
+
+    public Vector2 getSize() {
+        return new Vector2(size);
+    }
+
+    public void setSize(Vector2 size) {
+        this.size = size;
     }
 
 
@@ -151,19 +168,11 @@ public class SpriteEntity extends Entity {
         angle = ((angle % 360) + 360) % 360;
         super.setRotationAngle(rotate ? angle : 0);
         if (angle >= 90f && angle <= 270f) {
+            super.setRotationAngle(mirror ? angle-180 : angle);
             setFlipped(mirror);
         } else {
             setFlipped(false);
         }
-    }
-
-
-    public Vector2 getSize() {
-        return new Vector2(size);
-    }
-
-    public void setSize(Vector2 size) {
-        this.size = size;
     }
 
 }

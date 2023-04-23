@@ -62,6 +62,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
                 skin = IngameAssets.coolCatSkin;
         }
         setMirror(true);
+        setRotate(true);
         TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
         setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5, 0));
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);

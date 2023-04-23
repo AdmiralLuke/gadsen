@@ -5,9 +5,12 @@ import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 import com.gats.ui.assets.AssetContainer.MainMenuAssets;
+import com.gats.ui.hud.InputHandler;
+import com.gats.ui.hud.inventory.InventoryCell;
 
 public class GADSAssetManager {
     //dedicatod to loading and mangaing assets used in the application
@@ -30,6 +33,11 @@ public class GADSAssetManager {
     public static final String outlineShader = resourceDirectory + "shader/outline.frag";
     public static final String lookupShader = resourceDirectory + "shader/lookup.frag";
     public static final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
+    public final String skin = resourceDirectory + "uiUtility/skin.json";
+    public final String font = resourceDirectory + "uiUtility/lsans-15.fnt";
+    public final String outlineShader = resourceDirectory + "shader/outline.frag";
+    public final String lookupShader = resourceDirectory + "shader/lookup.frag";
+    public final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
 
     private boolean finishedLoading = false;
 
@@ -117,7 +125,7 @@ public class GADSAssetManager {
 
         IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("tile/16x_box01"), atlas.findRegion("tile/16x_anchor01")};
 
-        IngameAssets.aimingIndicatorSprite = atlas.findRegion("hud/aimIndicator");
+        IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicator");
 
         IngameAssets.gameCharacterAnimations = new AtlasAnimation[GameCharacterAnimationType.values().length];
 
@@ -136,7 +144,7 @@ public class GADSAssetManager {
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_DEATH.ordinal()] =
                 new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catDeath"), Animation.PlayMode.LOOP);
 
-        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.LOOP);
+        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.NORMAL);
 
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
@@ -166,6 +174,21 @@ public class GADSAssetManager {
         IngameAssets.damageParticle = new ParticleEffectPool(manager.get(damageParticle, ParticleEffect.class), 1, 10);
 
         IngameAssets.explosionParticle = new ParticleEffectPool(manager.get(explosionParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
+        IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
+        IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
+
+        //IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
+      //  IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
+
+        IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED,null);
+        IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
+        IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
+        IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");
+        IngameAssets.turnChange = atlas.findRegion("ui/turnChange");
+        IngameAssets.turnTimer = atlas.findRegion("ui/clockSprite");
+
 
         finishedLoading = true;
     }

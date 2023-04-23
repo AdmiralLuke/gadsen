@@ -9,12 +9,14 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.animation.action.*;
 import com.gats.animation.action.Action;
+import com.gats.animation.action.uiActions.*;
 import com.gats.animation.entity.*;
 import com.gats.manager.AnimationLogProcessor;
 import com.gats.simulation.*;
 import com.gats.simulation.action.*;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
+import com.gats.ui.hud.UiMessenger;
 
 
 import java.util.*;
@@ -37,6 +39,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private Viewport backgroundViewport;
 
     private SpriteEntity background;
+    private UiMessenger uiMessenger;
 
     private Batch batch;
 
@@ -121,7 +124,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static final Map<Class<?>, ActionConverter> map =
                 new HashMap<Class<?>, ActionConverter>() {
                     {
-                        put(CharacterWalkAction.class, ActionConverters::convertCharacterMoveAction);
+                        put(CharacterWalkAction.class, ActionConverters::convertCharacterWalkAction);
                         put(ProjectileAction.class, ActionConverters::convertProjectileMoveAction);
                         put(TileMoveAction.class, ActionConverters::convertTileMoveAction);
                         put(TileDestroyAction.class, ActionConverters::convertTileDestroyAction);
@@ -134,6 +137,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(CharacterHitAction.class, ActionConverters::convertCharacterHitAction);
                         put(GameOverAction.class, ActionConverters::convertGameOverAction);
                         put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
+                        put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
                     }
                 };
 
@@ -166,7 +170,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return children;
         }
 
-        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator) {
+        private static ExpandedAction convertCharacterWalkAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterWalkAction moveAction = (CharacterWalkAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
@@ -192,9 +196,10 @@ public class Animator implements Screen, AnimationLogProcessor {
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
             startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
-            animMoveAction.setChildren(new Action[]{stopWalking});
-
-            return new ExpandedAction(startWalking, stopWalking);
+            //notify ui
+            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0,animator.uiMessenger,animator.state.getCharacterFromTeams(moveAction.getTeam(),moveAction.getCharacter()));
+            animMoveAction.setChildren(new Action[]{stopWalking,messageUiPlayerMoveAction});
+            return new ExpandedAction(startWalking, messageUiPlayerMoveAction);
         }
 
         private static ExpandedAction convertCharacterFallAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -307,29 +312,52 @@ public class Animator implements Screen, AnimationLogProcessor {
             AimIndicator currentAimIndicator = animator.teams[aimAction.getTeam()][aimAction.getCharacter()].getAimingIndicator();
             RotateAction rotateAction = new RotateAction(0, currentAimIndicator, aimAction.getAngle());
             ScaleAction scaleAction = new ScaleAction(0, currentAimIndicator, new Vector2(aimAction.getStrength(), 1));
-            rotateAction.setChildren(new Action[]{scaleAction});
-            return new ExpandedAction(rotateAction, scaleAction);
+
+            //notify Ui
+            MessageUiPlayerAimAction aimValuesAction = new MessageUiPlayerAimAction(0,animator.uiMessenger,aimAction.getAngle().angleDeg(),aimAction.getStrength());
+            rotateAction.setChildren(new Action[]{scaleAction,aimValuesAction});
+
+            return new ExpandedAction(rotateAction, aimValuesAction);
         }
 
         private static ExpandedAction convertTurnStartAction(com.gats.simulation.action.Action action, Animator animator) {
             TurnStartAction startAction = (TurnStartAction) action;
             GameCharacter target = animator.teams[startAction.getTeam()][startAction.getCharacter()];
             animator.getCamera().moveToVector(target.getPos());
-            return new ExpandedAction(new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter));
+
+            CharacterSelectAction characterSelectAction = new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter);
+
+            //ui Action
+            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0,animator.uiMessenger,animator.state.getCharacterFromTeams(startAction.getTeam(),startAction.getCharacter()));
+
+            characterSelectAction.setChildren(new Action[]{indicateTurnStartAction});
+            return new ExpandedAction(characterSelectAction,indicateTurnStartAction);
         }
 
         private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterSwitchWeaponAction switchWeaponAction = (CharacterSwitchWeaponAction) action;
             GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
             AddAction addAction = new AddAction(action.getDelay(), target, Weapons.summon(switchWeaponAction.getWpType()));
-            return new ExpandedAction(addAction);
+
+            //notifyUhab nachdem du gerade gepusht hast noch ein 2.tes mal gemergt
+
+            MessageUiWeaponSelectAction selectedWeaponAction = new MessageUiWeaponSelectAction(0,animator.uiMessenger,switchWeaponAction.getWpType());
+            addAction.setChildren(new Action[]{selectedWeaponAction});
+
+            return new ExpandedAction(addAction,selectedWeaponAction);
         }
 
 
         private static ExpandedAction convertCharacterShootAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterShootAction shootAction = (CharacterShootAction) action;
+            com.gats.simulation.GameCharacter currentPlayer = animator.state.getCharacterFromTeams(shootAction.getTeam(),shootAction.getCharacter());
             //ToDo play weapon animation
-            return new ExpandedAction(new IdleAction(shootAction.getDelay(), 0));
+            IdleAction idleAction = new IdleAction(shootAction.getDelay(), 0);
+
+            //uiaction
+            MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0,animator.uiMessenger,currentPlayer,currentPlayer.getSelectedWeapon());
+            idleAction.setChildren(new Action[]{updateInventoryItem});
+            return new ExpandedAction(idleAction,updateInventoryItem);
         }
 
         private static ExpandedAction convertCharacterHitAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -358,6 +386,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 SummonAction<Entity> summonTombstone = new SummonAction<Entity>(0, null, () -> {
                     AnimatedEntity tombstone = new AnimatedEntity(IngameAssets.tombstoneAnimation);
                     tombstone.setRelPos(target.getRelPos());
+                    tombstone.setOrigin(new Vector2(IngameAssets.tombstoneAnimation.getKeyFrame(0).getRegionWidth()/2f, target.getOrigin().y));
                     animator.root.add(tombstone);
                     return tombstone;
 
@@ -392,6 +421,8 @@ public class Animator implements Screen, AnimationLogProcessor {
             });
 
 
+            //Todo pass to ui
+
             return new ExpandedAction(summonWinScreen);
         }
 
@@ -421,6 +452,23 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(summonAction, destroyAction);
         }
 
+        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator){
+            CharacterMoveAction moveAction = (CharacterMoveAction) action;
+
+            GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            Path path = moveAction.getPath();
+            SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
+            CharacterPath characterPath = new CharacterPath(moveAction.getPath());
+            MoveAction animMoveAction = new MoveAction(0, target, characterPath.getDuration(), characterPath);
+            //rotateAction to set the angle/direction of movement, to flip the character sprite
+            RotateAction animRotateAction = new RotateAction(0,target, characterPath.getDuration(), characterPath);
+            startWalking.setChildren(new Action[]{animMoveAction,animRotateAction});
+            SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
+            animMoveAction.setChildren(new Action[]{stopWalking});
+
+            return new ExpandedAction(startWalking, stopWalking);
+        }
+
     }
 
 
@@ -430,7 +478,8 @@ public class Animator implements Screen, AnimationLogProcessor {
      * @param state    Contains the initial state of the game before any actions are played
      * @param viewport viewport used for rendering
      */
-    public Animator(GameState state, Viewport viewport, int gameMode) {
+    public Animator(GameState state, Viewport viewport, int gameMode,UiMessenger uiMessenger) {
+        this.uiMessenger= uiMessenger;
         this.state = state;
         this.batch = new SpriteBatch();
         this.root = new EntityGroup();
@@ -592,9 +641,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         batch.setProjectionMatrix(camera.combined);
         //tells the batch to render in the way specified by the camera
         // e.g. Coordinate-system and Viewport scaling
-
         viewport.apply();
-
 
         //ToDo: make one step in the scheduled actions
 
