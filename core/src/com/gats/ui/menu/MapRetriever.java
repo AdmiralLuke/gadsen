@@ -170,7 +170,7 @@ public class MapRetriever implements FilenameFilter {
         JsonValue map=null;
         boolean mapLoaded = false;
         boolean internalDir = false;
-        String mapFolder;
+        String mapFolder = "";
 
         String filename = dir + mapName+filetype;
 
@@ -185,7 +185,8 @@ public class MapRetriever implements FilenameFilter {
             mapFolder = campaignMapFolder;
         }
 
-            if(internalDir){
+        if(internalDir){
+                filename = mapFolder + mapName+filetype;
         try {
             if(debug) {
 

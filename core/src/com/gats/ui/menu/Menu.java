@@ -135,7 +135,6 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 	MenuScreen menuScreen;
 	public Menu(Skin skin, TextureRegion titleSprite, Manager.NamedPlayerClass[] availableBots, String[] gameModes, MenuScreen menuScreen) {
 		menuTable = new Table(skin);
-
 		if(gameModeSelector==null) {
 			createButtons(skin, availableBots, gameModes,titleSprite);
 		}
@@ -238,17 +237,17 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 	}
 	public Table getGameModeLayout(int gameMode) {
 //Todo  fix hardcoded gamemode evaluation but passing String[] gameModes to buildTable
-
 		Skin skin = menuTable.getSkin();
-		switch (gameMode) {
-			case 0:
-				return new NormalLayout(skin, this);
-			case 1:
-				return new ChristmasLayout(skin, this);
-			default:
-				return new NormalLayout(menuTable.getSkin(), this);
 
-		}
+		//if(GameState.GameMode.Normal.ordinal() == gameMode) {
+		//	return new NormalLayout(skin, this);
+		//}
+		//if(GameState.GameMode.Campaign.ordinal() == gameMode) {
+		//		return new CampaignLayout(skin, this);
+		//}
+
+		//default case
+		return new NormalLayout(skin, this);
 	}
 
 	public void rebuildTable(){
@@ -298,17 +297,18 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		return gameModeSelect;
 	}
 
+	/**
+	 * Initializes the map selecter with the normal maps
+	 * @param skin
+	 * @return
+	 */
 	private SelectBox<GameMap> createMapSelector(Skin skin) {
+
+		//Todo, adjust maps based on first gamemode, dynamically -> if gamemodeselector is initialized, use selected value
+		//-> use function for evaluating the selected mode
 		SelectBox<GameMap> mapSelector = new SelectBox<>(skin);
-		mapSelector.setItems(new MapRetriever().getMaps());
 
-		mapSelector.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints());
-			}
-		});
-
+		setMapsNormal(mapSelector);
 
 		return mapSelector;
 	}
@@ -325,6 +325,32 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		BotSelectorTable botSelector = new BotSelectorTable(skin,3);
 		botSelector.setAvailableBots(availableBots);
 		return botSelector;
+	}
+
+	/**
+	 * Adds the maps from the Normal mode, to the {@link Menu#mapSelector}
+	 * @param mapSelector to add maps to.
+	 */
+	private void setMapsNormal(SelectBox<GameMap> mapSelector){
+
+		mapSelector.setItems(new MapRetriever().getMaps());
+		mapSelector.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints());
+			}
+		});
+	}
+	/**
+	 * Adds the maps from the Campaign mode, to the {@link Menu#mapSelector}
+	 * @param mapSelector to add maps to.
+	 */
+	private void setMapsCampaign(SelectBox<GameMap> mapSelector){
+
+	// maybe call this to remove the listener, will see
+	//	mapSelector.clearListeners();
+	mapSelector.setItems(new MapRetriever().getCampaignMaps());
+
 	}
 
 	public SelectBox<GameMap> getMapSelector() {
