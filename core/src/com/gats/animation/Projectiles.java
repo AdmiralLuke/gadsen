@@ -24,6 +24,12 @@ public class Projectiles {
         Animation<TextureRegion> animation;
         AnimatedEntity animatedEntity;
         switch (type){
+            case WOOL:
+                animation = AssetContainer.IngameAssets.projectiles.get(type);
+                animatedEntity = new AnimatedEntity(animation);
+                animatedEntity.setOrigin(new Vector2(animation.getKeyFrame(0).getRegionWidth()/2f, animation.getKeyFrame(0).getRegionHeight()/2f));
+                projectile = animatedEntity;
+                break;
             case WATER:
                 animation = AssetContainer.IngameAssets.projectiles.get(type);
                 animatedEntity = new AnimatedEntity(animation);
