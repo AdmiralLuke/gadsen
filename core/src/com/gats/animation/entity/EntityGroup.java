@@ -33,7 +33,9 @@ public class EntityGroup extends Entity implements Parent{
     @Override
     protected void setPos(Vector2 pos) {
         super.setPos(pos);
-        updatePos();
+        for (Entity child : children) {
+            child.updatePos();
+        }
     }
 
     @Override
@@ -41,13 +43,6 @@ public class EntityGroup extends Entity implements Parent{
         super.setRelPos(pos);
     }
 
-    @Override
-    public void updatePos() {
-        super.updatePos();
-        for (Entity child : children) {
-            child.updatePos();
-        }
-    }
 
     @Override
     public void add(Entity child){

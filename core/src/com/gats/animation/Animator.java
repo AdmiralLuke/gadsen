@@ -3,6 +3,7 @@ package com.gats.animation;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -10,9 +11,6 @@ import com.gats.animation.action.*;
 import com.gats.animation.action.Action;
 import com.gats.animation.action.uiActions.*;
 import com.gats.animation.entity.*;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.manager.AnimationLogProcessor;
 import com.gats.simulation.*;
 import com.gats.simulation.action.*;
@@ -179,10 +177,26 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_WALKING);
+
             MoveAction animMoveAction = new MoveAction(0, target, moveAction.getDuration(), new CharacterPath(moveAction.getPath()));
+
+
+            DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(moveAction.getDuration(), null, null, (entity) -> {
+                target.remove(entity);
+                entity.free();
+            });
+
+            SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.walkParticle);
+                target.add(particleEntity);
+                particleEntity.setLoop(true);
+                particleEntity.setRelPos(0, -3);
+                return particleEntity;
+            });
+            summonParticle.setChildren(new Action[]{destroyParticle});
             //rotateAction to set the angle/direction of movement, to flip the character sprite
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
-            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction});
+            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             //notify ui
             MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()));
@@ -210,9 +224,9 @@ public class Animator implements Screen, AnimationLogProcessor {
             MoveAction moveProjectile = new MoveAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
             RotateAction rotateProjectile = new RotateAction(0, null, projectileAction.getDuration(), projectileAction.getPath());
 
-            DestroyAction destroyProjectile = new DestroyAction(0, null, null, animator.root::remove);
+            DestroyAction<Entity> destroyProjectile = new DestroyAction<Entity>(0, null, null, animator.root::remove);
 
-            SummonAction summonProjectile = new SummonAction(action.getDelay(), target -> {
+            SummonAction<Entity> summonProjectile = new SummonAction<Entity>(action.getDelay(), target -> {
                 moveProjectile.setTarget(target);
                 rotateProjectile.setTarget(target);
                 destroyProjectile.setTarget(target);
@@ -241,12 +255,12 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             MoveAction moveTileEntity = new MoveAction(0, null, tileMoveAction.getDuration(), tileMoveAction.getPath());
 
-            DestroyAction destroyTileEntity = new DestroyAction(0, null, null, child -> {
+            DestroyAction<Entity> destroyTileEntity = new DestroyAction<Entity>(0, null, null, child -> {
                 animator.root.remove(child);
                 animator.map.setTile(IntPosAfter, tileType.intValue());
             });
 
-            SummonAction summonTileEntity = new SummonAction(action.getDelay(), target -> {
+            SummonAction<Entity> summonTileEntity = new SummonAction<Entity>(action.getDelay(), target -> {
                 moveTileEntity.setTarget(target);
                 destroyTileEntity.setTarget(target);
             }, () -> {
@@ -271,9 +285,9 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             TileDestroyAction destroyAction = (TileDestroyAction) action;
 
-            DestroyAction destroyProjectile = new DestroyAction(IngameAssets.destroyTileAnimation.getAnimationDuration(), null, null, animator.root::remove);
+            DestroyAction<Entity> destroyProjectile = new DestroyAction<Entity>(IngameAssets.destroyTileAnimation.getAnimationDuration(), null, null, animator.root::remove);
 
-            SummonAction summonProjectile = new SummonAction(action.getDelay(), destroyProjectile::setTarget, () -> {
+            SummonAction<Entity> summonProjectile = new SummonAction<Entity>(action.getDelay(), destroyProjectile::setTarget, () -> {
                 animator.map.setTile(destroyAction.getPos(), TileMap.TYLE_TYPE_NONE);
                 Entity particle = new AnimatedEntity(IngameAssets.destroyTileAnimation);
                 particle.setRelPos(destroyAction.getPos().toFloat().scl(animator.map.getTileSize()));
@@ -353,12 +367,25 @@ public class Animator implements Screen, AnimationLogProcessor {
             Action lastAction;
             GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
             SetAnimationAction hitAnimation = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
+            DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(2f, null, null, (entity) -> {
+                target.remove(entity);
+                entity.free();
+            });
+
+            SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.damageParticle);
+                target.add(particleEntity);
+                particleEntity.setLoop(false);
+                particleEntity.setRelPos(0, 5);
+                return particleEntity;
+            });
+            summonParticle.setChildren(new Action[]{destroyParticle});
             if (hitAction.getHealthAft() <= 0) {
-                SetAnimationAction deathAnimation = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_DEATH);
-                hitAnimation.setChildren(new Action[]{deathAnimation});
-                DestroyAction destroyCharacter = new DestroyAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, null, animator.characterGroup::remove);
+                SetAnimationAction deathAnimation = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, GameCharacterAnimationType.ANIMATION_TYPE_DEATH);
+                hitAnimation.setChildren(new Action[]{summonParticle, deathAnimation});
+                DestroyAction<Entity> destroyCharacter = new DestroyAction<Entity>(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_DEATH), target, null, animator.characterGroup::remove);
                 deathAnimation.setChildren(new Action[]{destroyCharacter});
-                SummonAction summonTombstone = new SummonAction(0, null, () -> {
+                SummonAction<Entity> summonTombstone = new SummonAction<Entity>(0, null, () -> {
                     AnimatedEntity tombstone = new AnimatedEntity(IngameAssets.tombstoneAnimation);
                     tombstone.setRelPos(target.getRelPos());
                     tombstone.setOrigin(new Vector2(IngameAssets.tombstoneAnimation.getKeyFrame(0).getRegionWidth()/2f, target.getOrigin().y));
@@ -372,7 +399,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 lastAction = summonTombstone;
             } else {
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
-                hitAnimation.setChildren(new Action[]{resetAnimationAction});
+                hitAnimation.setChildren(new Action[]{summonParticle, resetAnimationAction});
                 lastAction = resetAnimationAction;
             }
             return new ExpandedAction(hitAnimation, lastAction);
@@ -381,7 +408,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
             GameOverAction winAction = (GameOverAction) action;
 
-            SummonAction summonWinScreen = new SummonAction(action.getDelay(), null, () -> {
+            SummonAction<Entity> summonWinScreen = new SummonAction<Entity>(action.getDelay(), null, () -> {
 
                 Vector2 pos = animator.getCamera().getScreenCenter();
                 TextureRegion display;
@@ -406,9 +433,9 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertDebugPointAction(com.gats.simulation.action.Action action, Animator animator) {
             DebugPointAction debugPointAction = (DebugPointAction) action;
 
-            DestroyAction destroyAction = new DestroyAction(debugPointAction.getDuration(), null, null, animator.root::remove);
+            DestroyAction<Entity> destroyAction = new DestroyAction<Entity>(debugPointAction.getDuration(), null, null, animator.root::remove);
 
-            SummonAction summonAction = new SummonAction(action.getDelay(), destroyAction::setTarget, () -> {
+            SummonAction<Entity> summonAction = new SummonAction<Entity>(action.getDelay(), destroyAction::setTarget, () -> {
                 SpriteEntity entity;
                 if (debugPointAction.isCross()) {
                     entity = new SpriteEntity(IngameAssets.cross_marker);
