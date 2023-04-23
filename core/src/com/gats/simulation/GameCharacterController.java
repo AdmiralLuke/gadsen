@@ -13,6 +13,7 @@ import com.gats.simulation.action.CharacterAimAction;
 public class GameCharacterController {
     private final GameCharacter gameCharacter;
     private final GameState state;
+    boolean active = true;
 
     /**
      * Returns the root of the ActionLog that is currently recording in the simulation instance.
@@ -93,4 +94,11 @@ public class GameCharacterController {
         return endCommand();
     }
 
+    public void deactivate() {
+        active = false;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 }

@@ -1,10 +1,12 @@
 package com.gats.simulation.action;
 
+import java.io.Serializable;
+
 /**
  * Represents a collection of all UI-relevant {@link Action Actions},
  * that accumulated during a certain part of the simulation. Usually this is the execution of a single command.
  */
-public class ActionLog {
+public class ActionLog implements Serializable {
 
     private final Action rootAction;
 

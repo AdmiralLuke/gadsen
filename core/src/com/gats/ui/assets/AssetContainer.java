@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -94,6 +95,14 @@ public class AssetContainer {
         public static Animation<TextureRegion> coolCat;
 
         public static Animation<TextureRegion> tombstoneAnimation;
+
+        public static ParticleEffectPool slimeParticle;
+
+        public static ParticleEffectPool walkParticle;
+
+        public static ParticleEffectPool damageParticle;
+        public static ParticleEffectPool explosionParticle;
+
 
         public static TextureRegion inventoryCell;
 

@@ -3,7 +3,9 @@ package com.gats.simulation;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.gats.manager.Timer;
 
+import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -22,7 +24,7 @@ import java.util.*;
  * Natürlich könnt ihr diese trotzdem durchlesen, wenn euch interessiert wie unser Spiel von innen
  * funktioniert oder ihr euch anschauen möchtet, wie wir bestimmte Probleme gelöst haben.
  */
-public class GameState {
+public class GameState implements Serializable {
 
     // Spielbrett
     // x - Spalten
@@ -32,37 +34,80 @@ public class GameState {
     private int width;
     private int height;
 
-    //ToDo: use enums
-    public static final int GAME_MODE_NORMAL = 0;
-    public static final int GAME_MODE_CHRISTMAS = 1;
+    private final float[] scores;
 
-    private int gameMode = GAME_MODE_NORMAL;
+    public float[] getScores() {
+        return scores;
+    }
+
+    public GameState copy() {
+        return new GameState(this);
+    }
+
+    private GameState(GameState original) {
+        board = new Tile[original.width][original.height];
+        Tile[][] tiles = original.board;
+        for (int i = 0; i < tiles.length; i++) {
+            Tile[] row = tiles[i];
+            for (int j = 0; j < row.length; j++) {
+                board[i][j] = row[j]==null?null:row[j].copy(this);
+            }
+        }
+        width = original.width;
+        height = original.height;
+        gameMode = original.gameMode;
+        turnTimer = original.turnTimer;
+        teams = new GameCharacter[original.teamCount][original.charactersPerTeam];
+        GameCharacter[][] gameCharacters = original.teams;
+        for (int i = 0; i < gameCharacters.length; i++) {
+            GameCharacter[] team = gameCharacters[i];
+            for (int j = 0; j < team.length; j++) {
+                teams[i][j] = team[j]==null?null:team[j].copy(this);
+            }
+        }
+        teamCount = original.teamCount;
+        charactersPerTeam = original.charactersPerTeam;
+        turn = null;
+        active = original.active;
+        sim = null;
+        scores = Arrays.copyOf(original.scores, original.scores.length);
+    }
+
+    public enum GameMode {
+        Normal,
+        Campaign,
+
+        Exam_Admission,
+        Tournament_Phase_1,
+        Tournament_Phase_2,
+        Christmas
+    }
+
+    private final GameMode gameMode;
+
+
+    private transient Timer turnTimer;
 
     // Teams   Anzahl Teams x Anzahl Player
-    private GameCharacter[][] teams;
+    private final GameCharacter[][] teams;
 
-    private int teamCount;
-    private int charactersPerTeam;
-    private final ArrayDeque<IntVector2> turn = new ArrayDeque<>();
+    private final int teamCount;
+    private final int charactersPerTeam;
+    private final ArrayDeque<IntVector2> turn;
     private boolean active;
-    private Simulation sim;
+    private final transient Simulation sim;
 
-
-    //Deprecated ToDo: remove
-    GameState(int gameMode, String mapName, Simulation sim) {
-        new GameState(gameMode, mapName, 2, 1, sim);
-    }
 
     /**
      * Creates a new GameState for the specified attributes.
      *
-     * @param gameMode selected game mode
-     * @param mapName name of the selected map as String
-     * @param teamCount number of teams/players
+     * @param gameMode          selected game mode
+     * @param mapName           name of the selected map as String
+     * @param teamCount         number of teams/players
      * @param charactersPerTeam number of Characters per team
-     * @param sim the respective simulation instance
+     * @param sim               the respective simulation instance
      */
-    GameState(int gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
+    GameState(GameMode gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
         List<IntVector2> spawnpoints = loadMap(mapName);
         this.teamCount = teamCount;
@@ -70,15 +115,17 @@ public class GameState {
         this.active = true;
         this.sim = sim;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
+        this.turn = new ArrayDeque<>();
+        this.scores = new float[teamCount];
         this.initTeam(spawnpoints);
-
     }
 
     /**
      * Gibt den Spiel-Modus des laufenden Spiels zurück.
+     *
      * @return Spiel-Modus als int
      */
-    public int getGameMode() {
+    public GameMode getGameMode() {
         return gameMode;
     }
 
@@ -86,7 +133,8 @@ public class GameState {
      * Spawns players randomly distributed over the possible spawn-location, specified by the map.
      */
     void initTeam(List<IntVector2> spawnpoints) {
-        if (gameMode == GAME_MODE_CHRISTMAS) {
+        if (gameMode == GameMode.Christmas) {
+            //ToDo: remove Christmas Mode
             spawnpoints.sort(Comparator.comparingInt(v -> v.x));
             for (int i = 0; i < 4; i++) {
                 IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);
@@ -117,17 +165,23 @@ public class GameState {
     }
 
     //ToDo migrate to Simulation
+
     /**
      * Return whether the Game is still active.
+     *
      * @return True, if the game is still in progress.
      */
     public boolean isActive() {
         return active;
     }
 
+    protected void addScore(int team, float score){
+        scores[team] += score;
+    }
+
     //ToDo migrate to Simulation
-    protected void setActive(boolean active) {
-        this.active = active;
+    protected void deactivate() {
+        this.active = false;
     }
 
     /**
@@ -136,6 +190,7 @@ public class GameState {
     protected ArrayDeque<IntVector2> getTurn() {
         return turn;
     }
+
     /**
      * @return the respective simulation instance
      */
@@ -155,24 +210,25 @@ public class GameState {
      * Loads a Map from the asset-directory
      * Assumes that all Tiles on the map are directly or indirectly anchored.
      * The Map file has t be encoded in JSON.
+     *
      * @param mapName Name of the map without type as String
      */
     private List<IntVector2> loadMap(String mapName) {
         JsonReader reader = new JsonReader();
         JsonValue map;
-        try{
+        try {
             //attempt to load map from jar
             map = reader.parse(getClass().getClassLoader().getResourceAsStream("maps/" + mapName + ".json"));
-        }catch (Exception e){
-            map =null;
+        } catch (Exception e) {
+            map = null;
         }
-        if(map ==null){
-           try {
-               //attempt to load map from external maps dir
-               map = reader.parse(new FileHandle(Paths.get("./maps/"+mapName+".json").toFile()));
-           }catch (Exception e){
-             throw new RuntimeException("Could not find or load map:"+mapName);
-           }
+        if (map == null) {
+            try {
+                //attempt to load map from external maps dir
+                map = reader.parse(new FileHandle(Paths.get("./maps/" + mapName + ".json").toFile()));
+            } catch (Exception e) {
+                throw new RuntimeException("Could not find or load map:" + mapName);
+            }
         }
 
         width = map.get("width").asInt();
@@ -265,6 +321,7 @@ public class GameState {
     }
 
     //ToDo: discuss removal
+
     /**
      * Spawnt Spieler an zufälligen Positionen
      *
@@ -287,4 +344,14 @@ public class GameState {
         }
         return characters;
     }
+
+    public Timer getTurnTimer() {
+        return turnTimer;
+    }
+
+    protected void setTurnTimer(Timer turnTimer) {
+        this.turnTimer = turnTimer;
+    }
+
+
 }
