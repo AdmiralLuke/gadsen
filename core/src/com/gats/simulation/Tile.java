@@ -228,6 +228,7 @@ public class Tile implements Serializable, Cloneable {
      * oder auf anderer Box landet
      */
     public Action onDestroy(Action head) {
+        state.getSim().turnsWithoutAction = 0;
         ArrayList<Tile> rightList = null;
         ArrayList<Tile> upperList = null;
         ArrayList<Tile> lowerList = null;

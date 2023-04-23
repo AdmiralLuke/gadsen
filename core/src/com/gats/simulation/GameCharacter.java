@@ -192,6 +192,7 @@ public class GameCharacter implements Serializable {
      * @return the leading action for this function
      */
     Action setHealth(int newHealth, Action head, boolean environmental) {
+        state.getSim().turnsWithoutAction = 0;
         if (newHealth == this.health) return head;
         Action lastAction;
         if (newHealth < this.health) {
