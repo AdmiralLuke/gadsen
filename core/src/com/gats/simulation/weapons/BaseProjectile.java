@@ -144,7 +144,7 @@ public class BaseProjectile implements Projectile{
         int j = character.getTeamPos();
         Action pAc = generateAction();
         head.addChild(pAc);
-        Action hAc = sim.getWrapper().setHealth(pAc, i, j, health - damage);
+        Action hAc = sim.getWrapper().setHealth(pAc, i, j, health - damage, false);
         pAc.addChild(hAc);
         Vector2 dir = bsProj.path.getDir(bsProj.t);
         dir.nor();
@@ -170,7 +170,7 @@ public class BaseProjectile implements Projectile{
             if (pos.y <= 0) {
                 path = new ParablePath(character.getPlayerPos(), pos, path.getDir(0));
                 Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
-                Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), 0);
+                Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), 0, true);
                 head.addChild(cmAc);
                 return hAc;
             }
@@ -198,7 +198,7 @@ public class BaseProjectile implements Projectile{
         if (!(Math.floor(posN.y) == Math.floor(b.y) && Math.floor(posN.x) <= c.x && Math.floor(posN.x) >= b.x)) {
             cmAc = sim.getWrapper().fall(cmAc, character.getTeam(), character.getTeamPos());
         }
-        Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), character.getHealth() - (int)path.getDuration());
+        Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), character.getHealth() - (int)path.getDuration(), true);
         return hAc;
     }
 

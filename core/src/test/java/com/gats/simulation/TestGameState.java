@@ -12,7 +12,7 @@ public class TestGameState {
 
     @Before
     public void init() {
-        sim = new Simulation(0, "map1", 2, 1);
+        sim = new Simulation(GameState.GameMode.Normal, "map1", 2, 1);
         state = sim.getState();
     }
 

@@ -2,10 +2,12 @@ package com.gats.simulation;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.Serializable;
+
 /**
  * Stores the path an object travels, within the interval between 0 and {@link #getDuration()}
  */
-public interface Path {
+public interface Path extends Serializable {
 
     /**
      * Returns the position for the specified time.

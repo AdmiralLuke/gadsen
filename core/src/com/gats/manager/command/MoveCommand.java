@@ -12,7 +12,7 @@ public class MoveCommand extends Command{
     }
 
     @Override
-    public ActionLog run() {
+    public ActionLog onExecute() {
         return controller.walk(dx);
     }
 }
