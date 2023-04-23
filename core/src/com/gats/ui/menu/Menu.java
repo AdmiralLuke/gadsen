@@ -366,6 +366,11 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 				}
 			});
 		}
+
+		if (mapSelector.getItems().size==0){
+			mapSelector.setItems(new GameMap("no Maps found",0));
+		}
+
 		//need to change GameMap, for this to work
 		//mapSelector.setSelected(selected);
 	}
