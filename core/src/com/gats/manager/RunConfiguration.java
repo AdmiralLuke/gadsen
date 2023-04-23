@@ -10,6 +10,10 @@ public class RunConfiguration {
     //Todo add default values
     public GameMode gameMode = GameMode.Normal;
 
+    public GameMode[] getGameModes() {
+        return GameMode.values();
+    }
+
     public boolean gui = false;
 
     public AnimationLogProcessor animationLogProcessor = null;
