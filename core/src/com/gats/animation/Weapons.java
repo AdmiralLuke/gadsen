@@ -1,7 +1,5 @@
 package com.gats.animation;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.animation.entity.AnimatedEntity;
 import com.gats.simulation.WeaponType;
@@ -21,7 +19,7 @@ public class Weapons {
             case WATER_PISTOL:
                 //ToDo: Rendering Weapon on back needs to happen before Outline
                 AnimatedEntity carryEntity = new AnimatedEntity(AssetContainer.IngameAssets.EMPTY_ANIMATION);
-                carryEntity.setRotationAngle(90);
+                carryEntity.setRelRotationAngle(90);
                 carryEntity.setScale(new Vector2(1, -1));
                 carryEntity.setRelPos(new Vector2(-6, 0));
                 weapon = new Weapon(AssetContainer.IngameAssets.WaterPistol, carryEntity);
@@ -31,7 +29,7 @@ public class Weapons {
                 weapon = new Weapon(AssetContainer.IngameAssets.coolCat);
                 weapon.setRelPos(new Vector2(-2, -2));
                 weapon.setScale(new Vector2(0.25f, 0.25f));
-                weapon.setRotationAngle(-90);
+                weapon.setRelRotationAngle(-90);
                 System.err.println("Warning: Weapon-Type " + type + " is not Supported!");
         }
 

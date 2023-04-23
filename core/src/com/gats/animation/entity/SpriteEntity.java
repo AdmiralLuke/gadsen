@@ -164,11 +164,11 @@ public class SpriteEntity extends Entity {
      * @param angle angle in degrees
      */
     @Override
-    public void setRotationAngle(float angle) {
+    public void setRelRotationAngle(float angle) {
         angle = ((angle % 360) + 360) % 360;
-        super.setRotationAngle(rotate ? angle : 0);
+        super.setRelRotationAngle(rotate ? angle : 0);
         if (angle >= 90f && angle <= 270f) {
-            super.setRotationAngle(mirror ? angle-180 : angle);
+            super.setRelRotationAngle(mirror ? angle-180 : angle);
             setFlipped(mirror);
         } else {
             setFlipped(false);

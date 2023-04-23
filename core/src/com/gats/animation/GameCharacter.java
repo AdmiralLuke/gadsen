@@ -168,6 +168,15 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         weapon.setHolding(holdingWeapon);
     }
 
+
+    @Override
+    public void updateAngle() {
+        super.updateAngle();
+        if (weapon != null) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
+        }
+    }
+
     @Override
     public Entity asEntity() {
         return this;
@@ -187,6 +196,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     @Override
     public void remove(Entity child) {
         if (child == weapon) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
             weapon.setParent(null);
             weapon = null;
         } else if (child == aimingIndicator) {
