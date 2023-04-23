@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
  * Dient der Strukturierung der animierten Welt und der einfachen Positionierung geschachtelter Objekte
  */
 public class Entity {
+    private Vector2 scale = new Vector2(1, 1);
     private Vector2 pos = new Vector2(0, 0);
     private Vector2 relPos = new Vector2(0, 0);
 /**
@@ -50,6 +51,15 @@ public class Entity {
         setRelPos(new Vector2(x, y));
     }
 
+    public Vector2 getScale() {
+        return scale;
+    }
+
+    public void setScale(Vector2 scale) {
+        this.scale = scale;
+    }
+
+
     /**
      * Sets the angle of this entity
      * @param angle
@@ -63,8 +73,8 @@ public class Entity {
     }
 
     public void updatePos(){
-        if (parent == null) this.pos = this.relPos.cpy();
-        else this.pos = parent.asEntity().getPos().cpy().add(relPos);
+        if (parent == null) setPos(relPos);
+        else setPos(parent.asEntity().getPos().cpy().add(relPos));
     }
 
     public void setRelPos(Vector2 pos) {

@@ -10,7 +10,7 @@ public class ShootCommand extends Command{
     }
 
     @Override
-    public ActionLog run() {
+    public ActionLog onExecute() {
         return controller.shoot();
     }
 }
