@@ -24,6 +24,7 @@ public class Simulation {
     private final Wrapper wrapper;
 
     private int remainingTeams;
+    int turnsWithoutAction = 0;
 
     /**
      * erstellt eine neue Simulation
@@ -88,6 +89,8 @@ public class Simulation {
 
 
     public ActionLog endTurn() {
+        turnsWithoutAction++;
+
         int activeTeam = getActiveTeam();
 
         ArrayDeque<IntVector2> turn = gameState.getTurn();
@@ -139,7 +142,7 @@ public class Simulation {
             }
         }
 
-        if (remainingTeams <= 1) {
+        if (remainingTeams <= 1 || turnsWithoutAction >= gameState.getTeamCount() * 10) {
 
             if (remainingTeams == 1) {
                 //Reward score to surviving winner
