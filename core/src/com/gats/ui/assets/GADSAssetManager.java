@@ -180,6 +180,8 @@ public class GADSAssetManager {
 
         IngameAssets.WaterPistol = new AtlasAnimation(1/8f, atlas.findRegions("weapon/watergun"), Animation.PlayMode.LOOP);
 
+        IngameAssets.Wool = new AtlasAnimation(1/8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP);
+
         IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
         IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
         IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
@@ -189,8 +191,10 @@ public class GADSAssetManager {
 
         IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED,null);
         IngameAssets.weaponIcons.put(WeaponType.WATER_PISTOL, atlas.findRegion("ui/watergunIcon"));
+        IngameAssets.weaponIcons.put(WeaponType.WOOL, atlas.findRegion("ui/ballOfWoolIcon"));
 
         IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATER, new AtlasAnimation(1/8f, atlas.findRegions("projectile/watergunProjectile"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WOOL, new AtlasAnimation(1/8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP));
 
         IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
         IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
