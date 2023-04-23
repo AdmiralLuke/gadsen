@@ -4,21 +4,21 @@ import com.gats.animation.entity.Entity;
 
 import java.util.function.Function;
 
-public class SummonAction extends Action{
+public class SummonAction<T> extends Action{
 
-    private final SummonListener listener;
-    private final Summoner summoner;
+    private final SummonListener<T> listener;
+    private final Summoner<T> summoner;
 
-    public interface SummonListener{
-        void onSummon(Entity summonedEntity);
+    public interface SummonListener<T>{
+        void onSummon(T summonedEntity);
 
     }
 
-    public interface Summoner{
-        Entity summon();
+    public interface Summoner<T>{
+        T summon();
     }
 
-    public SummonAction(float start, SummonListener listener, Summoner summoner) {
+    public SummonAction(float start, SummonListener<T> listener, Summoner<T> summoner) {
         super(start);
         this.listener = listener;
         this.summoner = summoner;
@@ -26,7 +26,7 @@ public class SummonAction extends Action{
 
     @Override
     protected void runAction(float oldTime, float current) {
-        Entity entity = null;
+        T entity = null;
         if (summoner != null) entity = summoner.summon();
         if (listener != null) listener.onSummon(entity);
         endAction(oldTime);

@@ -1,30 +1,43 @@
 package com.gats.ui.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.gats.simulation.WeaponType;
+import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 import com.gats.ui.assets.AssetContainer.MainMenuAssets;
+import com.gats.ui.hud.InputHandler;
+import com.gats.ui.hud.inventory.InventoryCell;
 
 public class GADSAssetManager {
     //dedicatod to loading and mangaing assets used in the application
 
     //Pfad an dem sich der Textureatlas mit Assets relevant für das Spiel
-    public final String resourceDirectory = "";
-    public final String atlas = resourceDirectory + "texture_atlas/TextureAtlas.atlas";
+    public static final String resourceDirectory = "";
+    public static final String atlas = resourceDirectory + "texture_atlas/TextureAtlas.atlas";
 
-    public final String skin = resourceDirectory + "ui/skin.json";
-    public final String font = resourceDirectory + "ui/lsans-15.fnt";
+    public final String skin = resourceDirectory + "uiUtility/skin.json";
+    public final String font = resourceDirectory + "uiUtility/lsans-15.fnt";
 
-    public final String outlineShader = resourceDirectory + "shader/outline.frag";
-    public final String lookupShader = resourceDirectory + "shader/lookup.frag";
-    public final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
+    public static final String particleGroup = "particle/";
+    public static final String slimeParticle = "particle/slimeParticle.p";
+    public static final String walkParticle = "particle/slimeParticle.p";
+
+    public static final String damageParticle = "particle/damageParticle.p";
+
+    public static final String explosionParticle = "particle/explosionParticle.p";
+
+
+    //ToDo load different effect (not splash)
+    public static final String waterParticle = "particle/waterSplashParticle.p";
+
+    public static final String outlineShader = resourceDirectory + "shader/outline.frag";
+    public static final String lookupShader = resourceDirectory + "shader/lookup.frag";
+    public static final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
 
     private boolean finishedLoading = false;
 
@@ -44,6 +57,7 @@ public class GADSAssetManager {
         loadTextures();
         loadSkin();
         loadShader();
+        loadParticles();
 
         //ToDo: Implement Loading screen and remove the 2 following statements
         manager.finishLoading();
@@ -71,10 +85,22 @@ public class GADSAssetManager {
 
     }
 
-    private void loadShader(){
+    private void loadShader() {
         manager.load(outlineShader, ShaderProgram.class);
         manager.load(lookupShader, ShaderProgram.class);
         manager.load(lookupOutlineShader, ShaderProgram.class);
+    }
+
+    private void loadParticles() {
+        ParticleEffectLoader.ParticleEffectParameter particleEffectParameter = new ParticleEffectLoader.ParticleEffectParameter();
+        particleEffectParameter.atlasFile = atlas;
+        particleEffectParameter.atlasPrefix = particleGroup;
+
+        manager.load(slimeParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(walkParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(damageParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(explosionParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(waterParticle, ParticleEffect.class, particleEffectParameter);
     }
 
 
@@ -100,7 +126,7 @@ public class GADSAssetManager {
 
         IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("tile/16x_box01"), atlas.findRegion("tile/16x_anchor01")};
 
-        IngameAssets.aimingIndicatorSprite = atlas.findRegion("hud/aimIndicator");
+        IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicator");
 
         IngameAssets.gameCharacterAnimations = new AtlasAnimation[GameCharacterAnimationType.values().length];
 
@@ -113,19 +139,13 @@ public class GADSAssetManager {
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_FALLING.ordinal()] =
                 new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catFalling"), Animation.PlayMode.LOOP);
 
-        IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_COOKIE.ordinal()] =
-                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catIdle"), Animation.PlayMode.LOOP);
-
-        IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_SUGAR_CANE.ordinal()] =
-                new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catIdle"), Animation.PlayMode.LOOP);
-
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_HIT.ordinal()] =
                 new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catHit"), Animation.PlayMode.LOOP);
 
         IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_DEATH.ordinal()] =
                 new AtlasAnimation(1 / 10f, atlas.findRegions("cat/catDeath"), Animation.PlayMode.LOOP);
 
-        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.LOOP);
+        IngameAssets.tombstoneAnimation = new AtlasAnimation(1 / 10f, atlas.findRegions("cat/tombstone"), Animation.PlayMode.NORMAL);
 
 
         IngameAssets.outlineShader = manager.get(outlineShader, ShaderProgram.class);
@@ -142,10 +162,42 @@ public class GADSAssetManager {
 
         IngameAssets.mioSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/mioSkin"), Animation.PlayMode.LOOP);
 
+        IngameAssets.coolCat = new AtlasAnimation(1f, atlas.findRegions("cat/coolCat"), Animation.PlayMode.LOOP);
 
-        IngameAssets.Cookie = atlas.findRegions("projectile/cookieTumblingCroppedR");
+        IngameAssets.Cookie = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/cookieTumblingCroppedR"), Animation.PlayMode.LOOP);
 
-        IngameAssets.SugarCane = atlas.findRegions("projectile/sugarcaneProjectileFront");
+        IngameAssets.SugarCane = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/sugarcaneProjectileFront"), Animation.PlayMode.LOOP);
+
+        IngameAssets.slimeParticle = new ParticleEffectPool(manager.get(slimeParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.walkParticle = new ParticleEffectPool(manager.get(walkParticle, ParticleEffect.class), 1, 10);//ToDo replace
+
+        IngameAssets.damageParticle = new ParticleEffectPool(manager.get(damageParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.explosionParticle = new ParticleEffectPool(manager.get(explosionParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.waterParticle = new ParticleEffectPool(manager.get(waterParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.WaterPistol = new AtlasAnimation(1/8f, atlas.findRegions("weapon/watergun"), Animation.PlayMode.LOOP);
+
+        IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
+        IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
+        IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
+
+        //IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
+      //  IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
+
+        IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED,null);
+        IngameAssets.weaponIcons.put(WeaponType.WATER_PISTOL, atlas.findRegion("ui/watergunIcon"));
+
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATER, new AtlasAnimation(1/8f, atlas.findRegions("projectile/watergunProjectile"), Animation.PlayMode.LOOP));
+
+        IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
+        IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
+        IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");
+        IngameAssets.turnChange = atlas.findRegion("ui/turnChange");
+        IngameAssets.turnTimer = atlas.findRegion("ui/clockSprite");
+
 
         finishedLoading = true;
     }

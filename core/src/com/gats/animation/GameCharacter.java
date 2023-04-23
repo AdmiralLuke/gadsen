@@ -7,35 +7,36 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.StringBuilder;
-import com.gats.animation.entity.AnimatedEntity;
-import com.gats.ui.assets.AssetContainer;
-import com.gats.animation.entity.GameCharacterHudElement;
+import com.gats.animation.entity.*;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Random;
 
 /**
  * Repräsentiert eine Spielfigur auf der Karte
  */
-public class GameCharacter extends AnimatedEntity {
+public class GameCharacter extends AnimatedEntity implements Parent {
 
 
     private float accSkinTime = 0;
-    private boolean aimActive = false;
+    private final static Vector2 HOLSTER_OFFSET = new Vector2(1, 4);
 
     private static final float spriteOffsetLeft = 5;
 
     private static final float spriteOffsetRight = 2;
 
+    private final EntityGroup group;
+
+
     private Animation<TextureRegion> skin;
+
 
     private AimIndicator aimingIndicator;
 
-    private GameCharacterAnimationType idleType = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
+    private Weapon weapon;
+
+    private boolean holdingWeapon = false;
 
     private GameCharacterAnimationType currentAnimation = GameCharacterAnimationType.ANIMATION_TYPE_IDLE;
     private final Color teamColor;
@@ -44,8 +45,10 @@ public class GameCharacter extends AnimatedEntity {
 
 
     public GameCharacter(Color teamColor) {
-        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()], new Vector2(9, 15));
-        switch (new Random().nextInt(4)){
+        super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
+        group = new EntityGroup();
+        group.setParent(this);
+        switch (new Random().nextInt(4)) {
             case 1:
                 skin = IngameAssets.orangeCatSkin;
                 break;
@@ -58,7 +61,10 @@ public class GameCharacter extends AnimatedEntity {
             default:
                 skin = IngameAssets.coolCatSkin;
         }
-        setOrigin(new Vector2(5,0));
+        setMirror(true);
+        setRotate(true);
+        TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
+        setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5, 0));
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
@@ -66,12 +72,11 @@ public class GameCharacter extends AnimatedEntity {
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         accSkinTime += deltaTime;
 
-        batch.flush();
-
-        //draw the aimIndicator before the character, so it is overlapped by it
-        if (aimingIndicator != null && aimActive) {
-            aimingIndicator.draw(batch, deltaTime, parentAlpha);
+        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
+        if (!holdingWeapon && weapon != null) {
+            weapon.draw(batch, deltaTime, parentAlpha);
         }
+        batch.flush();
 
         ShaderProgram shader = IngameAssets.lookupOutlineShader;
         batch.setShader(shader);
@@ -83,7 +88,7 @@ public class GameCharacter extends AnimatedEntity {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
         TextureRegion skinFrame = this.skin.getKeyFrame(accSkinTime);
         skinFrame.getTexture().bind();
-        shader.setUniformf("flipped", isFlipped()? 1 : 0);
+        shader.setUniformf("flipped", isFlipped() ? 1 : 0);
         shader.setUniformf("v_skinBounds",
                 skinFrame.getU(),
                 skinFrame.getV(),
@@ -94,14 +99,15 @@ public class GameCharacter extends AnimatedEntity {
         batch.flush();
         batch.setShader(null);
 
+        if (holdingWeapon && weapon != null) weapon.draw(batch, deltaTime, parentAlpha);
+        group.draw(batch, deltaTime, parentAlpha);
+
     }
 
     public void setAnimation(GameCharacterAnimationType type) {
+        if (type == currentAnimation) return;
         currentAnimation = type;
-        if (type == GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
-            super.setAnimation(IngameAssets.gameCharacterAnimations[idleType.ordinal()]);
-        else
-            super.setAnimation(IngameAssets.gameCharacterAnimations[type.ordinal()]);
+        super.setAnimation(IngameAssets.gameCharacterAnimations[type.ordinal()]);
     }
 
     public Animation<TextureRegion> getAnimation() {
@@ -116,35 +122,88 @@ public class GameCharacter extends AnimatedEntity {
         this.skin = skin;
     }
 
-    public GameCharacterAnimationType getIdleType() {
-        return idleType;
-    }
-
-    public void setIdleType(GameCharacterAnimationType idleType) {
-        this.idleType = idleType;
-        if (currentAnimation == GameCharacterAnimationType.ANIMATION_TYPE_IDLE)
-            setAnimation(GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
-    }
 
     public AimIndicator getAimingIndicator() {
         return this.aimingIndicator;
     }
 
     public void setAimingIndicator(AimIndicator aimIndicator) {
+        if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
+        if (aimIndicator == null) return;
+        if (aimIndicator.getParent() != null) aimIndicator.getParent().remove(aimIndicator);
+        aimIndicator.setParent(this);
     }
 
     @Override
-    public void setRelPos(Vector2 pos) {
-        //setFlipped(this.getPos().x < pos.x);
-        super.setRelPos(pos);
+    protected void setPos(Vector2 pos) {
+        super.setPos(pos);
+        if (aimingIndicator != null) aimingIndicator.updatePos();
+        if (weapon != null) weapon.updatePos();
+        group.updatePos();
     }
 
     public static float getAnimationDuration(GameCharacterAnimationType type) {
         return IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
     }
 
-    public void aimActive(boolean active) {
-        aimActive = active;
+    public boolean isHoldingWeapon() {
+        return holdingWeapon;
+    }
+
+    public void setHoldingWeapon(boolean holdingWeapon) {
+        this.holdingWeapon = holdingWeapon;
+        if (weapon == null) return;
+        weapon.setHolding(holdingWeapon);
+    }
+
+    public void setWeapon(Weapon weapon) {
+        if (this.weapon != null && this.weapon.getParent() != null) {
+            remove(weapon);
+        }
+        this.weapon = weapon;
+        if (weapon == null) return;
+        if (weapon.getParent() != null) weapon.getParent().remove(weapon);
+        weapon.setParent(this);
+        weapon.setHolding(holdingWeapon);
+    }
+
+
+    @Override
+    public void updateAngle() {
+        super.updateAngle();
+        if (weapon != null) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
+        }
+    }
+
+    @Override
+    public Entity asEntity() {
+        return this;
+    }
+
+    @Override
+    public void add(Entity child) {
+        if (child instanceof AimIndicator) {
+            setAimingIndicator((AimIndicator) child);
+        } else if (child instanceof Weapon) {
+            setWeapon((Weapon) child);
+        }else {
+            group.add(child);
+        }
+    }
+
+    @Override
+    public void remove(Entity child) {
+        if (child == weapon) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
+            weapon.setParent(null);
+            weapon = null;
+        } else if (child == aimingIndicator) {
+            aimingIndicator.setParent(null);
+            aimingIndicator = null;
+        }else {
+            group.remove(child);
+        }
     }
 }

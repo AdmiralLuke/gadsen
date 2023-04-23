@@ -12,13 +12,23 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class SpriteEntity extends Entity {
 
-    private final TextureRegion textureRegion;
+    private TextureRegion textureRegion;
 
     private Color color = null;
     private Vector2 scale = new Vector2(1, 1);
-    private Vector2 size = new Vector2(1, 1);
+    private Vector2 size = null;
 
-    private Vector2 relPos = Vector2.Zero;
+    private boolean flipped = false;
+
+
+    private boolean rotate = true;
+    /**
+     * When mirror is set to true, the character will be flipped once the angle is 180 or higher on the x axis
+     */
+
+    private boolean mirror = false;
+
+    private Vector2 origin = new Vector2();
 
     public SpriteEntity(TextureRegion textureRegion) {
         super();
@@ -35,14 +45,36 @@ public class SpriteEntity extends Entity {
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         super.draw(batch, deltaTime, parentAlpha);
-        if (color == null)
-            batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x,
-                    size.y, scale.x, scale.y, getRotationAngle());
-        else {
+        if (color != null)
             batch.setColor(color);
-            batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
+
+        if (size == null)
+            batch.draw(textureRegion,
+                    getPos().x - origin.x,
+                    getPos().y - origin.y,
+                    origin.x,
+                    origin.y,
+                    textureRegion.getRegionWidth(),
+                    textureRegion.getRegionHeight(),
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
+                    getRotationAngle());
+        else
+            batch.draw(textureRegion,
+                    getPos().x - origin.x,
+                    getPos().y - origin.y,
+                    origin.x,
+                    origin.y,
+                    size.x,
+                    size.y,
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
+                    getRotationAngle());
+
+        //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
+
+        if (color != null)
             batch.setColor(Color.WHITE);
-        }
     }
 
 
@@ -62,17 +94,13 @@ public class SpriteEntity extends Entity {
         this.size = size;
     }
 
-    public void setRelPos(Vector2 newRelPos) {
-        this.relPos = new Vector2(newRelPos);
+
+    public Vector2 getOrigin() {
+        return origin;
     }
 
-    @Override
-    public Vector2 getRelPos() {
-        return new Vector2(relPos);
-    }
-
-    public Vector2 getPos() {
-        return new Vector2(getRelPos().add(super.getPos()));
+    public void setOrigin(Vector2 origin) {
+        this.origin = origin;
     }
 
 
@@ -99,10 +127,52 @@ public class SpriteEntity extends Entity {
         this.color = color;
     }
 
+    public TextureRegion getTextureRegion() {
+        return textureRegion;
+    }
+
+    public void setTextureRegion(TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
+    }
+
     /**
      * @return specified tint of the sprite
      */
     public Color getColor() {
         return color;
     }
+
+    public boolean isFlipped() {
+        return flipped;
+    }
+
+    private void setFlipped(boolean flipped) {
+        this.flipped = flipped;
+    }
+
+    public void setRotate(boolean rotate) {
+        this.rotate = rotate;
+    }
+
+    public void setMirror(boolean mirror) {
+        this.mirror = mirror;
+    }
+
+    /**
+     * Sets the angle of this entity
+     *
+     * @param angle angle in degrees
+     */
+    @Override
+    public void setRelRotationAngle(float angle) {
+        angle = ((angle % 360) + 360) % 360;
+        super.setRelRotationAngle(rotate ? angle : 0);
+        if (angle >= 90f && angle <= 270f) {
+            super.setRelRotationAngle(mirror ? angle-180 : angle);
+            setFlipped(mirror);
+        } else {
+            setFlipped(false);
+        }
+    }
+
 }

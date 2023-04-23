@@ -1,12 +1,12 @@
 package com.gats.simulation;
 
 public enum WeaponType {
-    LONG_RANGE,
-    SHORT_RANGE,
+    WOOL,
+    WATER_PISTOL,
+    GRENADE,
     CLOSE_COMBAT,
-    BOMB,
-    COOKIE,
-    SUGAR_CANE,
-    NOT_SELECTED
+    MIOJLNIR,
+    WATERBOMB,
+    NOT_SELECTED,
 }
 

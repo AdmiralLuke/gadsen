@@ -14,7 +14,7 @@ public class WeaponSelectCommand extends Command{
     }
 
     @Override
-    public ActionLog run() {
+    public ActionLog onExecute() {
         return controller.selectWeapon(type);
     }
 }

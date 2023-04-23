@@ -7,38 +7,40 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.gats.animation.entity.AnimatedEntity;
 import com.gats.animation.entity.Entity;
+import com.gats.animation.entity.EntityGroup;
+import com.gats.animation.entity.ParticleEntity;
 import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer;
+import com.gats.ui.assets.AtlasAnimation;
+import org.lwjgl.Sys;
 
 public class Projectiles {
 
 
     protected static Entity summon(ProjectileAction.ProjectileType type){
-        Array<TextureAtlas.AtlasRegion> texture;
+        Entity projectile;
         //configuring of drawing properties [0]:AnimatedEntity.rotate [1]:AnimatedEntity.mirror
         boolean[] settings;
+        Animation<TextureRegion> animation;
+        AnimatedEntity animatedEntity;
         switch (type){
-            case COOKIE:
-                texture = AssetContainer.IngameAssets.Cookie;
-                settings = new boolean[]{/*rotate*/false,/*mirror*/false};
-                break;
-            case CANDY_CANE:
-                texture = AssetContainer.IngameAssets.SugarCane;
-                //flip the sprite so it also looks to the left
-                //ToDo declare a standard direction for Sprites to look in
-                //preferrably right?
-                for (TextureRegion sprite:texture) {
-                    sprite.flip(true,false);
-
-                }
-                settings = new boolean[]{/*rotate*/true,/*mirror*/true};
+            case WATER:
+                animation = AssetContainer.IngameAssets.projectiles.get(type);
+                animatedEntity = new AnimatedEntity(animation);
+                animatedEntity.setOrigin(new Vector2(animation.getKeyFrame(0).getRegionWidth()/2f, animation.getKeyFrame(0).getRegionHeight()/2f));
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(AssetContainer.IngameAssets.waterParticle);
+                particleEntity.setLoop(true);
+                projectile = new EntityGroup(animatedEntity, particleEntity);
                 break;
             default:
-                throw new RuntimeException("Type " + type + " is not Supported!");
+                animation = AssetContainer.IngameAssets.coolCat;
+                animatedEntity = new AnimatedEntity(animation);
+                animatedEntity.setRotate(true);
+                animatedEntity.setMirror(false);
+                projectile = animatedEntity;
+                System.err.println("Warning: Projectile-Type " + type + " is not Supported!");
 
         }
-        Animation<TextureRegion> animation = new Animation<>(1/8f, texture);
-        animation.setPlayMode(Animation.PlayMode.LOOP);
-        return new AnimatedEntity(animation, new Vector2(texture.get(0).getRegionWidth(), texture.get(0).getRegionHeight()),settings[0],settings[1]);
+        return projectile;
     }
 }

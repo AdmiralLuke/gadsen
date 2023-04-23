@@ -4,11 +4,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
+import com.gats.simulation.WeaponType;
+import com.gats.simulation.action.ProjectileAction;
+
+import java.util.HashMap;
 
 /**
  * Contains Loaded Instances of Assets
@@ -17,7 +20,6 @@ public class AssetContainer {
 
     /**
      * Loading Screen Assets
-     *
      * Will be Loaded immediately before other assets are finished
      */
     public static class LoadingScreenAssets{
@@ -41,6 +43,7 @@ public class AssetContainer {
      */
     public static class IngameAssets{
 
+        public static final Animation<TextureRegion> EMPTY_ANIMATION = new Animation<>(1f, new TextureRegion(new Texture(new Pixmap(1, 1, Pixmap.Format.Alpha))));;
         public static Animation<TextureRegion> destroyTileAnimation;
 
         public static TextureRegion victoryDisplay;
@@ -81,22 +84,49 @@ public class AssetContainer {
         public static ShaderProgram lookupOutlineShader;
 
         //Projectiles
-        public static Array<TextureAtlas.AtlasRegion> Cookie;
-        public static Array<TextureAtlas.AtlasRegion> SugarCane;
+        public static Animation<TextureRegion> Cookie;
+        public static Animation<TextureRegion> SugarCane;
+
+        public static Animation<TextureRegion> WaterPistol;
 
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
         public static Animation<TextureRegion> yinYangSkin;
         public static Animation<TextureRegion> mioSkin;
 
+
+        public static Animation<TextureRegion> coolCat;
+
         public static Animation<TextureRegion> tombstoneAnimation;
 
+        public static ParticleEffectPool slimeParticle;
+
+        public static ParticleEffectPool walkParticle;
+
+        public static ParticleEffectPool damageParticle;
+        public static ParticleEffectPool explosionParticle;
+        public static ParticleEffectPool waterParticle;
+
+
+        public static TextureRegion inventoryCell;
+
+        public static TextureRegion cookieIcon;
+        public static TextureRegion sugarCaneIcon;
+        public static HashMap<WeaponType, TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
+
+        public static HashMap<ProjectileAction.ProjectileType, AtlasAnimation> projectiles = new HashMap<ProjectileAction.ProjectileType, AtlasAnimation>() {};
+
+        public static TextureRegion fastForwardButton;
+        public static TextureRegion fastForwardButtonPressed;
+        public static TextureRegion fastForwardButtonChecked;
+
+        public static TextureRegion turnChange;
+
+        public static TextureRegion turnTimer;
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,
             ANIMATION_TYPE_FALLING,
-            ANIMATION_TYPE_COOKIE,
-            ANIMATION_TYPE_SUGAR_CANE,
             ANIMATION_TYPE_HIT,
             ANIMATION_TYPE_DEATH
         }
