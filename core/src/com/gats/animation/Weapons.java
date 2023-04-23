@@ -16,6 +16,10 @@ public class Weapons {
         //configuring of drawing properties [0]:AnimatedEntity.rotate [1]:AnimatedEntity.mirror
         boolean[] settings;
         switch (type){
+            case WOOL:
+                weapon = new Weapon(AssetContainer.IngameAssets.Wool);
+                weapon.setRelPos(new Vector2(-4.5f, -6.5f));
+                break;
             case WATER_PISTOL:
                 //ToDo: Rendering Weapon on back needs to happen before Outline
                 AnimatedEntity carryEntity = new AnimatedEntity(AssetContainer.IngameAssets.EMPTY_ANIMATION);
