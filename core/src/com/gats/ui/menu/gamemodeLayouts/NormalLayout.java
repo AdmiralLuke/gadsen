@@ -16,6 +16,9 @@ public class NormalLayout extends GamemodeLayout {
 	@Override
 	protected void positionButtons(Menu menu) {
 
+		//allow teamslider to change botselector size etc.
+		getTeamAmountSlider().freezeSlider(false);
+
 		this.add(menu.getMapSelector()).colspan(getDefaultColspan()).pad(getDefaultPadding());
 		menu.setMaps(getMapSelector(), GameState.GameMode.Normal,"");
 		this.row();

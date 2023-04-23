@@ -12,8 +12,18 @@ public class CampaignLayout extends GamemodeLayout{
 
 	@Override
 	protected void positionButtons(Menu menu) {
-		this.add(getMapSelector());
+		getTeamAmountSlider().freezeSlider(true);
+		this.add(getMapSelector()).colspan(getDefaultColspan()).pad(getDefaultPadding());
+
+		row();
+
+		//set playercount to 1
+		this.add(getBotSelector()).colspan(getDefaultColspan());
+
+
 		menu.setMaps(getMapSelector(), GameState.GameMode.Campaign,"");
-		this.add(getBotSelector());
+
+
+		getBotSelector().resizeTable(1);
 	}
 }

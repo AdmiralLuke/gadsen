@@ -34,7 +34,7 @@ public class MapRetriever implements FilenameFilter {
 
     ArrayList<String> internalMaps = new ArrayList<String>(Arrays.asList(hardCodeMapNames));
 
-    String campaignMapFolder= "maps/campaign";
+    String campaignMapFolder= "maps/campaign/";
     String campaignDirectory = internalDir+ campaignMapFolder;
     String[] campaignMaps = {"testingMap"};
 

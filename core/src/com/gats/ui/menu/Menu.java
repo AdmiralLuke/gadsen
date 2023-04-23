@@ -375,6 +375,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		//mapSelector.setSelected(selected);
 	}
 
+
 	public SelectBox<GameMap> getMapSelector() {
 		return mapSelector;
 	}
