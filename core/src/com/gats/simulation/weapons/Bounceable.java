@@ -52,7 +52,7 @@ public class Bounceable implements Projectile {
             Path path = null;
             bsProj.strength *= modifier;
             if (bsProj.strength < 0.05) {
-                return bsProj.hitWall(head, t, dec, bsProj);
+                return dec.hitWall(head, t, dec, bsProj);
             }
             Vector2 v = new Vector2((dir.x * (bsProj.strength)) * 400, (dir.y * (bsProj.strength)) * 400);
             if (bsProj.type == ProjectileAction.ProjectileType.WOOL || bsProj.type == ProjectileAction.ProjectileType.WATER || bsProj.type == ProjectileAction.ProjectileType.GRENADE) path = new ParablePath(pos.cpy(), 10, v);

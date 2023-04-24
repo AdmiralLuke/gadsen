@@ -86,18 +86,19 @@ public class BaseProjectile implements Projectile{
             // DebugPointAction dbAc = new DebugPointAction(0, pos, Color.BLUE, 0.1f, true);
             // head.addChild(dbAc);
             log = checkForHit(head, dec, pos, posN);
-            if (log == null) this.t += 0.001f;
+            if (log == null) this.t += 0.00001f;
         }
         return log;
     }
 
     Action checkForHit(Action head, Projectile dec, Vector2 pos, Vector2 posN) {
+        Action lastAc = null;
         Tile h = sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16);
         if (h != null) {
             if (lastTile == null || !lastTile.equals(h)) {
                 Tile tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
                 while (tN == null || !tN.equals(h)) {
-                    this.t += 0.0001f;
+                    this.t += 0.000001f;
                     pos = path.getPos(t);
                     if (lastTile != null && !h.equals(lastTile)) lastTile = h;
                     tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
@@ -120,20 +121,19 @@ public class BaseProjectile implements Projectile{
                 GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
                 if (character != null) {
                     if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
-                        if (lastCharacter == null) {
+                        if (lastCharacter == null || lastCharacter != character) {
                             lastCharacter = character;
-                            return dec.hitCharacter(head, character, dec, this);
+                            lastAc =  dec.hitCharacter(head, character, dec, this);
                         }
-                        if (lastCharacter == character) return null;
                     }
                 }
             }
         }
 
-        lastCharacter = null;
+        // lastCharacter = null;
         lastTile = null;
 
-        return null;
+        return lastAc;
     }
 
 
@@ -144,27 +144,33 @@ public class BaseProjectile implements Projectile{
         int j = character.getTeamPos();
         Action pAc = generateAction();
         head.addChild(pAc);
-        Action hAc = sim.getWrapper().setHealth(pAc, i, j, health - damage);
+        Action hAc = sim.getWrapper().setHealth(pAc, i, j, health - damage, false);
         pAc.addChild(hAc);
         Vector2 dir = bsProj.path.getDir(bsProj.t);
         dir.nor();
+        int offset = 0;
+        if (dir.x > 0) offset = 16;
         Vector2 v = new Vector2((dir.x * (0.1f * knockback)) * 400, (dir.y * (0.1f * knockback)) * 400);
-        Path path = new ParablePath(character.getPlayerPos(),15, v);
+        Vector2 pos = character.getPlayerPos().cpy();
+        pos.x += offset;
+        Path path = new ParablePath(pos,300, v);
 
         return traverse(pAc, character, path, this.sim);
     }
 
     static Action traverse(Action head, GameCharacter character, Path path, Simulation sim) {
-        float t = 0.1f;
+        if (path.getDir(0).x == 0 && path.getDir(0).y == 0) return head;
+        float t = 0f;
+        float offset = 0;
         if (path.getDir(0).x < 0.00002f && path.getDir(0).x > -0.00002f) return head;
+        if (path.getDir(0).x > 0) offset = 16;
 
         while (t < path.getDuration()) {
             Vector2 pos = path.getPos(t);
             if (pos.y <= 0) {
-
                 path = new ParablePath(character.getPlayerPos(), pos, path.getDir(0));
                 Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
-                Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), 0);
+                Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), 0, true);
                 head.addChild(cmAc);
                 return hAc;
             }
@@ -174,6 +180,7 @@ public class BaseProjectile implements Projectile{
             }
             t += 0.001f;
         }
+
         Vector2 posN = path.getPos(t + 0.001f);
         Vector2 pos = path.getPos(t);
         Tile tile = sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16);
@@ -183,19 +190,15 @@ public class BaseProjectile implements Projectile{
 
         // b --- c
 
-
-
-
-
         path = new ParablePath(character.getPlayerPos(), path.getPos(t), path.getDir(0));
         if (path.getDuration() < 0.1f) return head;
         Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
-        sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x, (int)pos.y);
+        sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x - (int)offset, (int)pos.y);
         head.addChild(cmAc);
         if (!(Math.floor(posN.y) == Math.floor(b.y) && Math.floor(posN.x) <= c.x && Math.floor(posN.x) >= b.x)) {
             cmAc = sim.getWrapper().fall(cmAc, character.getTeam(), character.getTeamPos());
         }
-        Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), character.getHealth() - (int)path.getDuration());
+        Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), character.getHealth() - (int)path.getDuration(), true);
         return hAc;
     }
 

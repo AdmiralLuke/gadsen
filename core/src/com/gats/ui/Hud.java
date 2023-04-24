@@ -20,8 +20,6 @@ import com.gats.ui.hud.*;
 import com.gats.ui.hud.inventory.InventoryDrawer;
 import com.gats.ui.hud.ImagePopup;
 
-import java.util.List;
-
 /**
  * Class for taking care of the User Interface.
  * Input Handling during the game.
@@ -166,7 +164,7 @@ public class Hud implements Disposable {
 	 * Input Processor handling all of the Inputs meant to be sent to {@link com.gats.simulation.Simulation} via {@link HumanPlayer}
 	 * @return
 	 */
-	public GadsenInputProcessor getGadsenInputProcessor() {
+	public InputHandler getInputHandler() {
 		return inputHandler;
 	}
 
@@ -176,10 +174,6 @@ public class Hud implements Disposable {
 	 */
 	public InputProcessor getInputProcessor(){
 		return inputMultiplexer;
-	}
-
-	public void setHumanPlayers(List<HumanPlayer> humanPlayers){
-		inputHandler.setHumanPlayers(humanPlayers);
 	}
 
 	public void draw() {
