@@ -90,6 +90,7 @@ public class AssetContainer {
         public static Animation<TextureRegion> WaterPistol;
         public static AtlasAnimation Wool;
         public static Animation<TextureRegion> Grenade;
+        public static AtlasAnimation Miojlnir;
 
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
