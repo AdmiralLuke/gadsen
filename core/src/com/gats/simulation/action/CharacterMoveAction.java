@@ -14,4 +14,9 @@ public class CharacterMoveAction extends CharacterAction {
     public Path getPath() {
         return path;
     }
+
+    @Override
+    public String toString() {
+        return "CharacterMoveAction: moved from " + path.getPos(0) + " to " + path.getPos(path.getDuration()) + " in " + path.getDuration() + "s";
+    }
 }

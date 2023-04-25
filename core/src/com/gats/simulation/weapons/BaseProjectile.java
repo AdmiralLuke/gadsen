@@ -72,7 +72,7 @@ public class BaseProjectile implements Projectile{
         if (recoil > 0) {
             Vector2 v = new Vector2((dir.x * (-1) * (0.1f * recoil)) * 400, (dir.y * (-1) * (0.1f * recoil)) * 400);
             Path path = new ParablePath(character.getPlayerPos(), 15, v);
-            head = traverse(head, character, path, sim);
+            head = traverse(head, character, path, sim, this);
         }
         return this.move(head, strength , dec);
     }
@@ -131,7 +131,7 @@ public class BaseProjectile implements Projectile{
         }
 
         // lastCharacter = null;
-        lastTile = null;
+
 
         return lastAc;
     }
@@ -155,10 +155,10 @@ public class BaseProjectile implements Projectile{
         pos.x += offset;
         Path path = new ParablePath(pos,300, v);
 
-        return traverse(pAc, character, path, this.sim);
+        return traverse(pAc, character, path, this.sim, bsProj);
     }
 
-    static Action traverse(Action head, GameCharacter character, Path path, Simulation sim) {
+    static Action traverse(Action head, GameCharacter character, Path path, Simulation sim, BaseProjectile bsProj) {
         if (path.getDir(0).x == 0 && path.getDir(0).y == 0) return head;
         float t = 0f;
         float offset = 0;
@@ -175,8 +175,10 @@ public class BaseProjectile implements Projectile{
                 return hAc;
             }
             if (sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
-                t -= 0.001f;
-                break;
+                if (!sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
+                    t -= 0.001f;
+                    break;
+                }
             }
             t += 0.001f;
         }
@@ -191,7 +193,7 @@ public class BaseProjectile implements Projectile{
         // b --- c
 
         path = new ParablePath(character.getPlayerPos(), path.getPos(t), path.getDir(0));
-        if (path.getDuration() < 0.1f) return head;
+        if (path.getDuration() < 0.01f) return head;
         Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
         sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x - (int)offset, (int)pos.y);
         head.addChild(cmAc);

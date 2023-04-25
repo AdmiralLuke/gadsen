@@ -235,7 +235,10 @@ public class Tile implements Serializable, Cloneable {
         ArrayList<Tile> lowerList = new ArrayList<>();
         ArrayList<Tile> leftList = new ArrayList<>();
 
-        boolean[][] map = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] mapUp = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] mapDown = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] mapLeft = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
+        boolean[][] mapRight = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
 
 
 
@@ -243,10 +246,10 @@ public class Tile implements Serializable, Cloneable {
         this.deleteFromGraph();
         TileDestroyAction destroyAction = new TileDestroyAction(this.position);
         head.addChild(destroyAction);
-        if (hasRight())right.convertGraphToList(rightList, map);
-        if (hasUp()) up.convertGraphToList(upperList, map);
-        if (hasDown()) down.convertGraphToList(lowerList, map);
-        if (hasLeft()) left.convertGraphToList(leftList, map);
+        if (hasRight())right.convertGraphToList(rightList, mapRight);
+        if (hasUp()) up.convertGraphToList(upperList, mapUp);
+        if (hasDown()) down.convertGraphToList(lowerList, mapDown);
+        if (hasLeft()) left.convertGraphToList(leftList, mapLeft);
 
 
         if (!rightList.isEmpty()) checkForAnchor(rightList, head);
@@ -325,28 +328,29 @@ public class Tile implements Serializable, Cloneable {
      * @param map   lookup-map um bereits besuchte Tiles zu markieren
      * @return ArrayList mit allen verbunden Tiles
      */
-    protected void convertGraphToList(ArrayList<Tile> tiles, boolean[][] map) {
-        if (tiles.contains(this)) return;
+    protected boolean convertGraphToList(ArrayList<Tile> tiles, boolean[][] map) {
+        if (tiles.contains(this)) return false;
         tiles.add(this);
         IntVector2 pos = this.getPosition();
         map[pos.x][pos.y] = true;
-        if (tiles.get(tiles.size() - 1).isAnchor) return;
+        if (this.isAnchor) return true;
         if (this.hasUp() && !map[pos.x][pos.y + 1]) {
-            up.convertGraphToList(tiles, map);
+            if (up.convertGraphToList(tiles, map)) return true;
         }
         if (pos.y > 0) {
             if (this.hasDown() && !map[pos.x][pos.y - 1]) {
-                down.convertGraphToList(tiles, map);
+                if (down.convertGraphToList(tiles, map)) return true;
             }
         }
         if (pos.x > 0) {
             if (this.hasLeft() && !map[pos.x - 1][pos.y]) {
-                left.convertGraphToList(tiles, map);
+                if (left.convertGraphToList(tiles, map)) return true;
             }
         }
         if (this.hasRight() && !map[pos.x + 1][pos.y]) {
-            right.convertGraphToList(tiles, map);
+            if (right.convertGraphToList(tiles, map)) return true;
         }
+        return false;
     }
 
     Tile getTileAtPosition(int x, int y, GameState state) {
