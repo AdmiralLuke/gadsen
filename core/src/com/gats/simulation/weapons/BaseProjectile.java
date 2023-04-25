@@ -1,12 +1,9 @@
 package com.gats.simulation.weapons;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.*;
 import com.gats.simulation.action.CharacterMoveAction;
-import com.gats.simulation.action.DebugPointAction;
 import com.gats.simulation.action.ProjectileAction;
 
 import java.util.ArrayList;
@@ -22,7 +19,7 @@ public class BaseProjectile implements Projectile{
     float recoil;
     float knockback;
     Tile lastTile;
-    GameCharacter lastCharacter;
+    ArrayList<GameCharacter> activeCollisions = new ArrayList<>();
 
     Simulation sim;
 
@@ -65,7 +62,7 @@ public class BaseProjectile implements Projectile{
     @Override
     public Action shoot(Action head, Vector2 dir, float strength, Projectile dec, GameCharacter character) {
         this.t = 0f;
-        this.lastCharacter = character;
+        this.activeCollisions.add(character);
         this.lastTile = null;
         this.strength = strength;
         // recoil
@@ -104,7 +101,7 @@ public class BaseProjectile implements Projectile{
                     tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
                 }
                 lastTile = h;
-                lastCharacter = null;
+                activeCollisions = null;
                 return dec.hitWall(head, tN, dec, this);
             }
         } else {
@@ -115,14 +112,15 @@ public class BaseProjectile implements Projectile{
             return dec.hitNothing(head, dec, this);
         }
 
+        ArrayList<GameCharacter> newCollisions = new ArrayList<>();
 
         for (int i = 0; i < sim.getState().getTeamCount(); i++) {
             for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
                 GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
                 if (character != null) {
                     if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
-                        if (lastCharacter == null || lastCharacter != character) {
-                            lastCharacter = character;
+                        newCollisions.add(character);
+                        if (!activeCollisions.contains(character)) {
                             lastAc =  dec.hitCharacter(head, character, dec, this);
                         }
                     }
@@ -130,6 +128,7 @@ public class BaseProjectile implements Projectile{
             }
         }
 
+        activeCollisions = newCollisions;
         // lastCharacter = null;
 
 

@@ -10,18 +10,32 @@ import com.gats.animation.entity.Parent;
 
 public class Weapon extends AnimatedEntity implements Parent {
 
-    private Animation<TextureRegion> holdingAnimation;
+    private final Animation<TextureRegion> holdingAnimation;
+
+    private Animation<TextureRegion> shootingAnimation;
     private AnimatedEntity carryEntity;
 
+    private boolean shooting = false;
     private boolean holding = false;
 
     public Weapon(Animation<TextureRegion> holdingAnimation) {
         super(holdingAnimation);
+        this.holdingAnimation = holdingAnimation;
     }
 
     public Weapon(Animation<TextureRegion> holdingAnimation, AnimatedEntity carryEntity) {
         super(holdingAnimation);
+        this.holdingAnimation = holdingAnimation;
         add(carryEntity);
+    }
+
+    public Animation<TextureRegion> getShootingAnimation() {
+        return shootingAnimation;
+    }
+
+    public void setShootingAnimation(Animation<TextureRegion> shootingAnimation) {
+        this.shootingAnimation = shootingAnimation;
+        if (shootingAnimation != null) shootingAnimation.setPlayMode(Animation.PlayMode.NORMAL);
     }
 
     public boolean isHolding() {
@@ -32,11 +46,24 @@ public class Weapon extends AnimatedEntity implements Parent {
         this.holding = holding;
     }
 
+    public void shoot(){
+        if (shootingAnimation != null){
+            shooting = true;
+            setAnimation(shootingAnimation);
+            resetAccTime();
+        }
+    }
+
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         if (holding) super.draw(batch, deltaTime, parentAlpha);
         else if (carryEntity != null) {
             carryEntity.draw(batch, deltaTime, parentAlpha);
+        }
+        if (shooting && shootingAnimation.isAnimationFinished(getAccTime())){
+            shooting = false;
+            setAnimation(holdingAnimation);
+            resetAccTime();
         }
     }
 
