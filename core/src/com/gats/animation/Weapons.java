@@ -16,6 +16,10 @@ public class Weapons {
         //configuring of drawing properties [0]:AnimatedEntity.rotate [1]:AnimatedEntity.mirror
         boolean[] settings;
         switch (type){
+            case MIOJLNIR:
+                weapon = new Weapon(AssetContainer.IngameAssets.Miojlnir);
+                weapon.setRelPos(new Vector2(-5.5f, -7.5f));
+                break;
             case GRENADE:
                 weapon = new Weapon(AssetContainer.IngameAssets.Grenade);
                 weapon.setRelPos(new Vector2(-8.5f, -11.5f));
