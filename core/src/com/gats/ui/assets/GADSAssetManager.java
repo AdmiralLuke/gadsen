@@ -185,6 +185,10 @@ public class GADSAssetManager {
         IngameAssets.Grenade = new AtlasAnimation(1/8f, atlas.findRegions("weapon/grenadeReddish"), Animation.PlayMode.LOOP);
         IngameAssets.Miojlnir = new AtlasAnimation(1/8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP);
 
+        IngameAssets.BaseballBat = new AtlasAnimation(1/8f, atlas.findRegions("weapon/baseballBat"), Animation.PlayMode.LOOP);
+
+        IngameAssets.BaseballBatAttack = new AtlasAnimation(1/8f, atlas.findRegions("weapon/baseballBatAttack"), Animation.PlayMode.NORMAL);
+
         IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
         IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
         IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
@@ -197,11 +201,13 @@ public class GADSAssetManager {
         IngameAssets.weaponIcons.put(WeaponType.WOOL, atlas.findRegion("ui/ballOfWoolIcon"));
         IngameAssets.weaponIcons.put(WeaponType.GRENADE, atlas.findRegion("ui/grenadeReddishIcon"));
         IngameAssets.weaponIcons.put(WeaponType.MIOJLNIR, atlas.findRegion("ui/miosHammerIcon"));
+        IngameAssets.weaponIcons.put(WeaponType.CLOSE_COMBAT, atlas.findRegion("ui/baseballBatIcon"));
 
         IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATER, new AtlasAnimation(1/8f, atlas.findRegions("projectile/watergunProjectile"), Animation.PlayMode.LOOP));
         IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WOOL, new AtlasAnimation(1/8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP));
         IngameAssets.projectiles.put(ProjectileAction.ProjectileType.GRENADE, new AtlasAnimation(1/8f, atlas.findRegions("projectile/grenadeProjectile"), Animation.PlayMode.LOOP));
         IngameAssets.projectiles.put(ProjectileAction.ProjectileType.MIOJLNIR, new AtlasAnimation(1/8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.CLOSE_COMB, new AtlasAnimation(1/8f, atlas.findRegions("projectile/baseballBatHit"), Animation.PlayMode.NORMAL));
 
         IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
         IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");

@@ -34,6 +34,13 @@ public class AnimatedEntity extends SpriteEntity {
         super.draw(batch, deltaTime, parentAlpha);
     }
 
+    public void resetAccTime(){
+        accTime = 0;
+    }
+
+    public float getAccTime() {
+        return accTime;
+    }
 
     public void setAnimation(Animation<TextureRegion> animation) {
         if (animation == this.animation) return;
