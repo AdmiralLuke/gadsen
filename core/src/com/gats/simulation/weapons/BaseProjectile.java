@@ -44,8 +44,8 @@ public class BaseProjectile implements Projectile{
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE) this.projType = ProjType.PARABLE;
-        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.WATERBOMB || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
+        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE || type == ProjectileAction.ProjectileType.WATERBOMB) this.projType = ProjType.PARABLE;
+        else if(type == ProjectileAction.ProjectileType.MIOJLNIR  || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
     }
 
     public BaseProjectile(int damage, float knockback, float recoil, Simulation sim, ProjectileAction.ProjectileType type) {
@@ -54,14 +54,17 @@ public class BaseProjectile implements Projectile{
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE) this.projType = ProjType.PARABLE;
-        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.WATERBOMB || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
+        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE || type == ProjectileAction.ProjectileType.WATERBOMB ) this.projType = ProjType.PARABLE;
+        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
     }
 
 
     @Override
     public Action shoot(Action head, Vector2 dir, float strength, Projectile dec, GameCharacter character) {
         this.t = 0f;
+        if (this.activeCollisions == null) {
+            activeCollisions = new ArrayList<>();
+        }
         this.activeCollisions.add(character);
         this.lastTile = null;
         this.strength = strength;
@@ -69,7 +72,7 @@ public class BaseProjectile implements Projectile{
         if (recoil > 0) {
             Vector2 v = new Vector2((dir.x * (-1) * (0.1f * recoil)) * 400, (dir.y * (-1) * (0.1f * recoil)) * 400);
             Path path = new ParablePath(character.getPlayerPos(), 15, v);
-            head = traverse(head, character, path, sim);
+            head = traverse(head, character, path, sim, this);
         }
         return this.move(head, strength , dec);
     }
@@ -130,7 +133,7 @@ public class BaseProjectile implements Projectile{
 
         activeCollisions = newCollisions;
         // lastCharacter = null;
-        lastTile = null;
+
 
         return lastAc;
     }
@@ -149,15 +152,15 @@ public class BaseProjectile implements Projectile{
         dir.nor();
         int offset = 0;
         if (dir.x > 0) offset = 16;
-        Vector2 v = new Vector2((dir.x * (0.1f * knockback)) * 400, (dir.y * (0.1f * knockback)) * 400);
+        Vector2 v = new Vector2((dir.x * (0.8f * knockback)) * 400, (dir.y * (0.8f * knockback)) * 400);
         Vector2 pos = character.getPlayerPos().cpy();
         pos.x += offset;
         Path path = new ParablePath(pos,300, v);
 
-        return traverse(pAc, character, path, this.sim);
+        return traverse(pAc, character, path, this.sim, bsProj);
     }
 
-    static Action traverse(Action head, GameCharacter character, Path path, Simulation sim) {
+    static Action traverse(Action head, GameCharacter character, Path path, Simulation sim, BaseProjectile bsProj) {
         if (path.getDir(0).x == 0 && path.getDir(0).y == 0) return head;
         float t = 0f;
         float offset = 0;
@@ -174,9 +177,12 @@ public class BaseProjectile implements Projectile{
                 return hAc;
             }
             if (sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
-                t -= 0.001f;
-                break;
+                if (bsProj.lastTile == null || !sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
+                    t -= 0.001f;
+                    break;
+                }
             }
+            if (t > 0.005) bsProj.lastTile = null;
             t += 0.001f;
         }
 
@@ -190,7 +196,7 @@ public class BaseProjectile implements Projectile{
         // b --- c
 
         path = new ParablePath(character.getPlayerPos(), path.getPos(t), path.getDir(0));
-        if (path.getDuration() < 0.1f) return head;
+        if (path.getDuration() < 0.01f) return head;
         Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
         sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x - (int)offset, (int)pos.y);
         head.addChild(cmAc);

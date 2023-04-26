@@ -239,29 +239,41 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             //The Projectile should be moved after being summoned
             summonProjectile.setChildren(new Action[]{moveProjectile, rotateProjectile});
-
-            if (projectileAction.getType() == ProjectileAction.ProjectileType.GRENADE){
-                //ToDo fix first explosion
-                DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(5f, null, null, (entity) -> {
-                    animator.root.remove(entity);
-                    entity.free();
-                });
-
-                SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
-                    ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.explosionParticle);
-                    animator.root.add(particleEntity);
-                    particleEntity.setLoop(false);
-                    particleEntity.setRelPos(path.getPos(path.getDuration()));
-                    return particleEntity;
-                });
-                summonParticle.setChildren(new Action[]{destroyParticle});
-                moveProjectile.setChildren(new Action[]{destroyProjectile, summonParticle});
-            }else
-            //The Projectile should get destroyed at the end of its path
-                moveProjectile.setChildren(new Action[]{destroyProjectile});
+            ExpandedAction particleAction;
+            switch (projectileAction.getType()) {
+                case WATERBOMB:
+                    particleAction = addParticle(IngameAssets.splashParticle, path.getPos(path.getDuration()), 4f, animator);
+                    moveProjectile.setChildren(new Action[]{destroyProjectile, particleAction.head});
+                    break;
+                case GRENADE:
+                    //ToDo fix first explosion
+                    particleAction = addParticle(IngameAssets.explosionParticle, path.getPos(path.getDuration()), 5f, animator);
+                    moveProjectile.setChildren(new Action[]{destroyProjectile, particleAction.head});
+                    break;
+                default:
+                    //The Projectile should get destroyed at the end of its path
+                    moveProjectile.setChildren(new Action[]{destroyProjectile});
+            }
 
             //We sliced the projectile Action: Summon is now the first and Destroy the last Action with Move in between
             return new ExpandedAction(summonProjectile, destroyProjectile);
+        }
+
+        private static ExpandedAction addParticle(ParticleEffectPool effect, Vector2 pos, float duration, Animator animator){
+            DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(duration, null, null, (entity) -> {
+            animator.root.remove(entity);
+            entity.free();
+        });
+
+            SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(effect);
+                animator.root.add(particleEntity);
+                particleEntity.setLoop(false);
+                particleEntity.setRelPos(pos);
+                return particleEntity;
+            });
+            summonParticle.setChildren(new Action[]{destroyParticle});
+            return new ExpandedAction(summonParticle, destroyParticle);
         }
 
         private static ExpandedAction convertTileMoveAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -373,10 +385,10 @@ public class Animator implements Screen, AnimationLogProcessor {
             com.gats.simulation.GameCharacter currentPlayer = animator.state.getCharacterFromTeams(shootAction.getTeam(), shootAction.getCharacter());
             GameCharacter target = animator.teams[shootAction.getTeam()][shootAction.getCharacter()];
 
-            ExecutorAction shotExecutorAction = new ExecutorAction(shootAction.getDelay(), ()-> {
+            ExecutorAction shotExecutorAction = new ExecutorAction(shootAction.getDelay(), () -> {
                 target.getWeapon().shoot();
                 Animation<TextureRegion> anim = target.getWeapon().getShootingAnimation();
-                return anim != null? anim.getAnimationDuration(): 0;
+                return anim != null ? anim.getAnimationDuration() : 0;
             });
 
             //uiaction
@@ -411,7 +423,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 SummonAction<Entity> summonTombstone = new SummonAction<Entity>(0, null, () -> {
                     AnimatedEntity tombstone = new AnimatedEntity(IngameAssets.tombstoneAnimation);
                     tombstone.setRelPos(target.getRelPos());
-                    tombstone.setOrigin(new Vector2(IngameAssets.tombstoneAnimation.getKeyFrame(0).getRegionWidth()/2f, target.getOrigin().y));
+                    tombstone.setOrigin(new Vector2(IngameAssets.tombstoneAnimation.getKeyFrame(0).getRegionWidth() / 2f, target.getOrigin().y));
                     animator.root.add(tombstone);
                     return tombstone;
 
@@ -479,7 +491,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(summonAction, destroyAction);
         }
 
-        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator){
+        private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterMoveAction moveAction = (CharacterMoveAction) action;
 
             GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
@@ -488,8 +500,8 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterPath characterPath = new CharacterPath(moveAction.getPath());
             MoveAction animMoveAction = new MoveAction(0, target, characterPath.getDuration(), characterPath);
             //rotateAction to set the angle/direction of movement, to flip the character sprite
-            RotateAction animRotateAction = new RotateAction(0,target, characterPath.getDuration(), characterPath);
-            startWalking.setChildren(new Action[]{animMoveAction,animRotateAction});
+            RotateAction animRotateAction = new RotateAction(0, target, characterPath.getDuration(), characterPath);
+            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             animMoveAction.setChildren(new Action[]{stopWalking});
 
