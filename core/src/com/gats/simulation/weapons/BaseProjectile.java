@@ -62,6 +62,9 @@ public class BaseProjectile implements Projectile{
     @Override
     public Action shoot(Action head, Vector2 dir, float strength, Projectile dec, GameCharacter character) {
         this.t = 0f;
+        if (this.activeCollisions == null) {
+            activeCollisions = new ArrayList<>();
+        }
         this.activeCollisions.add(character);
         this.lastTile = null;
         this.strength = strength;
@@ -149,7 +152,7 @@ public class BaseProjectile implements Projectile{
         dir.nor();
         int offset = 0;
         if (dir.x > 0) offset = 16;
-        Vector2 v = new Vector2((dir.x * (0.1f * knockback)) * 400, (dir.y * (0.1f * knockback)) * 400);
+        Vector2 v = new Vector2((dir.x * (0.8f * knockback)) * 400, (dir.y * (0.8f * knockback)) * 400);
         Vector2 pos = character.getPlayerPos().cpy();
         pos.x += offset;
         Path path = new ParablePath(pos,300, v);
@@ -174,7 +177,7 @@ public class BaseProjectile implements Projectile{
                 return hAc;
             }
             if (sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
-                if (!sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
+                if (bsProj.lastTile == null || !sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
                     t -= 0.001f;
                     break;
                 }

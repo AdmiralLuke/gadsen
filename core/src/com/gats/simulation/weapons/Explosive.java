@@ -76,10 +76,10 @@ public class Explosive implements Projectile {
             for (GameCharacter ch : charactersToMove) {
                 if (ch == null) break;
                 Vector2 bsPos = bsProj.path.getPos(bsProj.t).cpy();
-                Vector2 playerPos = ch.getPlayerPos();
+                Vector2 playerPos = ch.getPlayerPos().cpy().add(GameCharacter.getSize().scl(0.5f));
 
-                Vector2 dir = bsPos.sub(playerPos).nor();
-                Vector2 v = new Vector2((dir.x * (0.5f * bsProj.knockback)) * 400, (dir.y * (0.5f * bsProj.knockback)) * 400);
+                Vector2 dir = bsPos.sub(playerPos).nor().scl(-1);
+                Vector2 v = new Vector2((dir.x * (0.4f * bsProj.knockback)) * 400, (dir.y * (0.4f * bsProj.knockback)) * 400);
                 Path path = new ParablePath(ch.getPlayerPos(), 15, v);
                 sim.getWrapper().setHealth(head, ch.getTeam(), ch.getTeamPos(), ch.getHealth() - bsProj.damage, false);
                 BaseProjectile.traverse(head, ch, path, sim, bsProj);
