@@ -2,7 +2,6 @@ package com.gats.animation.entity;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
@@ -36,9 +35,9 @@ public class ParticleEntity extends Entity implements Disposable, Pool.Poolable 
     }
 
     @Override
-    public void setRotationAngle(float angle) {
+    public void setRelRotationAngle(float angle) {
         float oldAngle = getRotationAngle();
-        super.setRotationAngle(angle);
+        super.setRelRotationAngle(angle);
         float diff = angle - oldAngle;
 //        ToDo: Implement dynamic rotation
 //        for (ParticleEmitter emitter : effect.getEmitters()

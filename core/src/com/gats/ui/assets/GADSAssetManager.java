@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gats.simulation.WeaponType;
+import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
 import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType;
 import com.gats.ui.assets.AssetContainer.MainMenuAssets;
@@ -29,6 +30,10 @@ public class GADSAssetManager {
     public static final String damageParticle = "particle/damageParticle.p";
 
     public static final String explosionParticle = "particle/explosionParticle.p";
+
+
+    //ToDo load different effect (not splash)
+    public static final String waterParticle = "particle/waterSplashParticle.p";
 
     public static final String outlineShader = resourceDirectory + "shader/outline.frag";
     public static final String lookupShader = resourceDirectory + "shader/lookup.frag";
@@ -95,6 +100,7 @@ public class GADSAssetManager {
         manager.load(walkParticle, ParticleEffect.class, particleEffectParameter);
         manager.load(damageParticle, ParticleEffect.class, particleEffectParameter);
         manager.load(explosionParticle, ParticleEffect.class, particleEffectParameter);
+        manager.load(waterParticle, ParticleEffect.class, particleEffectParameter);
     }
 
 
@@ -170,6 +176,15 @@ public class GADSAssetManager {
 
         IngameAssets.explosionParticle = new ParticleEffectPool(manager.get(explosionParticle, ParticleEffect.class), 1, 10);
 
+        IngameAssets.waterParticle = new ParticleEffectPool(manager.get(waterParticle, ParticleEffect.class), 1, 10);
+
+        IngameAssets.WaterPistol = new AtlasAnimation(1/8f, atlas.findRegions("weapon/watergun"), Animation.PlayMode.LOOP);
+
+        IngameAssets.Wool = new AtlasAnimation(1/8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP);
+
+        IngameAssets.Grenade = new AtlasAnimation(1/8f, atlas.findRegions("weapon/grenadeReddish"), Animation.PlayMode.LOOP);
+        IngameAssets.Miojlnir = new AtlasAnimation(1/8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP);
+
         IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
         IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
         IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
@@ -178,6 +193,16 @@ public class GADSAssetManager {
       //  IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
 
         IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED,null);
+        IngameAssets.weaponIcons.put(WeaponType.WATER_PISTOL, atlas.findRegion("ui/watergunIcon"));
+        IngameAssets.weaponIcons.put(WeaponType.WOOL, atlas.findRegion("ui/ballOfWoolIcon"));
+        IngameAssets.weaponIcons.put(WeaponType.GRENADE, atlas.findRegion("ui/grenadeReddishIcon"));
+        IngameAssets.weaponIcons.put(WeaponType.MIOJLNIR, atlas.findRegion("ui/miosHammerIcon"));
+
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATER, new AtlasAnimation(1/8f, atlas.findRegions("projectile/watergunProjectile"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WOOL, new AtlasAnimation(1/8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.GRENADE, new AtlasAnimation(1/8f, atlas.findRegions("projectile/grenadeProjectile"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.MIOJLNIR, new AtlasAnimation(1/8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP));
+
         IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
         IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
         IngameAssets.fastForwardButtonChecked = atlas.findRegion("ui/fastForwardButtonChecked");

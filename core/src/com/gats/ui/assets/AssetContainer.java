@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gats.simulation.WeaponType;
+import com.gats.simulation.action.ProjectileAction;
 
 import java.util.HashMap;
 
@@ -59,7 +60,7 @@ public class AssetContainer {
 
         public static TextureRegion pixel;
 
-		static {
+        static {
             Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
             map.setColor(Color.WHITE);
             map.drawPixel(0, 0);
@@ -86,6 +87,11 @@ public class AssetContainer {
         public static Animation<TextureRegion> Cookie;
         public static Animation<TextureRegion> SugarCane;
 
+        public static Animation<TextureRegion> WaterPistol;
+        public static AtlasAnimation Wool;
+        public static Animation<TextureRegion> Grenade;
+        public static AtlasAnimation Miojlnir;
+
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
         public static Animation<TextureRegion> yinYangSkin;
@@ -102,13 +108,16 @@ public class AssetContainer {
 
         public static ParticleEffectPool damageParticle;
         public static ParticleEffectPool explosionParticle;
+        public static ParticleEffectPool waterParticle;
 
 
         public static TextureRegion inventoryCell;
 
         public static TextureRegion cookieIcon;
         public static TextureRegion sugarCaneIcon;
-        public static HashMap<WeaponType,TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
+        public static HashMap<WeaponType, TextureRegion> weaponIcons = new HashMap<WeaponType,TextureRegion>() {};
+
+        public static HashMap<ProjectileAction.ProjectileType, AtlasAnimation> projectiles = new HashMap<ProjectileAction.ProjectileType, AtlasAnimation>() {};
 
         public static TextureRegion fastForwardButton;
         public static TextureRegion fastForwardButtonPressed;

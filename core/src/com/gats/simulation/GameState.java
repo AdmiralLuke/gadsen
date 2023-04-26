@@ -44,6 +44,7 @@ public class GameState implements Serializable {
         return new GameState(this);
     }
 
+
     private GameState(GameState original) {
         board = new Tile[original.width][original.height];
         Tile[][] tiles = original.board;
