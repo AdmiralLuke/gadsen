@@ -44,8 +44,8 @@ public class BaseProjectile implements Projectile{
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE) this.projType = ProjType.PARABLE;
-        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.WATERBOMB || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
+        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE || type == ProjectileAction.ProjectileType.WATERBOMB) this.projType = ProjType.PARABLE;
+        else if(type == ProjectileAction.ProjectileType.MIOJLNIR  || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
     }
 
     public BaseProjectile(int damage, float knockback, float recoil, Simulation sim, ProjectileAction.ProjectileType type) {
@@ -54,8 +54,8 @@ public class BaseProjectile implements Projectile{
         this.knockback = knockback;
         this.sim = sim;
         this.type = type;
-        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE) this.projType = ProjType.PARABLE;
-        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.WATERBOMB || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
+        if (type == ProjectileAction.ProjectileType.WOOL || type == ProjectileAction.ProjectileType.WATER || type == ProjectileAction.ProjectileType.GRENADE || type == ProjectileAction.ProjectileType.WATERBOMB ) this.projType = ProjType.PARABLE;
+        else if(type == ProjectileAction.ProjectileType.MIOJLNIR || type == ProjectileAction.ProjectileType.CLOSE_COMB) this.projType = ProjType.LINEAR;
     }
 
 

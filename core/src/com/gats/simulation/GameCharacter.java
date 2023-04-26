@@ -255,7 +255,7 @@ public class GameCharacter implements Serializable {
      */
     protected void initInventory() {
         this.weapons = new Weapon[6];
-        weapons[0] = new Weapon(new Explosive(new BaseProjectile(3, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), 200, WeaponType.WATERBOMB, team, teamPos, 2);
+        weapons[0] = new Weapon(new Explosive(new BaseProjectile(3, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), 200, WeaponType.WATERBOMB, team, teamPos, 10);
         weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 10, 0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
         weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, team, teamPos, 10);
         weapons[2] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, team, teamPos, 13);
