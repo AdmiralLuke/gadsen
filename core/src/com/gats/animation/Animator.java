@@ -371,13 +371,18 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertCharacterShootAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterShootAction shootAction = (CharacterShootAction) action;
             com.gats.simulation.GameCharacter currentPlayer = animator.state.getCharacterFromTeams(shootAction.getTeam(), shootAction.getCharacter());
-            //ToDo play weapon animation
-            IdleAction idleAction = new IdleAction(shootAction.getDelay(), 0);
+            GameCharacter target = animator.teams[shootAction.getTeam()][shootAction.getCharacter()];
+
+            ExecutorAction shotExecutorAction = new ExecutorAction(shootAction.getDelay(), ()-> {
+                target.getWeapon().shoot();
+                Animation<TextureRegion> anim = target.getWeapon().getShootingAnimation();
+                return anim != null? anim.getAnimationDuration(): 0;
+            });
 
             //uiaction
             MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0, animator.uiMessenger, currentPlayer, currentPlayer.getSelectedWeapon());
-            idleAction.setChildren(new Action[]{updateInventoryItem});
-            return new ExpandedAction(idleAction, updateInventoryItem);
+            shotExecutorAction.setChildren(new Action[]{updateInventoryItem});
+            return new ExpandedAction(shotExecutorAction, updateInventoryItem);
         }
 
         private static ExpandedAction convertCharacterHitAction(com.gats.simulation.action.Action action, Animator animator) {

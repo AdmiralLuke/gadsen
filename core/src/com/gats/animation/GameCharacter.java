@@ -127,6 +127,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         return this.aimingIndicator;
     }
 
+
     public void setAimingIndicator(AimIndicator aimIndicator) {
         if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
@@ -155,6 +156,10 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         this.holdingWeapon = holdingWeapon;
         if (weapon == null) return;
         weapon.setHolding(holdingWeapon);
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
     }
 
     public void setWeapon(Weapon weapon) {

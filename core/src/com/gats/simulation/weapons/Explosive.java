@@ -3,6 +3,7 @@ package com.gats.simulation.weapons;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.*;
 import com.gats.simulation.action.Action;
+import com.gats.simulation.action.ProjectileAction;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -19,14 +20,15 @@ public class Explosive implements Projectile {
 
     @Override
     public Action hitWall(Action head, Tile t, Projectile dec, BaseProjectile bsProj) {
+
         head = proj.hitNothing(head, dec, bsProj);
+
         return explode(head, t, null, bsProj.path.getPos(bsProj.t), bsProj.sim, bsProj);
     }
 
     @Override
     public Action hitCharacter(Action head, GameCharacter character, Projectile dec, BaseProjectile bsProj) {
-        head = proj.hitNothing(head, dec, bsProj);
-        return explode(head, null, character, bsProj.path.getPos(bsProj.t), bsProj.sim, bsProj);
+        return null;
     }
 
     @Override
@@ -53,14 +55,16 @@ public class Explosive implements Projectile {
     public Action explode(Action head, Tile t, GameCharacter character, Vector2 midPos, Simulation sim, BaseProjectile bsProj) {
         HashMap<Tile, Integer> tilesInRadius = new HashMap<>();
         HashMap<GameCharacter, Integer> charactersInRadius = new HashMap<>();
-        traverseCircle(tilesInRadius, charactersInRadius, this.radius, midPos, sim, head);
+        traverseCircle(tilesInRadius, charactersInRadius, this.radius, midPos, sim, head, bsProj);
         if (t != null) tilesInRadius.put(t, 0);
         if (character != null) charactersInRadius.put(character, 0);
 
-        Set<Tile> tileToDestroy = tilesInRadius.keySet();
-        if (!tileToDestroy.isEmpty()) {
-            for (Tile td : tileToDestroy) {
-                if (td != null) td.onDestroy(head);
+        if (bsProj.type != ProjectileAction.ProjectileType.WATERBOMB) {
+            Set<Tile> tileToDestroy = tilesInRadius.keySet();
+            if (!tileToDestroy.isEmpty()) {
+                for (Tile td : tileToDestroy) {
+                    if (td != null) td.onDestroy(head);
+                }
             }
         }
 
@@ -71,17 +75,21 @@ public class Explosive implements Projectile {
         if (!charactersToMove.isEmpty()) {
             for (GameCharacter ch : charactersToMove) {
                 if (ch == null) break;
-                Vector2 dir = bsProj.path.getPos(bsProj.t).cpy().sub(ch.getPlayerPos()).nor().scl(-1);
-                Vector2 v = new Vector2((dir.x * (0.1f * bsProj.knockback)) * 400, (dir.y * (0.1f * bsProj.knockback)) * 400);
+                Vector2 bsPos = bsProj.path.getPos(bsProj.t).cpy();
+                Vector2 playerPos = ch.getPlayerPos().cpy().add(GameCharacter.getSize().scl(0.5f));
+
+                Vector2 dir = bsPos.sub(playerPos).nor().scl(-1);
+                Vector2 v = new Vector2((dir.x * (0.4f * bsProj.knockback)) * 400, (dir.y * (0.4f * bsProj.knockback)) * 400);
                 Path path = new ParablePath(ch.getPlayerPos(), 15, v);
                 sim.getWrapper().setHealth(head, ch.getTeam(), ch.getTeamPos(), ch.getHealth() - bsProj.damage, false);
-                BaseProjectile.traverse(head, ch, path, sim);
+                BaseProjectile.traverse(head, ch, path, sim, bsProj);
             }
         }
+
         return head;
     }
 
-    void traverseCircle(HashMap<Tile, Integer> tiles, HashMap<GameCharacter, Integer> characters, int rad, Vector2 midPos, Simulation sim, Action head) {
+    void traverseCircle(HashMap<Tile, Integer> tiles, HashMap<GameCharacter, Integer> characters, int rad, Vector2 midPos, Simulation sim, Action head, BaseProjectile bsProj) {
         if (rad <= 0) return;
 
         int steps = rad * 7 * 200;
@@ -97,7 +105,7 @@ public class Explosive implements Projectile {
             if (rad == radius) {
                 if (t != null && !tiles.containsKey(t)) tiles.put(t, 0);
             } else {
-                if (t != null) t.destroyTileDirect(head);
+                if (t != null && bsProj.type !=  ProjectileAction.ProjectileType.WATERBOMB) t.destroyTileDirect(head);
             }
 
 
@@ -110,6 +118,6 @@ public class Explosive implements Projectile {
                 }
             }
         }
-        traverseCircle(tiles, characters, rad - 1, midPos, sim, head);
+        traverseCircle(tiles, characters, rad - 1, midPos, sim, head, bsProj);
     }
 }

@@ -20,6 +20,11 @@ public class Weapons {
                 weapon = new Weapon(AssetContainer.IngameAssets.Miojlnir);
                 weapon.setRelPos(new Vector2(-5.5f, -7.5f));
                 break;
+            case CLOSE_COMBAT:
+                weapon = new Weapon(AssetContainer.IngameAssets.BaseballBat);
+                weapon.setRelPos(new Vector2(-15.5f, -9.5f));
+                weapon.setShootingAnimation(AssetContainer.IngameAssets.BaseballBatAttack);
+                break;
             case GRENADE:
                 weapon = new Weapon(AssetContainer.IngameAssets.Grenade);
                 weapon.setRelPos(new Vector2(-8.5f, -11.5f));
