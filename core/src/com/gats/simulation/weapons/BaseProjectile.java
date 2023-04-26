@@ -182,6 +182,7 @@ public class BaseProjectile implements Projectile{
                     break;
                 }
             }
+            if (t > 0.005) bsProj.lastTile = null;
             t += 0.001f;
         }
 
