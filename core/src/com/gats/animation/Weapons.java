@@ -22,7 +22,7 @@ public class Weapons {
                 break;
             case CLOSE_COMBAT:
                 weapon = new Weapon(AssetContainer.IngameAssets.BaseballBat);
-                weapon.setRelPos(new Vector2(-8.5f, -11.5f));
+                weapon.setRelPos(new Vector2(-15.5f, -9.5f));
                 weapon.setShootingAnimation(AssetContainer.IngameAssets.BaseballBatAttack);
                 break;
             case GRENADE:
