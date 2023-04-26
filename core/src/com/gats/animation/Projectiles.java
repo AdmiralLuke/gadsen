@@ -25,6 +25,7 @@ public class Projectiles {
         AnimatedEntity animatedEntity;
         switch (type){
             case CLOSE_COMB:
+            case MIOJLNIR:
             case GRENADE:
             case WOOL:
                 animation = AssetContainer.IngameAssets.projectiles.get(type);
