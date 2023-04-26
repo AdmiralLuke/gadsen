@@ -24,6 +24,7 @@ public class Projectiles {
         Animation<TextureRegion> animation;
         AnimatedEntity animatedEntity;
         switch (type){
+            case WATERBOMB:
             case CLOSE_COMB:
             case MIOJLNIR:
             case GRENADE:

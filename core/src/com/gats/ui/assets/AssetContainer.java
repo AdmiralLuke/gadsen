@@ -93,6 +93,7 @@ public class AssetContainer {
         public static Animation<TextureRegion> BaseballBat;
         public static Animation<TextureRegion> BaseballBatAttack;
         public static AtlasAnimation Miojlnir;
+        public static AtlasAnimation WaterBomb;
 
         public static Animation<TextureRegion> coolCatSkin;
         public static Animation<TextureRegion> orangeCatSkin;
@@ -111,6 +112,7 @@ public class AssetContainer {
         public static ParticleEffectPool damageParticle;
         public static ParticleEffectPool explosionParticle;
         public static ParticleEffectPool waterParticle;
+        public static ParticleEffectPool splashParticle;
 
 
         public static TextureRegion inventoryCell;
