@@ -88,7 +88,7 @@ public class GADSAssetManager {
         TextureAtlas atlas = manager.get(this.atlas, TextureAtlas.class);
 
         //Main Menu
-        MainMenuAssets.background = atlas.findRegion("background/WeihnachtsBG");
+        MainMenuAssets.background = atlas.findRegion("background/mainTitleBackground");
         MainMenuAssets.titleSprite = atlas.findRegion("ui/titleTileset");
         MainMenuAssets.skin = manager.get(skin, Skin.class);
 
