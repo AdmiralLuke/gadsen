@@ -12,7 +12,8 @@ public class Entity {
     private Vector2 scale = new Vector2(1, 1);
     private Vector2 pos = new Vector2(0, 0);
     private Vector2 relPos = new Vector2(0, 0);
-    /**
+
+/**
      * rotation angle of the Entity from 0 - 360
      */
     private float angle = 0f;

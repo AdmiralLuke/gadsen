@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.gats.simulation.GameCharacter;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.Hud;
+import com.gats.ui.assets.AssetContainer;
 
 
 /**
@@ -27,8 +28,6 @@ public class UiMessenger {
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(null);
 		refillStaminaBar(currentPlayer.getStamina());
-
-
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
 
@@ -101,17 +100,30 @@ public class UiMessenger {
 	 */
 	public void startTurnTimer(){hud.startTurnTimer();};
 
+	/**
+	 * Starts the turn timer for specified time.
+	 * @param seconds
+	 */
+	public void startTurnTimer(int seconds){
+		hud.startTurnTimer(seconds);
+	}
+
 
 	public void stopTurnTimer(){
 		hud.stopTurnTimer();
 	}
 
+	public void gameEnded(boolean won, int team){
+		hud.gameEnded(won,team);
+
+	}
 
 	/**
 	 * Calls necessary functions to update Ui Elements after a player shot.
 	 * @param currentPlayer
 	 * @param weapon
 	 */
+
 
 
 	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){
