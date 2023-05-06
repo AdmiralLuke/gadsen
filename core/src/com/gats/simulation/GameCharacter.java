@@ -100,6 +100,14 @@ public class GameCharacter implements Serializable {
 
 
     /**
+     * resets the stamina and the shoot from the GameCharacter
+     */
+    void reset() {
+        this.resetAlreadyShot();
+        this.resetStamina();
+    }
+
+    /**
      * Makes the Character equip the specified weapon.
      *
      * @param type Weapon-type as Enum
