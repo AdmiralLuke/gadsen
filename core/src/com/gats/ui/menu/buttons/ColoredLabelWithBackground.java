@@ -31,6 +31,11 @@ public class ColoredLabelWithBackground extends Label {
 
 	}
 
+	public ColoredLabelWithBackground(CharSequence text, Skin skin, Color color,Drawable background) {
+		this(text,skin,color.r,color.g,color.b,color.a);
+		setBackground(background);
+	}
+
 	/**
 	 * Farbiges Label mit Hintergrund
 	 * @param text Labeltext
@@ -49,9 +54,7 @@ public class ColoredLabelWithBackground extends Label {
 		super(text,skin);
 
 		//skin/style des Labels ändern um mit der gewünschten farbe, die skinfarbe zu überschreiben
-		LabelStyle style = new LabelStyle(getStyle());
-		style.fontColor = new Color(r,g,b,a);
-		this.setStyle(style);
+		setColor(new Color(r,g,b,a));
 
 
 		//Hintergrund erstellen
@@ -81,4 +84,31 @@ public class ColoredLabelWithBackground extends Label {
 	public void  enableBackground(boolean enable){
 		this.enableBackground = enable;
 	}
+
+	public void setBackground(Drawable background){
+		if(background!=null) {
+			this.background = background;
+		}
+	}
+
+	@Override
+	public void setColor(Color color) {
+		if(color!=null){
+			LabelStyle style = new LabelStyle(getStyle());
+			style.fontColor = color;
+			this.setStyle(style);
+		}
+
+	}
+
+	@Override
+	public void setColor(float r, float g, float b, float a) {
+		this.setColor(new Color(r,g,b,a));
+	}
+
+	@Override
+	public Color getColor(){
+		return new Color(getStyle().fontColor);
+	}
+
 }

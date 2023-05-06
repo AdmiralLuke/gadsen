@@ -1,6 +1,7 @@
 package com.gats.ui.hud;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -8,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 /**
  * Button to toggle the Animation speedup
  */
-public class FastForwardButton extends ImageButton {
+public class FastForwardButton extends Button {
 
 	UiMessenger uiMessenger;
 	boolean speedUp;
@@ -23,6 +24,7 @@ public class FastForwardButton extends ImageButton {
 				 toggleAnimationSpeed();
 			 };
 			 });
+
 	}
 
 
@@ -35,6 +37,8 @@ public class FastForwardButton extends ImageButton {
 		}
 		speedUp=!speedUp;
 	}
+
+
 
 
 

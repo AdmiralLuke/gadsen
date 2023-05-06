@@ -26,11 +26,12 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
 
     private final int KEY_TOGGLE_DEBUG = Input.Keys.F3;
 
-    private HumanPlayer currentPlayer;
-    private Vector2 lastMousePosition;
-    private Vector2 deltaMouseMove;
-    private boolean rightMousePressed;
-    private boolean turnInProgress = false;
+	private HumanPlayer currentPlayer;
+	private Vector2 lastMousePosition;
+	private Vector2 deltaMouseMove;
+	private boolean leftMousePressed;
+	private boolean rightMousePressed;
+	private boolean turnInProgress = false;
 
 
     //used for storing arrow key input -> for now used for camera
@@ -45,8 +46,15 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
     }
 
 
-    public void activateTurn(HumanPlayer humanPlayer) {
-        currentPlayer = humanPlayer;
+	public void activateTurn(HumanPlayer humanPlayer) {
+
+		currentPlayer = humanPlayer;
+		//wait for the turnstart/change to finish
+		synchronized (this) {
+			try {
+				wait(2000);
+			} catch (InterruptedException ignored) {}
+		}
 //        System.out.printf("Activating turn for player %s\n", humanPlayer.toString());
         turnInProgress = true;
     }
@@ -182,7 +190,6 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
                 break;
             case KEY_CAMERA_ZOOM_OUT:
                 cameraZoomPressed -= 1;
-
                 break;
             default:
                 if (turnInProgress && currentPlayer != null) {
@@ -206,15 +213,22 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
             lastMousePosition = new Vector2(screenX, screenY);
             rightMousePressed = true;
 
-        }
-        return false;
-    }
+		}
+		if(button==Input.Buttons.LEFT){
+			leftMousePressed = true;
+			processMouseAim(screenX,screenY);
+		}
+		return false;
+	}
 
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (button == Input.Buttons.RIGHT) {
-            rightMousePressed = false;
-        }
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		if(button==Input.Buttons.RIGHT){
+			rightMousePressed=false;
+		}
+		if(button==Input.Buttons.LEFT){
+			leftMousePressed=false;
+		}
 
         return false;
     }
@@ -228,16 +242,20 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
             return true;
         }
 
-        return false;
-    }
+		//only change the aim values, when leftmouse is pressed
+		if(leftMousePressed){
+			processMouseAim(screenX,screenY);
+			return true;
+		}
+		return false;
+	}
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
 
 
-        processMouseAim(screenX, screenY);
-        return false;
-    }
+		return false;
+	}
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
