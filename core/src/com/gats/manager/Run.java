@@ -1,6 +1,7 @@
 package com.gats.manager;
 
 import com.gats.simulation.GameState;
+import com.gats.ui.menu.gamemodeLayouts.CampaignLayout;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
@@ -27,10 +28,9 @@ public abstract class Run {
 
     public static Run getRun(Manager manager, RunConfiguration runConfig) {
         switch (runConfig.gameMode) {
+            case Campaign:
             case Normal:
             case Christmas:
-                //ToDo implement differences
-            case Campaign:
             case Exam_Admission:
                 return new SingleGameRun(manager, runConfig);
             case Tournament_Phase_1:

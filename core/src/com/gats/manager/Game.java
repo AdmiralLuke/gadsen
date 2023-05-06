@@ -67,6 +67,12 @@ public class Game {
 
     protected Game(GameConfig config) {
         this.config = config;
+        if (config.gameMode == GameState.GameMode.Campaign){
+            ArrayList<Class<? extends Player>> bots = new ArrayList<>();
+            config.players.addAll(bots);
+            config.teamCount = config.players.size();
+
+        }
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;
         inputGenerator = config.inputProcessor;
