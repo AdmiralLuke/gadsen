@@ -127,6 +127,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         return this.aimingIndicator;
     }
 
+
     public void setAimingIndicator(AimIndicator aimIndicator) {
         if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
@@ -157,6 +158,10 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         weapon.setHolding(holdingWeapon);
     }
 
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
     public void setWeapon(Weapon weapon) {
         if (this.weapon != null && this.weapon.getParent() != null) {
             remove(weapon);
@@ -166,6 +171,15 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         if (weapon.getParent() != null) weapon.getParent().remove(weapon);
         weapon.setParent(this);
         weapon.setHolding(holdingWeapon);
+    }
+
+
+    @Override
+    public void updateAngle() {
+        super.updateAngle();
+        if (weapon != null) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
+        }
     }
 
     @Override
@@ -187,6 +201,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     @Override
     public void remove(Entity child) {
         if (child == weapon) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
             weapon.setParent(null);
             weapon = null;
         } else if (child == aimingIndicator) {

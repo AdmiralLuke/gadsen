@@ -164,6 +164,7 @@ public class Simulation {
         IntVector2 turnChar = gameState.getTurn().peek();
         ActionLog lastTurn = this.actionLog;
         assert turnChar != null;
+        gameState.getCharacterFromTeams(turnChar.x, turnChar.y).resetAlreadyShot();
         this.actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         return lastTurn;
 
