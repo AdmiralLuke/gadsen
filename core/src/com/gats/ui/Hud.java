@@ -47,6 +47,7 @@ public class Hud implements Disposable {
 	private AimInformation aimInfo;
 
 	private StaminaBar staminaBar;
+	private float renderingSpeed = 1;
 
 	private boolean debugVisible;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
@@ -205,7 +206,7 @@ public class Hud implements Disposable {
 	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second, with a hardcoded height of 300,300
 	 */
 	public void createTurnChangePopup() {
-		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8));
+		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8));
 	}
 
 	public void drawImagePopup(ImagePopup image){
@@ -228,11 +229,14 @@ public class Hud implements Disposable {
 	}
 
 	/**
-	 * Changes the animation playback speed.
+	 * Changes the animation playback speed. And adjustes the turn wait time.
 	 * @param speed Will multiply with the normal playback.
 	 */
 	public void setRenderingSpeed(float speed){
 		inGameScreen.setRenderingSpeed(speed);
+		inputHandler.turnChangeSpeedup(speed);
+		this.renderingSpeed = speed;
+
 	}
 
 	/**
