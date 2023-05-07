@@ -54,7 +54,7 @@ public class GameCharacter implements Serializable {
      * @param teamPos Characters index within its team
      * @param sim     the executing Simulation instance of the game
      */
-    GameCharacter(int x, int y, GameState state, int team, int teamPos, Simulation sim) {
+    GameCharacter(int x, int y, GameState state, int team, int teamPos, Weapon[] inventory, Simulation sim) {
         this.boundingBox = new IntRectangle(x, y, SIZE.x, SIZE.y);
         this.state = state;
         this.team = team;
@@ -62,7 +62,7 @@ public class GameCharacter implements Serializable {
         this.sim = sim;
         this.damageReceived = new int[state.getTeamCount()];
         resetStamina();
-        initInventory();
+        this.weapons = inventory;
     }
 
     private GameCharacter(GameCharacter original, GameState newState) {
@@ -253,14 +253,15 @@ public class GameCharacter implements Serializable {
      *
      * @Weihnachtsaufgabe Inventar wird initialisiert mit Keks (50 Schuss) und Zuckerstange (4 Schuss)
      */
-    protected void initInventory() {
-        this.weapons = new Weapon[6];
-        weapons[0] = new Weapon(new Explosive(new BaseProjectile(3, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), 200, WeaponType.WATERBOMB, team, teamPos, 10);
-        weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 10, 0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
-        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, team, teamPos, 10);
-        weapons[2] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, team, teamPos, 13);
-        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, team, teamPos, 0.5f);
-        weapons[1] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, team, teamPos, 9);
+    protected static Weapon[] initInventory(Simulation sim) {
+        Weapon[] weapons = new Weapon[6];
+        weapons[0] = new Weapon(new Explosive(new BaseProjectile(3, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), 200, WeaponType.WATERBOMB, 10);
+        weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 10, 0.8f), 200, WeaponType.WOOL, 15);
+        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, 10);
+        weapons[2] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, 13);
+        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, 0.5f);
+        weapons[1] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, 9);
+        return weapons;
     }
 
     /**
