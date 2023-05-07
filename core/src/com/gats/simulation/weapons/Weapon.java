@@ -14,24 +14,18 @@ public class Weapon implements Serializable {
     private transient Projectile projectile;
     private int ammo;
     private WeaponType type;
-    int team;
-    int teamN;
     float duration;
 
-    public Weapon(Projectile projectile, int ammo, WeaponType type, int team, int teamN, float duration) {
+    public Weapon(Projectile projectile, int ammo, WeaponType type, float duration) {
         this.projectile = projectile;
         this.ammo = ammo;
         this.type = type;
-        this.team = team;
-        this.teamN = teamN;
         this.duration = duration;
     }
 
     private Weapon(Weapon original){
         this.ammo = original.ammo;
         this.type = original.type;
-        this.team = original.team;
-        this.teamN = original.teamN;
         this.duration = original.duration;
     }
 
@@ -48,7 +42,7 @@ public class Weapon implements Serializable {
         if (type == WeaponType.WOOL || type == WeaponType.WATER_PISTOL || type == WeaponType.GRENADE || type == WeaponType.WATERBOMB) path = new ParablePath(pos.cpy(), duration, v);
         else if(type == WeaponType.MIOJLNIR ||  type == WeaponType.CLOSE_COMBAT) path = new LinearPath(pos.cpy(), dir.cpy(), duration, 40);
         projectile.setPath(path);
-        CharacterShootAction shootAction = new CharacterShootAction(team, teamN);
+        CharacterShootAction shootAction = new CharacterShootAction(character.getTeamPos(), character.getTeamPos());
         head.getChildren().add(shootAction);
         return projectile.shoot(shootAction, dir, strength, projectile, character);
     }
