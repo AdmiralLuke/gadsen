@@ -35,6 +35,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     private AimIndicator aimingIndicator;
 
     private Weapon weapon;
+    private Healthbar healthbar;
 
     private boolean holdingWeapon = false;
 
@@ -72,9 +73,11 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         accSkinTime += deltaTime;
 
-        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
         if (!holdingWeapon && weapon != null) {
             weapon.draw(batch, deltaTime, parentAlpha);
+        }
+        if (healthbar!=null){
+            healthbar.draw(batch,deltaTime,parentAlpha);
         }
         batch.flush();
 
@@ -99,6 +102,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         batch.flush();
         batch.setShader(null);
 
+        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
         if (holdingWeapon && weapon != null) weapon.draw(batch, deltaTime, parentAlpha);
         group.draw(batch, deltaTime, parentAlpha);
 
@@ -128,12 +132,29 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     }
 
 
+    public Healthbar getHealthbar(){
+        return this.healthbar;
+    }
+
     public void setAimingIndicator(AimIndicator aimIndicator) {
         if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
         if (aimIndicator == null) return;
         if (aimIndicator.getParent() != null) aimIndicator.getParent().remove(aimIndicator);
         aimIndicator.setParent(this);
+
+
+        //Farbe/Transparenz des Indicators setzen
+        Color c;
+        if(this.teamColor!=null){
+            c = new Color(teamColor);
+
+        }
+        else {
+            c = new Color(Color.WHITE);
+        }
+        c.a=0.75f;
+        aimIndicator.setColor(c);
     }
 
     @Override
@@ -141,6 +162,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         super.setPos(pos);
         if (aimingIndicator != null) aimingIndicator.updatePos();
         if (weapon != null) weapon.updatePos();
+        if (healthbar!=null)healthbar.updatePos();
         group.updatePos();
     }
 
@@ -174,6 +196,12 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     }
 
 
+    public void setHealthbar(Healthbar healthbar){
+        if(healthbar==null) {return;}
+        this.healthbar = healthbar;
+        this.healthbar.setParent(this);
+    }
+
     @Override
     public void updateAngle() {
         super.updateAngle();
@@ -193,6 +221,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
             setAimingIndicator((AimIndicator) child);
         } else if (child instanceof Weapon) {
             setWeapon((Weapon) child);
+        } else if (child instanceof Healthbar) {
+           setHealthbar((Healthbar)child);
         }else {
             group.add(child);
         }

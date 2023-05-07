@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -371,8 +372,6 @@ public class Animator implements Screen, AnimationLogProcessor {
             GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
             AddAction addAction = new AddAction(action.getDelay(), target, Weapons.summon(switchWeaponAction.getWpType()));
 
-            //notifyUhab nachdem du gerade gepusht hast noch ein 2.tes mal gemergt
-
             MessageUiWeaponSelectAction selectedWeaponAction = new MessageUiWeaponSelectAction(0, animator.uiMessenger, switchWeaponAction.getWpType());
             addAction.setChildren(new Action[]{selectedWeaponAction});
 
@@ -431,38 +430,33 @@ public class Animator implements Screen, AnimationLogProcessor {
                 destroyCharacter.setChildren(new Action[]{summonTombstone});
                 IdleAction waitAnimation = new IdleAction(0, IngameAssets.tombstoneAnimation.getAnimationDuration());
                 summonTombstone.setChildren(new Action[]{waitAnimation});
-                lastAction = summonTombstone;
+
             } else {
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
                 hitAnimation.setChildren(new Action[]{summonParticle, resetAnimationAction});
-                lastAction = resetAnimationAction;
             }
+           UpdateHealthBarAction updateHealthBarAction  = new UpdateHealthBarAction(0,hitAction.getHealthAft(),target.getHealthbar());
+            hitAnimation.addChild(updateHealthBarAction);
+            lastAction=updateHealthBarAction;
+
             return new ExpandedAction(hitAnimation, lastAction);
         }
 
         private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
             GameOverAction winAction = (GameOverAction) action;
 
-            SummonAction<Entity> summonWinScreen = new SummonAction<Entity>(action.getDelay(), null, () -> {
-
-                Vector2 pos = animator.getCamera().getScreenCenter();
-                TextureRegion display;
-                if (winAction.getTeam() < 0) {
-                    //ToDo replace with draw display
-                    display = IngameAssets.lossDisplay;
+                MessageUiGameEndedAction gameEndedAction;
+                if (winAction.getTeam() <= 0) {
+                    //Todo replace with draw display
+                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
                 } else {
-                    //ToDo display winner
-                    display = IngameAssets.victoryDisplay;
+
+                    //Todo display with winner
+                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,false, winAction.getTeam());
                 }
-                Entity winSprite = new WinEntity(display, pos);
-                animator.root.add(winSprite);
-                return winSprite;
-            });
 
 
-            //Todo pass to ui
-
-            return new ExpandedAction(summonWinScreen);
+            return new ExpandedAction(gameEndedAction);
         }
 
         private static ExpandedAction convertDebugPointAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -558,6 +552,8 @@ public class Animator implements Screen, AnimationLogProcessor {
 
                     AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                     aimIndicator.setScale(new Vector2(0.5f, 1));
+                    //init healhtbar with correct health and position.
+                    new Healthbar(simGameCharacter,animGameCharacter);
                     teams[curTeam][curCharacter] = animGameCharacter;
                     animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy().add(com.gats.simulation.GameCharacter.getSize().scl(0.5f)));
                     characterGroup.add(animGameCharacter);

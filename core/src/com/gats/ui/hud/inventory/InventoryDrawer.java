@@ -1,6 +1,7 @@
 package com.gats.ui.hud.inventory;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.utils.Disposable;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.GameCharacter;
@@ -16,14 +17,8 @@ public class InventoryDrawer extends Container<Inventory>{
 
 	public InventoryDrawer(RunConfiguration runConfiguration) {
 		playerInventory = new Inventory[runConfiguration.teamCount][runConfiguration.teamSize];
-		current = new Inventory(9);
-	}
-
-	public void setScale(float scale) {
-		//	for (InventoryCell cell : cells
-		//	) {
-		//		cell.scaleSizeBy(scale);
-		//	}
+		current = new Inventory(6);
+		setActor(current);
 	}
 
 	/**
@@ -79,5 +74,7 @@ public class InventoryDrawer extends Container<Inventory>{
 	public void setSelectedItem(WeaponType weaponType) {
 		current.setSelectedItem(weaponType);
 	}
+
+
 
 }

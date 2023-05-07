@@ -13,7 +13,9 @@ import com.gats.simulation.GameState;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.Action;
 import com.gats.ui.assets.AssetContainer;
-import com.gats.ui.menu.debugView.DebugView;
+import com.gats.ui.debugView.DebugView;
+
+import java.util.List;
 
 /**
  * Der Screen welcher ein aktives Spiel anzeigt.

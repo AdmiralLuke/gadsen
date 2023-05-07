@@ -15,6 +15,7 @@ public class Inventory extends VerticalGroup {
 
 	private int selectedItemIndex;
 	private ArrayList<InventoryCell> items;
+
 	public Inventory(int size){
 		itemsIndex = new HashMap<WeaponType, Integer>(size);
 		items = new ArrayList<InventoryCell>();
@@ -100,4 +101,15 @@ public class Inventory extends VerticalGroup {
 
 		return weapons;
 	}
+
+
+	public void setCellSize(float width,float height){
+		for (InventoryCell cell:items) {
+		//	cell.setSize(width,height);
+		}
+		//sizeChanged();
+	}
+
+
+
 }
