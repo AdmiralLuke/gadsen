@@ -139,7 +139,7 @@ public class GameState implements Serializable {
             spawnpoints.sort(Comparator.comparingInt(v -> v.x));
             for (int i = 0; i < 4; i++) {
                 IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, sim);
+                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, sim, null);
                 turn.add(new IntVector2(i, 0));
             }
             return;
@@ -154,7 +154,7 @@ public class GameState implements Serializable {
             for (int j = 0; j < charactersPerTeam; j++) {
                 int index = rnd.nextInt(pointCount--);
                 IntVector2 pos = spawnpoints.remove(index).scl(Tile.TileSize);
-                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, sim);
+                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, sim, null);
             }
         }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
@@ -339,7 +339,7 @@ public class GameState implements Serializable {
                 if (getTile(randX, randY) != null) {
                     j--;
                 } else {
-                    characters[i][j] = new GameCharacter(randX, randY, this, i, j, sim);
+                    characters[i][j] = new GameCharacter(randX, randY, this, i, j, sim, null);
                 }
             }
         }

@@ -6,7 +6,9 @@ import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
+import com.gats.simulation.campaign.CampaignResources;
 import com.gats.ui.hud.UiMessenger;
+import org.lwjgl.Sys;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -67,11 +69,13 @@ public class Game {
 
     protected Game(GameConfig config) {
         this.config = config;
-        if (config.gameMode == GameState.GameMode.Campaign){
-            ArrayList<Class<? extends Player>> bots = new ArrayList<>();
-            config.players.addAll(bots);
+        if (config.gameMode == GameState.GameMode.Campaign) {
+            if (config.players.size() != 1) {
+                System.err.println("Campaign only accepts exactly 1 player");
+                setStatus(Status.ABORTED);
+            }
+            config.players.addAll(CampaignResources.getEnemies(config.mapName));
             config.teamCount = config.players.size();
-
         }
         gui = config.gui;
         animationLogProcessor = config.animationLogProcessor;
@@ -129,6 +133,7 @@ public class Game {
     }
 
     public void start() {
+        if (status == Status.ABORTED) return;
         setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
@@ -139,7 +144,7 @@ public class Game {
         simulationThread.start();
     }
 
-    private void setStatus(Status newStatus){
+    private void setStatus(Status newStatus) {
         status = newStatus;
         gameResults.setStatus(status);
     }
@@ -252,8 +257,8 @@ public class Game {
             }
             try {
                 while (true) {
-                    if (!simulation.isActingCharacterAlive()){
-                        if(currentPlayer.getType() == Player.PlayerType.Human) inputGenerator.endTurn();
+                    if (!simulation.isActingCharacterAlive()) {
+                        if (currentPlayer.getType() == Player.PlayerType.Human) inputGenerator.endTurn();
                         break;
                     }
                     Command nextCmd = commandQueue.take();

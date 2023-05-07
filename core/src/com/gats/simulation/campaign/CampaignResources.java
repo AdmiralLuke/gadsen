@@ -1,4 +1,4 @@
-package com.gats.manager.campaign;
+package com.gats.simulation.campaign;
 
 import com.gats.manager.Player;
 
@@ -22,6 +22,25 @@ public class CampaignResources {
                 break;
         }
         return enemies;
+    }
+
+    public static ArrayList<int[]> weaponCounts(String map){
+        ArrayList<int[]> inventories = new ArrayList<>();
+        switch (map){
+            case "level1":
+                inventories.add(new int[]{});
+                inventories.add(new int[]{});
+                break;
+            case "level2":
+                break;
+            case "level3":
+                break;
+            case "level4":
+                break;
+            case "level5":
+                break;
+        }
+        return inventories;
     }
 
 }

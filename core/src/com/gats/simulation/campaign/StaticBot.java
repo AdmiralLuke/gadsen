@@ -1,4 +1,4 @@
-package com.gats.manager.campaign;
+package com.gats.simulation.campaign;
 
 import com.gats.manager.Bot;
 import com.gats.manager.Controller;
@@ -12,7 +12,7 @@ public class StaticBot extends Bot {
 
     @Override
     public int getMatrikel() {
-        return -1; //Heh you thought
+        return -1; //Heh, you thought
     }
 
     @Override
