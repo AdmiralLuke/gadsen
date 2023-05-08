@@ -553,7 +553,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                     AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                     aimIndicator.setScale(new Vector2(0.5f, 1));
                     //init healhtbar with correct health and position.
-                    new Healthbar(simGameCharacter,animGameCharacter);
+                    new Healthbar(simGameCharacter, animGameCharacter);
                     teams[curTeam][curCharacter] = animGameCharacter;
                     animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy().add(com.gats.simulation.GameCharacter.getSize().scl(0.5f)));
                     characterGroup.add(animGameCharacter);

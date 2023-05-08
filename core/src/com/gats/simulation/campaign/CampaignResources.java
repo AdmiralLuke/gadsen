@@ -53,7 +53,7 @@ public class CampaignResources {
         ArrayList<int[]> helth = new ArrayList<>();
         switch (map){
             case "level1":
-                helth.add(new int[]{1});
+                helth.add(new int[]{5});
                 helth.add(new int[]{100});
                 break;
             case "level2":
