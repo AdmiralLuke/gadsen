@@ -4,10 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.gats.simulation.WeaponType;
 import com.gats.simulation.action.ProjectileAction;
 
@@ -55,6 +58,9 @@ public class AssetContainer {
         public static TextureRegion[] tileTextures;
 
         public static TextureRegion aimingIndicatorSprite;
+        public static TextureRegion aimCircle;
+
+        public static ProgressBar.ProgressBarStyle healthbarStyle;
 
         public static Animation<TextureRegion>[] gameCharacterAnimations;
 
@@ -130,6 +136,7 @@ public class AssetContainer {
         public static TextureRegion turnChange;
 
         public static TextureRegion turnTimer;
+        public static NinePatchDrawable healthBarBackground;
         public enum GameCharacterAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING,

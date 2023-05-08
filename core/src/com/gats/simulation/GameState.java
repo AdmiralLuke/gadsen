@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gats.manager.Timer;
+import com.gats.simulation.weapons.Weapon;
 
 import java.io.Serializable;
 import java.nio.file.Paths;
@@ -134,12 +135,14 @@ public class GameState implements Serializable {
      * Spawns players randomly distributed over the possible spawn-location, specified by the map.
      */
     void initTeam(List<IntVector2> spawnpoints) {
+
         if (gameMode == GameMode.Christmas) {
             //ToDo: remove Christmas Mode
             spawnpoints.sort(Comparator.comparingInt(v -> v.x));
             for (int i = 0; i < 4; i++) {
+                Weapon[] inventory = GameCharacter.initInventory(sim, null);
                 IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, sim, null);
+                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory,  sim);
                 turn.add(new IntVector2(i, 0));
             }
             return;
@@ -151,10 +154,11 @@ public class GameState implements Serializable {
                     teamCount, charactersPerTeam, pointCount));
         Random rnd = new Random();
         for (int i = 0; i < teamCount; i++) {
+            Weapon[] inventory = GameCharacter.initInventory(sim, null);
             for (int j = 0; j < charactersPerTeam; j++) {
                 int index = rnd.nextInt(pointCount--);
                 IntVector2 pos = spawnpoints.remove(index).scl(Tile.TileSize);
-                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, sim, null);
+                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, sim);
             }
         }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
@@ -319,31 +323,6 @@ public class GameState implements Serializable {
      */
     public int getBoardSizeY() {
         return height;
-    }
-
-    //ToDo: discuss removal
-
-    /**
-     * Spawnt Spieler an zufälligen Positionen
-     *
-     * @param amountTeams   Anzahl an Teams
-     * @param amountPlayers Anzahl Spieler pro Team
-     * @return Team Array
-     */
-    GameCharacter[][] spawnCharacter(int amountTeams, int amountPlayers) {
-        GameCharacter[][] characters = new GameCharacter[amountTeams][amountPlayers];
-        for (int i = 0; i < amountTeams; i++) {
-            for (int j = 0; j < amountPlayers; j++) {
-                int randX = (int) (Math.random() * getBoardSizeX());
-                int randY = (int) (Math.random() * getBoardSizeY());
-                if (getTile(randX, randY) != null) {
-                    j--;
-                } else {
-                    characters[i][j] = new GameCharacter(randX, randY, this, i, j, sim, null);
-                }
-            }
-        }
-        return characters;
     }
 
     public Timer getTurnTimer() {

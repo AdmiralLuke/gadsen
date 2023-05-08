@@ -2,9 +2,17 @@ package com.gats.ui.assets;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.gats.animation.entity.SpriteEntity;
 import com.gats.simulation.WeaponType;
 import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
@@ -112,7 +120,7 @@ public class GADSAssetManager {
         TextureAtlas atlas = manager.get(this.atlas, TextureAtlas.class);
 
         //Main Menu
-        MainMenuAssets.background = atlas.findRegion("background/WeihnachtsBG");
+        MainMenuAssets.background = atlas.findRegion("background/mainTitleBackground");
         MainMenuAssets.titleSprite = atlas.findRegion("ui/titleTileset");
         MainMenuAssets.skin = manager.get(skin, Skin.class);
 
@@ -126,7 +134,7 @@ public class GADSAssetManager {
 
         IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("tile/16x_box01"), atlas.findRegion("tile/16x_anchor01")};
 
-        IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicator");
+        IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicatorNinepatchColorless");
 
         IngameAssets.gameCharacterAnimations = new AtlasAnimation[GameCharacterAnimationType.values().length];
 
@@ -222,7 +230,78 @@ public class GADSAssetManager {
         IngameAssets.turnTimer = atlas.findRegion("ui/clockSprite");
 
 
+        createCircleTexture();
+        createHealthHealthbarAssets(atlas);
+
+        //create aim indicator circle
+
         finishedLoading = true;
+    }
+
+private void createHealthHealthbarAssets(TextureAtlas atlas) {
+
+        //hb background
+
+        TextureRegion background = atlas.findRegion("ui/healthbarBackground");
+        IngameAssets.healthBarBackground = new NinePatchDrawable(new NinePatch(background,1,1,1,1));
+
+
+        ProgressBar.ProgressBarStyle progStyle = new ProgressBar.ProgressBarStyle();
+        //background of the healtbar
+
+        progStyle.background = new NinePatchDrawable(IngameAssets.healthBarBackground);
+        //create pixmap for the color representation
+        Pixmap pixmap = new Pixmap(1,2, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.RED);
+        pixmap.fill();
+        TextureRegionDrawable healthBarColor = new TextureRegionDrawable(new Texture(pixmap));
+        pixmap.dispose();
+
+        //area representing health
+        progStyle.knobBefore = new TextureRegionDrawable(healthBarColor);
+
+        //knob of 0 width,  "points" to current health
+        pixmap = new Pixmap(0,2,Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.GREEN);
+        pixmap.fill();
+
+        progStyle.knob = new TextureRegionDrawable(new Texture(pixmap));
+        pixmap.dispose();
+
+
+
+        IngameAssets.healthbarStyle = progStyle;
+
+
+    }
+
+
+    public void createCircleTexture(){
+        Vector2 maxSize = new Vector2(64,7);
+        float circleOpacity = 0.5f;
+
+        //todo find betterway to load circle with size parameters
+        //could not be done bcause of threading context inside of aim indicator -> graphic operations need to be done on graphic thread
+        // -> could theoretically be done, but this is easier
+        //only problem being hardcoded size
+
+        final TextureRegion[] circleTexture = new TextureRegion[1];
+        //get max size of the aim indicator
+        int circleSize = (int) maxSize.x;
+        //create a Pixmap for drawing the circle texture
+        Pixmap circle = new Pixmap(2 * circleSize + 1, 2 * circleSize + 1, Pixmap.Format.RGBA8888);
+        //circle Color
+        Color color = new Color(Color.WHITE);
+        //circle alpha
+        color.a = circleOpacity;
+        circle.setColor(color);
+        //draw circle at
+        circle.drawCircle(circleSize, circleSize, circleSize);
+
+        IngameAssets.aimCircle =
+        new TextureRegion(new Texture(circle));
+
+
     }
 
     public float update() {
