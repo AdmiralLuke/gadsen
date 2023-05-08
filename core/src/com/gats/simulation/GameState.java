@@ -260,9 +260,11 @@ public class GameState implements Serializable {
                     int team = type - 101; //teams starting at 0
                     while (spawnpoints.size() <= team)
                         spawnpoints.add(new LinkedList<>()); //Increase list of spawnpoints as necessary
-                    spawnpoints.get(i).add(new IntVector2(i, j)); // Add current tile
+                    spawnpoints.get(team).add(new IntVector2(i, j)); // Add current tile
                 } else
                     switch (type) {
+                        case 0:
+                            break;
                         case 1:
                             board[i][j] = new Tile(i, j, true, this);
                             break;
