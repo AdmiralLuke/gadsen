@@ -227,7 +227,7 @@ public class MapRetriever implements FilenameFilter {
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
                     int type = tileData.get(i + (height - j - 1) * width).asInt();
-                    if (type == 3) {
+                    if (type > 100) {
                         spawnpoints++;
                     }
                 }
