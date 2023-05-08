@@ -256,7 +256,7 @@ public class Game {
                     log = nextCmd.run();
                     if (log == null) continue;
                     gameResults.addActionLog(log);
-                    if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
+                    if (gui) {
                         animationLogProcessor.animate(log);
                         //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
                     }

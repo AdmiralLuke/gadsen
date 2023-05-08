@@ -120,7 +120,7 @@ public class BaseProjectile implements Projectile{
         for (int i = 0; i < sim.getState().getTeamCount(); i++) {
             for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
                 GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
-                if (character != null) {
+                if (character != null && character.isAlive()) {
                     if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
                         newCollisions.add(character);
                         if (!activeCollisions.contains(character)) {
@@ -146,8 +146,7 @@ public class BaseProjectile implements Projectile{
         int j = character.getTeamPos();
         Action pAc = generateAction();
         head.addChild(pAc);
-        Action hAc = sim.getWrapper().setHealth(pAc, i, j, health - damage, false);
-        pAc.addChild(hAc);
+        sim.getWrapper().setHealth(pAc, i, j, health - damage, false);
         Vector2 dir = bsProj.path.getDir(bsProj.t);
         dir.nor();
         int offset = 0;
@@ -156,11 +155,11 @@ public class BaseProjectile implements Projectile{
         Vector2 pos = character.getPlayerPos().cpy();
         pos.x += offset;
         Path path = new ParablePath(pos,300, v);
-
         return traverse(pAc, character, path, this.sim, bsProj);
     }
 
     static Action traverse(Action head, GameCharacter character, Path path, Simulation sim, BaseProjectile bsProj) {
+        if (bsProj.knockback == 0) return head;
         if (path.getDir(0).x == 0 && path.getDir(0).y == 0) return head;
         float t = 0f;
         float offset = 0;

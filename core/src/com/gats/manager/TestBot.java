@@ -55,8 +55,8 @@ public class TestBot extends Bot {
      */
     @Override
     protected void executeTurn(GameState state, Controller controller) {
-        System.out.println("Position " + controller.getGameCharacter().getPlayerPos());
-        controller.move(16);
+        // System.out.println("Position " + controller.getGameCharacter().getPlayerPos());
+        // controller.move(16);
         int team = controller.getGameCharacter().getTeam();
         for (int i = 0; i < state.getTeamCount(); i++) {
             if (i != team) {
@@ -85,6 +85,6 @@ public class TestBot extends Bot {
         float arcTh = (float)Math.atan(th);
 
         float thDeg = (float)Math.toDegrees(arcTh);
-        return new Vector2(1, 0).rotateDeg(thDeg);
+        return dx < 0 ? new Vector2(-1, 0).rotateDeg(thDeg) : new Vector2(1, 0).rotateDeg(thDeg);
     }
 }

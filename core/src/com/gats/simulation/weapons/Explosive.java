@@ -112,7 +112,7 @@ public class Explosive implements Projectile {
             for (int j = 0; j < sim.getState().getTeamCount(); j++) {
                 for (int k = 0; k < sim.getState().getCharactersPerTeam(); k++) {
                     GameCharacter character = sim.getState().getCharacterFromTeams(j, k);
-                    if (character != null && (int) x == (int) character.getPlayerPos().x / 16 && (int) y == character.getPlayerPos().y / 16) {
+                    if (character != null && (int) x == (int) character.getPlayerPos().x / 16 && (int) y == character.getPlayerPos().y / 16 && character.isAlive()) {
                         if (!characters.containsKey(character)) characters.put(character, 0);
                     }
                 }

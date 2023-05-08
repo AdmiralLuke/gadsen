@@ -258,7 +258,7 @@ public class Tile implements Serializable, Cloneable {
         if (!lowerList.isEmpty()) checkForAnchor(lowerList, head);
         for (GameCharacter[] characters : this.state.getTeams()) {
             for (GameCharacter character : characters) {
-                if (character != null) {
+                if (character != null && character.isAlive()) {
                     character.fall(head);
                 }
             }
