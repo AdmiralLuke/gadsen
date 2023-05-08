@@ -28,14 +28,20 @@ public class CampaignResources {
         ArrayList<int[]> inventories = new ArrayList<>();
         switch (map){
             case "level1":
-                inventories.add(new int[]{});
-                inventories.add(new int[]{});
+                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
+                inventories.add(new int[]{0, 1, 0, 0, 0, 0});
                 break;
             case "level2":
+                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
+                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
                 break;
             case "level3":
+                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
+                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
                 break;
             case "level4":
+                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
+                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
                 break;
             case "level5":
                 break;
@@ -43,4 +49,28 @@ public class CampaignResources {
         return inventories;
     }
 
+    public static ArrayList<int[]> getHealth(String map){
+        ArrayList<int[]> helth = new ArrayList<>();
+        switch (map){
+            case "level1":
+                helth.add(new int[]{1});
+                helth.add(new int[]{100});
+                break;
+            case "level2":
+                helth.add(new int[]{0});
+                helth.add(new int[]{0});
+                break;
+            case "level3":
+                helth.add(new int[]{0});
+                helth.add(new int[]{0});
+                break;
+            case "level4":
+                helth.add(new int[]{0});
+                helth.add(new int[]{0});
+                break;
+            case "level5":
+                break;
+        }
+        return helth;
+    }
 }

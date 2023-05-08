@@ -3,6 +3,7 @@ package com.gats.simulation;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.gats.animation.action.IdleAction;
 import com.gats.manager.Timer;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.simulation.weapons.Weapon;
@@ -144,7 +145,7 @@ public class GameState implements Serializable {
             for (int i = 0; i < 4; i++) {
                 Weapon[] inventory = GameCharacter.initInventory(sim, null);
                 IntVector2 pos = spawnpoints.get(i).get(1).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, sim);
+                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, i==0?100:1, sim);
                 turn.add(new IntVector2(i, 0));
             }
             return;
@@ -156,18 +157,25 @@ public class GameState implements Serializable {
                     teamCount, typeCount));
         Random rnd = new Random();
         ArrayList<int[]> weapons;
-        if (gameMode == GameMode.Campaign) weapons = CampaignResources.getWeaponCounts(this.mapName);
-        else weapons = new ArrayList<>();
+        ArrayList<int[]> health;
+        if (gameMode == GameMode.Campaign) {
+            weapons = CampaignResources.getWeaponCounts(this.mapName);
+            health = CampaignResources.getHealth(this.mapName);
+        } else {
+            weapons = new ArrayList<>();
+            health = new ArrayList<>();
+        }
         for (int i = 0; i < teamCount; i++) {
             Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null);
+            int[] characterHealth = health.size()>i ?health.get(i):new int[0];
             List<IntVector2> teamSpawns = spawnpoints.get(i);
             if (teamSpawns.size() < charactersPerTeam)
                 throw new RuntimeException(String.format(
-                    "Requested %d Characters, but the selected map only supports %d different characters for team %d",
-                    charactersPerTeam, teamSpawns.size(), i));
+                        "Requested %d Characters, but the selected map only supports %d different characters for team %d",
+                        charactersPerTeam, teamSpawns.size(), i));
             for (int j = 0; j < charactersPerTeam; j++) {
-                IntVector2 pos = teamSpawns.get(j).scl(Tile.TileSize).add(Math.round((16 - GameCharacter.getSize().x)/2), 0);
-                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, sim);
+                IntVector2 pos = teamSpawns.get(j).scl(Tile.TileSize).add(Math.round((16 - GameCharacter.getSize().x) / 2), 0);
+                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, characterHealth.length > j?characterHealth[j]:100, sim);
             }
         }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)

@@ -9,9 +9,10 @@ public class Level1Bot extends StaticBot {
 
     @Override
     protected void executeTurn(GameState state, Controller controller) {
+        super.executeTurn(state, controller);
         switch (turnCount){
-            case 1:
-                controller.aim(new Vector2(-1, 1), 1);
+            case 0:
+                controller.aim(new Vector2(-1, 0), 1);
                 controller.selectWeapon(WeaponType.WATER_PISTOL);
                 controller.shoot();
                 break;
