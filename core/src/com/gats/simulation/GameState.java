@@ -114,7 +114,7 @@ public class GameState implements Serializable {
     GameState(GameMode gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
         this.mapName = mapName;
-        List<IntVector2> spawnpoints = loadMap(gameMode == GameMode.Campaign ? "campaign/" + mapName : mapName);
+        List<List<IntVector2>> spawnpoints = loadMap(gameMode == GameMode.Campaign ? "campaign/" + mapName : mapName);
         this.teamCount = teamCount;
         this.charactersPerTeam = charactersPerTeam;
         this.active = true;
@@ -137,33 +137,36 @@ public class GameState implements Serializable {
     /**
      * Spawns players randomly distributed over the possible spawn-location, specified by the map.
      */
-    void initTeam(List<IntVector2> spawnpoints) {
+    void initTeam(List<List<IntVector2>> spawnpoints) {
 
         if (gameMode == GameMode.Christmas) {
             //ToDo: remove Christmas Mode
-            spawnpoints.sort(Comparator.comparingInt(v -> v.x));
             for (int i = 0; i < 4; i++) {
                 Weapon[] inventory = GameCharacter.initInventory(sim, null);
-                IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);
+                IntVector2 pos = spawnpoints.get(i).get(1).scl(Tile.TileSize);
                 this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, sim);
                 turn.add(new IntVector2(i, 0));
             }
             return;
         }
-        int pointCount = spawnpoints.size();
-        if (pointCount < teamCount * charactersPerTeam)
+        int typeCount = spawnpoints.size();
+        if (typeCount < teamCount)
             throw new RuntimeException(String.format(
-                    "Requested %d x %d Characters, but the selected map has only %d spawning locations",
-                    teamCount, charactersPerTeam, pointCount));
+                    "Requested %d Teams, but the selected map only supports %d different teams",
+                    teamCount, typeCount));
         Random rnd = new Random();
         ArrayList<int[]> weapons;
         if (gameMode == GameMode.Campaign) weapons = CampaignResources.getWeaponCounts(this.mapName);
         else weapons = new ArrayList<>();
         for (int i = 0; i < teamCount; i++) {
-            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size()>i? weapons.get(i) : null);
+            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null);
+            List<IntVector2> teamSpawns = spawnpoints.get(i);
+            if (teamSpawns.size() < charactersPerTeam)
+                throw new RuntimeException(String.format(
+                    "Requested %d Characters, but the selected map only supports %d different characters for team %d",
+                    charactersPerTeam, teamSpawns.size(), i));
             for (int j = 0; j < charactersPerTeam; j++) {
-                int index = rnd.nextInt(pointCount--);
-                IntVector2 pos = spawnpoints.remove(index).scl(Tile.TileSize);
+                IntVector2 pos = teamSpawns.get(j).scl(Tile.TileSize).add(Math.round((16 - GameCharacter.getSize().x)/2), 0);
                 this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, sim);
             }
         }
@@ -224,7 +227,7 @@ public class GameState implements Serializable {
      *
      * @param mapName Name of the map without type as String
      */
-    private List<IntVector2> loadMap(String mapName) {
+    private List<List<IntVector2>> loadMap(String mapName) {
         JsonReader reader = new JsonReader();
         JsonValue map;
         try {
@@ -248,21 +251,28 @@ public class GameState implements Serializable {
 
         JsonValue tileData = map.get("layers").get(0).get("data");
 
-        List<IntVector2> spawnpoints = new LinkedList<>();
+        List<List<IntVector2>> spawnpoints = new LinkedList<>();
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int type = tileData.get(i + (height - j - 1) * width).asInt();
-                switch (type) {
-                    case 1:
-                        board[i][j] = new Tile(i, j, true, this);
-                        break;
-                    case 2:
-                        board[i][j] = new Tile(i, j, this, true);
-                        break;
-                    case 3:
-                        spawnpoints.add(new IntVector2(i, j));
-                }
+                if (type > 100) {
+                    int team = type - 101; //teams starting at 0
+                    while (spawnpoints.size() <= team)
+                        spawnpoints.add(new LinkedList<>()); //Increase list of spawnpoints as necessary
+                    spawnpoints.get(i).add(new IntVector2(i, j)); // Add current tile
+                } else
+                    switch (type) {
+                        case 1:
+                            board[i][j] = new Tile(i, j, true, this);
+                            break;
+                        case 2:
+                            board[i][j] = new Tile(i, j, this, true);
+                            break;
+                        default:
+                            //ToDo load special box
+                            board[i][j] = new Tile(i, j, this, true);
+                    }
             }
         }
         return spawnpoints;
