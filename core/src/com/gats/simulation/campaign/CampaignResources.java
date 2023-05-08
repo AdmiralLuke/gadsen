@@ -24,7 +24,7 @@ public class CampaignResources {
         return enemies;
     }
 
-    public static ArrayList<int[]> weaponCounts(String map){
+    public static ArrayList<int[]> getWeaponCounts(String map){
         ArrayList<int[]> inventories = new ArrayList<>();
         switch (map){
             case "level1":

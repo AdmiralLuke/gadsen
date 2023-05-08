@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gats.manager.Timer;
+import com.gats.simulation.campaign.CampaignResources;
 import com.gats.simulation.weapons.Weapon;
 
 import java.io.Serializable;
@@ -86,6 +87,7 @@ public class GameState implements Serializable {
     }
 
     private final GameMode gameMode;
+    private String mapName;
 
 
     private transient Timer turnTimer;
@@ -111,6 +113,7 @@ public class GameState implements Serializable {
      */
     GameState(GameMode gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
+        this.mapName = mapName;
         List<IntVector2> spawnpoints = loadMap(gameMode == GameMode.Campaign ? "campaign/" + mapName : mapName);
         this.teamCount = teamCount;
         this.charactersPerTeam = charactersPerTeam;
@@ -142,7 +145,7 @@ public class GameState implements Serializable {
             for (int i = 0; i < 4; i++) {
                 Weapon[] inventory = GameCharacter.initInventory(sim, null);
                 IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory,  sim);
+                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, sim);
                 turn.add(new IntVector2(i, 0));
             }
             return;
@@ -153,8 +156,11 @@ public class GameState implements Serializable {
                     "Requested %d x %d Characters, but the selected map has only %d spawning locations",
                     teamCount, charactersPerTeam, pointCount));
         Random rnd = new Random();
+        ArrayList<int[]> weapons;
+        if (gameMode == GameMode.Campaign) weapons = CampaignResources.getWeaponCounts(this.mapName);
+        else weapons = new ArrayList<>();
         for (int i = 0; i < teamCount; i++) {
-            Weapon[] inventory = GameCharacter.initInventory(sim, null);
+            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size()>i? weapons.get(i) : null);
             for (int j = 0; j < charactersPerTeam; j++) {
                 int index = rnd.nextInt(pointCount--);
                 IntVector2 pos = spawnpoints.remove(index).scl(Tile.TileSize);
