@@ -66,6 +66,11 @@ public class DesktopLauncher {
                 .hasArg()
                 .desc("When printing results, they will be encased by the given key, ensuring authenticity").build());
 
+        cliOptions.addOption(Option
+                .builder("r")
+                .longOpt("replay")
+                .desc("Saves replay and results of the matches (WIP)").build());
+
     }
 
     public static void main(String[] args) {
@@ -73,12 +78,17 @@ public class DesktopLauncher {
         CommandLineParser parser = new DefaultParser();
         CommandLine params;
         try {
-            if (parser.parse(new Options().addOption("?", "help", false, "Prints this list"), args).hasOption("?")) {
-                printHelp();
-                return;
+            for (String arg : args
+            ) {
+                if (arg.equals("-?") || arg.equals("--help")) {
+                    printHelp();
+                    return;
+                }
             }
+
             params = parser.parse(cliOptions, args);
         } catch (ParseException e) {
+            System.err.println(e.getMessage());
             printHelp();
             return;
         }
@@ -87,6 +97,8 @@ public class DesktopLauncher {
         runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p"))
             runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
+        if (params.hasOption("r"))
+            runConfig.replay = true;
         int gameMode = Integer.parseInt(params.getOptionValue("g", "0"));
         if (gameMode < 0 || gameMode >= GameState.GameMode.values().length) {
             System.err.println("Valid GameModes range from 0 to 4");
@@ -110,7 +122,14 @@ public class DesktopLauncher {
             if (runConfig.players == null) {
                 System.err.println("Param -m is required for no GUI mode");
                 invalidConfig = true;
+            } else if (runConfig.gameMode == GameState.GameMode.Campaign){
+                if( runConfig.players.size() != 1) {
+                    System.err.println("The Campaign can only be played by exactly one player");
+                    invalidConfig = true;
+                }
+
             } else if (runConfig.players.size() < 2) {
+
                 System.err.println("At least two players are required");
                 invalidConfig = true;
             }
@@ -134,19 +153,19 @@ public class DesktopLauncher {
                 }
             }
 
-            printResults(run, params.getOptionValue("k",""));
+            printResults(run, params.getOptionValue("k", ""));
         }
         Manager.getManager().dispose();
     }
 
     private static void printResults(Run run, String key) {
         StringBuilder builder = new StringBuilder();
-        if (key!= null && key.length()>0) builder.append("<").append(key).append(">");
+        if (key != null && key.length() > 0) builder.append("<").append(key).append(">");
         switch (run.getGameMode()) {
             case Normal:
             case Tournament_Phase_1:
                 builder.append("\nScores:\n");
-                int i=0;
+                int i = 0;
                 for (Class<? extends Player> cur : run.getPlayers()) {
                     builder.append(String.format("%-10s : %-6f", cur.getName(), run.getScores()[i++]));
                 }
@@ -161,7 +180,7 @@ public class DesktopLauncher {
                 builder.append("\n");
                 builder.append(Arrays.toString(run.getScores()));
         }
-        if (key!= null && key.length()>0) builder.append("<").append(key).append(">");
+        if (key != null && key.length() > 0) builder.append("<").append(key).append(">");
         System.out.println(builder.toString());
     }
 
