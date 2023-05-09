@@ -79,8 +79,14 @@ public class Manager {
                         activeGames.add(game);
                     } else if (scheduledGames.size() > 0) {
                         Game game = scheduledGames.remove(scheduledGames.size() - 1);
-                        game.start();
-                        activeGames.add(game);
+                        try {
+                            game.start();
+                            activeGames.add(game);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.err.println("Game crashed on start(); Aborting...\n" + game);
+                            game.abort();
+                        }
                     } else {
                         break;
                     }
