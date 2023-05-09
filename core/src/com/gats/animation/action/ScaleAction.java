@@ -9,9 +9,9 @@ import com.gats.animation.entity.SpriteEntity;
  */
 public class ScaleAction extends Action{
     private Vector2 scale;
-    private SpriteEntity target;
+    private Entity target;
 
-    public ScaleAction(float start, SpriteEntity target, Vector2 scale) {
+    public ScaleAction(float start, Entity target, Vector2 scale) {
         super(start);
         this.target = target;
         this.scale = scale;

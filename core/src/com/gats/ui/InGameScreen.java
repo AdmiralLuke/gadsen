@@ -8,15 +8,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.*;
 import com.gats.animation.Animator;
 import com.gats.animation.AnimatorCamera;
-import com.gats.manager.AnimationLogProcessor;
-import com.gats.manager.HumanPlayer;
-import com.gats.manager.Manager;
-import com.gats.manager.RunConfiguration;
+import com.gats.manager.*;
+import com.gats.simulation.GameState;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.action.Action;
 import com.gats.ui.assets.AssetContainer;
-import com.gats.ui.menu.debugView.DebugView;
-import com.gats.ui.hud.UiMessenger;
+import com.gats.ui.debugView.DebugView;
 
 import java.util.List;
 
@@ -26,7 +23,6 @@ import java.util.List;
 public class InGameScreen implements Screen, AnimationLogProcessor {
 
     private final Manager manager;
-    private final List<HumanPlayer> humanList;
     private Viewport gameViewport;
     private float worldWidth = 80*12;
     private float worldHeight = 80*12;
@@ -38,6 +34,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     private Animator animator;
     private final GADS gameManager;
 
+    private Run run;
+
     private DebugView debugView;
     public InGameScreen(GADS instance, RunConfiguration runConfig){
 
@@ -45,7 +43,6 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         gameViewport = new FillViewport(worldWidth,worldHeight);
 
         hud = new Hud(this, runConfig);
-        runConfig.uiMessenger=hud.getUiMessenger();
 
         debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
@@ -54,14 +51,16 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         //update runconfig
         runConfig.gui = true;
         runConfig.animationLogProcessor = this;
-        runConfig.input = hud.getGadsenInputProcessor();
+        runConfig.uiMessenger = hud.getUiMessenger();
+        runConfig.inputProcessor = hud.getInputHandler();
 
-        manager = new Manager(runConfig);
-        animator = new Animator(manager.getState(), gameViewport, runConfig.gameMode,runConfig.uiMessenger);
-        manager.start();
-
-        humanList = manager.getHumanList();
-
+        manager = Manager.getManager();
+        animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
+        //ToDo this should be happening in Menu
+        run = manager.startRun(runConfig);
+        //ToDo Handle case size >= 1
+        if (run.getGames().size() > 1) System.err.println("Warning: RunConfig produced more than one game: Only showing the first game!");
+        Game game = run.getGames().get(0);
     }
 
     //gets called when the screen becomes the main screen of GADS
@@ -82,13 +81,21 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         debugView.draw();
     }
 
+    @Override
+    public void init(GameState state) {
+        //ToDo the game is starting remove waiting screen etc.
+        animator.init(state);
+    }
+
     /**
      * Forwards the ActionLog to the Animator for processing
      *
      * @param log Queue of all {@link Action animation-related Actions}
      */
-    public void animate(ActionLog log) {animator.animate(log);
-    debugView.add(log);}
+    public void animate(ActionLog log) {
+        animator.animate(log);
+    debugView.add(log);
+    }
 
 
     @Override
@@ -125,7 +132,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     @Override
     public void dispose() {
         animator.dispose();
-        manager.dispose();
+        manager.stop(run);
         hud.dispose();
         gameManager.setScreenMenu();
     }
@@ -134,7 +141,6 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         //animator als actor?
          //       simulation als actor?
         Gdx.input.setInputProcessor(hud.getInputProcessor());
-        hud.setHumanPlayers(humanList);
 
     }
 

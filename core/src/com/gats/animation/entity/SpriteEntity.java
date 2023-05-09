@@ -15,7 +15,6 @@ public class SpriteEntity extends Entity {
     private TextureRegion textureRegion;
 
     private Color color = null;
-    private Vector2 scale = new Vector2(1, 1);
     private Vector2 size = null;
 
     private boolean flipped = false;
@@ -48,6 +47,7 @@ public class SpriteEntity extends Entity {
         if (color != null)
             batch.setColor(color);
 
+        Vector2 scale = getScale();
         if (size == null)
             batch.draw(textureRegion,
                     getPos().x - origin.x,
@@ -78,16 +78,11 @@ public class SpriteEntity extends Entity {
     }
 
 
-    public Vector2 getScale() {
-        return scale;
-    }
-
-    public void setScale(Vector2 scale) {
-        this.scale = scale;
-    }
-
     public Vector2 getSize() {
-        return new Vector2(size);
+        if(size!=null) {
+            return new Vector2(size);
+        }
+        return new Vector2(0,0);
     }
 
     public void setSize(Vector2 size) {
@@ -106,7 +101,7 @@ public class SpriteEntity extends Entity {
 
     /**
      * Returns the center of the rendered Sprite as a Vector.
-     * This is calculated with the {@link SpriteEntity#scale};
+     * This is calculated with the Sprites Scale
      *
      * @return Vector of the sprite center.
      */
@@ -164,11 +159,11 @@ public class SpriteEntity extends Entity {
      * @param angle angle in degrees
      */
     @Override
-    public void setRotationAngle(float angle) {
+    public void setRelRotationAngle(float angle) {
         angle = ((angle % 360) + 360) % 360;
-        super.setRotationAngle(rotate ? angle : 0);
+        super.setRelRotationAngle(rotate ? angle : 0);
         if (angle >= 90f && angle <= 270f) {
-            super.setRotationAngle(mirror ? angle-180 : angle);
+            super.setRelRotationAngle(mirror ? angle-180 : angle);
             setFlipped(mirror);
         } else {
             setFlipped(false);

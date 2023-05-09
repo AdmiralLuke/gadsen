@@ -1,19 +1,15 @@
 package com.gats.ui.hud;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.manager.HumanPlayer;
-import com.gats.ui.Hud;
 import com.gats.ui.InGameScreen;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class InputHandler implements GadsenInputProcessor{
+public class InputHandler implements InputProcessor, com.gats.manager.InputProcessor {
 
 
 	InGameScreen ingameScreen;
-
 
 
 	private final int KEY_CAMERA_UP = Input.Keys.UP;
@@ -33,10 +29,14 @@ public class InputHandler implements GadsenInputProcessor{
 	private HumanPlayer currentPlayer;
 	private Vector2 lastMousePosition;
 	private Vector2 deltaMouseMove;
+	private boolean leftMousePressed;
 	private boolean rightMousePressed;
-	private List<HumanPlayer> humanList = new ArrayList<>();
 	private boolean turnInProgress = false;
 
+	//Time between turns
+	private int defaultTurnWait = 2 * 1000;
+
+	private int turnWaitTime = defaultTurnWait;
 
 	//used for storing arrow key input -> for now used for camera
 	//first index for x Axis, second for y
@@ -45,23 +45,34 @@ public class InputHandler implements GadsenInputProcessor{
 
 	float cameraZoomPressed = 0;
 
-	public InputHandler(InGameScreen ingameScreen){
+	private long waitStart;
+
+	public InputHandler(InGameScreen ingameScreen) {
 		this.ingameScreen = ingameScreen;
 	}
 
 
-
-
-
-
 	public void activateTurn(HumanPlayer humanPlayer) {
+
 		currentPlayer = humanPlayer;
+		//wait for the turnstart/change to finish
+
+		synchronized (this) {
+
+			try {
+				waitStart = System.currentTimeMillis();
+				wait(turnWaitTime);
+			} catch (InterruptedException ignored) {
+			}
+		}
 //        System.out.printf("Activating turn for player %s\n", humanPlayer.toString());
+
 		turnInProgress = true;
 	}
 
 	public void endTurn() {
 		turnInProgress = false;
+		currentPlayer.endCurrentTurn();
 	}
 
 	public void tick(float delta) {
@@ -70,19 +81,15 @@ public class InputHandler implements GadsenInputProcessor{
 		}
 	}
 
-	public void setHumanPlayers(List<HumanPlayer> humanList) {
-		this.humanList = humanList;
-	}
-
-
 	/**
 	 * Converts the mouse screen-coordinates to worldPosition and calls {@link HumanPlayer#aimToVector(Vector2)} to aim the Indicator
+	 *
 	 * @param screenX
 	 * @param screenY
 	 */
-	private void processMouseAim(int screenX, int screenY){
-		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX,screenY));
-		if(currentPlayer!=null) {
+	private void processMouseAim(int screenX, int screenY) {
+		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX, screenY));
+		if (currentPlayer != null) {
 			currentPlayer.aimToVector(worldCursorPos);
 		}
 	}
@@ -90,21 +97,23 @@ public class InputHandler implements GadsenInputProcessor{
 	/**
 	 * Allows the camera to be moved with the mouse by using the position of the new and old mouse positions, to calculate the distance
 	 * to move.
+	 *
 	 * @param screenX
 	 * @param screenY
 	 */
-	private void processMouseCameraMove(int screenX,int screenY){
+	private void processMouseCameraMove(int screenX, int screenY) {
 		Vector2 worldCursorPos = ingameScreen.toWorldCoordinates(new Vector2(screenX, screenY));
 		deltaMouseMove = worldCursorPos.sub(ingameScreen.toWorldCoordinates(lastMousePosition));
 		lastMousePosition = new Vector2(screenX, screenY);
 
 		ingameScreen.moveCameraByOffset(deltaMouseMove);
 	}
+
 	/**
 	 * Called whenever a button is just pressed.
 	 * For now it handles input from the Arrow Keys, used for the camera Movement.
 	 * This is done by storing the direction in {@link InputHandler#ingameCameraDirection}.
-	 *
+	 * <p>
 	 * Also calls {@link HumanPlayer#processKeyDown(int keycode)} for user input.
 	 * Currently is the default case.
 	 *
@@ -157,7 +166,7 @@ public class InputHandler implements GadsenInputProcessor{
 				}
 				break;
 		}
-		ingameScreen.processInputs(ingameCameraDirection,cameraZoomPressed);
+		ingameScreen.processInputs(ingameCameraDirection, cameraZoomPressed);
 
 
 		return true;
@@ -174,35 +183,34 @@ public class InputHandler implements GadsenInputProcessor{
 	 */
 	@Override
 	public boolean keyUp(int keycode) {
-		  switch (keycode) {
-            case Input.Keys.UP:
-                ingameCameraDirection[1] -= 1;
-                break;
-            case Input.Keys.DOWN:
-               ingameCameraDirection[1] += 1;
-                break;
-            case Input.Keys.LEFT:
-               ingameCameraDirection[0] += 1;
-                break;
-            case Input.Keys.RIGHT:
-                ingameCameraDirection[0] -= 1;
-                break;
-             case KEY_CAMERA_ZOOM_IN:
-                cameraZoomPressed += 1;
-                break;
-            case KEY_CAMERA_ZOOM_OUT:
-                cameraZoomPressed -= 1;
+		switch (keycode) {
+			case Input.Keys.UP:
+				ingameCameraDirection[1] -= 1;
+				break;
+			case Input.Keys.DOWN:
+				ingameCameraDirection[1] += 1;
+				break;
+			case Input.Keys.LEFT:
+				ingameCameraDirection[0] += 1;
+				break;
+			case Input.Keys.RIGHT:
+				ingameCameraDirection[0] -= 1;
+				break;
+			case KEY_CAMERA_ZOOM_IN:
+				cameraZoomPressed += 1;
+				break;
+			case KEY_CAMERA_ZOOM_OUT:
+				cameraZoomPressed -= 1;
+				break;
+			default:
+				if (turnInProgress && currentPlayer != null) {
+					currentPlayer.processKeyUp(keycode);
+				}
+				break;
+		}
+		ingameScreen.processInputs(ingameCameraDirection, cameraZoomPressed);
 
-                break;
-            default:
-                if (turnInProgress && currentPlayer != null) {
-                    currentPlayer.processKeyUp(keycode);
-                }
-                break;
-        }
-        ingameScreen.processInputs(ingameCameraDirection,cameraZoomPressed);
-
-        return true;
+		return true;
 	}
 
 	@Override
@@ -212,18 +220,25 @@ public class InputHandler implements GadsenInputProcessor{
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		if(button==Input.Buttons.RIGHT){
-			lastMousePosition = new Vector2(screenX,screenY);
+		if (button == Input.Buttons.RIGHT) {
+			lastMousePosition = new Vector2(screenX, screenY);
 			rightMousePressed = true;
 
+		}
+		if (button == Input.Buttons.LEFT) {
+			leftMousePressed = true;
+			processMouseAim(screenX, screenY);
 		}
 		return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		if(button==Input.Buttons.RIGHT){
-			rightMousePressed=false;
+		if (button == Input.Buttons.RIGHT) {
+			rightMousePressed = false;
+		}
+		if (button == Input.Buttons.LEFT) {
+			leftMousePressed = false;
 		}
 
 		return false;
@@ -233,11 +248,16 @@ public class InputHandler implements GadsenInputProcessor{
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 
 		//wenn gezogen wird, alte position nehmen, distanz zur neuen position ermitteln und die Kamera nun um diesen wert verschieben
-		if(rightMousePressed) {
-			processMouseCameraMove(screenX,screenY);
+		if (rightMousePressed) {
+			processMouseCameraMove(screenX, screenY);
 			return true;
 		}
 
+		//only change the aim values, when leftmouse is pressed
+		if (leftMousePressed) {
+			processMouseAim(screenX, screenY);
+			return true;
+		}
 		return false;
 	}
 
@@ -245,17 +265,23 @@ public class InputHandler implements GadsenInputProcessor{
 	public boolean mouseMoved(int screenX, int screenY) {
 
 
-		processMouseAim(screenX,screenY);
 		return false;
 	}
 
 	@Override
 	public boolean scrolled(float amountX, float amountY) {
 
-		if(amountY!=0) {
+		if (amountY != 0) {
 			ingameScreen.zoomCamera(amountY / 10);
 		}
 		return false;
+	}
+
+	//decreases the turn wait time by multiplying with 1/speedupval
+	public void turnChangeSpeedup(float speedupVal) {
+
+		turnWaitTime = (defaultTurnWait / (int)speedupVal);
+
 	}
 
 

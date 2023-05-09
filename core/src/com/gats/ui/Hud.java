@@ -2,15 +2,14 @@ package com.gats.ui;
 
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.manager.HumanPlayer;
@@ -19,8 +18,6 @@ import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.hud.*;
 import com.gats.ui.hud.inventory.InventoryDrawer;
 import com.gats.ui.hud.ImagePopup;
-
-import java.util.List;
 
 /**
  * Class for taking care of the User Interface.
@@ -36,7 +33,7 @@ public class Hud implements Disposable {
 	private InventoryDrawer inventory;
 	private TurnTimer turnTimer;
 	private Table layoutTable;
-	private VerticalGroup turnPopupContainer;
+	private Container<ImagePopup> turnPopupContainer;
 	private InGameScreen inGameScreen;
 
 	private TextureRegion turnChangeSprite;
@@ -50,6 +47,7 @@ public class Hud implements Disposable {
 	private AimInformation aimInfo;
 
 	private StaminaBar staminaBar;
+	private float renderingSpeed = 1;
 
 	private boolean debugVisible;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
@@ -57,10 +55,10 @@ public class Hud implements Disposable {
 		this.inGameScreen = ingameScreen;
 
 
-		int viewportSizeX = 256;
-		int viewportSizeY = 256;
+		int viewportSizeX = 1028;
+		int viewportSizeY = 1028;
 		float animationSpeedupValue = 8;
-		turnChangeDuration = 1;
+		turnChangeDuration = 2;
 		turnChangeSprite = AssetContainer.IngameAssets.turnChange;
 
 
@@ -82,8 +80,7 @@ public class Hud implements Disposable {
 
 		fastForwardButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
 
-		turnPopupContainer = new VerticalGroup();
-
+		turnPopupContainer = new Container<ImagePopup>();
 		layoutHudElements();
 
 		//Combine input from both processors
@@ -124,8 +121,6 @@ public class Hud implements Disposable {
        Table table = new Table(AssetContainer.MainMenuAssets.skin);
 
         table.setFillParent(true);
-        //debug
-        table.setDebug(false);
 		//align the table to the left of the stage
 		table.center();
 		return table;
@@ -137,16 +132,28 @@ public class Hud implements Disposable {
 	 */
 	private void layoutHudElements() {
 		float padding = 10;
-		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left();
-		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
-		layoutTable.add(turnPopupContainer).expandX().size(turnChangeSprite.getRegionWidth(),turnChangeSprite.getRegionHeight());
-		layoutTable.add(aimInfo).expandX().expandY().pad(10).right().align(Align.right).width(40);
-		layoutTable.row();
-		layoutTable.add(fastForwardButton).pad(padding).expandX().left().bottom();
-		layoutTable.add(staminaBar).pad(padding).expandX().center().width(32);
-		layoutTable.add(turnTimer).expandX().right().bottom().pad(padding);
 
+		//currently setting the element size of elements in their class file: hardcoded
+		//changing the size via the table/actor methods does not really work. could be a fault of not implementing the ui elementparents correctly
+		//-> yet it is a bit too much work for now
+		//Todo Refactor resizing of every Ui element
+
+
+
+		staminaBar.setSize(1,48);
+
+		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left().width(aimInfo.getPrefWidth());
+		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
+		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(700,700).fill();
+		layoutTable.add(aimInfo).expandX().expandY().pad(padding).right().align(Align.right);
+		layoutTable.row();
+		layoutTable.add(fastForwardButton).pad(padding).left().bottom().size(64,64);
+
+		layoutTable.add(staminaBar).pad(padding).center().bottom().width(384);
+		layoutTable.add(turnTimer).pad(padding).right().bottom();
 	}
+
+
 	/**
 	 * Creates a {@link FastForwardButton} with the correct sprites.
 	 * @param uiMessenger
@@ -166,7 +173,7 @@ public class Hud implements Disposable {
 	 * Input Processor handling all of the Inputs meant to be sent to {@link com.gats.simulation.Simulation} via {@link HumanPlayer}
 	 * @return
 	 */
-	public GadsenInputProcessor getGadsenInputProcessor() {
+	public InputHandler getInputHandler() {
 		return inputHandler;
 	}
 
@@ -178,12 +185,9 @@ public class Hud implements Disposable {
 		return inputMultiplexer;
 	}
 
-	public void setHumanPlayers(List<HumanPlayer> humanPlayers){
-		inputHandler.setHumanPlayers(humanPlayers);
-	}
-
 	public void draw() {
 		//apply the viewport, so the glViewport is using the correct settings for drawing
+
 		stage.getViewport().apply(true);
        	stage.draw();
 	}
@@ -199,13 +203,21 @@ public class Hud implements Disposable {
 
 
 	/**
-	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second
+	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second, with a hardcoded height of 300,300
 	 */
 	public void createTurnChangePopup() {
+		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8));
+	}
+
+	public void drawImagePopup(ImagePopup image){
 		if(turnPopupContainer.hasChildren()) {
-			turnPopupContainer.removeActorAt(0, false);
+			turnPopupContainer.removeActorAt(0,false);
 		}
-		turnPopupContainer.addActor(new ImagePopup(turnChangeSprite,turnChangeDuration));
+		turnPopupContainer.setActor(image);
+		turnPopupContainer.center();
+		image.setScaling(Scaling.fit);
+		turnPopupContainer.fill();
+		turnPopupContainer.maxSize(image.getWidthForContainer(),image.getHeightForContainer());
 	}
 
 	public void resizeViewport(int width, int height){
@@ -217,11 +229,14 @@ public class Hud implements Disposable {
 	}
 
 	/**
-	 * Changes the animation playback speed.
+	 * Changes the animation playback speed. And adjustes the turn wait time.
 	 * @param speed Will multiply with the normal playback.
 	 */
 	public void setRenderingSpeed(float speed){
 		inGameScreen.setRenderingSpeed(speed);
+		inputHandler.turnChangeSpeedup(speed);
+		this.renderingSpeed = speed;
+
 	}
 
 	/**
@@ -234,6 +249,10 @@ public class Hud implements Disposable {
 
 	public void startTurnTimer(){
 		turnTimer.startTimer();
+	}
+
+	public void startTurnTimer(int seconds){
+		turnTimer.startTimer(seconds);
 	}
 
 	public void stopTurnTimer(){
@@ -262,4 +281,36 @@ public class Hud implements Disposable {
 
 		this.layoutTable.setDebug(debugVisible);
 	}
+
+	/**
+	 * Creates a popup Display for displaying the GameOver Situation and Tints the Screen in a semi-Transparent Black
+	 * @param won
+	 * @param team
+	 */
+	public void gameEnded(boolean won,int team){
+
+		//create a pixel with a set color that will be used as Background
+		Pixmap pixmap = new Pixmap(1,1, Pixmap.Format.RGBA8888);
+		//set the color to black
+		pixmap.setColor(0,0,0,0.5f);
+		pixmap.fill();
+		layoutTable.setBackground( new TextureRegionDrawable(new Texture(pixmap)));
+		pixmap.dispose();
+
+		ImagePopup display;
+		//determine sprite
+		if(won){
+			display= new ImagePopup(AssetContainer.IngameAssets.victoryDisplay,-1,
+					AssetContainer.IngameAssets.victoryDisplay.getRegionWidth(),
+					AssetContainer.IngameAssets.victoryDisplay.getRegionHeight());
+		}
+		else {
+			display = new ImagePopup(AssetContainer.IngameAssets.lossDisplay, -1,
+					AssetContainer.IngameAssets.lossDisplay.getRegionWidth(),
+					AssetContainer.IngameAssets.lossDisplay.getRegionHeight());
+		}
+		drawImagePopup(display);
+
+	}
+
 }

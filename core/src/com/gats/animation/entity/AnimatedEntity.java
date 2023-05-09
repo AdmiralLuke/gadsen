@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.gats.animation.entity.SpriteEntity;
 
 /**
  * Verhält sich wie ein SpriteEntity mit dem Unterschied, dass beim draw() Aufruf
@@ -34,6 +35,13 @@ public class AnimatedEntity extends SpriteEntity {
         super.draw(batch, deltaTime, parentAlpha);
     }
 
+    public void resetAccTime(){
+        accTime = 0;
+    }
+
+    public float getAccTime() {
+        return accTime;
+    }
 
     public void setAnimation(Animation<TextureRegion> animation) {
         if (animation == this.animation) return;

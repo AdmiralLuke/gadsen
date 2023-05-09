@@ -26,12 +26,16 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     private static final float spriteOffsetRight = 2;
 
+    private final EntityGroup group;
+
+
     private Animation<TextureRegion> skin;
 
 
     private AimIndicator aimingIndicator;
 
     private Weapon weapon;
+    private Healthbar healthbar;
 
     private boolean holdingWeapon = false;
 
@@ -43,6 +47,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     public GameCharacter(Color teamColor) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
+        group = new EntityGroup();
+        group.setParent(this);
         switch (new Random().nextInt(4)) {
             case 1:
                 skin = IngameAssets.orangeCatSkin;
@@ -59,7 +65,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         setMirror(true);
         setRotate(true);
         TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
-        setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5,0));
+        setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5, 0));
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
     }
 
@@ -67,9 +73,11 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         accSkinTime += deltaTime;
 
-        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
         if (!holdingWeapon && weapon != null) {
             weapon.draw(batch, deltaTime, parentAlpha);
+        }
+        if (healthbar!=null){
+            healthbar.draw(batch,deltaTime,parentAlpha);
         }
         batch.flush();
 
@@ -94,7 +102,9 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         batch.flush();
         batch.setShader(null);
 
+        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
         if (holdingWeapon && weapon != null) weapon.draw(batch, deltaTime, parentAlpha);
+        group.draw(batch, deltaTime, parentAlpha);
 
     }
 
@@ -121,30 +131,39 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         return this.aimingIndicator;
     }
 
+
+    public Healthbar getHealthbar(){
+        return this.healthbar;
+    }
+
     public void setAimingIndicator(AimIndicator aimIndicator) {
         if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
         if (aimIndicator == null) return;
         if (aimIndicator.getParent() != null) aimIndicator.getParent().remove(aimIndicator);
         aimIndicator.setParent(this);
+
+
+        //Farbe/Transparenz des Indicators setzen
+        Color c;
+        if(this.teamColor!=null){
+            c = new Color(teamColor);
+
+        }
+        else {
+            c = new Color(Color.WHITE);
+        }
+        c.a=0.75f;
+        aimIndicator.setColor(c);
     }
 
     @Override
     protected void setPos(Vector2 pos) {
         super.setPos(pos);
-        updatePos();
-    }
-
-    @Override
-    public void setRelPos(Vector2 pos) {
-        super.setRelPos(pos);
-    }
-
-    @Override
-    public void updatePos() {
-        super.updatePos();
         if (aimingIndicator != null) aimingIndicator.updatePos();
         if (weapon != null) weapon.updatePos();
+        if (healthbar!=null)healthbar.updatePos();
+        group.updatePos();
     }
 
     public static float getAnimationDuration(GameCharacterAnimationType type) {
@@ -161,6 +180,10 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         weapon.setHolding(holdingWeapon);
     }
 
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
     public void setWeapon(Weapon weapon) {
         if (this.weapon != null && this.weapon.getParent() != null) {
             remove(weapon);
@@ -170,6 +193,21 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         if (weapon.getParent() != null) weapon.getParent().remove(weapon);
         weapon.setParent(this);
         weapon.setHolding(holdingWeapon);
+    }
+
+
+    public void setHealthbar(Healthbar healthbar){
+        if(healthbar==null) {return;}
+        this.healthbar = healthbar;
+        this.healthbar.setParent(this);
+    }
+
+    @Override
+    public void updateAngle() {
+        super.updateAngle();
+        if (weapon != null) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
+        }
     }
 
     @Override
@@ -183,17 +221,24 @@ public class GameCharacter extends AnimatedEntity implements Parent {
             setAimingIndicator((AimIndicator) child);
         } else if (child instanceof Weapon) {
             setWeapon((Weapon) child);
+        } else if (child instanceof Healthbar) {
+           setHealthbar((Healthbar)child);
+        }else {
+            group.add(child);
         }
     }
 
     @Override
     public void remove(Entity child) {
         if (child == weapon) {
+            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
             weapon.setParent(null);
             weapon = null;
         } else if (child == aimingIndicator) {
             aimingIndicator.setParent(null);
             aimingIndicator = null;
+        }else {
+            group.remove(child);
         }
     }
 }

@@ -12,8 +12,8 @@ public class Wrapper {
         this.wpWrapper = WeaponWrapper.instance();
     }
 
-    public Action setHealth(Action head, int team, int gchar, int newHealth) {
-        return this.team[team][gchar].setHealth(newHealth, head);
+    public Action setHealth(Action head, int team, int gchar, int newHealth, boolean environmental) {
+        return this.team[team][gchar].setHealth(newHealth, head, environmental);
     }
 
     public void setPosition(int team, int gchar, int x, int y) {

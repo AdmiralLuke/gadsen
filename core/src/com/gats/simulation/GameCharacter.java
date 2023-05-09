@@ -8,14 +8,21 @@ import com.gats.simulation.weapons.Explosive;
 import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.action.*;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 /**
  * Repräsentiert eine {@link GameCharacter Spielfigur} auf der Karte
  */
-public class GameCharacter {
+public class GameCharacter implements Serializable {
 
     private static final IntVector2 SIZE = new IntVector2(9, 15);
 
-    public static Vector2 getSize(){return SIZE.toFloat();}
+    private int[] damageReceived;
+
+    public static Vector2 getSize() {
+        return SIZE.toFloat();
+    }
 
     private final IntRectangle boundingBox;
 
@@ -29,7 +36,7 @@ public class GameCharacter {
     private final int team;
     private final int teamPos;
     private final GameState state;
-    private final Simulation sim;
+    private transient final Simulation sim;
     private Vector2 dir = new Vector2(1, 0);
     private float strength = 0.5f;
 
@@ -47,14 +54,33 @@ public class GameCharacter {
      * @param teamPos Characters index within its team
      * @param sim     the executing Simulation instance of the game
      */
-    GameCharacter(int x, int y, GameState state, int team, int teamPos, Simulation sim) {
+    GameCharacter(int x, int y, GameState state, int team, int teamPos, Weapon[] inventory, Simulation sim) {
         this.boundingBox = new IntRectangle(x, y, SIZE.x, SIZE.y);
         this.state = state;
         this.team = team;
         this.teamPos = teamPos;
         this.sim = sim;
+        this.damageReceived = new int[state.getTeamCount()];
         resetStamina();
-        initInventory();
+        this.weapons = inventory;
+    }
+
+    private GameCharacter(GameCharacter original, GameState newState) {
+        boundingBox = new IntRectangle(original.boundingBox);
+        health = original.health;
+        stamina = original.stamina;
+        alreadyShot = original.alreadyShot;
+        team = original.team;
+        teamPos = original.teamPos;
+        state = newState;
+        sim = null;
+        dir = original.dir.cpy();
+        strength = original.strength;
+        weapons = new Weapon[original.weapons.length];
+        for (int i = 0; i < original.weapons.length; i++) {
+            weapons[i] = original.weapons[i].copy();
+        }
+        selectedWeapon = original.selectedWeapon;
     }
 
     /**
@@ -71,7 +97,6 @@ public class GameCharacter {
             return WeaponType.NOT_SELECTED;
         }
     }
-
 
 
     /**
@@ -166,12 +191,26 @@ public class GameCharacter {
      * @param head      the leading action of the caller
      * @return the leading action for this function
      */
-    Action setHealth(int newHealth, Action head) {
-        if (newHealth == this.health) return head;
+    Action setHealth(int newHealth, Action head, boolean environmental) {
+        state.getSim().turnsWithoutAction = 0;
+        if (newHealth == this.health || this.health <= 0) return head;
         Action lastAction;
         if (newHealth < this.health) {
+            int activeTeam = sim.getActiveTeam();
+            damageReceived[activeTeam] += health - newHealth;
+            if (activeTeam != team) {
+                state.addScore(activeTeam, environmental ? 1.5f : 1.0f * (health - Math.max(newHealth, 0)));
+                if (newHealth <= 0 && health > 0) {
+                    state.addScore(activeTeam, Simulation.SCORE_KILL);
+                    for (int i = 0; i< damageReceived.length; i++){
+                        if (i!=activeTeam && damageReceived[i]>=50)
+                            state.addScore(activeTeam, Simulation.SCORE_ASSIST);
+                    }
+                }
+            }
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
+            state.addScore(team, (newHealth - health));
             lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth) {
             };
         }
@@ -213,14 +252,15 @@ public class GameCharacter {
      *
      * @Weihnachtsaufgabe Inventar wird initialisiert mit Keks (50 Schuss) und Zuckerstange (4 Schuss)
      */
-    protected void initInventory() {
-        this.weapons = new Weapon[6];
-        weapons[0] = new Weapon(new BaseProjectile(3, 0.1f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB), 200, WeaponType.WATERBOMB, team, teamPos, 2);
-        weapons[4] = new Weapon(new Bounceable(new BaseProjectile( 1, 0.1f, 0, sim, ProjectileAction.ProjectileType.WOOL),  10,  0.8f), 200, WeaponType.WOOL, team, teamPos, 15);
-        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, team, teamPos, 10);
-        weapons[2] = new Weapon(new BaseProjectile(5, 0.6f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, team, teamPos, 13);
-        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, team, teamPos, 0.5f);
-        weapons[1] = new Weapon(new BaseProjectile(5, 0.3f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, team, teamPos, 9);
+    protected static Weapon[] initInventory(Simulation sim) {
+        Weapon[] weapons = new Weapon[6];
+        weapons[0] = new Weapon(new Explosive(new BaseProjectile(3, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), 200, WeaponType.WATERBOMB, 10);
+        weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 10, 0.8f), 200, WeaponType.WOOL, 15);
+        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), 200, WeaponType.GRENADE, 10);
+        weapons[2] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 200, WeaponType.MIOJLNIR, 13);
+        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), 200, WeaponType.CLOSE_COMBAT, 0.5f);
+        weapons[1] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), 200, WeaponType.WATER_PISTOL, 9);
+        return weapons;
     }
 
     /**
@@ -379,9 +419,9 @@ public class GameCharacter {
         Action fallAction = new CharacterFallAction(0.001f, team, teamPos, posBef, this.getPlayerPos());
         head.addChild(fallAction);
         if (collision) {
-            return this.setHealth(getHealth() - getFallDmg(fallen), fallAction);
+            return this.setHealth(getHealth() - getFallDmg(fallen), fallAction, true);
         }
-        return this.setHealth(0, fallAction);
+        return this.setHealth(0, fallAction, true);
     }
 
     /**
@@ -501,7 +541,7 @@ public class GameCharacter {
 
         if (falling) {
             //We detected a gap while walking, start falling after walk
-            lastAction = walk(sign * (distance - moved -1), fall(lastAction));
+            lastAction = walk(sign * (distance - moved - 1), fall(lastAction));
         }
         return lastAction;
     }
@@ -541,5 +581,30 @@ public class GameCharacter {
      */
     Vector2 getDir() {
         return dir;
+    }
+
+    protected GameCharacter copy(GameState state) {
+        return new GameCharacter(this, state);
+    }
+
+    @Override
+    public String toString() {
+        return "GameCharacter{" +
+                "damageDealt=" + Arrays.toString(damageReceived) +
+                ", boundingBox=" + boundingBox +
+                ", health=" + health +
+                ", stamina=" + stamina +
+                ", alreadyShot=" + alreadyShot +
+                ", team=" + team +
+                ", teamPos=" + teamPos +
+                ", dir=" + dir +
+                ", strength=" + strength +
+                ", weapons=" + Arrays.toString(weapons) +
+                ", selectedWeapon=" + selectedWeapon +
+                '}';
+    }
+
+    public boolean isAlive() {
+        return health>0;
     }
 }
