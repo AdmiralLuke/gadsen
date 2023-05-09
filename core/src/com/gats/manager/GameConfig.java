@@ -22,6 +22,7 @@ class GameConfig implements Serializable {
         mapName = runConfiguration.mapName;
         teamSize = runConfiguration.teamSize;
         teamCount = runConfiguration.teamCount;
+        replay = runConfiguration.replay;
     }
 
     //Todo add default values
@@ -37,6 +38,7 @@ class GameConfig implements Serializable {
 
     public int teamCount;
     public int teamSize;
+    public boolean replay = false;
 
     public List<Class<? extends Player>> players;
 
@@ -51,6 +53,7 @@ class GameConfig implements Serializable {
         copy.mapName = mapName;
         copy.teamSize = teamSize;
         copy.teamCount = teamCount;
+        copy.replay = replay;
         return copy;
     }
 

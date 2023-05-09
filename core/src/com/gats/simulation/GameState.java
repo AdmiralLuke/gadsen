@@ -37,6 +37,8 @@ public class GameState implements Serializable {
     private int width;
     private int height;
 
+    private boolean winnerTakesAll;
+
     private final float[] scores;
 
     public float[] getScores() {
@@ -69,6 +71,7 @@ public class GameState implements Serializable {
                 teams[i][j] = team[j] == null ? null : team[j].copy(this);
             }
         }
+        winnerTakesAll = original.winnerTakesAll;
         teamCount = original.teamCount;
         charactersPerTeam = original.charactersPerTeam;
         turn = null;
@@ -123,6 +126,7 @@ public class GameState implements Serializable {
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
         this.turn = new ArrayDeque<>();
         this.scores = new float[teamCount];
+        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Exam_Admission || gameMode == GameMode.Christmas || gameMode == GameMode.Tournament_Phase_2;
         this.initTeam(spawnpoints);
     }
 
@@ -145,7 +149,7 @@ public class GameState implements Serializable {
             for (int i = 0; i < 4; i++) {
                 Weapon[] inventory = GameCharacter.initInventory(sim, null);
                 IntVector2 pos = spawnpoints.get(i).get(1).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, i==0?100:1, sim);
+                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, i == 0 ? 100 : 1, sim);
                 turn.add(new IntVector2(i, 0));
             }
             return;
@@ -167,7 +171,7 @@ public class GameState implements Serializable {
         }
         for (int i = 0; i < teamCount; i++) {
             Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null);
-            int[] characterHealth = health.size()>i ?health.get(i):new int[0];
+            int[] characterHealth = health.size() > i ? health.get(i) : new int[0];
             List<IntVector2> teamSpawns = spawnpoints.get(i);
             if (teamSpawns.size() < charactersPerTeam)
                 throw new RuntimeException(String.format(
@@ -175,7 +179,7 @@ public class GameState implements Serializable {
                         charactersPerTeam, teamSpawns.size(), i));
             for (int j = 0; j < charactersPerTeam; j++) {
                 IntVector2 pos = teamSpawns.get(j).scl(Tile.TileSize).add(Math.round((16 - GameCharacter.getSize().x) / 2), 0);
-                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, characterHealth.length > j?characterHealth[j]:100, sim);
+                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, characterHealth.length > j ? characterHealth[j] : 100, sim);
             }
         }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
@@ -198,7 +202,8 @@ public class GameState implements Serializable {
     }
 
     protected void addScore(int team, float score) {
-        scores[team] += score;
+        if (!winnerTakesAll) scores[team] += score;
+        else if (score == Simulation.SCORE_WIN[0]) scores[team] = 1;
     }
 
     //ToDo migrate to Simulation

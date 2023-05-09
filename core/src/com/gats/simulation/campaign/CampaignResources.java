@@ -88,4 +88,17 @@ public class CampaignResources {
         }
         return helth;
     }
+
+    public static int getCharacterCount(String map) {
+        switch (map){
+            case "level1_1":
+            case "level1_2":
+            case "level1_3":
+            case "level2_1":
+            case "level2_2":
+            case "level2_3":
+                return 1;
+        }
+        return 1;
+    }
 }

@@ -8,7 +8,6 @@ import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.ui.hud.UiMessenger;
-import org.lwjgl.Sys;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -66,6 +65,8 @@ public class Game {
     private boolean pendingShutdown = false;
     private GameConfig config;
 
+    private boolean saveReplay;
+
 
     protected Game(GameConfig config) {
         this.config = config;
@@ -76,8 +77,10 @@ public class Game {
             }
             config.players.addAll(CampaignResources.getEnemies(config.mapName));
             config.teamCount = config.players.size();
+            config.teamSize = CampaignResources.getCharacterCount(config.mapName);
         }
         gui = config.gui;
+        saveReplay = config.replay;
         animationLogProcessor = config.animationLogProcessor;
         inputGenerator = config.inputProcessor;
         uiMessenger = config.uiMessenger;
@@ -137,7 +140,7 @@ public class Game {
         setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
-        animationLogProcessor.init(state);
+        if (gui) animationLogProcessor.init(state);
         //Run the Game
         simulationThread = new Thread(this::run);
         simulationThread.setName("Manager_Simulation_Thread");
@@ -368,6 +371,10 @@ public class Game {
             setStatus(Status.ABORTED);
             dispose();
         }
+    }
+
+    public boolean shouldSaveReplay() {
+        return saveReplay;
     }
 
     public GameResults getGameResults() {

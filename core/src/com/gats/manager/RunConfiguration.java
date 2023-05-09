@@ -24,6 +24,8 @@ public class RunConfiguration {
 
     public String mapName;
 
+    public boolean replay = false;
+
     public int teamCount;
     public int teamSize;
 
