@@ -3,7 +3,6 @@ package com.gats.simulation;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.gats.animation.action.IdleAction;
 import com.gats.manager.Timer;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.simulation.weapons.Weapon;
@@ -279,19 +278,26 @@ public class GameState implements Serializable {
                         case 0:
                             break;
                         case 1:
-                            board[i][j] = new Tile(i, j, true, this);
-                            break;
-                        case 2:
                             board[i][j] = new Tile(i, j, this, true);
+                            break;
+                        case 4:
+                            board[i][j] = new Tile(i, j, this, false, Tile.TileType.WEAPON_BOX);
+                            break;
+                        case 5:
+                            board[i][j] = new Tile(i, j, this, true, Tile.TileType.WEAPON_BOX);
+                            break;
+                        case 6:
+                            board[i][j] = new Tile(i, j, this, false, Tile.TileType.HEALTH_BOX);
                             break;
                         default:
-                            //ToDo load special box
-                            board[i][j] = new Tile(i, j, this, true);
+                            board[i][j] = new Tile(i, j, this, false);
                     }
             }
         }
+
         return spawnpoints;
     }
+
 
     /**
      * Gibt einen bestimmten Charakter aus einem bestimmten Team zurück

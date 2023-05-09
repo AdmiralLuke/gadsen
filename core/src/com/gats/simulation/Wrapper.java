@@ -25,9 +25,6 @@ public class Wrapper {
         return this.team[team][gchar].fall(head);
     }
 
-    public void tileSetAnchored(Tile t) {
-        t.setAnchor(true);
-    }
 
     public Action destroyTile(Tile t, GameCharacter character, Action head) {
         head = onDestroyTile(t, head);
