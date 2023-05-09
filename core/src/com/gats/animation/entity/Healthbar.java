@@ -27,7 +27,7 @@ public class Healthbar extends Entity implements Toggleable {
 	private ProgressBar healthProgressBar;
 
 	public Healthbar(com.gats.simulation.GameCharacter currSimPlayer, com.gats.animation.GameCharacter currPlayer) {
-		int maxHealth = currSimPlayer.getHealth();
+		int maxHealth = 100; //currSimPlayer.getHealth();
 		//ProgressBar.ProgressBarStyle progStyle = new ProgressBar.ProgressBarStyle();
 		//background of the healtbar
 
@@ -51,8 +51,8 @@ public class Healthbar extends Entity implements Toggleable {
 		//pixmap.dispose();
 
 
-		this.healthProgressBar = new ProgressBar(0,maxHealth,1,false, AssetContainer.IngameAssets.healthbarStyle);
-		healthProgressBar.setValue(maxHealth);
+		this.healthProgressBar = new ProgressBar(0, maxHealth,1,false, AssetContainer.IngameAssets.healthbarStyle);
+		healthProgressBar.setValue(currSimPlayer.getHealth());
 
 
 		//hardcoded size

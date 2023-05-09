@@ -38,6 +38,7 @@ public class TeamAmountSlider extends RelationSlider {
 	 * @param numberOfspawnpoints
 	 */
 	public void adjustTeamSizeToSpawnpoints(int numberOfspawnpoints) {
+		//Todo: make this function interchangeable: eq. by moving it to an interface/function and then changing it for different modes
 		this.currentSpawnpoints = numberOfspawnpoints;
 		//Falls keine Spawnpunkte vorhanden sind, die Auswahl begrenzen auf 0
 		if (numberOfspawnpoints == 0) {

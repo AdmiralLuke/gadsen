@@ -10,6 +10,10 @@ public class RunConfiguration {
     //Todo add default values
     public GameMode gameMode = GameMode.Normal;
 
+    public GameMode[] getGameModes() {
+        return GameMode.values();
+    }
+
     public boolean gui = false;
 
     public AnimationLogProcessor animationLogProcessor = null;
@@ -19,6 +23,8 @@ public class RunConfiguration {
     public InputProcessor inputProcessor = null;
 
     public String mapName;
+
+    public boolean replay = false;
 
     public int teamCount;
     public int teamSize;

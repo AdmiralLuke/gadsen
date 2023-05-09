@@ -3,7 +3,9 @@ package com.gats.simulation;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.gats.animation.action.IdleAction;
 import com.gats.manager.Timer;
+import com.gats.simulation.campaign.CampaignResources;
 import com.gats.simulation.weapons.Weapon;
 
 import java.io.Serializable;
@@ -35,6 +37,8 @@ public class GameState implements Serializable {
     private int width;
     private int height;
 
+    private boolean winnerTakesAll;
+
     private final float[] scores;
 
     public float[] getScores() {
@@ -52,7 +56,7 @@ public class GameState implements Serializable {
         for (int i = 0; i < tiles.length; i++) {
             Tile[] row = tiles[i];
             for (int j = 0; j < row.length; j++) {
-                board[i][j] = row[j]==null?null:row[j].copy(this);
+                board[i][j] = row[j] == null ? null : row[j].copy(this);
             }
         }
         width = original.width;
@@ -64,9 +68,10 @@ public class GameState implements Serializable {
         for (int i = 0; i < gameCharacters.length; i++) {
             GameCharacter[] team = gameCharacters[i];
             for (int j = 0; j < team.length; j++) {
-                teams[i][j] = team[j]==null?null:team[j].copy(this);
+                teams[i][j] = team[j] == null ? null : team[j].copy(this);
             }
         }
+        winnerTakesAll = original.winnerTakesAll;
         teamCount = original.teamCount;
         charactersPerTeam = original.charactersPerTeam;
         turn = null;
@@ -86,6 +91,7 @@ public class GameState implements Serializable {
     }
 
     private final GameMode gameMode;
+    private String mapName;
 
 
     private transient Timer turnTimer;
@@ -111,7 +117,8 @@ public class GameState implements Serializable {
      */
     GameState(GameMode gameMode, String mapName, int teamCount, int charactersPerTeam, Simulation sim) {
         this.gameMode = gameMode;
-        List<IntVector2> spawnpoints = loadMap(mapName);
+        this.mapName = mapName;
+        List<List<IntVector2>> spawnpoints = loadMap(gameMode == GameMode.Campaign ? "campaign/" + mapName : mapName);
         this.teamCount = teamCount;
         this.charactersPerTeam = charactersPerTeam;
         this.active = true;
@@ -119,6 +126,7 @@ public class GameState implements Serializable {
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
         this.turn = new ArrayDeque<>();
         this.scores = new float[teamCount];
+        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Exam_Admission || gameMode == GameMode.Christmas || gameMode == GameMode.Tournament_Phase_2;
         this.initTeam(spawnpoints);
     }
 
@@ -134,31 +142,44 @@ public class GameState implements Serializable {
     /**
      * Spawns players randomly distributed over the possible spawn-location, specified by the map.
      */
-    void initTeam(List<IntVector2> spawnpoints) {
+    void initTeam(List<List<IntVector2>> spawnpoints) {
 
         if (gameMode == GameMode.Christmas) {
             //ToDo: remove Christmas Mode
-            spawnpoints.sort(Comparator.comparingInt(v -> v.x));
             for (int i = 0; i < 4; i++) {
-                Weapon[] inventory = GameCharacter.initInventory(sim);
-                IntVector2 pos = spawnpoints.get(i).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory,  sim);
+                Weapon[] inventory = GameCharacter.initInventory(sim, null);
+                IntVector2 pos = spawnpoints.get(i).get(1).scl(Tile.TileSize);
+                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, i == 0 ? 100 : 1, sim);
                 turn.add(new IntVector2(i, 0));
             }
             return;
         }
-        int pointCount = spawnpoints.size();
-        if (pointCount < teamCount * charactersPerTeam)
+        int typeCount = spawnpoints.size();
+        if (typeCount < teamCount)
             throw new RuntimeException(String.format(
-                    "Requested %d x %d Characters, but the selected map has only %d spawning locations",
-                    teamCount, charactersPerTeam, pointCount));
+                    "Requested %d Teams, but the selected map only supports %d different teams",
+                    teamCount, typeCount));
         Random rnd = new Random();
+        ArrayList<int[]> weapons;
+        ArrayList<int[]> health;
+        if (gameMode == GameMode.Campaign) {
+            weapons = CampaignResources.getWeaponCounts(this.mapName);
+            health = CampaignResources.getHealth(this.mapName);
+        } else {
+            weapons = new ArrayList<>();
+            health = new ArrayList<>();
+        }
         for (int i = 0; i < teamCount; i++) {
-            Weapon[] inventory = GameCharacter.initInventory(sim);
+            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null);
+            int[] characterHealth = health.size() > i ? health.get(i) : new int[0];
+            List<IntVector2> teamSpawns = spawnpoints.get(i);
+            if (teamSpawns.size() < charactersPerTeam)
+                throw new RuntimeException(String.format(
+                        "Requested %d Characters, but the selected map only supports %d different characters for team %d",
+                        charactersPerTeam, teamSpawns.size(), i));
             for (int j = 0; j < charactersPerTeam; j++) {
-                int index = rnd.nextInt(pointCount--);
-                IntVector2 pos = spawnpoints.remove(index).scl(Tile.TileSize);
-                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, sim);
+                IntVector2 pos = teamSpawns.get(j).scl(Tile.TileSize).add(Math.round((16 - GameCharacter.getSize().x) / 2), 0);
+                this.teams[i][j] = new GameCharacter(pos.x, pos.y, this, i, j, inventory, characterHealth.length > j ? characterHealth[j] : 100, sim);
             }
         }
         // Vector der Queue: (x = Team Nummer | y = Character Nummer im Team)
@@ -180,8 +201,9 @@ public class GameState implements Serializable {
         return active;
     }
 
-    protected void addScore(int team, float score){
-        scores[team] += score;
+    protected void addScore(int team, float score) {
+        if (!winnerTakesAll) scores[team] += score;
+        else if (score == Simulation.SCORE_WIN[0]) scores[team] = 1;
     }
 
     //ToDo migrate to Simulation
@@ -218,7 +240,7 @@ public class GameState implements Serializable {
      *
      * @param mapName Name of the map without type as String
      */
-    private List<IntVector2> loadMap(String mapName) {
+    private List<List<IntVector2>> loadMap(String mapName) {
         JsonReader reader = new JsonReader();
         JsonValue map;
         try {
@@ -242,21 +264,30 @@ public class GameState implements Serializable {
 
         JsonValue tileData = map.get("layers").get(0).get("data");
 
-        List<IntVector2> spawnpoints = new LinkedList<>();
+        List<List<IntVector2>> spawnpoints = new LinkedList<>();
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int type = tileData.get(i + (height - j - 1) * width).asInt();
-                switch (type) {
-                    case 1:
-                        board[i][j] = new Tile(i, j, true, this);
-                        break;
-                    case 2:
-                        board[i][j] = new Tile(i, j, this, true);
-                        break;
-                    case 3:
-                        spawnpoints.add(new IntVector2(i, j));
-                }
+                if (type > 100) {
+                    int team = type - 101; //teams starting at 0
+                    while (spawnpoints.size() <= team)
+                        spawnpoints.add(new LinkedList<>()); //Increase list of spawnpoints as necessary
+                    spawnpoints.get(team).add(new IntVector2(i, j)); // Add current tile
+                } else
+                    switch (type) {
+                        case 0:
+                            break;
+                        case 1:
+                            board[i][j] = new Tile(i, j, true, this);
+                            break;
+                        case 2:
+                            board[i][j] = new Tile(i, j, this, true);
+                            break;
+                        default:
+                            //ToDo load special box
+                            board[i][j] = new Tile(i, j, this, true);
+                    }
             }
         }
         return spawnpoints;

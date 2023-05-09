@@ -6,6 +6,7 @@ import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
+import com.gats.simulation.campaign.CampaignResources;
 import com.gats.ui.hud.UiMessenger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -64,10 +65,22 @@ public class Game {
     private boolean pendingShutdown = false;
     private GameConfig config;
 
+    private boolean saveReplay;
+
 
     protected Game(GameConfig config) {
         this.config = config;
+        if (config.gameMode == GameState.GameMode.Campaign) {
+            if (config.players.size() != 1) {
+                System.err.println("Campaign only accepts exactly 1 player");
+                setStatus(Status.ABORTED);
+            }
+            config.players.addAll(CampaignResources.getEnemies(config.mapName));
+            config.teamCount = config.players.size();
+            config.teamSize = CampaignResources.getCharacterCount(config.mapName);
+        }
         gui = config.gui;
+        saveReplay = config.replay;
         animationLogProcessor = config.animationLogProcessor;
         inputGenerator = config.inputProcessor;
         uiMessenger = config.uiMessenger;
@@ -123,17 +136,27 @@ public class Game {
     }
 
     public void start() {
+        if (status == Status.ABORTED) return;
         setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
-        animationLogProcessor.init(state);
+        if (gui) animationLogProcessor.init(state);
         //Run the Game
         simulationThread = new Thread(this::run);
         simulationThread.setName("Manager_Simulation_Thread");
+        simulationThread.setUncaughtExceptionHandler(this::crashHandler);
         simulationThread.start();
     }
 
-    private void setStatus(Status newStatus){
+    private void crashHandler(Thread thread, Throwable throwable) {
+        System.err.println("Error in game: " + this);
+        System.err.println("Error in thread: " + thread);
+        throwable.printStackTrace();
+        System.err.println("Game crashed during execution\nIf you see this message, please forward all console logs to wettbewerb@acagamics.de");
+        Manager.getManager().stop(this);
+    }
+
+    private void setStatus(Status newStatus) {
         status = newStatus;
         gameResults.setStatus(status);
     }
@@ -246,8 +269,8 @@ public class Game {
             }
             try {
                 while (true) {
-                    if (!simulation.isActingCharacterAlive()){
-                        if(currentPlayer.getType() == Player.PlayerType.Human) inputGenerator.endTurn();
+                    if (!simulation.isActingCharacterAlive()) {
+                        if (currentPlayer.getType() == Player.PlayerType.Human) inputGenerator.endTurn();
                         break;
                     }
                     Command nextCmd = commandQueue.take();
@@ -256,7 +279,7 @@ public class Game {
                     log = nextCmd.run();
                     if (log == null) continue;
                     gameResults.addActionLog(log);
-                    if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
+                    if (gui) {
                         animationLogProcessor.animate(log);
                         //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
                     }
@@ -357,6 +380,10 @@ public class Game {
             setStatus(Status.ABORTED);
             dispose();
         }
+    }
+
+    public boolean shouldSaveReplay() {
+        return saveReplay;
     }
 
     public GameResults getGameResults() {
