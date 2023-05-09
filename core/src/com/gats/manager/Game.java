@@ -95,7 +95,6 @@ public class Game {
                 case Human:
                     if (!gui) throw new RuntimeException("HumanPlayers can't be used without GUI to capture inputs");
                     humanList.add((HumanPlayer) curPlayer);
-                    ((HumanPlayer) (curPlayer)).setUiMessenger(uiMessenger);
                     break;
                 case AI:
 

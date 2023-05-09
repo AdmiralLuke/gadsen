@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.manager.HumanPlayer;
 import com.gats.manager.RunConfiguration;
+import com.gats.simulation.GameCharacter;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.hud.*;
 import com.gats.ui.hud.inventory.InventoryDrawer;
@@ -54,6 +55,7 @@ public class Hud implements Disposable {
 
 		this.inGameScreen = ingameScreen;
 
+		this.uiMessenger = new UiMessenger(this);
 
 		int viewportSizeX = 1028;
 		int viewportSizeY = 1028;
@@ -74,10 +76,10 @@ public class Hud implements Disposable {
 		aimInfo = new AimInformation(" Grad"," %");
 		inventory = setupInventoryDrawer(runConfig);
 		inputHandler = setupInputHandler(ingameScreen);
-		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer,AssetContainer.MainMenuAssets.skin);
-		turnTimer.setCurrentTime(3);
-		this.uiMessenger = new UiMessenger(this);
+		inputHandler.setUiMessenger(uiMessenger);
 
+		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer);
+		turnTimer.setCurrentTime(0);
 		fastForwardButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
 
 		turnPopupContainer = new Container<ImagePopup>();
@@ -247,9 +249,6 @@ public class Hud implements Disposable {
 		turnTimer.setCurrentTime(time);
 	}
 
-	public void startTurnTimer(){
-		turnTimer.startTimer();
-	}
 
 	public void startTurnTimer(int seconds){
 		turnTimer.startTimer(seconds);
