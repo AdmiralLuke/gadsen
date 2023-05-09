@@ -40,17 +40,13 @@ public class Tile implements Serializable {
     Tile down;
     Tile left;
 
-    enum TileType {
+    public enum TileType {
         STANDARD,
         WEAPON_BOX,
         HEALTH_BOX
     }
 
     TileType tileType;
-
-    public int getType() {
-        return isAnchor ? 1 : 0;
-    }
 
     public TileType getTileType() {
         return this.tileType;
@@ -228,6 +224,10 @@ public class Tile implements Serializable {
 
         return destroyAction;
 
+    }
+
+    public boolean isAnchor() {
+        return isAnchor;
     }
 
     void checkForAnchor(ArrayList<Tile> list, Action head) {
