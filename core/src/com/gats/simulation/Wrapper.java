@@ -48,7 +48,7 @@ public class Wrapper {
             // dont overheal
             health = Math.min(health, 100 - character.getHealth());
 
-            head = this.setHealth(head, character.getTeam(), character.getTeamPos(), character.getHealth() + health);
+            head = this.setHealth(head, character.getTeam(), character.getTeamPos(), character.getHealth() + health, true);
         }
         return head;
     }
