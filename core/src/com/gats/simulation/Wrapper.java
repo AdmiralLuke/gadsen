@@ -40,12 +40,12 @@ public class Wrapper {
             // health-box
 
             // random amount of health
-            int health = (int)(Math.random() * 25) + 10;
+            int health = character.getHealth() + 35;
 
             // dont overheal
-            health = Math.min(health, 100 - character.getHealth());
+            health = Math.min(health, 100);
 
-            head = this.setHealth(head, character.getTeam(), character.getTeamPos(), character.getHealth() + health, true);
+            head = this.setHealth(head, character.getTeam(), character.getTeamPos(), health, true);
         }
         return head;
     }
