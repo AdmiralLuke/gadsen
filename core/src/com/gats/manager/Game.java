@@ -144,7 +144,16 @@ public class Game {
         //Run the Game
         simulationThread = new Thread(this::run);
         simulationThread.setName("Manager_Simulation_Thread");
+        simulationThread.setUncaughtExceptionHandler(this::crashHandler);
         simulationThread.start();
+    }
+
+    private void crashHandler(Thread thread, Throwable throwable) {
+        System.err.println("Error in game: " + this);
+        System.err.println("Error in thread: " + thread);
+        throwable.printStackTrace();
+        System.err.println("Game crashed during execution\nIf you see this message, please forward all console logs to wettbewerb@acagamics.de");
+        Manager.getManager().stop(this);
     }
 
     private void setStatus(Status newStatus) {
