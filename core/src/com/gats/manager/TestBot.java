@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
+import org.junit.validator.ValidateWith;
 
 public class TestBot extends Bot {
 
@@ -66,6 +67,7 @@ public class TestBot extends Bot {
                         Vector2 st = controller.getGameCharacter().getPlayerPos();
                         Vector2 e = character.getPlayerPos();
                         Vector2 dir = calcParableDir(st, e, 1f);
+                        if (Float.isNaN(dir.x)) dir = new Vector2(1,0);
                         controller.selectWeapon(WeaponType.WATER_PISTOL);
                         controller.aim(dir, 1f);
                         controller.shoot();
@@ -79,6 +81,8 @@ public class TestBot extends Bot {
     private static Vector2 calcParableDir(Vector2 startPos, Vector2 endPos, float strength) {
         float dx = endPos.x - startPos.x;
         float dy = endPos.y - startPos.y;
+        if (dy < 0 || dy > 16) endPos.y += 16; dy = endPos.y - startPos.y;
+
         strength -= 0.2;
 
         float th = (float) ((dy / dx) + ((9.81 * 8) * dx) / (2 * (400 * strength) * (400 * strength) * Math.cos(Math.atan(dy / dx))));
