@@ -45,6 +45,13 @@ public class Game {
     private static final int HUMAN_EXECUTION_GRACE_PERIODE = 5000;
     private static final int HUMAN_INIT_TIMEOUT = 30000;
 
+    private static final boolean isDebug;
+    static {
+        isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
+                getInputArguments().toString().contains("-agentlib:jdwp");
+        if (isDebug) System.err.println("Warning: Debugger engaged; Disabling Bot-Timeout!");
+    }
+
     private final InputProcessor inputGenerator;
 
     private final AnimationLogProcessor animationLogProcessor;
@@ -118,7 +125,9 @@ public class Game {
                     });
 
                     try {
-                        future.get(AI_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
+                        if (isDebug) future.get();
+                        else
+                            future.get(AI_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException e) {
                         System.out.println("bot was interrupted");
                     } catch (ExecutionException e) {
@@ -204,7 +213,9 @@ public class Game {
                         inputGenerator.activateTurn((HumanPlayer) currentPlayer);
                         try {
                             Thread.currentThread().setName("Future_Executor_Player_Human");
-                            future.get(HUMAN_EXECUTION_TIMEOUT + HUMAN_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
+                            if (isDebug) future.get();
+                            else
+                                future.get(HUMAN_EXECUTION_TIMEOUT + HUMAN_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Player
                             System.out.println("bot was interrupted");
@@ -235,7 +246,9 @@ public class Game {
                     futureExecutor = new Thread(() -> {
                         Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
                         try {
-                            future.get(AI_EXECUTION_TIMEOUT + AI_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
+                            if (isDebug) future.get();
+                            else
+                                future.get(AI_EXECUTION_TIMEOUT + AI_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Bot
                             System.out.println("bot was interrupted");
