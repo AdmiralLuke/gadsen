@@ -50,9 +50,9 @@ public class AnimatorCamera extends OrthographicCamera {
 
 
        //linear interpolation to make a smooth transition towards a target position
-        //the target position ist often reached with  0.5 so it will stop there
+        //the target position ist often reached with  0.7 so it will stop there
         //this way the camera will not be unable to move from other sources
-       if(elapsed<=0.5) {
+       if(elapsed<=0.7) {
            elapsed += delta;
            float progress = Math.min(1f, elapsed / lifetime);
            float alpha = cameraInterpolation.apply(progress);

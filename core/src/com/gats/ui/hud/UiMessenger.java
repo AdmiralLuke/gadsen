@@ -115,8 +115,8 @@ public class UiMessenger {
 		hud.stopTurnTimer();
 	}
 
-	public void gameEnded(boolean won, int team){
-		hud.gameEnded(won,team);
+	public void gameEnded(boolean won, int team,boolean isDraw){
+		hud.gameEnded(won,team,isDraw);
 
 	}
 

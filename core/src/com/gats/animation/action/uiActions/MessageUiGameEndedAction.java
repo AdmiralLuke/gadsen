@@ -9,6 +9,7 @@ import com.gats.ui.hud.UiMessenger;
 public class MessageUiGameEndedAction extends MessageUiAction{
 
 	boolean won;
+	boolean draw;
 	int team;
 	public MessageUiGameEndedAction(float start, UiMessenger uiMessenger, boolean won, int team) {
 		super(start, uiMessenger);
@@ -16,9 +17,14 @@ public class MessageUiGameEndedAction extends MessageUiAction{
 		this.team = team;
 
 	}
+	public MessageUiGameEndedAction(float start,UiMessenger uiMessenger,boolean isDraw){
+		super(start, uiMessenger);
+		draw = isDraw;
+
+	}
 
 	@Override
 	protected void runAction(float oldTime, float current) {
-		uiMessenger.gameEnded(won,team);
+		uiMessenger.gameEnded(won,team,draw);
 	}
 }

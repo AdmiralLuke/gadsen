@@ -52,6 +52,8 @@ public class AssetContainer {
         public static TextureRegion victoryDisplay;
         public static TextureRegion lossDisplay;
 
+        public static TextureRegion drawDisplay;
+
 
         public static TextureRegion background;
 

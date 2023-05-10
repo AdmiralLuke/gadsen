@@ -129,6 +129,7 @@ public class GADSAssetManager {
 
         IngameAssets.victoryDisplay = atlas.findRegion("ui/victoryTileset");
         IngameAssets.lossDisplay = atlas.findRegion("ui/loseTilesetTitle");
+        IngameAssets.drawDisplay = atlas.findRegion("ui/drawTileset");
 
         IngameAssets.background = atlas.findRegion("background/WeihnachtsBG");
 

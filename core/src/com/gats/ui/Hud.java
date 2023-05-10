@@ -146,7 +146,7 @@ public class Hud implements Disposable {
 
 		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left().width(aimInfo.getPrefWidth());
 		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
-		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(700,700).fill();
+		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(800,800).fill();
 		layoutTable.add(aimInfo).expandX().expandY().pad(padding).right().align(Align.right);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).left().bottom().size(64,64);
@@ -286,7 +286,7 @@ public class Hud implements Disposable {
 	 * @param won
 	 * @param team
 	 */
-	public void gameEnded(boolean won,int team){
+	public void gameEnded(boolean won,int team,boolean isDraw){
 
 		//create a pixel with a set color that will be used as Background
 		Pixmap pixmap = new Pixmap(1,1, Pixmap.Format.RGBA8888);
@@ -298,7 +298,12 @@ public class Hud implements Disposable {
 
 		ImagePopup display;
 		//determine sprite
-		if(won){
+		if(isDraw){
+			display = new ImagePopup(AssetContainer.IngameAssets.drawDisplay,-1,
+					AssetContainer.IngameAssets.drawDisplay.getRegionWidth(),
+					AssetContainer.IngameAssets.drawDisplay.getRegionHeight());
+		}
+		else if(won){
 			display= new ImagePopup(AssetContainer.IngameAssets.victoryDisplay,-1,
 					AssetContainer.IngameAssets.victoryDisplay.getRegionWidth(),
 					AssetContainer.IngameAssets.victoryDisplay.getRegionHeight());
