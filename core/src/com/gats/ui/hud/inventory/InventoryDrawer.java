@@ -63,10 +63,29 @@ public class InventoryDrawer extends Container<Inventory>{
 		current.updateItem(character, weaponType);
 	}
 
+	/**checks if the current inventory exists, if not creates a new inventory from the game characters current one
+	 * also resizes the amount of inventories if a new one exists
+	 * @param character
+	 */
+
 	private void checkPlayerInventoryExists(GameCharacter character) {
-		Inventory currInv = playerInventory[character.getTeam()];
-		if (currInv == null) {
-			playerInventory[character.getTeam()] = createCharacterInventory(character);
+		if(character.getTeam()<playerInventory.length) {
+			Inventory currInv = playerInventory[character.getTeam()];
+			if (currInv == null) {
+				playerInventory[character.getTeam()] = createCharacterInventory(character);
+			}
+		}
+		else{
+			Inventory[] tmp = playerInventory;
+			playerInventory = new Inventory[character.getTeam()+1];
+
+			for(int i = 0;i<tmp.length;i++){
+				playerInventory[i] = tmp[i];
+			}
+			for(int i = tmp.length;i<playerInventory.length;i++) {
+				playerInventory[i] = null;
+			}
+			playerInventory[character.getTeam()]= new Inventory(character);
 		}
 
 	}

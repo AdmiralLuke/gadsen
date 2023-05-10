@@ -12,8 +12,8 @@ public class MessageUiGameEndedAction extends MessageUiAction{
 	int team;
 	public MessageUiGameEndedAction(float start, UiMessenger uiMessenger, boolean won, int team) {
 		super(start, uiMessenger);
-		won = won;
-		team = team;
+		this.won = won;
+		this.team = team;
 
 	}
 
