@@ -184,6 +184,11 @@ public class GameCharacter implements Serializable {
         return this.stamina;
     }
 
+    void reset() {
+        this.resetStamina();
+        this.resetAlreadyShot();
+    }
+
     /**
      * Will set this Characters health value to a specific value.
      * May produce appropriate {@link Action Actions} in the process, which will be directly or indirectly linked to the head received from the caller.
@@ -261,7 +266,7 @@ public class GameCharacter implements Serializable {
         weapons[0] = new Weapon(new Explosive(new BaseProjectile(3, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), weaponCounts.length>0?weaponCounts[0]:200, WeaponType.WATERBOMB, 10);
         weapons[1] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), weaponCounts.length>1?weaponCounts[1]:200, WeaponType.WATER_PISTOL, 9);
         weapons[2] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), weaponCounts.length>2?weaponCounts[2]:200, WeaponType.MIOJLNIR, 13);
-        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), weaponCounts.length>3?weaponCounts[3]:200, WeaponType.GRENADE, 10);
+        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 1f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), weaponCounts.length>3?weaponCounts[3]:200, WeaponType.GRENADE, 10);
         weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 10, 0.8f), weaponCounts.length>4?weaponCounts[4]:200, WeaponType.WOOL, 15);
         weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), weaponCounts.length>5?weaponCounts[5]:200, WeaponType.CLOSE_COMBAT, 0.5f);
         return weapons;

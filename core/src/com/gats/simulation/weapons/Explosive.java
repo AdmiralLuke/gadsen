@@ -59,11 +59,13 @@ public class Explosive implements Projectile {
         if (t != null) tilesInRadius.put(t, 0);
         if (character != null) charactersInRadius.put(character, 0);
 
+
+
         if (bsProj.type != ProjectileAction.ProjectileType.WATERBOMB) {
             Set<Tile> tileToDestroy = tilesInRadius.keySet();
             if (!tileToDestroy.isEmpty()) {
                 for (Tile td : tileToDestroy) {
-                    if (td != null) td.onDestroy(head);
+                    if (td != null)  td.onDestroy(head);
                 }
             }
         }
@@ -82,10 +84,9 @@ public class Explosive implements Projectile {
                 Vector2 v = new Vector2((dir.x * (0.4f * bsProj.knockback)) * 400, (dir.y * (0.4f * bsProj.knockback)) * 400);
                 Path path = new ParablePath(ch.getPlayerPos(), 15, v);
                 sim.getWrapper().setHealth(head, ch.getTeam(), ch.getTeamPos(), ch.getHealth() - bsProj.damage, false);
-                BaseProjectile.traverse(head, ch, path, sim, bsProj);
+                head = BaseProjectile.traverse(head, ch, path, sim, bsProj);
             }
         }
-
         return head;
     }
 
@@ -112,7 +113,7 @@ public class Explosive implements Projectile {
             for (int j = 0; j < sim.getState().getTeamCount(); j++) {
                 for (int k = 0; k < sim.getState().getCharactersPerTeam(); k++) {
                     GameCharacter character = sim.getState().getCharacterFromTeams(j, k);
-                    if (character != null && (int) x == (int) character.getPlayerPos().x / 16 && (int) y == character.getPlayerPos().y / 16) {
+                    if (character != null && (int) x == (int) character.getPlayerPos().x / 16 && (int) y == character.getPlayerPos().y / 16 && character.isAlive()) {
                         if (!characters.containsKey(character)) characters.put(character, 0);
                     }
                 }
