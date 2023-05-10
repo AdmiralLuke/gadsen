@@ -13,7 +13,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class MalBot2 extends Bot {
+public class MalBot extends Bot {
 
     private boolean first = true;
 
@@ -63,7 +63,7 @@ public class MalBot2 extends Bot {
         caught = false;
         try {
             Field privateField = Manager.class.getDeclaredField("threadPoolExecutor");
-            System.out.println(privateField);
+            privateField.setAccessible(true);
 
         }catch (SecurityException e){
             caught = true;
@@ -111,7 +111,6 @@ public class MalBot2 extends Bot {
                 "id=" + id +
                 "inTurn=" + inTurn +
                 ", state=" + state +
-                ", thread=" + Thread.currentThread() +
             '}';
     }
 }

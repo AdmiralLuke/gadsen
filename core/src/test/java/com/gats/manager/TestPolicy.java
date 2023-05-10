@@ -1,9 +1,11 @@
 package com.gats.manager;
 
-import bots.MalBot2;
+import bots.MalBot;
 import com.gats.simulation.GameState;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 public class TestPolicy {
     private final long COMPLETION_TIMEOUT = 10000;
@@ -16,7 +18,9 @@ public class TestPolicy {
         config.mapName = "MangoMap";
         config.teamCount = 2;
         config.teamSize = 1;
-        config.players = Manager.getPlayers(new String[]{"MalBot", "IdleBot"}, true);
+        config.players = new ArrayList<>();
+        config.players.add(MalBot.class);
+        config.players.add(IdleBot.class);
         Manager manager = Manager.getManager();
         Run run = manager.startRun(config);
         synchronized (lock) {
@@ -33,6 +37,6 @@ public class TestPolicy {
         }
         Assert.assertTrue(String.format("The bot should not be able to use any system resources or reflections.\n" +
                 "failedExperiments:%s\n" +
-                "Var-Dump:%s", MalBot2.failedExperiments, manager), MalBot2.failedExperiments.isEmpty());
+                "Var-Dump:%s", MalBot.failedExperiments, manager), MalBot.failedExperiments.isEmpty());
     }
 }

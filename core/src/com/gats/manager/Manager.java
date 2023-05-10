@@ -7,6 +7,8 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -221,8 +223,13 @@ public class Manager {
                 URL url = new File(".").toURI().toURL();
                 URL[] urls = new URL[]{url};
                 ClassLoader loader = new URLClassLoader(urls);
+
                 for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))) {
                     try {
+                        if (containsIllegalTerms(botFile)) {
+                            System.err.printf("File %s contains illegal terms. -> Exclude from Loading%n", botFile);
+                            continue;
+                        }
                         Class<?> nextClass = loader.loadClass("bots." + botFile.getName().replace(".class", ""));
                         if (Bot.class.isAssignableFrom(nextClass))
                             players.add(new NamedPlayerClass((Class<? extends Player>) nextClass, botFile.getName().replace(".class", "")));
@@ -234,12 +241,33 @@ public class Manager {
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
-        }else {
+        } else {
             System.err.println("Warning: No Bot-Dir found at " + botDir.getAbsolutePath());
         }
         NamedPlayerClass[] array = new NamedPlayerClass[players.size()];
         players.toArray(array);
         return array;
+    }
+
+    private static boolean containsIllegalTerms(File botFile) {
+        if (botFile == null) return false;
+        if (!botFile.exists()) return false;
+        if (!botFile.isFile()) return false;
+        StringBuilder resultStringBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(botFile.toPath())))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                resultStringBuilder.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        String fileContent = resultStringBuilder.toString();
+
+        if (fileContent.contains("java/lang/Thread")) return true;
+        if (fileContent.contains("java/util/concurrent/")) return true;
+
+        return false;
     }
 
     public static ArrayList<Class<? extends Player>> getPlayers(String[] names, boolean noGUI) {
