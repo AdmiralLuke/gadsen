@@ -270,6 +270,9 @@ public class BaseProjectile implements Projectile{
                 }
             }
         }
+        if (head.getChildren().isEmpty()) {
+            return head;
+        }
         return head.getChildren().get(0) != projAction ? head : dt;
     }
 
