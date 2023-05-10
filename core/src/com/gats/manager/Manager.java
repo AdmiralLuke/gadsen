@@ -1,7 +1,12 @@
 package com.gats.manager;
 
+import jdk.internal.reflect.Reflection;
+import sun.security.util.SecurityConstants;
+
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.util.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,9 +17,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
-
 public class Manager {
 
+    public static final RuntimePermission CHECK_MANAGER_ACCESS_PERMISSION =
+            new RuntimePermission("accessManagerInstance");
     private static final String RESULT_DIR_NAME = "results";
     private static final File RESULT_DIR = new File(RESULT_DIR_NAME);
     private static int systemReservedProcessorCount = 2;
@@ -40,7 +46,12 @@ public class Manager {
     private final Object schedulingLock = new Object();
 
 
+    @SuppressWarnings("removal")
     public static Manager getManager() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(CHECK_MANAGER_ACCESS_PERMISSION);
+        }
         return singleton;
     }
 
@@ -204,6 +215,7 @@ public class Manager {
         players.add(new NamedPlayerClass(IdleBot.class, "IdleBot"));
         players.add(new NamedPlayerClass(TestBot.class, "TestBot"));
         File botDir = new File("bots");
+        System.out.println(new File("").getAbsolutePath());
         if (botDir.exists()) {
             try {
                 URL url = new File(".").toURI().toURL();
@@ -222,6 +234,8 @@ public class Manager {
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
+        }else {
+            System.err.println("Warning: No Bot-Dir found at " + botDir.getAbsolutePath());
         }
         NamedPlayerClass[] array = new NamedPlayerClass[players.size()];
         players.toArray(array);
@@ -247,7 +261,12 @@ public class Manager {
         return selectedPlayers;
     }
 
+    @SuppressWarnings({"removal"})
     private Manager() {
+        java.security.Policy.setPolicy(new BotSecurityPolicy());
+
+        System.err.println("Please Ignore the following Warning---------------------");
+        System.setSecurityManager(new SecurityManager());
         executionManager = new Thread(this::executionManager);
         executionManager.start();
     }

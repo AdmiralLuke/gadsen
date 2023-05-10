@@ -1,0 +1,14 @@
+package com.gats.manager;
+
+import java.security.*;
+
+public class BotSecurityPolicy extends Policy {
+
+    @Override
+    public boolean implies(ProtectionDomain domain, Permission permission) {
+        if (Thread.currentThread().getThreadGroup().equals(Game.PLAYER_THREAD_GROUP)){
+            return false;
+        }
+        return true;
+    }
+}
