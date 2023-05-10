@@ -8,13 +8,12 @@ import com.gats.simulation.action.TileMoveAction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Vector;
 
 /**
  * Represents one of the Tiles the map is made of.
- * Special behaviors of certain Tile-Types will be implemented by sub-classes
+ * Special behaviors of certain Tile-Types will be implemented by the {@link Wrapper Wrapper}
  */
-public class Tile implements Serializable, Cloneable {
+public class Tile implements Serializable {
 
     public static final int TileSizeX = 16;
     public static final int TileSizeY = 16;
@@ -24,13 +23,9 @@ public class Tile implements Serializable, Cloneable {
 
 
     // Box als Ankerpunkt
-    private boolean isAnchor;
+    private final boolean isAnchor;
 
     private final boolean isSolid;
-
-    // Box hängt an einer Box oder an Verkettung von Boxen die an Anker hängt
-    //ToDo: box should always be anchored, or removed from the map otherwise
-    private boolean isAnchored;
 
 
     // Haltbarkeit der Box
@@ -45,9 +40,16 @@ public class Tile implements Serializable, Cloneable {
     Tile down;
     Tile left;
 
+    public enum TileType {
+        STANDARD,
+        WEAPON_BOX,
+        HEALTH_BOX
+    }
 
-    public int getType() {
-        return isAnchor ? 1 : 0;
+    TileType tileType;
+
+    public TileType getTileType() {
+        return this.tileType;
     }
 
     /**
@@ -68,9 +70,12 @@ public class Tile implements Serializable, Cloneable {
 
     /**
      * Gibt die dimension einer Box zurück
+     *
      * @return Box-dimension als ganzzahliger 2D Vektor
      */
-    public IntVector2 getTileSize(){return TileSize.cpy();}
+    public IntVector2 getTileSize() {
+        return TileSize.cpy();
+    }
 
     /**
      * Box wird nur aus Position erstellt. Definitiv kein Anker selbst
@@ -79,47 +84,7 @@ public class Tile implements Serializable, Cloneable {
      * @param y Position Y
      */
     Tile(int x, int y, GameState state) {
-        this.position = new IntVector2(x, y);
-        this.isAnchor = false;
-        this.state = state;
-        this.isSolid = true;
-        this.isAnchored = true;
-        if (isAnchored) {
-            state.getBoard()[x][y] = this;
-            sortIntoTree();
-        } else {
-            // Die Garbage Collection wird das schon löschen
-            state.getBoard()[x][y] = null;
-        }
-    }
-
-    Tile(int x, int y, GameState state, boolean isAnchored) {
-        this.position = new IntVector2(x, y);
-        this.isAnchor = false;
-        this.state = state;
-        this.isSolid = true;
-        this.isAnchored = isAnchored;
-        if (isAnchored) {
-            state.getBoard()[x][y] = this;
-            sortIntoTree();
-        } else {
-            // Die Garbage Collection wird das schon löschen
-            state.getBoard()[x][y] = null;
-        }
-    }
-
-    private Tile(Tile original, GameState newState){
-         isAnchor = original.isAnchor;
-
-         isSolid = original.isSolid;
-
-         isAnchored = original.isAnchored;
-
-         health = original.health;
-
-         position = original.position.cpy();
-
-         state = newState;
+        this(x, y, state, false);
     }
 
     /**
@@ -129,19 +94,39 @@ public class Tile implements Serializable, Cloneable {
      * @param y        Position Y auf dem Spielbrett
      * @param isAnchor Box kann als Anker makiert werden, sonst wird geschaut ob Nachbar Ankerpunkt ist
      */
-    Tile(int x, int y, boolean isAnchor, GameState state) {
+    Tile(int x, int y, GameState state, boolean isAnchor) {
+        this(x, y, state, isAnchor, TileType.STANDARD);
+    }
+
+    private Tile(Tile original, GameState newState) {
+        isAnchor = original.isAnchor;
+
+        isSolid = original.isSolid;
+
+        health = original.health;
+
+        position = original.position.cpy();
+
+        tileType = original.tileType;
+
+        state = newState;
+    }
+
+    /**
+     * erweiterte Erstellung von Boxen inklusive Boxtyp
+     *
+     * @param x        Position X auf dem Spielbrett
+     * @param y        Position Y auf dem Spielbrett
+     * @param isAnchor Box kann als Anker makiert werden, sonst wird geschaut ob Nachbar Ankerpunkt ist
+     */
+    Tile(int x, int y, GameState state, boolean isAnchor, TileType tileType) {
         this.isAnchor = isAnchor;
-        this.isAnchored = isAnchor || checkIfAnchored(x, y, state);
         this.position = new IntVector2(x, y);
         this.state = state;
         this.isSolid = true;
-        if (isAnchored) {
-            state.getBoard()[x][y] = this;
-            sortIntoTree();
-        } else {
-            // Die Garbage Collection wird das schon löschen
-            state.getBoard()[x][y] = null;
-        }
+        state.getBoard()[x][y] = this;
+        sortIntoTree();
+        this.tileType = tileType;
     }
 
     /**
@@ -173,44 +158,18 @@ public class Tile implements Serializable, Cloneable {
         if (this.down != null) {
             this.down.up = this;
         }
-
-
     }
 
     /**
      * Konstruktor zum Klonen von Tiles
      */
-    Tile(boolean isAnchor, boolean isAnchored, int health) {
+    Tile(boolean isAnchor, int health, TileType tileType) {
         this.isAnchor = isAnchor;
-        this.isAnchored = isAnchored;
         this.isSolid = true;
         this.health = health;
+        this.tileType = tileType;
     }
 
-    /**
-     * Schaut sich im Board Array an, ob Nachbarboxen verankert sind, oder selber Anker sind
-     *
-     * @return true wenn Nachbar anchored oder Anker ist
-     * x
-     * xax
-     * x
-     * a = verankert bzw. ankernd
-     * x = kann angehangen werden
-     */
-    private boolean checkIfAnchored(int x, int y, GameState state) {
-        boolean isAnchor = false;
-        if (x > 0) {
-            isAnchor = state.getTile(x - 1, y) != null || state.getTile(x + 1, y) != null;
-        } else if (x == 0) {
-            isAnchor = state.getTile(x + 1, y) != null;
-        }
-        if (y > 0 && !isAnchor) {
-            isAnchor = state.getTile(x, y - 1) != null || state.getTile(x, y + 1) != null;
-        } else if (y == 0 & !isAnchor) {
-            isAnchor = state.getTile(x, y + 1) != null;
-        }
-        return isAnchor;
-    }
 
     /**
      * entfernt eine Tile aus dem Graphen (und alle Referenzen)
@@ -241,12 +200,11 @@ public class Tile implements Serializable, Cloneable {
         boolean[][] mapRight = new boolean[state.getBoardSizeX()][state.getBoardSizeY()];
 
 
-
         state.getBoard()[this.position.x][this.position.y] = null;
         this.deleteFromGraph();
         TileDestroyAction destroyAction = new TileDestroyAction(this.position);
         head.addChild(destroyAction);
-        if (hasRight())right.convertGraphToList(rightList, mapRight);
+        if (hasRight()) right.convertGraphToList(rightList, mapRight);
         if (hasUp()) up.convertGraphToList(upperList, mapUp);
         if (hasDown()) down.convertGraphToList(lowerList, mapDown);
         if (hasLeft()) left.convertGraphToList(leftList, mapLeft);
@@ -266,6 +224,10 @@ public class Tile implements Serializable, Cloneable {
 
         return destroyAction;
 
+    }
+
+    public boolean isAnchor() {
+        return isAnchor;
     }
 
     void checkForAnchor(ArrayList<Tile> list, Action head) {
@@ -368,12 +330,10 @@ public class Tile implements Serializable, Cloneable {
     }
 
 
-
     @Override
     public String toString() {
         return "Tile{" +
                 "isAnchor=" + isAnchor +
-                ", isAnchored=" + isAnchored +
                 ", health=" + health +
                 ", position" + position +
                 '}';
@@ -404,19 +364,16 @@ public class Tile implements Serializable, Cloneable {
         if (o == null || getClass() != o.getClass()) return false;
         if (this == o) return true;
         Tile tile = (Tile) o;
-        return isAnchor == tile.isAnchor && isAnchored == tile.isAnchored && getPosition().equals(tile.getPosition());
+        return isAnchor == tile.isAnchor && getPosition().equals(tile.getPosition());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isAnchor, isAnchored, getPosition());
+        return Objects.hash(isAnchor, getPosition());
     }
 
-    void setAnchor(boolean anchor) {
-        this.isAnchor = anchor;
-    }
 
-    protected Tile copy(GameState state){
+    protected Tile copy(GameState state) {
         return new Tile(this, state);
     }
 }

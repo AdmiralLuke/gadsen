@@ -55,6 +55,15 @@ public class Weapon implements Serializable {
         return new Weapon(this);
     }
 
-    public int getAmmo(){return ammo;}
+    protected void setAmmo(int ammo) {
+        this.ammo = ammo;
+    }
 
+    public int getAmmo() {
+        return ammo;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
 }

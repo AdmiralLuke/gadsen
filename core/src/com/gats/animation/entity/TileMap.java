@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
 import com.gats.simulation.IntVector2;
 import com.gats.simulation.Tile;
+import com.gats.simulation.action.TileSummonAction;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -30,8 +31,17 @@ public class TileMap extends Entity{
         for (int i = 0; i<sizeX; i++)
             for (int j = 0; j<sizeY; j++){
                 Tile tile = state.getTile(i,j);
-                tiles[i][j] = tile == null? TYLE_TYPE_NONE : tile.getType();
+                tiles[i][j] = getTileID(tile);
             }
+    }
+
+    private int getTileID(Tile tile){
+        if (tile == null) return TYLE_TYPE_NONE;
+        Tile.TileType type = tile.getTileType();
+        if (type == Tile.TileType.HEALTH_BOX) return 5;
+        if (type == Tile.TileType.STANDARD) return tile.isAnchor()?0:1;
+        if (type == Tile.TileType.WEAPON_BOX) return tile.isAnchor()?3:4;
+        return TYLE_TYPE_NONE;
     }
 
     @Override

@@ -40,7 +40,7 @@ public class Simulation {
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         remainingTeams = teamAm;
-        this.wrapper = new Wrapper(gameState.getTeams());
+        this.wrapper = new Wrapper(gameState);
     }
 
     public static IntVector2 convertToTileCoords(IntVector2 worldCoords) {
