@@ -8,25 +8,23 @@ import com.gats.simulation.GameState;
 import com.gats.simulation.IntVector2;
 import com.gats.simulation.Tile;
 import com.gats.simulation.action.TileSummonAction;
+import com.gats.ui.assets.AssetContainer;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class TileMap extends Entity{
 
     public static final int TYLE_TYPE_NONE = -1;
-
-    private TextureRegion[] tileTextures;
     private int[][] tiles;
     private int sizeX;
     private int sizeY;
 
     private int tileSize = 12;
 
-    public TileMap(TextureRegion[] tileTextures, GameState state) {
-        this.tileTextures = tileTextures;
+    public TileMap(GameState state) {
         sizeX = state.getBoardSizeX();
         sizeY = state.getBoardSizeY();
-        if(tileTextures.length > 0) tileSize = tileTextures[0].getRegionWidth();
+        if(AssetContainer.IngameAssets.tileTextures.length > 0) tileSize = AssetContainer.IngameAssets.tileTextures[0].getRegionWidth();
         this.tiles = new int[sizeX][sizeY];
         for (int i = 0; i<sizeX; i++)
             for (int j = 0; j<sizeY; j++){
@@ -53,7 +51,7 @@ public class TileMap extends Entity{
             for (int j = 0; j<sizeY; j++){
                 int type = tiles[i][j];
                 if (type != TYLE_TYPE_NONE){
-                    batch.draw(tileTextures[type],pos.x + i * tileSize, pos.y + j * tileSize);
+                    batch.draw(AssetContainer.IngameAssets.tileTextures[type],pos.x + i * tileSize, pos.y + j * tileSize);
                 }
             }
     }

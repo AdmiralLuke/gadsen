@@ -131,10 +131,10 @@ public class GADSAssetManager {
         IngameAssets.lossDisplay = atlas.findRegion("ui/loseTilesetTitle");
         IngameAssets.drawDisplay = atlas.findRegion("ui/drawTileset");
 
-        IngameAssets.background = atlas.findRegion("background/WeihnachtsBG");
+        IngameAssets.background = atlas.findRegion("background/GADSBG");
 
         IngameAssets.tileTextures = new TextureRegion[]{
-                atlas.findRegion("tile/16x_anchor02"),
+                atlas.findRegion("tile/16x_anchor01"),
                 atlas.findRegion("tile/16x_box01"),
                 atlas.findRegion("tile/slimeBox"),
                 atlas.findRegion("tile/weaponBoxAnchor"),

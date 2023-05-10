@@ -562,7 +562,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     public void init(GameState state) {
         synchronized (root) {
             this.state = state;
-            map = new TileMap(IngameAssets.tileTextures, state);
+            map = new TileMap(state);
             root.add(map);
 
             teamCount = state.getTeamCount();
