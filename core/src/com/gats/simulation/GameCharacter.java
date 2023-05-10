@@ -184,6 +184,11 @@ public class GameCharacter implements Serializable {
         return this.stamina;
     }
 
+    void reset() {
+        this.resetStamina();
+        this.resetAlreadyShot();
+    }
+
     /**
      * Will set this Characters health value to a specific value.
      * May produce appropriate {@link Action Actions} in the process, which will be directly or indirectly linked to the head received from the caller.

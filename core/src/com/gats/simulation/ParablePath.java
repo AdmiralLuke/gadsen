@@ -27,6 +27,19 @@ public class ParablePath implements Path {
         if (startVelocity.cpy().nor().epsilonEquals(0,1, 0.001f)) {
             float t = startVelocity.y / g * 2;
             this.duration = startPosition.epsilonEquals(endPosition, 0.001f) ? t * 2 : t;
+            if (endPosition.y < startPosition.y) this.duration += ((startPosition.y - (endPosition.y + 9)) / startVelocity.y);
+        } else {
+            this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
+        }
+    }
+
+    public ParablePath(Vector2 startPosition, Vector2 endPosition, Vector2 startVelocity, float dur) {
+        this.startPosition = startPosition;
+        this.startVelocity = startVelocity;
+        if (startVelocity.cpy().nor().epsilonEquals(0,1, 0.001f)) {
+            float t = startVelocity.y / g * 2;
+            if (dur < 0.1f) t = dur / 2;
+            this.duration = startPosition.epsilonEquals(endPosition, 0.001f) ? t * 2 : t;
         } else {
             this.duration = -((startPosition.x - endPosition.x) / startVelocity.x);
         }
@@ -45,46 +58,6 @@ public class ParablePath implements Path {
         this.startVelocity = startVelocity;
         this.duration = duration;
     }
-
-
-    //ToDo: Implement | no!
-    /**
-     * Creates a parabolic path, that connects start while peaking at the specified height.
-     * The specified peak must therefore be at least as high as both start- and end-point.
-     *
-     * @param start
-     * @param end
-     * @param peak  maximum y-value
-     */
-//    public ParablePath(Vector2 start, float peak, Vector2 end) {
-//        if (peak < start.y || peak < end.y)
-//            throw new IllegalArgumentException("The peak of a gravity bound parabola has to be at least as high as both its start and end point");
-//        this.startPosition = start;
-//        this.startVelocity = new Vector2(0,0);
-//        // s_y(p) = peak | v_y(p) = 0
-//        // p is the point in time where
-//        float p = (float) Math.sqrt(2f/(3*g) * (start.y - peak));
-//        startVelocity.y = 1/p *(start.y - p*p*g/2 - peak);
-//
-//
-//    }
-
-    /**
-     * Creates a parabolic path, that begins at start and travels through anchor while peaking at the specified height.
-     * The specified peak must therefore at least as high as both start and anchor.
-     * This path will be followed with the specified velocity for the specified duration.
-     *
-     * @param duration
-     * @param start
-     * @param anchor
-     * @param peak
-     * @param velocity
-     */
-//    public ParablePath(float duration, Vector2 start, Vector2 anchor, float peak, float velocity) {
-//        this.duration = duration;
-//        this.startPosition = start;
-//        this.startVelocity = startVelocity;
-//    }
 
     /**
      * Returns the position for the specified time.

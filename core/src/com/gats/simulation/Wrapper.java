@@ -58,4 +58,8 @@ public class Wrapper {
     public void addAmmoToWeapon(int weapon, int addAmmo, GameCharacter character) {
         wpWrapper.addAmmo(character.getWeapon(weapon), addAmmo);
     }
+
+    public GameCharacter[][] getTeam() {
+        return team;
+    }
 }
