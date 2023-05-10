@@ -25,10 +25,10 @@ public class ParallelMultiGameRun extends Run {
                 complete();
                 return;
             }
-            //ToDo: replace with enemies
-            runConfig.players.add(IdleBot.class);
-            runConfig.players.add(IdleBot.class);
-            runConfig.players.add(IdleBot.class);
+
+            runConfig.players.add(AguadseBot.class);
+            runConfig.players.add(KamigadseBot.class);
+            runConfig.players.add(BobBot.class);
             runConfig.teamCount = runConfig.players.size();
             runConfig.teamSize = 3;
             runConfig.mapName = "MangoMap";

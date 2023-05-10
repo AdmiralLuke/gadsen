@@ -276,6 +276,13 @@ public class GameCharacter implements Serializable {
      * Gibt eine Waffe aus dem Inventar zurück.
      * Der Index muss aus dem ganzzahligen Intervall [0, getWeaponAmount() - 1] stammen.
      *
+     * 0: Waterbomb
+     * 1: WaterPistol
+     * 2: Miojlnir
+     * 3: Grendade
+     * 4: Wool
+     * 5: Close Combat
+     *
      * @param n Index der Waffe, die gewählt werden soll.
      * @return Instanz der Waffe.
      */
