@@ -36,9 +36,11 @@ public class GameState implements Serializable {
     private int width;
     private int height;
 
-    private boolean winnerTakesAll;
+    private final boolean winnerTakesAll;
 
     private final float[] scores;
+
+    private final int[] weaponBoxCycle;
 
     public float[] getScores() {
         return scores;
@@ -70,6 +72,8 @@ public class GameState implements Serializable {
                 teams[i][j] = team[j] == null ? null : team[j].copy(this);
             }
         }
+        weaponBoxCycle = new int[original.teamCount];
+        System.arraycopy(original.weaponBoxCycle, 0, weaponBoxCycle, 0, original.teamCount);
         winnerTakesAll = original.winnerTakesAll;
         teamCount = original.teamCount;
         charactersPerTeam = original.charactersPerTeam;
@@ -124,6 +128,7 @@ public class GameState implements Serializable {
         this.sim = sim;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
         this.turn = new ArrayDeque<>();
+        this.weaponBoxCycle = new int[teamCount];
         this.scores = new float[teamCount];
         this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Exam_Admission || gameMode == GameMode.Christmas || gameMode == GameMode.Tournament_Phase_2;
         this.initTeam(spawnpoints);
@@ -324,6 +329,38 @@ public class GameState implements Serializable {
         return charactersPerTeam;
     }
 
+    public int getWeaponBoxCycle(int team) {
+        return weaponBoxCycle[team];
+    }
+
+    public static int getWeaponFromCycleIndex(int index) {
+        if (index < 0) return -1;
+        index = index % 10;
+        switch (index) {
+            case 0:
+            case 4:
+                return WeaponType.WOOL.ordinal();
+            case 9:
+                return WeaponType.MIOJLNIR.ordinal();
+            case 1:
+            case 5:
+            case 7:
+                return WeaponType.WATERBOMB.ordinal();
+            case 3:
+            case 6:
+                return WeaponType.CLOSE_COMBAT.ordinal();
+            case 2:
+            case 8:
+                return WeaponType.GRENADE.ordinal();
+        }
+        return -1;
+    }
+
+    protected int cycleWeapon(int team) {
+        int result = weaponBoxCycle[team];
+        weaponBoxCycle[team] = (weaponBoxCycle[team]+1)%10;
+        return result;
+    }
 
     /**
      * @return The 2D array that saves all Tiles

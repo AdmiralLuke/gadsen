@@ -6,9 +6,11 @@ import com.gats.simulation.weapons.WeaponWrapper;
 public class Wrapper {
 
     private GameCharacter[][] team;
+    private GameState state;
     private WeaponWrapper wpWrapper;
-    Wrapper(GameCharacter[][] team) {
-        this.team = team;
+    Wrapper(GameState state) {
+        this.team = state.getTeams();
+        this.state = state;
         this.wpWrapper = WeaponWrapper.instance();
     }
 
@@ -29,13 +31,12 @@ public class Wrapper {
     public Action destroyTile(Tile t, GameCharacter character, Action head) {
         head = onDestroyTile(t, head);
         if (t.getTileType() == Tile.TileType.WEAPON_BOX) {
-            // weapon-box
+            //roll two weapons according to the cycle
+            int w1 = GameState.getWeaponFromCycleIndex(state.cycleWeapon(character.getTeam()));
+            int w2 = GameState.getWeaponFromCycleIndex(state.cycleWeapon(character.getTeam()));
 
-            // select random weapon
-            int weapon = (int)(Math.random() * character.getWeaponAmount());
-            // select random amount of ammo
-            int ammo = (int)(Math.random() * 3) + 1; //min 1, max 4
-            addAmmoToWeapon(weapon, ammo, character);
+            addAmmoToWeapon(w1, 1, character);
+            addAmmoToWeapon(w2, 1, character);
         } else if (t.getTileType() == Tile.TileType.HEALTH_BOX) {
             // health-box
 

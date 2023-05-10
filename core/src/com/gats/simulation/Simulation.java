@@ -45,7 +45,7 @@ public class Simulation {
             gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction(), false);
         }
         remainingTeams = teamAm;
-        this.wrapper = new Wrapper(gameState.getTeams());
+        this.wrapper = new Wrapper(gameState);
     }
 
     public static IntVector2 convertToTileCoords(IntVector2 worldCoords) {
