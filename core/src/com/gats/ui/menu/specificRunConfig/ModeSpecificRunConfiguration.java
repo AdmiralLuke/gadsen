@@ -18,9 +18,7 @@ public abstract class ModeSpecificRunConfiguration extends RunConfiguration {
 	 */
 	public void passSettings(RunConfiguration settings){
 
-		if(gameMode== GameState.GameMode.Normal){
-			gameMode = settings.gameMode;
-		}
+		gameMode = settings.gameMode;
 
 		if(!gui){
 			gui = settings.gui;

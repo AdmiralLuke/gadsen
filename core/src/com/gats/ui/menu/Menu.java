@@ -16,6 +16,7 @@ import com.gats.ui.menu.gamemodeLayouts.ChristmasLayout;
 import com.gats.ui.menu.gamemodeLayouts.ExamAdmissionLayout;
 import com.gats.ui.menu.gamemodeLayouts.NormalLayout;
 import com.gats.ui.menu.specificRunConfig.ChristmasModeConfig;
+import com.gats.ui.menu.specificRunConfig.ExamAdmissionConfig;
 import com.gats.ui.menu.specificRunConfig.NormalModeConfig;
 
 import java.util.Arrays;
@@ -233,6 +234,10 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			//	//Todo deal with hardcoded values, might be neede for later gameModes
 			//	modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
 			//	break;
+
+			case Exam_Admission:
+				modeSettings = new ExamAdmissionConfig(configuration);
+				break;
 			default:
 				modeSettings = new NormalModeConfig(configuration);
 

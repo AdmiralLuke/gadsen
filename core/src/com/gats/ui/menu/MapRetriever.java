@@ -35,7 +35,7 @@ public class MapRetriever implements FilenameFilter {
 
     String campaignDirectory = internalDir + campaignMapFolder;
 
-    String[] campaignMaps = {"level1_1", "level1_2", "level1_3", "level2_1", "level2_2", "level2_3", "level3_1", "level3_2", "level3_3", "level4_1", "level4_2", "level4_3"};
+    String[] campaignMaps = {"level1_1", "level1_2", "level1_3", "level2_1", "level2_2", "level2_3"};
 
     /**
      * Creates a {@link MapRetriever}, wich is responsible for providing the selectable Maps
