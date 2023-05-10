@@ -241,4 +241,7 @@ public class GameCharacter extends AnimatedEntity implements Parent {
             group.remove(child);
         }
     }
+    public Color getTeamColor(){
+        return new Color(teamColor);
+    }
 }

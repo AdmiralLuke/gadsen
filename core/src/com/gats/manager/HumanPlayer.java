@@ -79,13 +79,13 @@ public class HumanPlayer extends Player {
 
     {
         weaponTypeStack.addAll(Arrays.asList(WeaponType.values()));
+        weaponTypeStack.remove(WeaponType.NOT_SELECTED);
     }
 
     private boolean turnInProgress;
     private GameState state;
     private Controller controller;
 
-    private UiMessenger uiMessenger;
     @Override
     public String getName() {
         return "Human";
@@ -111,21 +111,20 @@ public class HumanPlayer extends Player {
         this.controller = controller;
         for (int i = 0; i < lastTick.length; i++) lastTick[i] = NO_TICK;
 
-        //Todo add 5 seconds time  between turns
-        //setup timer for updating the ui Time
-      if(uiMessenger!=null) {
-          uiMessenger.startTurnTimer(turnDuration+turnStartWaitTime);
-
-      }
-        synchronized (this) {
-            try {
-                this.wait(turnDuration* 1000L);
-                uiMessenger.stopTurnTimer();
-            } catch (InterruptedException ignored) {
 //                System.out.println("Turn has been ended preemptively");
+
+
+       synchronized (this) {
+            try {
+
+
+                this.wait(turnDuration* 1000L);
+
+            } catch (InterruptedException ignored) {
 
             }
         }
+
     }
 
     //ToDo: make protected after migration to UI
@@ -301,7 +300,9 @@ public class HumanPlayer extends Player {
         return PlayerType.Human;
     }
 
-    public void setUiMessenger(UiMessenger uiMessenger){
-       this.uiMessenger = uiMessenger;
+
+
+    public int getTurnDuration(){
+        return this.turnDuration;
     }
 }

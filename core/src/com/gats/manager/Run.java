@@ -30,7 +30,6 @@ public abstract class Run {
         switch (runConfig.gameMode) {
             case Campaign:
             case Normal:
-            case Christmas:
             case Exam_Admission:
                 return new SingleGameRun(manager, runConfig);
             case Tournament_Phase_1:

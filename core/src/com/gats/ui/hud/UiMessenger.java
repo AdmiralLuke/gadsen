@@ -1,10 +1,11 @@
 package com.gats.ui.hud;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.Color;
 import com.gats.simulation.GameCharacter;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.Hud;
-import com.gats.ui.assets.AssetContainer;
+
+import java.awt.*;
 
 
 /**
@@ -24,9 +25,9 @@ public class UiMessenger {
 	 * Applies the necessary changes to the Hud for a new turn.
 	 * @param currentPlayer
 	 */
-	public void turnChanged(GameCharacter currentPlayer){
+	public void turnChanged(GameCharacter currentPlayer, com.gats.animation.GameCharacter animPlayer){
 		changeInventory(currentPlayer);
-		drawTurnChangePopup(null);
+		drawTurnChangePopup(animPlayer.getTeamColor());
 		refillStaminaBar(currentPlayer.getStamina());
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
@@ -69,11 +70,11 @@ public class UiMessenger {
 
 
 	/**
-	 * Will call {@link Hud#createTurnChangePopup()} to temporarily draw it to the Hud.
-	 * @param gameCharacter Sprite/Skin of the current/new Player -> could be implemented
+	 * Will call {@link Hud#createTurnChangePopup(Color)} to temporarily draw it to the Hud.
+	 * @param outlinecolor  Teamcolor of the current/new Player -> could be implemented
 	 */
-	private void drawTurnChangePopup(TextureRegion gameCharacter){
-		hud.createTurnChangePopup();
+	private void drawTurnChangePopup(Color outlinecolor){
+		hud.createTurnChangePopup(outlinecolor);
 	}
 
 	/**
@@ -95,17 +96,19 @@ public class UiMessenger {
 	}
 
 
-	/**
-	 * Start the turn Timer
-	 */
-	public void startTurnTimer(){hud.startTurnTimer();};
 
 	/**
 	 * Starts the turn timer for specified time.
-	 * @param seconds
+	 * @param
 	 */
-	public void startTurnTimer(int seconds){
-		hud.startTurnTimer(seconds);
+	public void startTurnTimer(int turnTime,boolean currPlayerIsHuman){
+		if(currPlayerIsHuman) {
+			hud.startTurnTimer(turnTime);
+		}
+		else{
+			stopTurnTimer();
+
+		}
 	}
 
 
@@ -113,8 +116,8 @@ public class UiMessenger {
 		hud.stopTurnTimer();
 	}
 
-	public void gameEnded(boolean won, int team){
-		hud.gameEnded(won,team);
+	public void gameEnded(boolean won, int team,boolean isDraw,Color color){
+		hud.gameEnded(won,team,isDraw,color);
 
 	}
 
