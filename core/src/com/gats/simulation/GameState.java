@@ -163,7 +163,7 @@ public class GameState implements Serializable {
             health = new ArrayList<>();
         }
         for (int i = 0; i < teamCount; i++) {
-            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null);
+            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null, teamCount, charactersPerTeam);
             int[] characterHealth = health.size() > i ? health.get(i) : new int[0];
             List<IntVector2> teamSpawns = spawnpoints.get(i);
             if (teamSpawns.size() < charactersPerTeam)
