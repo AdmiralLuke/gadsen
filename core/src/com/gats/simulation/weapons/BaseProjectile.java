@@ -200,7 +200,7 @@ public class BaseProjectile implements Projectile{
         path = new ParablePath(character.getPlayerPos(), path.getPos(t), path.getDir(0));
         if (path.getDuration() < 0.01f) return head;
         Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
-        sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x - (int)offset, (int)pos.y);
+        sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x, (int)pos.y);
         head.addChild(cmAc);
         if (!(Math.floor(posN.y) == Math.floor(b.y) && Math.floor(posN.x) <= c.x && Math.floor(posN.x) >= b.x)) {
             cmAc = sim.getWrapper().fall(cmAc, character.getTeam(), character.getTeamPos());
@@ -231,7 +231,7 @@ public class BaseProjectile implements Projectile{
 
     ProjectileAction generateAction() {
         Path path = null;
-        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t),  this.path.getDir(0));
+        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t),  this.path.getDir(0), this.t);
         if (projType == ProjType.LINEAR) path = new LinearPath(this.path.getPos(0), this.path.getPos(t), 100);
         return new ProjectileAction(0,type, path);
     }
