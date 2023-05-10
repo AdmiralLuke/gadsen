@@ -12,6 +12,7 @@ public class TeamAmountSlider extends RelationSlider {
 	BotSelectorTable botSelectorTable;
 	int currentSpawnpoints;
 	int currentTeams;
+	int minteamsPerMap  = 2;
 
 	public TeamAmountSlider(float min, float max, float stepSize, boolean vertical, Skin skin) {
 		super(min, max, stepSize, vertical, skin);
@@ -83,10 +84,20 @@ public class TeamAmountSlider extends RelationSlider {
 	}
 
 	public void setRanges(int teams, int teamsize ){
+		if(!freeze){
+		if(teams>=minteamsPerMap) {
+			this.setRange(minteamsPerMap, teams);
+			relatedSlider.setRange(1, teamsize);
 
-		this.setRange(1,teams);
-		relatedSlider.setRange(1,teamsize);
-
+		}else{
+			this.setRange(0,0);
+			relatedSlider.setRange(0,0);
+		}
+		}
+		else {
+			this.setRange(teams, teams);
+			relatedSlider.setRange(teamsize, teamsize);
+		}
 
 	}
 

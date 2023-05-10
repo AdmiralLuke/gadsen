@@ -13,6 +13,7 @@ import com.gats.ui.MenuScreen;
 import com.gats.ui.menu.buttons.*;
 import com.gats.ui.menu.gamemodeLayouts.CampaignLayout;
 import com.gats.ui.menu.gamemodeLayouts.ChristmasLayout;
+import com.gats.ui.menu.gamemodeLayouts.ExamAdmissionLayout;
 import com.gats.ui.menu.gamemodeLayouts.NormalLayout;
 import com.gats.ui.menu.specificRunConfig.ChristmasModeConfig;
 import com.gats.ui.menu.specificRunConfig.NormalModeConfig;
@@ -250,6 +251,9 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		if(gameMode == GameState.GameMode.Campaign) {
 			return new CampaignLayout(skin, this);
 		}
+		if(gameMode == GameState.GameMode.Exam_Admission) {
+			return new ExamAdmissionLayout(skin, this);
+		}
 
 		//default case
 		return new NormalLayout(skin, this);
@@ -291,7 +295,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		String[] modeNames = new String[gameModes.length];
 		int i=0;
 
-		gameModeSelector.setItems(runConfig.getGameModes());
+		gameModeSelector.setItems(GameState.GameMode.Normal, GameState.GameMode.Campaign, GameState.GameMode.Exam_Admission);
 
 	}
 
@@ -353,6 +357,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			mapSelector.setItems(new MapRetriever().getCampaignMaps());
 
 		}
+		//Todo examAdmission maps
 
 
 		else{
