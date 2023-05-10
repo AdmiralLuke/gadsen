@@ -79,7 +79,6 @@ public class ParallelMultiGameRun extends Run {
             for (int j =0; j<scores.length; j++){
                 scores[j] /= gameCount;
             }
-            if (gameMode == GameState.GameMode.Exam_Admission) scores[0] = scores[0]<333?0:1;
             complete();
         }
     }

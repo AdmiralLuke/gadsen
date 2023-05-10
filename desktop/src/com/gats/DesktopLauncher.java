@@ -171,8 +171,18 @@ public class DesktopLauncher {
                 }
                 break;
             case Campaign:
-            case Exam_Admission:
                 if (run.getScores()[0] > 0) builder.append("Bot completed the challenge");
+                else builder.append("Bot failed the challenge");
+                break;
+            case Exam_Admission:
+                StringBuilder scoreBuilder = new StringBuilder();
+                scoreBuilder.append("\nScores:\n");
+                int j = 0;
+                for (Class<? extends Player> cur : run.getPlayers()) {
+                    scoreBuilder.append(String.format("%-10s : %-6f", cur.getName(), run.getScores()[j++]));
+                }
+                System.out.println(scoreBuilder);
+                if (run.getScores()[0] >= 333) builder.append("Bot completed the challenge");
                 else builder.append("Bot failed the challenge");
                 break;
             default:
