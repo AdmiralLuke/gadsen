@@ -1,5 +1,6 @@
 package com.gats.simulation.weapons;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.*;
@@ -178,9 +179,9 @@ public class BaseProjectile implements Projectile{
 
         Vector2 v = path.getDir(0);
         ParablePath pathA = new ParablePath(character.getPlayerPos(), 300, v);
-        ParablePath pathB = new ParablePath(character.getPlayerPos().add(0, 15), 300, v);
-        ParablePath pathC = new ParablePath(character.getPlayerPos().add(15, 15), 300, v);
-        ParablePath pathD = new ParablePath(character.getPlayerPos().add(15,0), 300, v);
+        ParablePath pathB = new ParablePath(character.getPlayerPos().add(0, GameCharacter.getSize().y), 300, v);
+        ParablePath pathC = new ParablePath(character.getPlayerPos().add(GameCharacter.getSize()), 300, v);
+        ParablePath pathD = new ParablePath(character.getPlayerPos().add(GameCharacter.getSize().x,0), 300, v);
 
 
 
