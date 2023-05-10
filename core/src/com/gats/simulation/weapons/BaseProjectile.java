@@ -245,8 +245,7 @@ public class BaseProjectile implements Projectile{
 
 
         Vector2 tmpPpos = character.getPlayerPos();
-        if (dir.x >= 0) tmpPpos.x -= 4;
-        // if (dir.x < 0) tmpPpos.x -= 2;
+
         path = new ParablePath(tmpPpos, tmpPos, path.getDir(0));
         if (path.getDuration() < 0.01f) return head;
         Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
