@@ -59,11 +59,13 @@ public class Explosive implements Projectile {
         if (t != null) tilesInRadius.put(t, 0);
         if (character != null) charactersInRadius.put(character, 0);
 
+
+
         if (bsProj.type != ProjectileAction.ProjectileType.WATERBOMB) {
             Set<Tile> tileToDestroy = tilesInRadius.keySet();
             if (!tileToDestroy.isEmpty()) {
                 for (Tile td : tileToDestroy) {
-                    if (td != null) td.onDestroy(head);
+                    if (td != null)  td.onDestroy(head);
                 }
             }
         }

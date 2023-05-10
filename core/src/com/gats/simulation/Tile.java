@@ -202,7 +202,7 @@ public class Tile implements Serializable {
 
         state.getBoard()[this.position.x][this.position.y] = null;
         this.deleteFromGraph();
-        TileDestroyAction destroyAction = new TileDestroyAction(this.position);
+        Action destroyAction = new TileDestroyAction(this.position);
         head.addChild(destroyAction);
         if (hasRight()) right.convertGraphToList(rightList, mapRight);
         if (hasUp()) up.convertGraphToList(upperList, mapUp);
@@ -214,13 +214,7 @@ public class Tile implements Serializable {
         if (!leftList.isEmpty()) checkForAnchor(leftList, head);
         if (!upperList.isEmpty()) checkForAnchor(upperList, head);
         if (!lowerList.isEmpty()) checkForAnchor(lowerList, head);
-        for (GameCharacter[] characters : this.state.getTeams()) {
-            for (GameCharacter character : characters) {
-                if (character != null && character.isAlive()) {
-                    character.fall(head);
-                }
-            }
-        }
+
 
         return destroyAction;
 

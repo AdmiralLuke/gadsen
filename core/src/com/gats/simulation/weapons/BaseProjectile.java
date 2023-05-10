@@ -153,7 +153,7 @@ public class BaseProjectile implements Projectile{
         Vector2 dir = bsProj.path.getDir(bsProj.t);
         dir.nor();
         int offset = 0;
-        if (dir.x > 0) offset = 16;
+        if (dir.x >= 0) offset = 16;
         Vector2 v = new Vector2((dir.x * (0.8f * knockback)) * 400, (dir.y * (0.8f * knockback)) * 400);
         Vector2 pos = character.getPlayerPos().cpy();
         pos.x += offset;
@@ -165,9 +165,9 @@ public class BaseProjectile implements Projectile{
         if (bsProj.knockback == 0) return head;
         if (path.getDir(0).x == 0 && path.getDir(0).y == 0) return head;
         float t = 0f;
-        float offset = 0;
-        if (path.getDir(0).x < 0.00002f && path.getDir(0).x > -0.00002f) return head;
-        if (path.getDir(0).x > 0) offset = 16;
+        int offset = 0;
+        if (path.getDir(0).x < 0.00002f && path.getDir(0).x > -0.00002f && path.getDir(0).y < 0) return head;
+        if (path.getDir(0).x > 0) offset = 0;
 
         while (t < path.getDuration()) {
             Vector2 pos = path.getPos(t);
@@ -178,7 +178,7 @@ public class BaseProjectile implements Projectile{
                 head.addChild(cmAc);
                 return hAc;
             }
-            if (sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16) != null) {
+            if (sim.getState().getTile((int)(pos.x / 16), (int)pos.y / 16) != null) {
                 if (bsProj.lastTile == null || !sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
                     t -= 0.001f;
                     break;
@@ -197,10 +197,15 @@ public class BaseProjectile implements Projectile{
 
         // b --- c
 
-        path = new ParablePath(character.getPlayerPos(), path.getPos(t), path.getDir(0));
+        Vector2 tmpPos = path.getPos(t);
+        tmpPos.x -= 4;
+
+        Vector2 tmpPpos = character.getPlayerPos();
+        tmpPpos.x -= 4;
+        path = new ParablePath(tmpPpos, tmpPos, path.getDir(0));
         if (path.getDuration() < 0.01f) return head;
         Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
-        sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)pos.x, (int)pos.y);
+        sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)tmpPos.x, (int)pos.y);
         head.addChild(cmAc);
         if (!(Math.floor(posN.y) == Math.floor(b.y) && Math.floor(posN.x) <= c.x && Math.floor(posN.x) >= b.x)) {
             cmAc = sim.getWrapper().fall(cmAc, character.getTeam(), character.getTeamPos());
@@ -213,7 +218,15 @@ public class BaseProjectile implements Projectile{
     public Action hitWall(Action head, Tile t, Projectile dec, BaseProjectile bsProj) {
         ProjectileAction projAction = generateAction();
         head.getChildren().add(projAction);
-        return sim.getWrapper().destroyTile(t, shootedBy, projAction);
+        Action dt = sim.getWrapper().destroyTile(t, shootedBy, projAction);
+        for (GameCharacter[] characters : this.sim.getWrapper().getTeam()) {
+            for (GameCharacter character : characters) {
+                if (character != null && character.isAlive()) {
+                    head = sim.getWrapper().fall(dt, character.getTeam(), character.getTeamPos());
+                }
+            }
+        }
+        return head.getChildren().get(0) != projAction ? head : dt;
     }
 
     @Override
