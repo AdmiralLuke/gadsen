@@ -32,7 +32,7 @@ public class Inventory extends VerticalGroup {
 	 * @param character
 	 */
 	public Inventory(GameCharacter character){
-		this(character.getWeaponAmount());
+		this(6);
 		for(int i=0;i<character.getWeaponAmount();i++){
 			updateItem(character,i);
 		}
@@ -81,7 +81,9 @@ public class Inventory extends VerticalGroup {
 		}
 		//otherwise dont select any weapon
 		else {
-			items.get(selectedItemIndex).setSelected(false);
+			if(selectedItemIndex>0&&selectedItemIndex<items.size()) {
+				items.get(selectedItemIndex).setSelected(false);
+			}
 		}
 		selectedItemIndex = newSelectedIndex;
 
@@ -109,7 +111,5 @@ public class Inventory extends VerticalGroup {
 		}
 		//sizeChanged();
 	}
-
-
 
 }

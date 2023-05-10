@@ -39,11 +39,6 @@ public class Simulation {
         IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
-        if (gameMode == GameMode.Christmas) {
-            gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction(), false);
-            gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction(), false);
-            gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction(), false);
-        }
         remainingTeams = teamAm;
         this.wrapper = new Wrapper(gameState);
     }

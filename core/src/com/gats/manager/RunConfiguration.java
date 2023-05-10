@@ -9,6 +9,7 @@ public class RunConfiguration {
 
     //Todo add default values
     public GameMode gameMode = GameMode.Normal;
+    public int inventorySize = 6;
 
     public GameMode[] getGameModes() {
         return GameMode.values();
