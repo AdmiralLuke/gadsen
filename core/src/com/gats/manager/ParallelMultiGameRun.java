@@ -1,6 +1,9 @@
 package com.gats.manager;
 
 
+import com.gats.simulation.GameState;
+import com.gats.simulation.campaign.CampaignResources;
+
 import java.util.*;
 
 public class ParallelMultiGameRun extends Run {
@@ -15,6 +18,21 @@ public class ParallelMultiGameRun extends Run {
 
     protected ParallelMultiGameRun(Manager manager, RunConfiguration runConfig) {
         super(manager, runConfig);
+        if (runConfig.gameMode == GameState.GameMode.Exam_Admission){
+            if (runConfig.players.size() != 1) {
+                System.err.println("Exam Admission only accepts exactly 1 player");
+                scores = new float[1];
+                complete();
+                return;
+            }
+            //ToDo: replace with enemies
+            runConfig.players.add(IdleBot.class);
+            runConfig.players.add(IdleBot.class);
+            runConfig.players.add(IdleBot.class);
+            runConfig.teamCount = runConfig.players.size();
+            runConfig.teamSize = 3;
+            runConfig.mapName = "MangoMap";
+        }
         ArrayList<Integer> indices = new ArrayList<>();
         for (int i = 0; i < runConfig.players.size(); i++) {
             indices.add(i);
@@ -61,6 +79,7 @@ public class ParallelMultiGameRun extends Run {
             for (int j =0; j<scores.length; j++){
                 scores[j] /= gameCount;
             }
+            if (gameMode == GameState.GameMode.Exam_Admission) scores[0] = scores[0]<333?0:1;
             complete();
         }
     }
