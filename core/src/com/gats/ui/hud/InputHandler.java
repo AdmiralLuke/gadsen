@@ -33,6 +33,8 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
 	private boolean rightMousePressed;
 	private boolean turnInProgress = false;
 
+	private UiMessenger uiMessenger;
+
 	//Time between turns
 	private int defaultTurnWait = 2 * 1000;
 
@@ -62,6 +64,10 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
 			try {
 				waitStart = System.currentTimeMillis();
 				wait(turnWaitTime);
+				if(uiMessenger!=null) {
+					uiMessenger.startTurnTimer(humanPlayer.getTurnDuration(), true);
+				}
+
 			} catch (InterruptedException ignored) {
 			}
 		}
@@ -73,6 +79,9 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
 	public void endTurn() {
 		turnInProgress = false;
 		currentPlayer.endCurrentTurn();
+		if(uiMessenger!=null) {
+			uiMessenger.stopTurnTimer();
+		}
 	}
 
 	public void tick(float delta) {
@@ -282,6 +291,13 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
 
 		turnWaitTime = (defaultTurnWait / (int)speedupVal);
 
+	}
+	public void setUiMessenger(UiMessenger uiMessenger){
+		this.uiMessenger = uiMessenger;
+	}
+
+	public UiMessenger getUiMessenger(){
+		return this.uiMessenger;
 	}
 
 

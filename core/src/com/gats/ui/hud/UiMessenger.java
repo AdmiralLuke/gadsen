@@ -95,17 +95,19 @@ public class UiMessenger {
 	}
 
 
-	/**
-	 * Start the turn Timer
-	 */
-	public void startTurnTimer(){hud.startTurnTimer();};
 
 	/**
 	 * Starts the turn timer for specified time.
-	 * @param seconds
+	 * @param
 	 */
-	public void startTurnTimer(int seconds){
-		hud.startTurnTimer(seconds);
+	public void startTurnTimer(int turnTime,boolean currPlayerIsHuman){
+		if(currPlayerIsHuman) {
+			hud.startTurnTimer(turnTime);
+		}
+		else{
+			stopTurnTimer();
+
+		}
 	}
 
 
