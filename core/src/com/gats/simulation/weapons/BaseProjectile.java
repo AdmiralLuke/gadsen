@@ -154,6 +154,7 @@ public class BaseProjectile implements Projectile{
         dir.nor();
         int offset = 0;
         if (dir.x >= 0) offset = 16;
+        // if (dir.x < 0) offset = 16;
         Vector2 v = new Vector2((dir.x * (0.8f * knockback)) * 400, (dir.y * (0.8f * knockback)) * 400);
         Vector2 pos = character.getPlayerPos().cpy();
         pos.x += offset;
@@ -169,8 +170,22 @@ public class BaseProjectile implements Projectile{
         if (path.getDir(0).x < 0.00002f && path.getDir(0).x > -0.00002f && path.getDir(0).y < 0) return head;
         if (path.getDir(0).x > 0) offset = 0;
 
+
+        // sim all 4 edges
+        //      B -- C
+        //      |    |
+        //      A -- D
+
+        Vector2 v = path.getDir(0);
+        ParablePath pathA = new ParablePath(character.getPlayerPos(), 300, v);
+        ParablePath pathB = new ParablePath(character.getPlayerPos().add(0, 15), 300, v);
+        ParablePath pathC = new ParablePath(character.getPlayerPos().add(15, 15), 300, v);
+        ParablePath pathD = new ParablePath(character.getPlayerPos().add(15,0), 300, v);
+
+
+
         while (t < path.getDuration()) {
-            Vector2 pos = path.getPos(t);
+            Vector2 pos = pathA.getPos(t);
             if (pos.y <= 0) {
                 path = new ParablePath(character.getPlayerPos(), pos, path.getDir(0));
                 Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
@@ -178,36 +193,65 @@ public class BaseProjectile implements Projectile{
                 head.addChild(cmAc);
                 return hAc;
             }
+
+
+            // posA
             if (sim.getState().getTile((int)(pos.x / 16), (int)pos.y / 16) != null) {
                 if (bsProj.lastTile == null || !sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
                     t -= 0.001f;
                     break;
                 }
             }
+
+            // posB
+            pos = pathB.getPos(t);
+            if (sim.getState().getTile((int)(pos.x / 16), (int)pos.y / 16) != null) {
+                if (bsProj.lastTile == null || !sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
+                    t -= 0.001f;
+                    break;
+                }
+            }
+
+            // posC
+            pos = pathC.getPos(t);
+            if (sim.getState().getTile((int)(pos.x / 16), (int)pos.y / 16) != null) {
+                if (bsProj.lastTile == null || !sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
+                    t -= 0.001f;
+                    break;
+                }
+            }
+
+            // posD
+            pos = pathD.getPos(t);
+            if (sim.getState().getTile((int)(pos.x / 16), (int)pos.y / 16) != null) {
+                if (bsProj.lastTile == null || !sim.getState().getTile((int)pos.x / 16, (int)pos.y / 16).equals(bsProj.lastTile)) {
+                    t -= 0.001f;
+                    break;
+                }
+            }
+
             if (t > 0.005) bsProj.lastTile = null;
             t += 0.001f;
         }
 
         Vector2 posN = path.getPos(t + 0.001f);
         Vector2 pos = path.getPos(t);
-        Tile tile = sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16);
-        Vector2 tPos = tile.getWorldPosition();
-        Vector2 b = new Vector2(tPos.x, tPos.y + 15);
-        Vector2 c = new Vector2(b.x + 15, b.y);
 
-        // b --- c
+
+        Vector2 dir = path.getDir(0);
 
         Vector2 tmpPos = path.getPos(t);
-        tmpPos.x -= 4;
+
 
         Vector2 tmpPpos = character.getPlayerPos();
-        tmpPpos.x -= 4;
+        if (dir.x >= 0) tmpPpos.x -= 4;
+        // if (dir.x < 0) tmpPpos.x -= 2;
         path = new ParablePath(tmpPpos, tmpPos, path.getDir(0));
         if (path.getDuration() < 0.01f) return head;
         Action cmAc = new CharacterMoveAction(0f, character.getTeam(), character.getTeamPos(), path);
         sim.getWrapper().setPosition(character.getTeam(), character.getTeamPos(), (int)tmpPos.x, (int)pos.y);
         head.addChild(cmAc);
-        if (!(Math.floor(posN.y) == Math.floor(b.y) && Math.floor(posN.x) <= c.x && Math.floor(posN.x) >= b.x)) {
+        if (sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16) == null) {
             cmAc = sim.getWrapper().fall(cmAc, character.getTeam(), character.getTeamPos());
         }
         Action hAc = sim.getWrapper().setHealth(cmAc, character.getTeam(), character.getTeamPos(), character.getHealth() - (int)path.getDuration(), true);
