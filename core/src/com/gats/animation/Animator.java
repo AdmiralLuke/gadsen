@@ -361,7 +361,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterSelectAction characterSelectAction = new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter);
 
             //ui Action
-            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(startAction.getTeam(), startAction.getCharacter()));
+            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(startAction.getTeam(), startAction.getCharacter()),target);
 
             characterSelectAction.setChildren(new Action[]{indicateTurnStartAction});
             return new ExpandedAction(characterSelectAction, indicateTurnStartAction);
@@ -444,18 +444,27 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
             GameOverAction winAction = (GameOverAction) action;
-
+            Color teamcolor = animator.teams[winAction.getTeam()][0].getTeamColor();
                 MessageUiGameEndedAction gameEndedAction;
-                if (winAction.getTeam() < 0) {
-                    //Todo replace with draw display
-                    //gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
-                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true);
-                } else {
-
-                    //Todo display with winner
-                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
+                if(animator.gameMode==GameMode.Campaign||animator.gameMode==GameMode.Exam_Admission) {
+                    if (winAction.getTeam() == 0) {
+                        //if the player 0 (human or bot of student) has not won then display defeat
+                        gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true,winAction.getTeam(),teamcolor);
+                    } else if (winAction.getTeam()<0) {
+                        gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger,true);
+                    } else {
+                        gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, false, winAction.getTeam(),teamcolor);
+                    }
                 }
+                else {
+                    if (winAction.getTeam() < 0) {
+                        //gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
+                        gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true);
+                    } else {
 
+                        gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true, winAction.getTeam(), animator.teams[winAction.getTeam()][0].getTeamColor());
+                    }
+                }
 
             return new ExpandedAction(gameEndedAction);
         }

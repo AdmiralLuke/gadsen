@@ -146,7 +146,7 @@ public class Hud implements Disposable {
 
 		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left().width(aimInfo.getPrefWidth());
 		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
-		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(800,800).fill();
+		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(750,750).fill();
 		layoutTable.add(aimInfo).expandX().expandY().pad(padding).right().align(Align.right);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).left().bottom().size(64,64);
@@ -207,8 +207,8 @@ public class Hud implements Disposable {
 	/**
 	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second, with a hardcoded height of 300,300
 	 */
-	public void createTurnChangePopup() {
-		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8));
+	public void createTurnChangePopup(Color outlinecolor) {
+		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8,outlinecolor));
 	}
 
 	public void drawImagePopup(ImagePopup image){
@@ -281,12 +281,18 @@ public class Hud implements Disposable {
 		this.layoutTable.setDebug(debugVisible);
 	}
 
+
+
+	public void gameEnded(boolean won,int team,boolean isDraw) {
+		gameEnded(won,team,isDraw,null);
+	}
+
 	/**
 	 * Creates a popup Display for displaying the GameOver Situation and Tints the Screen in a semi-Transparent Black
 	 * @param won
 	 * @param team
 	 */
-	public void gameEnded(boolean won,int team,boolean isDraw){
+	public void gameEnded(boolean won,int team,boolean isDraw, Color color){
 
 		//create a pixel with a set color that will be used as Background
 		Pixmap pixmap = new Pixmap(1,1, Pixmap.Format.RGBA8888);
@@ -297,21 +303,22 @@ public class Hud implements Disposable {
 		pixmap.dispose();
 
 		ImagePopup display;
+
 		//determine sprite
 		if(isDraw){
 			display = new ImagePopup(AssetContainer.IngameAssets.drawDisplay,-1,
-					AssetContainer.IngameAssets.drawDisplay.getRegionWidth(),
-					AssetContainer.IngameAssets.drawDisplay.getRegionHeight());
+					AssetContainer.IngameAssets.drawDisplay.getRegionWidth()*2,
+					AssetContainer.IngameAssets.drawDisplay.getRegionHeight()*2);
 		}
 		else if(won){
 			display= new ImagePopup(AssetContainer.IngameAssets.victoryDisplay,-1,
-					AssetContainer.IngameAssets.victoryDisplay.getRegionWidth(),
-					AssetContainer.IngameAssets.victoryDisplay.getRegionHeight());
+					AssetContainer.IngameAssets.victoryDisplay.getRegionWidth()*2,
+					AssetContainer.IngameAssets.victoryDisplay.getRegionHeight()*2,color,2f);
 		}
 		else {
 			display = new ImagePopup(AssetContainer.IngameAssets.lossDisplay, -1,
-					AssetContainer.IngameAssets.lossDisplay.getRegionWidth(),
-					AssetContainer.IngameAssets.lossDisplay.getRegionHeight());
+					AssetContainer.IngameAssets.lossDisplay.getRegionWidth()*2,
+					AssetContainer.IngameAssets.lossDisplay.getRegionHeight()*2,color,2f);
 		}
 		drawImagePopup(display);
 
