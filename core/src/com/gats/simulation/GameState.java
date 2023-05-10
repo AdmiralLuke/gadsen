@@ -87,7 +87,6 @@ public class GameState implements Serializable {
         Exam_Admission,
         Tournament_Phase_1,
         Tournament_Phase_2,
-        Christmas
     }
 
     private final GameMode gameMode;
@@ -126,7 +125,7 @@ public class GameState implements Serializable {
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
         this.turn = new ArrayDeque<>();
         this.scores = new float[teamCount];
-        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Exam_Admission || gameMode == GameMode.Christmas || gameMode == GameMode.Tournament_Phase_2;
+        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Exam_Admission || gameMode == GameMode.Tournament_Phase_2;
         this.initTeam(spawnpoints);
     }
 
@@ -144,16 +143,6 @@ public class GameState implements Serializable {
      */
     void initTeam(List<List<IntVector2>> spawnpoints) {
 
-        if (gameMode == GameMode.Christmas) {
-            //ToDo: remove Christmas Mode
-            for (int i = 0; i < 4; i++) {
-                Weapon[] inventory = GameCharacter.initInventory(sim, null);
-                IntVector2 pos = spawnpoints.get(i).get(1).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, i == 0 ? 100 : 1, sim);
-                turn.add(new IntVector2(i, 0));
-            }
-            return;
-        }
         int typeCount = spawnpoints.size();
         if (typeCount < teamCount)
             throw new RuntimeException(String.format(

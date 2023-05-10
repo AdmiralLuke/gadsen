@@ -555,10 +555,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                     com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                     GameCharacter animGameCharacter;
-                    if (gameMode == GameMode.Christmas)
-                        animGameCharacter = new GameCharacter(teamColors[Math.min(1, curTeam)]);
-                    else
-                        animGameCharacter = new GameCharacter(teamColors[curTeam]);
+                    animGameCharacter = new GameCharacter(teamColors[curTeam]);
 
                     AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                     aimIndicator.setScale(new Vector2(0.5f, 1));
