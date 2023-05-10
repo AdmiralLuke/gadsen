@@ -51,6 +51,10 @@ public class Bounceable implements Projectile {
             dir.nor();
             Path path = null;
             bsProj.strength *= modifier;
+            if (bsProj.type == ProjectileAction.ProjectileType.WOOL) {
+                bsProj.damage = Math.max((bounces - leftBounces) * 10, 1);
+            }
+
             if (bsProj.strength < 0.1) {
                 if (dec != this) {
                     return dec.hitWall(head, t, dec, bsProj);
