@@ -15,6 +15,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class Manager {
 
+    private static final String RESULT_DIR_NAME = "results";
+    private static final File RESULT_DIR = new File(RESULT_DIR_NAME);
     private static int systemReservedProcessorCount = 2;
     private static final Manager singleton = new Manager();
     private boolean pendingShutdown = false;
@@ -77,21 +79,29 @@ public class Manager {
                         activeGames.add(game);
                     } else if (scheduledGames.size() > 0) {
                         Game game = scheduledGames.remove(scheduledGames.size() - 1);
-                        game.start();
-                        activeGames.add(game);
+                        try {
+                            game.start();
+                            activeGames.add(game);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.err.println("Game crashed on start(); Aborting...\n" + game);
+                            game.abort();
+                        }
                     } else {
                         break;
                     }
                     runningThreads += 2;
                 }
             }
-            while (!pendingSaves.isEmpty()){
+            while (!pendingSaves.isEmpty()) {
                 GameResults results = pendingSaves.poll();
-                try(FileOutputStream fs = new FileOutputStream(String.format("results/%s_%d_%d.replay", results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles++))) {
-                    new ObjectOutputStream(fs).writeObject(results);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                if (RESULT_DIR.exists() || RESULT_DIR.mkdirs()) {
+                    try (FileOutputStream fs = new FileOutputStream(String.format("%s/%s_%d_%d.replay", RESULT_DIR, results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles++))) {
+                        new ObjectOutputStream(fs).writeObject(results);
+                    } catch (IOException e) {
+                        System.err.printf("Unable to save replay at %s/%s_%d_%d.replay %n", RESULT_DIR, results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles);
+                    }
+                } else System.err.printf("Unable to create results directory at %s %n", RESULT_DIR);
             }
         }
     }
@@ -112,8 +122,9 @@ public class Manager {
 
     private void notifyExecutionManager(Game game) {
         synchronized (schedulingLock) {
-            if(!activeGames.remove(game) && !pausedGames.remove(game)) System.err.printf("Warning unsuccessfully attempted to complete Game %s\nInstance: %s", game, this);
-            pendingSaves.add(game.getGameResults());
+            if (!activeGames.remove(game) && !pausedGames.remove(game))
+                System.err.printf("Warning unsuccessfully attempted to complete Game %s\nInstance: %s", game, this);
+            if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
             completedGames.add(game);
         }
         synchronized (executionManager) {
@@ -141,7 +152,7 @@ public class Manager {
                         pausedGames.remove(game);
                         break;
                 }
-                pendingSaves.add(game.getGameResults());
+                if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
                 completedGames.add(game);
                 game.abort();
             }

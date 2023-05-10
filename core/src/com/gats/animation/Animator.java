@@ -138,6 +138,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(CharacterSwitchWeaponAction.class, ActionConverters::convertCharacterSwitchWeaponAction);
                         put(CharacterShootAction.class, ActionConverters::convertCharacterShootAction);
                         put(CharacterHitAction.class, ActionConverters::convertCharacterHitAction);
+                        put(CharacterHealAction.class, ActionConverters::convertCharacterHealAction);
                         put(GameOverAction.class, ActionConverters::convertGameOverAction);
                         put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
                         put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
@@ -435,11 +436,35 @@ public class Animator implements Screen, AnimationLogProcessor {
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
                 hitAnimation.setChildren(new Action[]{summonParticle, resetAnimationAction});
             }
-           UpdateHealthBarAction updateHealthBarAction  = new UpdateHealthBarAction(0,hitAction.getHealthAft(),target.getHealthbar());
+            UpdateHealthBarAction updateHealthBarAction  = new UpdateHealthBarAction(0,hitAction.getHealthAft(),target.getHealthbar());
             hitAnimation.addChild(updateHealthBarAction);
             lastAction=updateHealthBarAction;
 
             return new ExpandedAction(hitAnimation, lastAction);
+        }
+        private static ExpandedAction convertCharacterHealAction(com.gats.simulation.action.Action action, Animator animator) {
+            CharacterHealAction hitAction = (CharacterHealAction) action;
+            GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
+            //SetAnimationAction healAnimation = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
+            /*
+            DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(2f, null, null, (entity) -> {
+                target.remove(entity);
+                entity.free();
+            });
+
+
+            SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.damageParticle);
+                target.add(particleEntity);
+                particleEntity.setLoop(false);
+                particleEntity.setRelPos(0, 5);
+                return particleEntity;
+            });
+            summonParticle.setChildren(new Action[]{destroyParticle});*/
+            UpdateHealthBarAction updateHealthBarAction  = new UpdateHealthBarAction(0,hitAction.getHealthAft(),target.getHealthbar());
+            //healAnimation.addChild(updateHealthBarAction);
+
+            return new ExpandedAction(updateHealthBarAction);
         }
 
         private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -553,7 +578,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                     AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                     aimIndicator.setScale(new Vector2(0.5f, 1));
                     //init healhtbar with correct health and position.
-                    new Healthbar(simGameCharacter,animGameCharacter);
+                    new Healthbar(simGameCharacter, animGameCharacter);
                     teams[curTeam][curCharacter] = animGameCharacter;
                     animGameCharacter.setRelPos(simGameCharacter.getPlayerPos().cpy().add(com.gats.simulation.GameCharacter.getSize().scl(0.5f)));
                     characterGroup.add(animGameCharacter);

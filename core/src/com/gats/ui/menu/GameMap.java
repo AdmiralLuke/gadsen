@@ -10,7 +10,6 @@ public class GameMap {
 		this.mapName=name;
 		this.numberOfSpawnpoints=spawnpoints;
 
-		readFromFile();
 	}
 
 
@@ -24,9 +23,5 @@ public class GameMap {
 
 	public int getNumberOfSpawnpoints(){
 		return this.numberOfSpawnpoints;
-	}
-
-	public void readFromFile(){
-
 	}
 }

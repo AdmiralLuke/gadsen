@@ -15,50 +15,50 @@
  </tile>
  <tile id="2">
   <properties>
-   <property name="Beschreibung" value="Spawnpunkt Team 1"/>
-  </properties>
-  <image width="16" height="16" source="tilesetAssets/spawpointIndicator1.png"/>
- </tile>
- <tile id="3">
-  <properties>
-   <property name="Beschreibung" value="Spawnpunkt Team 2"/>
-  </properties>
-  <image width="16" height="16" source="tilesetAssets/spawpointIndicator2.png"/>
- </tile>
- <tile id="4">
-  <properties>
-   <property name="Beschreibung" value="Spawnpunkt Team 3"/>
-  </properties>
-  <image width="16" height="16" source="tilesetAssets/spawpointIndicator3.png"/>
- </tile>
- <tile id="5">
-  <properties>
-   <property name="Beschreibung" value="Spawnpunkt Team 4"/>
-  </properties>
-  <image width="16" height="16" source="tilesetAssets/spawpointIndicator4.png"/>
- </tile>
- <tile id="6">
-  <properties>
    <property name="Beschreibung" value="Schleimbox"/>
   </properties>
   <image width="16" height="16" source="tilesetAssets/slimeBox.png"/>
  </tile>
- <tile id="7">
+ <tile id="3">
   <properties>
    <property name="Beschreibung" value="Waffenbox-Normal"/>
   </properties>
   <image width="16" height="16" source="tilesetAssets/weaponBoxChest.png"/>
  </tile>
- <tile id="8">
+ <tile id="4">
   <properties>
    <property name="Beschreibung" value="Waffenbox-Anker"/>
   </properties>
   <image width="16" height="16" source="tilesetAssets/weaponBoxAnchor.png"/>
  </tile>
- <tile id="9">
+ <tile id="5">
   <properties>
    <property name="Beschreibung" value="Medibox"/>
   </properties>
   <image width="16" height="16" source="tilesetAssets/healthBoxRC.png"/>
  </tile>
+<tile id="100">
+ <properties>
+  <property name="Beschreibung" value="Spawnpunkt Team 1"/>
+ </properties>
+ <image width="16" height="16" source="tilesetAssets/spawpointIndicator1.png"/>
+</tile>
+<tile id="101">
+ <properties>
+  <property name="Beschreibung" value="Spawnpunkt Team 2"/>
+ </properties>
+ <image width="16" height="16" source="tilesetAssets/spawpointIndicator2.png"/>
+</tile>
+<tile id="102">
+ <properties>
+  <property name="Beschreibung" value="Spawnpunkt Team 3"/>
+ </properties>
+ <image width="16" height="16" source="tilesetAssets/spawpointIndicator3.png"/>
+</tile>
+<tile id="103">
+ <properties>
+  <property name="Beschreibung" value="Spawnpunkt Team 4"/>
+ </properties>
+ <image width="16" height="16" source="tilesetAssets/spawpointIndicator4.png"/>
+</tile>
 </tileset>
