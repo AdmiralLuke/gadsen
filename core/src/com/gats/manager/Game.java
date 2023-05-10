@@ -182,6 +182,12 @@ public class Game {
                     }
             }
 
+            ActionLog firstLog = simulation.clearAndReturnActionLog();
+            gameResults.addActionLog(firstLog);
+            if (gui) {
+                animationLogProcessor.animate(firstLog);
+            }
+
             GameCharacterController gcController = simulation.getController();
             int currentPlayerIndex = gcController.getGameCharacter().getTeam();
             int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
@@ -300,11 +306,11 @@ public class Game {
             if (gui) {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
-                if (pendingShutdown) {
-                    executor.shutdown();
-                    futureExecutor.interrupt();
-                    break;
-                }
+            }
+            if (pendingShutdown) {
+                executor.shutdown();
+                futureExecutor.interrupt();
+                break;
             }
             try {
                 futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
