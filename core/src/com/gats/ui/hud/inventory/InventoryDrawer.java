@@ -17,7 +17,7 @@ public class InventoryDrawer extends Container<Inventory>{
 
 	public InventoryDrawer(RunConfiguration runConfiguration) {
 		playerInventory = new Inventory[runConfiguration.teamCount];
-		current = new Inventory(6);
+		current = new Inventory(runConfiguration.inventorySize);
 		setActor(current);
 	}
 
