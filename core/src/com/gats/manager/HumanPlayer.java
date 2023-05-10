@@ -79,6 +79,7 @@ public class HumanPlayer extends Player {
 
     {
         weaponTypeStack.addAll(Arrays.asList(WeaponType.values()));
+        weaponTypeStack.remove(WeaponType.NOT_SELECTED);
     }
 
     private boolean turnInProgress;
