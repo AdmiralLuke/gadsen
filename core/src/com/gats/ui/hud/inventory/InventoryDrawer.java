@@ -12,11 +12,11 @@ import com.gats.simulation.WeaponType;
  */
 public class InventoryDrawer extends Container<Inventory>{
 
-	Inventory[][] playerInventory;
+	Inventory[] playerInventory;
 	Inventory current;
 
 	public InventoryDrawer(RunConfiguration runConfiguration) {
-		playerInventory = new Inventory[runConfiguration.teamCount][runConfiguration.teamSize];
+		playerInventory = new Inventory[runConfiguration.teamCount];
 		current = new Inventory(6);
 		setActor(current);
 	}
@@ -43,7 +43,7 @@ public class InventoryDrawer extends Container<Inventory>{
 	public void changeInventory(GameCharacter character) {
 
 		checkPlayerInventoryExists(character);
-		current = playerInventory[character.getTeam()][character.getTeamPos()];
+		current = playerInventory[character.getTeam()];
 		this.setActor(current);
 	}
 
@@ -59,14 +59,14 @@ public class InventoryDrawer extends Container<Inventory>{
 	public void updateItem(GameCharacter character, WeaponType weaponType) {
 
 		checkPlayerInventoryExists(character);
-		current = playerInventory[character.getTeam()][character.getTeamPos()];
+		current = playerInventory[character.getTeam()];
 		current.updateItem(character, weaponType);
 	}
 
 	private void checkPlayerInventoryExists(GameCharacter character) {
-		Inventory currInv = playerInventory[character.getTeam()][character.getTeamPos()];
+		Inventory currInv = playerInventory[character.getTeam()];
 		if (currInv == null) {
-			playerInventory[character.getTeam()][character.getTeamPos()] = createCharacterInventory(character);
+			playerInventory[character.getTeam()] = createCharacterInventory(character);
 		}
 
 	}

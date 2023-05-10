@@ -448,11 +448,11 @@ public class Animator implements Screen, AnimationLogProcessor {
                 MessageUiGameEndedAction gameEndedAction;
                 if (winAction.getTeam() <= 0) {
                     //Todo replace with draw display
-                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
+                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,false, winAction.getTeam());
                 } else {
 
                     //Todo display with winner
-                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,false, winAction.getTeam());
+                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
                 }
 
 

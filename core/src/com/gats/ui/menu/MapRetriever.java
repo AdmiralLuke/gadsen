@@ -5,10 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class MapRetriever implements FilenameFilter {
     static FileHandle dirHandler;
@@ -19,26 +16,29 @@ public class MapRetriever implements FilenameFilter {
 
     /**
      * For dev use in the Project/Ide.
-      */
+     */
     String internalDir = "core/resources/";
 
     String internalMapFolder = "maps/";
-    String internalMapDirectory = internalDir+internalMapFolder;
+    String internalMapDirectory = internalDir + internalMapFolder;
     /**
-    /**
+     * /**
      * Path relative to the jar after building
      */
     String externalMapDirectory = "map/";
 
-    String[] hardCodeMapNames = new String[]{"christmasMap","map1","MapSafeGround","testingMap"};
+    String[] hardCodeMapNames = new String[]{"christmasMap", "kratzbaumMap", "MangoMap"};
 
     ArrayList<String> internalMaps = new ArrayList<String>(Arrays.asList(hardCodeMapNames));
 
-    String campaignMapFolder= "maps/campaign/";
-    String campaignDirectory = internalDir+ campaignMapFolder;
-    String[] campaignMaps = {"testingMap"};
+    String campaignMapFolder = "maps/campaign/";
 
-    /**Creates a {@link MapRetriever}, wich is responsible for providing the selectable Maps
+    String campaignDirectory = internalDir + campaignMapFolder;
+
+    String[] campaignMaps = {"level1_1", "level1_2", "level1_3", "level2_1", "level2_2", "level2_3", "level7", "level8", "level9", "level10", "level11", "level12"};
+
+    /**
+     * Creates a {@link MapRetriever}, wich is responsible for providing the selectable Maps
      * found in a directory.
      * Currently, does not look into subdirectories.
      * assigns it the directory that can be found
@@ -53,33 +53,36 @@ public class MapRetriever implements FilenameFilter {
 
     /**
      * checks whether the given directory exists
+     *
      * @param directoryPath Directory to check
      * @return directory if it exists, otherwise returns null
      */
-    public FileHandle determineMapDirectory(String directoryPath){
+    public FileHandle determineMapDirectory(String directoryPath) {
         FileHandle dir = new FileHandle(directoryPath);
-        if(dir.isDirectory()){
+        if (dir.isDirectory()) {
             return dir;
         }
-            return null;
+        return null;
     }
 
     /**
      * Removes the File extension from the Name of all Maps in a String array.
+     *
      * @param maps String[] of the map names.
      */
     void removeExtension(ArrayList<String> maps) {
         maps.replaceAll(s -> s.replace(filetype, ""));
     }
+
     /**
      * Lists all Map files, with the default File Extension,
      * in {@link MapRetriever#internalMapDirectory}.
      *
      * @return String Array with map Names located in mapDirectory
      */
-    public GameMap[] getMaps(){
+    public GameMap[] getMaps() {
 
-       GameMap[] maps = new GameMap[0];
+        GameMap[] maps = new GameMap[0];
         ArrayList<GameMap> allMaps = new ArrayList<>();
 
 
@@ -88,52 +91,52 @@ public class MapRetriever implements FilenameFilter {
 
         //otherwise the dir needs to be set to look at a different path
 
-        allMaps.addAll(listMaps(internalMapDirectory));
+        allMaps.addAll(listMaps(internalMapFolder));
         allMaps.addAll(listMaps(externalMapDirectory));
 
-        if(allMaps.size()==0) {
-            allMaps.add(new GameMap("Maps could not be loaded",0));
+        if (allMaps.size() == 0) {
+            allMaps.add(new GameMap("Maps could not be loaded", 0));
         }
         return allMaps.toArray(maps);
 
 
-
-
-
     }
 
-    public GameMap[] getCampaignMaps(){
+    public GameMap[] getCampaignMaps() {
 
         GameMap[] maps = new GameMap[0];
-        return listMaps(campaignDirectory).toArray(maps);
+        return listMaps(campaignMapFolder).toArray(maps);
 
     }
-
 
 
     /**
      * Lists all Maps files, with the provided File Extension,
      * in {@link MapRetriever#internalMapDirectory}.
+     *
      * @return {@link ArrayList<GameMap>} with map Names located in mapDirectory
      * @return Empty List if the dir is not available.
      */
-    public ArrayList<GameMap> listMaps(String dir){
-
+    public ArrayList<GameMap> listMaps(String dir) {
+        if (isInternalDir(dir)) {
+            return loadInternalMaps(dir);
+        }
         //create Filehandle for the target directory
-        FileHandle directory = determineMapDirectory(dir);
-        if(directory==null){
-           //the directory is not valid
+        FileHandle directory = new FileHandle(dir);
+
+        if (!directory.isDirectory()) {
+            //the directory is not valid
             System.out.println(dir + " is not a valid directory.");
             return new ArrayList<GameMap>();
         }
 
         ArrayList<String> mapNames;
-        ArrayList<GameMap> maps = new ArrayList<>();
+        ArrayList<GameMap> maps;
 
         mapNames = getFileHandleNames(directory.list(this));
         removeExtension(mapNames);
 
-        maps = stringArrayListToGameMap(mapNames,dir);
+        maps = stringArrayListToGameMap(mapNames, dir);
 
 //        if(dirHandler==null || !dirHandler.toString().equals(internalMapDirectory)) {
 //            /*
@@ -148,7 +151,23 @@ public class MapRetriever implements FilenameFilter {
 
     }
 
-    public ArrayList<String> getFileHandleNames(FileHandle[] handles){
+    private ArrayList<GameMap> loadInternalMaps(String dir) {
+        ArrayList<GameMap> mapList = new ArrayList<>();
+        String[] mapNames = hardCodeMapNames;
+        if (dir.equals(campaignMapFolder)) {
+
+            mapNames = campaignMaps;
+        } else {
+            dir = internalMapFolder;
+
+        }
+        for (String map : mapNames) {
+            mapList.add(readMapFromFile(map, dir,true));
+        }
+        return mapList;
+    }
+
+    public ArrayList<String> getFileHandleNames(FileHandle[] handles) {
 
 
         ArrayList<String> fileHandleNames = new ArrayList<>();
@@ -162,82 +181,106 @@ public class MapRetriever implements FilenameFilter {
 
     /**
      * Reads a map file, with the specified name.
+     *
      * @param mapName
      * @return
      */
-    private GameMap readMapFromFile(String mapName,String dir) {
-        JsonReader reader = new JsonReader();
-        JsonValue map=null;
+    private GameMap readMapFromFile(String mapName, String dir, boolean internalDir) {
         boolean mapLoaded = false;
-        boolean internalDir = false;
+
+        JsonValue map = null;
+
         String mapFolder = "";
 
-        String filename = dir + mapName+filetype;
+        String filename = dir + mapName + filetype;
 
-        if(dir.equals(internalMapDirectory)) {
-            internalDir = true;
-            mapFolder = internalMapFolder;
+        if (internalDir) {
+
+            filename = dir + mapName + filetype;
+
+
+            map = readInternalMap(filename);
+
+        } else {
+
+            map = readExternalMap(filename);
+
+
         }
-
-        else if(dir.equals(campaignDirectory)) {
-
-            internalDir = true;
-            mapFolder = campaignMapFolder;
+        if (map!=null) {
+            return createGameMap(map,mapName);
         }
+            //if map could not be loaded, return this hint in selection
+            return new GameMap("ProblemLoadingMap: " + mapName, 0);
+    }
 
-        if(internalDir){
-                filename = mapFolder + mapName+filetype;
-        try {
-            if(debug) {
 
-                System.out.println("Get internal Map from: " + getClass().getClassLoader().getResourceAsStream(filename));
-            }
+    private JsonValue readInternalMap(String filename){
 
-            map = reader.parse(getClass().getClassLoader().getResourceAsStream(filename));
-            mapLoaded = true;
-        }
-        catch(Exception e){
-            if(debug) {
-                System.out.println("Could not find/load internal mapfile!");
-            }
-            mapLoaded = false;
-        }
-        }
-        else {
-
+            JsonReader reader = new JsonReader();
+            JsonValue map = null;
             try {
                 if (debug) {
-                    System.out.println("Try to get external Mapfile from:" + Paths.get(filename));
+
+                    System.out.println("Get internal Map from: " + getClass().getClassLoader().getResourceAsStream(filename));
                 }
-                map = reader.parse(new FileHandle(Paths.get(filename).toFile()));
+
+                map = reader.parse(getClass().getClassLoader().getResourceAsStream(filename));
             } catch (Exception e) {
                 if (debug) {
-                    System.out.println("Could not find/load external mapfile!");
+                    System.out.println("Could not find/load internal mapfile!");
                 }
             }
+
+        return map;
         }
-        if(mapLoaded) {
+    private JsonValue readExternalMap(String filename){
+        JsonReader reader = new JsonReader();
+        JsonValue map = null;
+        try {
+            if (debug) {
+                System.out.println("Try to get external Mapfile from:" + Paths.get(filename));
+            }
+            map = reader.parse(new FileHandle(Paths.get(filename).toFile()));
+        } catch (Exception e) {
+            if (debug) {
+                System.out.println("Could not find/load external mapfile!");
+            }
+        }
+       return map;
+    }
+
+
+    private GameMap createGameMap(JsonValue map,String mapName){
+
             int width = map.get("width").asInt();
             int height = map.get("height").asInt();
 
             JsonValue tileData = map.get("layers").get(0).get("data");
-
-            int spawnpoints = 0;
+        HashMap<Integer,Integer> teams=new LinkedHashMap<>();
 
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
                     int type = tileData.get(i + (height - j - 1) * width).asInt();
                     if (type > 100) {
-                        spawnpoints++;
+                        if(teams.containsKey(type)){
+                            teams.replace(type,teams.get(type)+1);
+                        }
+                       else{teams.put(type,1);}
                     }
                 }
             }
 
-            return new GameMap(mapName, spawnpoints);
+
+            ArrayList<Integer> spawnpoints =new  ArrayList<>(teams.values());
+            //get lowest number of spawnpoints
+            spawnpoints.sort(Comparator.naturalOrder());
+            if(spawnpoints.size()==0){
+                spawnpoints.add(0);
+            }
+          return new GameMap(mapName, spawnpoints.get(0),spawnpoints.size());
         }
-        //if map could not be loaded, return this hint in selection
-        return new GameMap("ProblemLoadingMap: " + mapName,0);
-    }
+
 
     /**
      * Converts an {@link ArrayList<String>} of mapNames to {@link ArrayList<GameMap>}
@@ -246,9 +289,8 @@ public class MapRetriever implements FilenameFilter {
      */
     private ArrayList<GameMap> stringArrayListToGameMap(ArrayList<String> mapNames,String path)  {
        ArrayList<GameMap> maps = new ArrayList<GameMap>();
-       int count=0;
         for (String mapName:mapNames) {
-           maps.add(readMapFromFile(mapName,path));
+           maps.add(readMapFromFile(mapName,path,false));
 
         }
 
@@ -265,4 +307,12 @@ public class MapRetriever implements FilenameFilter {
     public boolean accept(File dir, String name) {
         return name.endsWith(filetype.toLowerCase());
     }
+
+    public boolean isInternalDir(String dir){
+
+
+        return dir.equals(campaignMapFolder) || dir.equals(internalMapFolder);
+
+    }
+
 }

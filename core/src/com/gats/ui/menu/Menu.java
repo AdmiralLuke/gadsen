@@ -283,7 +283,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		teamAmountSlider.addBotSelector(botSelector);
 		teamSizeSlider.addRelatedSlider(teamAmountSlider);
 
-		teamAmountSlider.adjustTeamSizeToSpawnpoints(mapSelector.getSelected().getNumberOfSpawnpoints());
+		teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
 
 
 		GameState.GameMode[] gameModes = runConfig.getGameModes();
@@ -362,7 +362,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			mapSelector.addListener(new ChangeListener() {
 				@Override
 				public void changed(ChangeEvent event, Actor actor) {
-					teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints());
+					teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
 				}
 			});
 		}
