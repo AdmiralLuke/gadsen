@@ -208,15 +208,20 @@ public class Hud implements Disposable {
 	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second, with a hardcoded height of 300,300
 	 */
 	public void createTurnChangePopup(Color outlinecolor) {
-		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8,outlinecolor));
+		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8,outlinecolor),false);
 	}
 
-	public void drawImagePopup(ImagePopup image){
+	public void drawImagePopup(ImagePopup image,boolean center){
 		if(turnPopupContainer.hasChildren()) {
 			turnPopupContainer.removeActorAt(0,false);
 		}
 		turnPopupContainer.setActor(image);
-		turnPopupContainer.center();
+		if(center) {
+			turnPopupContainer.center();
+		}
+		else {
+			turnPopupContainer.top();
+		}
 		image.setScaling(Scaling.fit);
 		turnPopupContainer.fill();
 		turnPopupContainer.maxSize(image.getWidthForContainer(),image.getHeightForContainer());
@@ -320,7 +325,7 @@ public class Hud implements Disposable {
 					AssetContainer.IngameAssets.lossDisplay.getRegionWidth()*2,
 					AssetContainer.IngameAssets.lossDisplay.getRegionHeight()*2,color,2f);
 		}
-		drawImagePopup(display);
+		drawImagePopup(display,true);
 
 	}
 
