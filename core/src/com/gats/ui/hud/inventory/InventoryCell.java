@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TransformDrawable;
 import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.assets.AssetContainer;
+import com.gats.ui.menu.buttons.ColoredLabelWithBackground;
 
 
 /**
@@ -22,6 +23,7 @@ public class InventoryCell extends Image {
 	private boolean selected;
 
 	private Color selectedColor;
+	private ColoredLabelWithBackground ammoLabel;
 	public InventoryCell(TextureRegion background) {
 		super(background);
 		//Todo make size adjustable, either by implementing it, so it can be resized easily, or just creating a size parameter for the constructor.
@@ -32,6 +34,11 @@ public class InventoryCell extends Image {
 		setColor(baseColor);
 
 		selectedColor = new Color(1, 1, 1,1);
+		ammoLabel = new ColoredLabelWithBackground("", AssetContainer.MainMenuAssets.skin);
+		ammoLabel.setFontScale(2);
+
+
+		positionAmmoLabel();
 	}
 
 	void setWeapon(Weapon weapon){
@@ -40,6 +47,14 @@ public class InventoryCell extends Image {
 			weaponIcon = AssetContainer.IngameAssets.coolCat.getKeyFrame(0);
 		}
 		this.weapon = new InventoryWeapon(weapon, weaponIcon);
+
+		if(ammoLabel!=null) {
+			if (weapon.getAmmo() > 99) {
+				ammoLabel.setText("€");
+			} else {
+				ammoLabel.setText(weapon.getAmmo());
+			}
+		}
 	}
 
 
@@ -107,8 +122,26 @@ public class InventoryCell extends Image {
 				icon.getDrawable().draw(batch, x + imageX, y + imageY, imageWidth * scaleX, imageHeight * scaleY);
 			}
 		}
+		ammoLabel.draw(batch,parentAlpha);
+
+
+	}
+	@Override
+	protected void positionChanged() {
+		super.positionChanged();
+		positionAmmoLabel();
+	}
+
+	@Override
+	protected void sizeChanged() {
+		super.sizeChanged();
+		positionAmmoLabel();
 
 	}
 
-
+	private void positionAmmoLabel(){
+		if(ammoLabel!=null) {
+			ammoLabel.setPosition(getX() + getImageX(), getY() + (54));
+		}
+	}
 }

@@ -110,6 +110,4 @@ public class Inventory extends VerticalGroup {
 		//sizeChanged();
 	}
 
-
-
 }

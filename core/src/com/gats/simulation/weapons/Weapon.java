@@ -54,4 +54,7 @@ public class Weapon implements Serializable {
     public Weapon copy(){
         return new Weapon(this);
     }
+
+    public int getAmmo(){return ammo;}
+
 }
