@@ -214,7 +214,7 @@ public class BaseProjectile implements Projectile{
     public Action hitWall(Action head, Tile t, Projectile dec, BaseProjectile bsProj) {
         ProjectileAction projAction = generateAction();
         head.getChildren().add(projAction);
-        return sim.getWrapper().destroyTile(t, shootedBy, head);
+        return sim.getWrapper().destroyTile(t, shootedBy, projAction);
     }
 
     @Override
