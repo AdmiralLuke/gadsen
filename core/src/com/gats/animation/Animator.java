@@ -138,6 +138,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(CharacterSwitchWeaponAction.class, ActionConverters::convertCharacterSwitchWeaponAction);
                         put(CharacterShootAction.class, ActionConverters::convertCharacterShootAction);
                         put(CharacterHitAction.class, ActionConverters::convertCharacterHitAction);
+                        put(CharacterHealAction.class, ActionConverters::convertCharacterHealAction);
                         put(GameOverAction.class, ActionConverters::convertGameOverAction);
                         put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
                         put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
@@ -260,11 +261,11 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(summonProjectile, destroyProjectile);
         }
 
-        private static ExpandedAction addParticle(ParticleEffectPool effect, Vector2 pos, float duration, Animator animator){
+        private static ExpandedAction addParticle(ParticleEffectPool effect, Vector2 pos, float duration, Animator animator) {
             DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(duration, null, null, (entity) -> {
-            animator.root.remove(entity);
-            entity.free();
-        });
+                animator.root.remove(entity);
+                entity.free();
+            });
 
             SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
                 ParticleEntity particleEntity = ParticleEntity.getParticleEntity(effect);
@@ -361,7 +362,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             CharacterSelectAction characterSelectAction = new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter);
 
             //ui Action
-            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(startAction.getTeam(), startAction.getCharacter()));
+            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(startAction.getTeam(), startAction.getCharacter()), target);
 
             characterSelectAction.setChildren(new Action[]{indicateTurnStartAction});
             return new ExpandedAction(characterSelectAction, indicateTurnStartAction);
@@ -435,26 +436,58 @@ public class Animator implements Screen, AnimationLogProcessor {
                 SetAnimationAction resetAnimationAction = new SetAnimationAction(GameCharacter.getAnimationDuration(GameCharacterAnimationType.ANIMATION_TYPE_HIT), target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
                 hitAnimation.setChildren(new Action[]{summonParticle, resetAnimationAction});
             }
-           UpdateHealthBarAction updateHealthBarAction  = new UpdateHealthBarAction(0,hitAction.getHealthAft(),target.getHealthbar());
+            UpdateHealthBarAction updateHealthBarAction = new UpdateHealthBarAction(0, hitAction.getHealthAft(), target.getHealthbar());
             hitAnimation.addChild(updateHealthBarAction);
-            lastAction=updateHealthBarAction;
+            lastAction = updateHealthBarAction;
 
             return new ExpandedAction(hitAnimation, lastAction);
         }
 
+        private static ExpandedAction convertCharacterHealAction(com.gats.simulation.action.Action action, Animator animator) {
+            CharacterHealAction hitAction = (CharacterHealAction) action;
+            GameCharacter target = animator.teams[hitAction.getTeam()][hitAction.getCharacter()];
+            //SetAnimationAction healAnimation = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
+            /*
+            DestroyAction<ParticleEntity> destroyParticle = new DestroyAction<ParticleEntity>(2f, null, null, (entity) -> {
+                target.remove(entity);
+                entity.free();
+            });
+
+
+            SummonAction<ParticleEntity> summonParticle = new SummonAction<ParticleEntity>(0, destroyParticle::setTarget, () -> {
+                ParticleEntity particleEntity = ParticleEntity.getParticleEntity(IngameAssets.damageParticle);
+                target.add(particleEntity);
+                particleEntity.setLoop(false);
+                particleEntity.setRelPos(0, 5);
+                return particleEntity;
+            });
+            summonParticle.setChildren(new Action[]{destroyParticle});*/
+            UpdateHealthBarAction updateHealthBarAction = new UpdateHealthBarAction(0, hitAction.getHealthAft(), target.getHealthbar());
+            //healAnimation.addChild(updateHealthBarAction);
+
+            return new ExpandedAction(updateHealthBarAction);
+        }
+
         private static ExpandedAction convertGameOverAction(com.gats.simulation.action.Action action, Animator animator) {
             GameOverAction winAction = (GameOverAction) action;
+            MessageUiGameEndedAction gameEndedAction;
+            if (winAction.getTeam() < 0) {
+                gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true);
+            } else {
+                Color teamcolor = animator.teams[winAction.getTeam()][0].getTeamColor();
+                if (animator.gameMode == GameMode.Campaign || animator.gameMode == GameMode.Exam_Admission) {
 
-                MessageUiGameEndedAction gameEndedAction;
-                if (winAction.getTeam() <= 0) {
-                    //Todo replace with draw display
-                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,true, winAction.getTeam());
+                    if (winAction.getTeam() == 0) {
+                        //if the player 0 (human or bot of student) has not won then display defeat
+                        gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true, winAction.getTeam(), teamcolor);
+                    } else {
+                        gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, false, winAction.getTeam(), teamcolor);
+                    }
                 } else {
+                    gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true, winAction.getTeam(), teamcolor);
 
-                    //Todo display with winner
-                    gameEndedAction = new MessageUiGameEndedAction(0,animator.uiMessenger,false, winAction.getTeam());
                 }
-
+            }
 
             return new ExpandedAction(gameEndedAction);
         }
@@ -527,7 +560,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     public void init(GameState state) {
         synchronized (root) {
             this.state = state;
-            map = new TileMap(IngameAssets.tileTextures, state);
+            map = new TileMap(state);
             root.add(map);
 
             teamCount = state.getTeamCount();
@@ -545,10 +578,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                     com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                     GameCharacter animGameCharacter;
-                    if (gameMode == GameMode.Christmas)
-                        animGameCharacter = new GameCharacter(teamColors[Math.min(1, curTeam)]);
-                    else
-                        animGameCharacter = new GameCharacter(teamColors[curTeam]);
+                    animGameCharacter = new GameCharacter(teamColors[curTeam]);
 
                     AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                     aimIndicator.setScale(new Vector2(0.5f, 1));

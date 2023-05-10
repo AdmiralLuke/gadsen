@@ -184,4 +184,8 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         AnimatorCamera camera = animator.getCamera();
         camera.addZoomPercent(zoom);
     }
+
+    public void skipTurnStart() {
+        hud.skipTurnStart();
+    }
 }

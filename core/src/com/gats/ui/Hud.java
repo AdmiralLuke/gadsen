@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gats.manager.HumanPlayer;
 import com.gats.manager.RunConfiguration;
+import com.gats.simulation.GameCharacter;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.hud.*;
 import com.gats.ui.hud.inventory.InventoryDrawer;
@@ -54,6 +55,7 @@ public class Hud implements Disposable {
 
 		this.inGameScreen = ingameScreen;
 
+		this.uiMessenger = new UiMessenger(this);
 
 		int viewportSizeX = 1028;
 		int viewportSizeY = 1028;
@@ -74,10 +76,10 @@ public class Hud implements Disposable {
 		aimInfo = new AimInformation(" Grad"," %");
 		inventory = setupInventoryDrawer(runConfig);
 		inputHandler = setupInputHandler(ingameScreen);
-		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer,AssetContainer.MainMenuAssets.skin);
-		turnTimer.setCurrentTime(3);
-		this.uiMessenger = new UiMessenger(this);
+		inputHandler.setUiMessenger(uiMessenger);
 
+		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer);
+		turnTimer.setCurrentTime(0);
 		fastForwardButton =	setupFastForwardButton(uiMessenger, animationSpeedupValue);
 
 		turnPopupContainer = new Container<ImagePopup>();
@@ -144,7 +146,7 @@ public class Hud implements Disposable {
 
 		layoutTable.add(this.inventory).pad(padding).expandX().expandY().left().width(aimInfo.getPrefWidth());
 		//set a fixed size for the turnPopupContainer, so it will not change the layout, once the turn Sprite is added
-		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(700,700).fill();
+		layoutTable.add(turnPopupContainer).pad(padding).expandX().expandY().size(750,750).fill();
 		layoutTable.add(aimInfo).expandX().expandY().pad(padding).right().align(Align.right);
 		layoutTable.row();
 		layoutTable.add(fastForwardButton).pad(padding).left().bottom().size(64,64);
@@ -205,8 +207,8 @@ public class Hud implements Disposable {
 	/**
 	 * Creates a Turn Change Popup for {@link Hud#turnChangeDuration} second, with a hardcoded height of 300,300
 	 */
-	public void createTurnChangePopup() {
-		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8));
+	public void createTurnChangePopup(Color outlinecolor) {
+		drawImagePopup(new ImagePopup(turnChangeSprite,turnChangeDuration/renderingSpeed,turnChangeSprite.getRegionWidth()*8,turnChangeSprite.getRegionHeight()*8,outlinecolor));
 	}
 
 	public void drawImagePopup(ImagePopup image){
@@ -247,9 +249,6 @@ public class Hud implements Disposable {
 		turnTimer.setCurrentTime(time);
 	}
 
-	public void startTurnTimer(){
-		turnTimer.startTimer();
-	}
 
 	public void startTurnTimer(int seconds){
 		turnTimer.startTimer(seconds);
@@ -282,12 +281,18 @@ public class Hud implements Disposable {
 		this.layoutTable.setDebug(debugVisible);
 	}
 
+
+
+	public void gameEnded(boolean won,int team,boolean isDraw) {
+		gameEnded(won,team,isDraw,null);
+	}
+
 	/**
 	 * Creates a popup Display for displaying the GameOver Situation and Tints the Screen in a semi-Transparent Black
 	 * @param won
 	 * @param team
 	 */
-	public void gameEnded(boolean won,int team){
+	public void gameEnded(boolean won,int team,boolean isDraw, Color color){
 
 		//create a pixel with a set color that will be used as Background
 		Pixmap pixmap = new Pixmap(1,1, Pixmap.Format.RGBA8888);
@@ -298,19 +303,29 @@ public class Hud implements Disposable {
 		pixmap.dispose();
 
 		ImagePopup display;
+
 		//determine sprite
-		if(won){
+		if(isDraw){
+			display = new ImagePopup(AssetContainer.IngameAssets.drawDisplay,-1,
+					AssetContainer.IngameAssets.drawDisplay.getRegionWidth()*2,
+					AssetContainer.IngameAssets.drawDisplay.getRegionHeight()*2);
+		}
+		else if(won){
 			display= new ImagePopup(AssetContainer.IngameAssets.victoryDisplay,-1,
-					AssetContainer.IngameAssets.victoryDisplay.getRegionWidth(),
-					AssetContainer.IngameAssets.victoryDisplay.getRegionHeight());
+					AssetContainer.IngameAssets.victoryDisplay.getRegionWidth()*2,
+					AssetContainer.IngameAssets.victoryDisplay.getRegionHeight()*2,color,2f);
 		}
 		else {
 			display = new ImagePopup(AssetContainer.IngameAssets.lossDisplay, -1,
-					AssetContainer.IngameAssets.lossDisplay.getRegionWidth(),
-					AssetContainer.IngameAssets.lossDisplay.getRegionHeight());
+					AssetContainer.IngameAssets.lossDisplay.getRegionWidth()*2,
+					AssetContainer.IngameAssets.lossDisplay.getRegionHeight()*2,color,2f);
 		}
 		drawImagePopup(display);
 
 	}
 
+	public void skipTurnStart() {
+		if (turnPopupContainer.getActor() != null)
+			turnPopupContainer.getActor().remove();
+	}
 }

@@ -108,7 +108,6 @@ public class Game {
                 case Human:
                     if (!gui) throw new RuntimeException("HumanPlayers can't be used without GUI to capture inputs");
                     humanList.add((HumanPlayer) curPlayer);
-                    ((HumanPlayer) (curPlayer)).setUiMessenger(uiMessenger);
                     break;
                 case AI:
 
@@ -181,6 +180,12 @@ public class Game {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+            }
+
+            ActionLog firstLog = simulation.clearAndReturnActionLog();
+            gameResults.addActionLog(firstLog);
+            if (gui) {
+                animationLogProcessor.animate(firstLog);
             }
 
             GameCharacterController gcController = simulation.getController();
@@ -301,11 +306,11 @@ public class Game {
             if (gui) {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
-                if (pendingShutdown) {
-                    executor.shutdown();
-                    futureExecutor.interrupt();
-                    break;
-                }
+            }
+            if (pendingShutdown) {
+                executor.shutdown();
+                futureExecutor.interrupt();
+                break;
             }
             try {
                 futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
