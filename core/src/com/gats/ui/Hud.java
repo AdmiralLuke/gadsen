@@ -324,4 +324,8 @@ public class Hud implements Disposable {
 
 	}
 
+	public void skipTurnStart() {
+		if (turnPopupContainer.getActor() != null)
+			turnPopupContainer.getActor().remove();
+	}
 }

@@ -161,6 +161,7 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
                 break;
             default:
                 if (turnInProgress && currentPlayer != null) {
+                    ingameScreen.skipTurnStart();
                     currentPlayer.processKeyDown(keycode);
                 }
                 break;
