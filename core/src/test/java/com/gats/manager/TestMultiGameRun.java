@@ -54,8 +54,8 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 2;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -63,9 +63,9 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 2;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -73,10 +73,10 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 2;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -84,11 +84,11 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 2;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -96,9 +96,9 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 3;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -106,10 +106,10 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 3;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -117,11 +117,11 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 3;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -129,12 +129,12 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 3;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -142,10 +142,10 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 4;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
@@ -153,25 +153,11 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 4;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
-
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
-        config.teamCount = 4;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
 
@@ -180,13 +166,12 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 4;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
 
@@ -195,14 +180,13 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 4;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
 
@@ -211,15 +195,14 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 4;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
 
@@ -228,16 +211,33 @@ public class TestMultiGameRun {
         config.mapName = "map1";
         config.teamCount = 4;
         config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        samples.add(new TestExample(config));
+
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "map1";
+        config.teamCount = 4;
+        config.players = new ArrayList<>();
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
+        config.players.add(TestBot.class);
         samples.add(new TestExample(config));
 
         return samples;

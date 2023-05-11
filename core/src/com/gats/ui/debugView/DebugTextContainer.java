@@ -28,7 +28,7 @@ public class DebugTextContainer extends VerticalGroup {
 		Skin skin;
 
 		Color textcolor = Color.WHITE;
-		float fontscale = 0.7f;
+		float fontscale = 1f;
 
 		//size before elements get removed
 		//percent of the viewport

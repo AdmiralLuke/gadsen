@@ -60,6 +60,14 @@ public class EntityGroup extends Entity implements Parent{
         }
     }
 
+    public void clear(){
+        for (Entity cur:
+                children) {
+            cur.setParent(null);
+        }
+        children.clear();
+    }
+
     @Override
     public Entity asEntity() {
         return this;

@@ -184,6 +184,11 @@ public class GameCharacter implements Serializable {
         return this.stamina;
     }
 
+    void reset() {
+        this.resetStamina();
+        this.resetAlreadyShot();
+    }
+
     /**
      * Will set this Characters health value to a specific value.
      * May produce appropriate {@link Action Actions} in the process, which will be directly or indirectly linked to the head received from the caller.
@@ -212,9 +217,8 @@ public class GameCharacter implements Serializable {
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
             state.addScore(team, (newHealth - health));
-            lastAction = new CharacterAction(0, team, teamPos) {
+            lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth) {
             };
-            //ToDo implement healAction
         }
         this.health = newHealth;
         head.addChild(lastAction);
@@ -254,23 +258,33 @@ public class GameCharacter implements Serializable {
      *
      * @Weihnachtsaufgabe Inventar wird initialisiert mit Keks (50 Schuss) und Zuckerstange (4 Schuss)
      */
-    protected static Weapon[] initInventory(Simulation sim, int[] weaponCounts) {
+    protected static Weapon[] initInventory(Simulation sim, int[] weaponCounts, int teamCount, int cpT) {
         if (weaponCounts== null){
             weaponCounts = new int[0];
         }
+
+        int ammoRare = (int)Math.ceil(1 + Math.log((teamCount - 1) * (cpT / 2f) + 2));
+
         Weapon[] weapons = new Weapon[6];
-        weapons[0] = new Weapon(new Explosive(new BaseProjectile(3, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), weaponCounts.length>0?weaponCounts[0]:200, WeaponType.WATERBOMB, 10);
-        weapons[1] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), weaponCounts.length>1?weaponCounts[1]:200, WeaponType.WATER_PISTOL, 9);
-        weapons[2] = new Weapon(new BaseProjectile(5, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), weaponCounts.length>2?weaponCounts[2]:200, WeaponType.MIOJLNIR, 13);
-        weapons[3] = new Weapon(new Explosive(new BaseProjectile(10, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), weaponCounts.length>3?weaponCounts[3]:200, WeaponType.GRENADE, 10);
-        weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 10, 0.8f), weaponCounts.length>4?weaponCounts[4]:200, WeaponType.WOOL, 15);
-        weapons[5] = new Weapon(new BaseProjectile(10, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), weaponCounts.length>5?weaponCounts[5]:200, WeaponType.CLOSE_COMBAT, 0.5f);
+        weapons[0] = new Weapon(new Explosive(new BaseProjectile(0, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), weaponCounts.length>0?weaponCounts[0]:(2 * cpT + teamCount), WeaponType.WATERBOMB, 10);
+        weapons[1] = new Weapon(new BaseProjectile(10, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), weaponCounts.length>1?weaponCounts[1]:999, WeaponType.WATER_PISTOL, 9);
+        weapons[2] = new Weapon(new BaseProjectile(35, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), weaponCounts.length>2?weaponCounts[2]:1, WeaponType.MIOJLNIR, 13);
+        weapons[3] = new Weapon(new Explosive(new BaseProjectile(15, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), weaponCounts.length>3?weaponCounts[3]:cpT, WeaponType.GRENADE, 10);
+        weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 5, 0.8f), weaponCounts.length>4?weaponCounts[4]:ammoRare, WeaponType.WOOL, 15);
+        weapons[5] = new Weapon(new BaseProjectile(20, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), weaponCounts.length>5?weaponCounts[5]:ammoRare / 2, WeaponType.CLOSE_COMBAT, 0.5f);
         return weapons;
     }
 
     /**
      * Gibt eine Waffe aus dem Inventar zurück.
      * Der Index muss aus dem ganzzahligen Intervall [0, getWeaponAmount() - 1] stammen.
+     *
+     * 0: Waterbomb
+     * 1: WaterPistol
+     * 2: Miojlnir
+     * 3: Grendade
+     * 4: Wool
+     * 5: Close Combat
      *
      * @param n Index der Waffe, die gewählt werden soll.
      * @return Instanz der Waffe.

@@ -49,6 +49,13 @@ public class Game {
     private static final int HUMAN_EXECUTION_GRACE_PERIODE = 5000;
     private static final int HUMAN_INIT_TIMEOUT = 30000;
 
+    private static final boolean isDebug;
+    static {
+        isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
+                getInputArguments().toString().contains("-agentlib:jdwp");
+        if (isDebug) System.err.println("Warning: Debugger engaged; Disabling Bot-Timeout!");
+    }
+
     private final InputProcessor inputGenerator;
 
     private final AnimationLogProcessor animationLogProcessor;
@@ -112,7 +119,6 @@ public class Game {
                 case Human:
                     if (!gui) throw new RuntimeException("HumanPlayers can't be used without GUI to capture inputs");
                     humanList.add((HumanPlayer) curPlayer);
-                    ((HumanPlayer) (curPlayer)).setUiMessenger(uiMessenger);
                     break;
                 case AI:
 
@@ -122,7 +128,9 @@ public class Game {
                     });
 
                     try {
-                        future.get(AI_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
+                        if (isDebug) future.get();
+                        else
+                            future.get(AI_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException e) {
                         System.out.println("bot was interrupted");
                     } catch (ExecutionException e) {
@@ -187,6 +195,12 @@ public class Game {
                     }
             }
 
+            ActionLog firstLog = simulation.clearAndReturnActionLog();
+            gameResults.addActionLog(firstLog);
+            if (gui) {
+                animationLogProcessor.animate(firstLog);
+            }
+
             GameCharacterController gcController = simulation.getController();
             int currentPlayerIndex = gcController.getGameCharacter().getTeam();
             int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
@@ -208,7 +222,9 @@ public class Game {
                         inputGenerator.activateTurn((HumanPlayer) currentPlayer);
                         try {
                             Thread.currentThread().setName("Future_Executor_Player_Human");
-                            future.get(HUMAN_EXECUTION_TIMEOUT + HUMAN_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
+                            if (isDebug) future.get();
+                            else
+                                future.get(HUMAN_EXECUTION_TIMEOUT + HUMAN_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Player
                             System.out.println("bot was interrupted");
@@ -239,7 +255,9 @@ public class Game {
                     futureExecutor = new Thread(() -> {
                         Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
                         try {
-                            future.get(AI_EXECUTION_TIMEOUT + AI_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
+                            if (isDebug) future.get();
+                            else
+                                future.get(AI_EXECUTION_TIMEOUT + AI_EXECUTION_GRACE_PERIODE, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
                             future.cancel(true);//Executor was interrupted: Interrupt Bot
                             System.out.println("bot was interrupted");
@@ -305,11 +323,11 @@ public class Game {
             if (gui) {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
-                if (pendingShutdown) {
-                    executor.shutdown();
-                    futureExecutor.interrupt();
-                    break;
-                }
+            }
+            if (pendingShutdown) {
+                executor.shutdown();
+                futureExecutor.interrupt();
+                break;
             }
             try {
                 futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
@@ -339,7 +357,6 @@ public class Game {
         //Shutdown all running threads
         pendingShutdown = true;
         if (simulationThread != null) {
-            System.out.println("Interrupting simulation thread");
             simulationThread.interrupt();
             executor.shutdown();
         }

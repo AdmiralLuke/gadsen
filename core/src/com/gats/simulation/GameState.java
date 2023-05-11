@@ -3,7 +3,6 @@ package com.gats.simulation;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.gats.animation.action.IdleAction;
 import com.gats.manager.Timer;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.simulation.weapons.Weapon;
@@ -37,9 +36,11 @@ public class GameState implements Serializable {
     private int width;
     private int height;
 
-    private boolean winnerTakesAll;
+    private final boolean winnerTakesAll;
 
     private final float[] scores;
+
+    private final int[] weaponBoxCycle;
 
     public float[] getScores() {
         return scores;
@@ -71,6 +72,8 @@ public class GameState implements Serializable {
                 teams[i][j] = team[j] == null ? null : team[j].copy(this);
             }
         }
+        weaponBoxCycle = new int[original.teamCount];
+        System.arraycopy(original.weaponBoxCycle, 0, weaponBoxCycle, 0, original.teamCount);
         winnerTakesAll = original.winnerTakesAll;
         teamCount = original.teamCount;
         charactersPerTeam = original.charactersPerTeam;
@@ -87,7 +90,6 @@ public class GameState implements Serializable {
         Exam_Admission,
         Tournament_Phase_1,
         Tournament_Phase_2,
-        Christmas
     }
 
     private final GameMode gameMode;
@@ -125,8 +127,9 @@ public class GameState implements Serializable {
         this.sim = sim;
         this.teams = new GameCharacter[teamCount][charactersPerTeam];
         this.turn = new ArrayDeque<>();
+        this.weaponBoxCycle = new int[teamCount];
         this.scores = new float[teamCount];
-        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Exam_Admission || gameMode == GameMode.Christmas || gameMode == GameMode.Tournament_Phase_2;
+        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Tournament_Phase_2;
         this.initTeam(spawnpoints);
     }
 
@@ -144,16 +147,6 @@ public class GameState implements Serializable {
      */
     void initTeam(List<List<IntVector2>> spawnpoints) {
 
-        if (gameMode == GameMode.Christmas) {
-            //ToDo: remove Christmas Mode
-            for (int i = 0; i < 4; i++) {
-                Weapon[] inventory = GameCharacter.initInventory(sim, null);
-                IntVector2 pos = spawnpoints.get(i).get(1).scl(Tile.TileSize);
-                this.teams[i][0] = new GameCharacter(pos.x, pos.y, this, i, 0, inventory, i == 0 ? 100 : 1, sim);
-                turn.add(new IntVector2(i, 0));
-            }
-            return;
-        }
         int typeCount = spawnpoints.size();
         if (typeCount < teamCount)
             throw new RuntimeException(String.format(
@@ -170,7 +163,7 @@ public class GameState implements Serializable {
             health = new ArrayList<>();
         }
         for (int i = 0; i < teamCount; i++) {
-            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null);
+            Weapon[] inventory = GameCharacter.initInventory(sim, weapons.size() > i ? weapons.get(i) : null, teamCount, charactersPerTeam);
             int[] characterHealth = health.size() > i ? health.get(i) : new int[0];
             List<IntVector2> teamSpawns = spawnpoints.get(i);
             if (teamSpawns.size() < charactersPerTeam)
@@ -279,19 +272,26 @@ public class GameState implements Serializable {
                         case 0:
                             break;
                         case 1:
-                            board[i][j] = new Tile(i, j, true, this);
-                            break;
-                        case 2:
                             board[i][j] = new Tile(i, j, this, true);
+                            break;
+                        case 4:
+                            board[i][j] = new Tile(i, j, this, false, Tile.TileType.WEAPON_BOX);
+                            break;
+                        case 5:
+                            board[i][j] = new Tile(i, j, this, true, Tile.TileType.WEAPON_BOX);
+                            break;
+                        case 6:
+                            board[i][j] = new Tile(i, j, this, false, Tile.TileType.HEALTH_BOX);
                             break;
                         default:
-                            //ToDo load special box
-                            board[i][j] = new Tile(i, j, this, true);
+                            board[i][j] = new Tile(i, j, this, false);
                     }
             }
         }
+
         return spawnpoints;
     }
+
 
     /**
      * Gibt einen bestimmten Charakter aus einem bestimmten Team zurück
@@ -318,6 +318,38 @@ public class GameState implements Serializable {
         return charactersPerTeam;
     }
 
+    public int getWeaponBoxCycle(int team) {
+        return weaponBoxCycle[team];
+    }
+
+    public static int getWeaponFromCycleIndex(int index) {
+        if (index < 0) return -1;
+        index = index % 10;
+        switch (index) {
+            case 0:
+            case 4:
+                return WeaponType.WOOL.ordinal();
+            case 9:
+                return WeaponType.MIOJLNIR.ordinal();
+            case 1:
+            case 5:
+            case 7:
+                return WeaponType.WATERBOMB.ordinal();
+            case 3:
+            case 6:
+                return WeaponType.CLOSE_COMBAT.ordinal();
+            case 2:
+            case 8:
+                return WeaponType.GRENADE.ordinal();
+        }
+        return -1;
+    }
+
+    protected int cycleWeapon(int team) {
+        int result = weaponBoxCycle[team];
+        weaponBoxCycle[team] = (weaponBoxCycle[team]+1)%10;
+        return result;
+    }
 
     /**
      * @return The 2D array that saves all Tiles

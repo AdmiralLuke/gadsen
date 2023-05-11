@@ -38,7 +38,7 @@ public class TestMap {
                         break;
                     case 1:
                         Assert.assertNotNull("Hier [" + i + "," + j + "] sollte sich eine Anker-Box befinden, aber es ist keine Box da.", state.getBoard()[i][j]);
-                        Assert.assertTrue("Hier [" + i + "," + j + "] sollte sich eine Anker-Box befinden, aber die Box ist kein Anker.", state.getBoard()[i][j].getType() == 1);
+                        Assert.assertTrue("Hier [" + i + "," + j + "] sollte sich eine Anker-Box befinden, aber die Box ist kein Anker.", state.getBoard()[i][j].isAnchor());
                         break;
                     case 2:
                         Assert.assertNotNull("Hier [" + i + "," + j + "] sollte sich eine normale Box befinden.", state.getBoard()[i][j]);

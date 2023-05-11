@@ -39,13 +39,8 @@ public class Simulation {
         IntVector2 turnChar = gameState.getTurn().peek();
         assert turnChar != null;
         actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
-        if (gameMode == GameMode.Christmas) {
-            gameState.getTeams()[1][0].setHealth(1, actionLog.getRootAction(), false);
-            gameState.getTeams()[2][0].setHealth(1, actionLog.getRootAction(), false);
-            gameState.getTeams()[3][0].setHealth(1, actionLog.getRootAction(), false);
-        }
         remainingTeams = teamAm;
-        this.wrapper = new Wrapper(gameState.getTeams());
+        this.wrapper = new Wrapper(gameState);
     }
 
     public static IntVector2 convertToTileCoords(IntVector2 worldCoords) {
@@ -164,7 +159,7 @@ public class Simulation {
         IntVector2 turnChar = gameState.getTurn().peek();
         ActionLog lastTurn = this.actionLog;
         assert turnChar != null;
-        gameState.getCharacterFromTeams(turnChar.x, turnChar.y).resetAlreadyShot();
+        gameState.getCharacterFromTeams(turnChar.x, turnChar.y).reset();
         this.actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
         return lastTurn;
 

@@ -49,7 +49,7 @@ public class CharacterFallAction extends CharacterAction {
 
        output += " ";
 
-       return output;
+       return output + "[FALL]";
 
     }
 

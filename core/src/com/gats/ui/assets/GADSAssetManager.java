@@ -129,10 +129,18 @@ public class GADSAssetManager {
 
         IngameAssets.victoryDisplay = atlas.findRegion("ui/victoryTileset");
         IngameAssets.lossDisplay = atlas.findRegion("ui/loseTilesetTitle");
+        IngameAssets.drawDisplay = atlas.findRegion("ui/drawTileset");
 
-        IngameAssets.background = atlas.findRegion("background/WeihnachtsBG");
+        IngameAssets.background = atlas.findRegion("background/GADSBG");
 
-        IngameAssets.tileTextures = new TextureRegion[]{atlas.findRegion("tile/16x_box01"), atlas.findRegion("tile/16x_anchor01")};
+        IngameAssets.tileTextures = new TextureRegion[]{
+                atlas.findRegion("tile/16x_anchor01"),
+                atlas.findRegion("tile/16x_box01"),
+                atlas.findRegion("tile/slimeBox"),
+                atlas.findRegion("tile/weaponBoxAnchor"),
+                atlas.findRegion("tile/weaponBoxChest"),
+                atlas.findRegion("tile/healthBoxOne")
+        };
 
         IngameAssets.aimingIndicatorSprite = atlas.findRegion("ui/aimIndicatorNinepatchColorless");
 
@@ -188,27 +196,27 @@ public class GADSAssetManager {
 
         IngameAssets.splashParticle = new ParticleEffectPool(manager.get(waterParticle, ParticleEffect.class), 1, 10);
 
-        IngameAssets.WaterPistol = new AtlasAnimation(1/8f, atlas.findRegions("weapon/watergun"), Animation.PlayMode.LOOP);
+        IngameAssets.WaterPistol = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/watergun"), Animation.PlayMode.LOOP);
 
-        IngameAssets.Wool = new AtlasAnimation(1/8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP);
+        IngameAssets.Wool = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP);
 
-        IngameAssets.Grenade = new AtlasAnimation(1/8f, atlas.findRegions("weapon/grenadeReddish"), Animation.PlayMode.LOOP);
-        IngameAssets.Miojlnir = new AtlasAnimation(1/8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP);
+        IngameAssets.Grenade = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/grenadeReddish"), Animation.PlayMode.LOOP);
+        IngameAssets.Miojlnir = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP);
 
-        IngameAssets.BaseballBat = new AtlasAnimation(1/8f, atlas.findRegions("weapon/baseballBat"), Animation.PlayMode.LOOP);
+        IngameAssets.BaseballBat = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/baseballBat"), Animation.PlayMode.LOOP);
 
-        IngameAssets.BaseballBatAttack = new AtlasAnimation(1/8f, atlas.findRegions("weapon/baseballBatAttack"), Animation.PlayMode.NORMAL);
+        IngameAssets.BaseballBatAttack = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/baseballBatAttack"), Animation.PlayMode.NORMAL);
 
-        IngameAssets.WaterBomb = new AtlasAnimation(1/8f, atlas.findRegions("weapon/waterbombProjectile"), Animation.PlayMode.NORMAL);
+        IngameAssets.WaterBomb = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/waterbombProjectile"), Animation.PlayMode.NORMAL);
 
         IngameAssets.cookieIcon = atlas.findRegion("ui/CookieSprite");
         IngameAssets.sugarCaneIcon = atlas.findRegion("ui/SugarCaneSprite");
         IngameAssets.inventoryCell = atlas.findRegion("ui/inventoryCell");
 
         //IngameAssets.weaponIcons.put(WeaponType.COOKIE, IngameAssets.cookieIcon);
-      //  IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
+        //  IngameAssets.weaponIcons.put(WeaponType.SUGAR_CANE, IngameAssets.sugarCaneIcon);
 
-        IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED,null);
+        IngameAssets.weaponIcons.put(WeaponType.NOT_SELECTED, null);
         IngameAssets.weaponIcons.put(WeaponType.WATER_PISTOL, atlas.findRegion("ui/watergunIcon"));
         IngameAssets.weaponIcons.put(WeaponType.WOOL, atlas.findRegion("ui/ballOfWoolIcon"));
         IngameAssets.weaponIcons.put(WeaponType.GRENADE, atlas.findRegion("ui/grenadeReddishIcon"));
@@ -216,12 +224,12 @@ public class GADSAssetManager {
         IngameAssets.weaponIcons.put(WeaponType.CLOSE_COMBAT, atlas.findRegion("ui/baseballBatIcon"));
         IngameAssets.weaponIcons.put(WeaponType.WATERBOMB, atlas.findRegion("ui/waterbombSprite"));
 
-        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATER, new AtlasAnimation(1/8f, atlas.findRegions("projectile/watergunProjectile"), Animation.PlayMode.LOOP));
-        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WOOL, new AtlasAnimation(1/8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP));
-        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.GRENADE, new AtlasAnimation(1/8f, atlas.findRegions("projectile/grenadeProjectile"), Animation.PlayMode.LOOP));
-        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.MIOJLNIR, new AtlasAnimation(1/8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP));
-        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.CLOSE_COMB, new AtlasAnimation(1/8f, atlas.findRegions("projectile/baseballBatHit"), Animation.PlayMode.NORMAL));
-        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATERBOMB, new AtlasAnimation(1/8f, atlas.findRegions("weapon/waterbombProjectile"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATER, new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/watergunProjectile"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WOOL, new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.GRENADE, new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/grenadeProjectile"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.MIOJLNIR, new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/miosHammerProjectile"), Animation.PlayMode.LOOP));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.CLOSE_COMB, new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/baseballBatHit"), Animation.PlayMode.NORMAL));
+        IngameAssets.projectiles.put(ProjectileAction.ProjectileType.WATERBOMB, new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/waterbombProjectile"), Animation.PlayMode.LOOP));
 
         IngameAssets.fastForwardButton = atlas.findRegion("ui/fastForwardButton");
         IngameAssets.fastForwardButtonPressed = atlas.findRegion("ui/fastForwardButtonPressed");
@@ -238,12 +246,12 @@ public class GADSAssetManager {
         finishedLoading = true;
     }
 
-private void createHealthHealthbarAssets(TextureAtlas atlas) {
+    private void createHealthHealthbarAssets(TextureAtlas atlas) {
 
         //hb background
 
         TextureRegion background = atlas.findRegion("ui/healthbarBackground");
-        IngameAssets.healthBarBackground = new NinePatchDrawable(new NinePatch(background,1,1,1,1));
+        IngameAssets.healthBarBackground = new NinePatchDrawable(new NinePatch(background, 1, 1, 1, 1));
 
 
         ProgressBar.ProgressBarStyle progStyle = new ProgressBar.ProgressBarStyle();
@@ -251,7 +259,7 @@ private void createHealthHealthbarAssets(TextureAtlas atlas) {
 
         progStyle.background = new NinePatchDrawable(IngameAssets.healthBarBackground);
         //create pixmap for the color representation
-        Pixmap pixmap = new Pixmap(1,2, Pixmap.Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(1, 2, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.RED);
         pixmap.fill();
         TextureRegionDrawable healthBarColor = new TextureRegionDrawable(new Texture(pixmap));
@@ -261,13 +269,12 @@ private void createHealthHealthbarAssets(TextureAtlas atlas) {
         progStyle.knobBefore = new TextureRegionDrawable(healthBarColor);
 
         //knob of 0 width,  "points" to current health
-        pixmap = new Pixmap(0,2,Pixmap.Format.RGBA8888);
+        pixmap = new Pixmap(0, 2, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.GREEN);
         pixmap.fill();
 
         progStyle.knob = new TextureRegionDrawable(new Texture(pixmap));
         pixmap.dispose();
-
 
 
         IngameAssets.healthbarStyle = progStyle;
@@ -276,8 +283,8 @@ private void createHealthHealthbarAssets(TextureAtlas atlas) {
     }
 
 
-    public void createCircleTexture(){
-        Vector2 maxSize = new Vector2(64,7);
+    public void createCircleTexture() {
+        Vector2 maxSize = new Vector2(64, 7);
         float circleOpacity = 0.5f;
 
         //todo find betterway to load circle with size parameters
@@ -299,7 +306,7 @@ private void createHealthHealthbarAssets(TextureAtlas atlas) {
         circle.drawCircle(circleSize, circleSize, circleSize);
 
         IngameAssets.aimCircle =
-        new TextureRegion(new Texture(circle));
+                new TextureRegion(new Texture(circle));
 
 
     }

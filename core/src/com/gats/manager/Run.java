@@ -30,9 +30,8 @@ public abstract class Run {
         switch (runConfig.gameMode) {
             case Campaign:
             case Normal:
-            case Christmas:
-            case Exam_Admission:
                 return new SingleGameRun(manager, runConfig);
+            case Exam_Admission:
             case Tournament_Phase_1:
                 return new ParallelMultiGameRun(manager, runConfig);
             case Tournament_Phase_2:

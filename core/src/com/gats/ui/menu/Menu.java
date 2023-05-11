@@ -13,8 +13,10 @@ import com.gats.ui.MenuScreen;
 import com.gats.ui.menu.buttons.*;
 import com.gats.ui.menu.gamemodeLayouts.CampaignLayout;
 import com.gats.ui.menu.gamemodeLayouts.ChristmasLayout;
+import com.gats.ui.menu.gamemodeLayouts.ExamAdmissionLayout;
 import com.gats.ui.menu.gamemodeLayouts.NormalLayout;
 import com.gats.ui.menu.specificRunConfig.ChristmasModeConfig;
+import com.gats.ui.menu.specificRunConfig.ExamAdmissionConfig;
 import com.gats.ui.menu.specificRunConfig.NormalModeConfig;
 
 import java.util.Arrays;
@@ -228,9 +230,13 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			case Normal:
 				modeSettings = new NormalModeConfig(configuration);
 				break;
-			case Christmas:
-				//Todo deal with hardcoded values, might be neede for later gameModes
-				modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
+			//case Christmas:
+			//	//Todo deal with hardcoded values, might be neede for later gameModes
+			//	modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
+			//	break;
+
+			case Exam_Admission:
+				modeSettings = new ExamAdmissionConfig(configuration);
 				break;
 			default:
 				modeSettings = new NormalModeConfig(configuration);
@@ -249,6 +255,9 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		}
 		if(gameMode == GameState.GameMode.Campaign) {
 			return new CampaignLayout(skin, this);
+		}
+		if(gameMode == GameState.GameMode.Exam_Admission) {
+			return new ExamAdmissionLayout(skin, this);
 		}
 
 		//default case
@@ -283,7 +292,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		teamAmountSlider.addBotSelector(botSelector);
 		teamSizeSlider.addRelatedSlider(teamAmountSlider);
 
-		teamAmountSlider.adjustTeamSizeToSpawnpoints(mapSelector.getSelected().getNumberOfSpawnpoints());
+		teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
 
 
 		GameState.GameMode[] gameModes = runConfig.getGameModes();
@@ -291,7 +300,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		String[] modeNames = new String[gameModes.length];
 		int i=0;
 
-		gameModeSelector.setItems(runConfig.getGameModes());
+		gameModeSelector.setItems(GameState.GameMode.Normal, GameState.GameMode.Campaign, GameState.GameMode.Exam_Admission);
 
 	}
 
@@ -353,6 +362,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			mapSelector.setItems(new MapRetriever().getCampaignMaps());
 
 		}
+		//Todo examAdmission maps
 
 
 		else{
@@ -362,7 +372,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			mapSelector.addListener(new ChangeListener() {
 				@Override
 				public void changed(ChangeEvent event, Actor actor) {
-					teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints());
+					teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
 				}
 			});
 		}

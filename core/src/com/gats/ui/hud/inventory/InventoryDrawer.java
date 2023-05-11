@@ -12,12 +12,20 @@ import com.gats.simulation.WeaponType;
  */
 public class InventoryDrawer extends Container<Inventory>{
 
-	Inventory[][] playerInventory;
+	Inventory[] playerInventory;
 	Inventory current;
+	RunConfiguration runConfiguration;
 
 	public InventoryDrawer(RunConfiguration runConfiguration) {
-		playerInventory = new Inventory[runConfiguration.teamCount][runConfiguration.teamSize];
-		current = new Inventory(6);
+		this.runConfiguration = runConfiguration;
+		playerInventory = new Inventory[runConfiguration.teamCount];
+		current = new Inventory(runConfiguration.inventorySize);
+		setActor(current);
+	}
+
+	public void rebuild(){
+		playerInventory = new Inventory[runConfiguration.teamCount];
+		current = new Inventory(runConfiguration.inventorySize);
 		setActor(current);
 	}
 
@@ -43,7 +51,7 @@ public class InventoryDrawer extends Container<Inventory>{
 	public void changeInventory(GameCharacter character) {
 
 		checkPlayerInventoryExists(character);
-		current = playerInventory[character.getTeam()][character.getTeamPos()];
+		current = playerInventory[character.getTeam()];
 		this.setActor(current);
 	}
 
@@ -59,14 +67,33 @@ public class InventoryDrawer extends Container<Inventory>{
 	public void updateItem(GameCharacter character, WeaponType weaponType) {
 
 		checkPlayerInventoryExists(character);
-		current = playerInventory[character.getTeam()][character.getTeamPos()];
+		current = playerInventory[character.getTeam()];
 		current.updateItem(character, weaponType);
 	}
 
+	/**checks if the current inventory exists, if not creates a new inventory from the game characters current one
+	 * also resizes the amount of inventories if a new one exists
+	 * @param character
+	 */
+
 	private void checkPlayerInventoryExists(GameCharacter character) {
-		Inventory currInv = playerInventory[character.getTeam()][character.getTeamPos()];
-		if (currInv == null) {
-			playerInventory[character.getTeam()][character.getTeamPos()] = createCharacterInventory(character);
+		if(character.getTeam()<playerInventory.length) {
+			Inventory currInv = playerInventory[character.getTeam()];
+			if (currInv == null) {
+				playerInventory[character.getTeam()] = createCharacterInventory(character);
+			}
+		}
+		else{
+			Inventory[] tmp = playerInventory;
+			playerInventory = new Inventory[character.getTeam()+1];
+
+			for(int i = 0;i<tmp.length;i++){
+				playerInventory[i] = tmp[i];
+			}
+			for(int i = tmp.length;i<playerInventory.length;i++) {
+				playerInventory[i] = null;
+			}
+			playerInventory[character.getTeam()]= new Inventory(character);
 		}
 
 	}
