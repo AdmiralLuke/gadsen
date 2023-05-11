@@ -30,7 +30,7 @@ task dist(type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
-    archiveVersion.set "1.1"
+    archiveVersion.set "1.2"
     baseName 'gadsen'
     dependsOn configurations.runtimeClasspath
     from {
