@@ -17,7 +17,12 @@ public class Simulation {
 
     public static final float SCORE_KILL = 50;
     public static final float SCORE_ELIMINATION = 50;
-    public static final float[] SCORE_WIN = new float[]{200, 100, 50};
+    protected static final float[] SCORE_WIN = new float[]{200, 100, 50};
+
+    public static float getWinScore(int placement){
+        if (placement>=SCORE_WIN.length) return 0;
+        return SCORE_WIN[placement];
+    }
     public static final float SCORE_ASSIST = 25;
     private final GameState gameState;
     private ActionLog actionLog;

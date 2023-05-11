@@ -43,7 +43,7 @@ public class GameState implements Serializable {
     private final int[] weaponBoxCycle;
 
     public float[] getScores() {
-        return scores;
+        return Arrays.copyOf(scores, scores.length);
     }
 
     public GameState copy() {
