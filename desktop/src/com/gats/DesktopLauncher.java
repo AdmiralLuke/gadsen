@@ -187,7 +187,7 @@ public class DesktopLauncher {
                     scoreBuilder.append(String.format("%-10s : %-6f%n", cur.getName(), run.getScores()[j++]));
                 }
                 System.out.println(scoreBuilder);
-                if (run.getScores()[0] >= 333) builder.append("Bot completed the challenge");
+                if (run.getScores()[0] >= 420) builder.append("Bot completed the challenge");
                 else builder.append("Bot failed the challenge");
                 break;
             default:
