@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
@@ -48,10 +49,13 @@ public class Hud implements Disposable {
 	private AimInformation aimInfo;
 
 	private StaminaBar staminaBar;
+
+	private RunConfiguration runConfiguration;
 	private float renderingSpeed = 1;
 
 	private boolean debugVisible;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
+		this.runConfiguration = runConfig;
 
 		this.inGameScreen = ingameScreen;
 
@@ -332,5 +336,14 @@ public class Hud implements Disposable {
 	public void skipTurnStart() {
 		if (turnPopupContainer.getActor() != null)
 			turnPopupContainer.getActor().remove();
+	}
+
+
+	public void newGame(){
+		layoutTable.setBackground((Drawable) null);
+		inventory.rebuild();
+		if(turnPopupContainer.hasChildren()) {
+			turnPopupContainer.removeActorAt(0, false);
+		}
 	}
 }

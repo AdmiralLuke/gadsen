@@ -201,7 +201,7 @@ public class GADSAssetManager {
         IngameAssets.Wool = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/ballOfWoolWeapon"), Animation.PlayMode.LOOP);
 
         IngameAssets.Grenade = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/grenadeReddish"), Animation.PlayMode.LOOP);
-        IngameAssets.Miojlnir = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/miosHammer"), Animation.PlayMode.LOOP);
+        IngameAssets.Miojlnir = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/miosHammerProjectile"), Animation.PlayMode.LOOP);
 
         IngameAssets.BaseballBat = new AtlasAnimation(1 / 8f, atlas.findRegions("weapon/baseballBat"), Animation.PlayMode.LOOP);
 

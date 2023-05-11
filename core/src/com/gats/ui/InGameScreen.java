@@ -82,6 +82,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     @Override
     public void init(GameState state) {
         //ToDo the game is starting remove waiting screen etc.
+        hud.newGame();
         animator.init(state);
     }
 
