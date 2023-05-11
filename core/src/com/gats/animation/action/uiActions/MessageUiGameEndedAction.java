@@ -31,5 +31,6 @@ public class MessageUiGameEndedAction extends MessageUiAction{
 	@Override
 	protected void runAction(float oldTime, float current) {
 		uiMessenger.gameEnded(won,team,draw,color);
+		endAction(oldTime);
 	}
 }

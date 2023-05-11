@@ -129,7 +129,7 @@ public class GameState implements Serializable {
         this.turn = new ArrayDeque<>();
         this.weaponBoxCycle = new int[teamCount];
         this.scores = new float[teamCount];
-        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Exam_Admission || gameMode == GameMode.Tournament_Phase_2;
+        this.winnerTakesAll = gameMode == GameMode.Campaign || gameMode == GameMode.Tournament_Phase_2;
         this.initTeam(spawnpoints);
     }
 

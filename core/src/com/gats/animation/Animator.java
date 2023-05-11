@@ -561,6 +561,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         synchronized (root) {
             this.state = state;
             map = new TileMap(state);
+            root.clear();
             root.add(map);
 
             teamCount = state.getTeamCount();

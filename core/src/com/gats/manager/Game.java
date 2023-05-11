@@ -353,7 +353,6 @@ public class Game {
         //Shutdown all running threads
         pendingShutdown = true;
         if (simulationThread != null) {
-            System.out.println("Interrupting simulation thread");
             simulationThread.interrupt();
             executor.shutdown();
         }
