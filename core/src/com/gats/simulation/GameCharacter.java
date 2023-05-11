@@ -149,7 +149,7 @@ public class GameCharacter implements Serializable {
             return false;
         }
         if (selectedWeapon != -1) {
-            weapons[selectedWeapon].shoot(head, dir, strength, this.getPlayerPos(), this);
+            sim.getWrapper().shoot(head, weapons[selectedWeapon], dir, strength, this.getPlayerPos(), this);
             alreadyShot = true;
             return true;
         } else {

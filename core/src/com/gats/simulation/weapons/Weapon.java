@@ -30,7 +30,7 @@ public class Weapon implements Serializable {
     }
 
 
-    public Action shoot(Action head, Vector2 dir, float strength, Vector2 pos, GameCharacter character) {
+    protected Action shoot(Action head, Vector2 dir, float strength, Vector2 pos, GameCharacter character) {
         if (ammo <= 0) return head;
         ammo--;
         pos.add(character.getSize().scl(0.5f));

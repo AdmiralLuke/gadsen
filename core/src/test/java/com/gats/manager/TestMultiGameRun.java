@@ -13,7 +13,7 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class TestMultiGameRun {
 
-    private final long COMPLETION_TIMEOUT = 100000;
+    private final long COMPLETION_TIMEOUT = 10000;
 
     private final RunConfiguration runConfig;
     private final Run run;

@@ -8,17 +8,21 @@ import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.ui.hud.UiMessenger;
+import sun.java2d.loops.ProcessPath;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 
 
     protected static final int REQUIRED_THREAD_COUNT = 2;
+
+    protected static final ThreadGroup PLAYER_THREAD_GROUP = new ThreadGroup("players");
 
 
     enum Status {
@@ -63,7 +67,7 @@ public class Game {
     private GameState state;
     private Player[] players;
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(new BotThreadFactory());
     private final List<HumanPlayer> humanList = new ArrayList<>();
 
     private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
