@@ -13,6 +13,7 @@ import com.gats.simulation.action.CharacterAimAction;
 public class GameCharacterController {
     private final GameCharacter gameCharacter;
     private final GameState state;
+    boolean active = true;
 
     /**
      * Returns the root of the ActionLog that is currently recording in the simulation instance.
@@ -83,7 +84,7 @@ public class GameCharacterController {
         return endCommand();
     }
     /**
-     * Makes the Character shoot its equipped {@link Weapon}.
+     * Makes the Character shoot its equipped {@link com.gats.simulation.weapons.Weapon}.
      * Will only trigger for the first Weapon each turn, that can currently be used by this Character
      *
      * @return the ActionLog produced when executing this command
@@ -93,4 +94,11 @@ public class GameCharacterController {
         return endCommand();
     }
 
+    public void deactivate() {
+        active = false;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 }

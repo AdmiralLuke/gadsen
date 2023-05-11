@@ -1,123 +1,195 @@
 package com.gats.manager;
 
-import com.gats.manager.command.Command;
-import com.gats.manager.command.EndTurnCommand;
-import com.gats.simulation.action.ActionLog;
-import com.gats.ui.HudStage;
-import com.gats.simulation.GameCharacterController;
-import com.gats.simulation.GameState;
-import com.gats.simulation.Simulation;
+import jdk.internal.reflect.Reflection;
+import sun.security.util.SecurityConstants;
 
+import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.*;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
-
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class Manager {
 
-    private static final int AI_EXECUTION_TIMEOUT = 500;
-    private static final int AI_INIT_TIMEOUT = 1000;
-
-    private static final int HUMAN_EXECUTION_TIMEOUT = 30000;
-    private static final int HUMAN_INIT_TIMEOUT = 30000;
-
-    private final HudStage inputGenerator;
-
-    private AnimationLogProcessor animationLogProcessor;
-
-    private boolean gui = false;
-    private Simulation simulation;
-    private GameState state;
-    private Player[] players;
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private List<HumanPlayer> humanList = new ArrayList<>();
-
-    private BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
-    private Thread simulationThread;
+    public static final RuntimePermission CHECK_MANAGER_ACCESS_PERMISSION =
+            new RuntimePermission("accessManagerInstance");
+    private static final String RESULT_DIR_NAME = "results";
+    private static final File RESULT_DIR = new File(RESULT_DIR_NAME);
+    private static int systemReservedProcessorCount = 2;
+    private static final Manager singleton = new Manager();
     private boolean pendingShutdown = false;
+    private int writtenFiles = 0;
 
-    /**
-     * Initializes simulation and players before
-     * starting the asynchronous execution
-     *
-     * @param config The execution-parameters of the simulation
-     */
-    public Manager(RunConfiguration config) {
-        simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
-        state = simulation.getState();
-        gui = config.gui;
-        animationLogProcessor = config.animationLogProcessor;
-        inputGenerator = config.hud;
+    private final Thread executionManager;
 
-        players = new Player[config.teamCount];
+    private ThreadPoolExecutor threadPoolExecutor;
 
-        for (int i = 0; i < config.teamCount; i++) {
-            final Player curPlayer;
+    private final ArrayList<Game> games = new ArrayList<>();
+    private final ArrayList<Game> scheduledGames = new ArrayList<>();
+
+    private final ArrayList<Game> activeGames = new ArrayList<>();
+
+    private final ArrayList<Game> pausedGames = new ArrayList<>();
+
+    private final ArrayList<Game> completedGames = new ArrayList<>();
+
+    private final BlockingQueue<GameResults> pendingSaves = new LinkedBlockingQueue<>();
+
+    private final Object schedulingLock = new Object();
+
+
+    @SuppressWarnings("removal")
+    public static Manager getManager() {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            sm.checkPermission(CHECK_MANAGER_ACCESS_PERMISSION);
+        }
+        return singleton;
+    }
+
+    public Run startRun(RunConfiguration runConfiguration) {
+        return Run.getRun(this, runConfiguration);
+    }
+
+    private void executionManager() {
+        while (!Thread.interrupted()) {
             try {
-                players[i] = (Player) config.players.get(i).getDeclaredConstructors()[0].newInstance();
-                curPlayer = players[i];
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
+                synchronized (executionManager) {
+                    executionManager.wait(5000);
+                }
+            } catch (InterruptedException e) {
+                System.out.println("ExecutionManager shutting down");
+                break;
             }
-            switch (curPlayer.getType()) {
-                case Human:
-                    humanList.add((HumanPlayer) curPlayer);
-                    break;
-                case AI:
-
-                    Future<?> future = executor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
-                            curPlayer.init(state);
+            int threadLimit = Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount;
+            synchronized (schedulingLock) {
+                int runningThreads = activeGames.size() * Game.REQUIRED_THREAD_COUNT;
+                if (runningThreads > threadLimit) {
+                    while (runningThreads > threadLimit) {
+                        if (activeGames.size() == 0) {
+                            System.err.println("Warning: System-reserved Processor Count exceeds physical limit. Simulation offline!");
+                            break;
                         }
-                    });
-
-                    try {
-                        future.get(AI_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {
-                        System.out.println("bot was interrupted");
-                    } catch (ExecutionException e) {
-                        System.out.println("bot failed initialization with exception: " + e.getCause());
-                    } catch (TimeoutException e) {
-                        future.cancel(true);
-
-                        System.out.println("bot" + i + "(" + curPlayer.getName()
-                                + ") initialization surpassed timeout");
+                        Game game = activeGames.remove(activeGames.size() - 1);
+                        game.pause();
+                        pausedGames.add(game);
+                        runningThreads -= 2;
                     }
-                    break;
+                } else while (runningThreads + 2 <= threadLimit) {
+                    if (pausedGames.size() > 0) {
+                        Game game = pausedGames.remove(pausedGames.size() - 1);
+                        game.resume();
+                        activeGames.add(game);
+                    } else if (scheduledGames.size() > 0) {
+                        Game game = scheduledGames.remove(scheduledGames.size() - 1);
+                        try {
+                            game.start();
+                            activeGames.add(game);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.err.println("Game crashed on start(); Aborting...\n" + game);
+                            game.abort();
+                        }
+                    } else {
+                        break;
+                    }
+                    runningThreads += 2;
+                }
+            }
+            while (!pendingSaves.isEmpty()) {
+                GameResults results = pendingSaves.poll();
+                if (RESULT_DIR.exists() || RESULT_DIR.mkdirs()) {
+                    try (FileOutputStream fs = new FileOutputStream(String.format("%s/%s_%d_%d.replay", RESULT_DIR, results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles++))) {
+                        new ObjectOutputStream(fs).writeObject(results);
+                    } catch (IOException e) {
+                        System.err.printf("Unable to save replay at %s/%s_%d_%d.replay %n", RESULT_DIR, results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles);
+                    }
+                } else System.err.printf("Unable to create results directory at %s %n", RESULT_DIR);
             }
         }
     }
 
-    public void start() {
-        //Run the Game
-        simulationThread = new Thread(this::run);
-        simulationThread.setName("Manager_Simulation_Thread");
-        simulationThread.start();
+    protected void schedule(Game game) {
+        synchronized (schedulingLock) {
+            if (pendingShutdown) return;
+            game.addCompletionListener(this::notifyExecutionManager);
+            games.add(game);
+            game.schedule();
+            scheduledGames.add(game);
+        }
+        synchronized (executionManager) {
+            executionManager.notify();
+        }
+    }
+
+
+    private void notifyExecutionManager(Game game) {
+        synchronized (schedulingLock) {
+            if (!activeGames.remove(game) && !pausedGames.remove(game))
+                System.err.printf("Warning unsuccessfully attempted to complete Game %s\nInstance: %s", game, this);
+            if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
+            completedGames.add(game);
+        }
+        synchronized (executionManager) {
+            executionManager.notify();
+        }
+    }
+
+    public void stop(Run run) {
+        for (Game game : run.getGames()) {
+            stop(game);
+        }
+    }
+
+    protected void stop(Game game) {
+        synchronized (schedulingLock) {
+            synchronized (game.schedulingLock) {
+                switch (game.getStatus()) {
+                    case SCHEDULED:
+                        scheduledGames.remove(game);
+                        break;
+                    case ACTIVE:
+                        activeGames.remove(game);
+                        break;
+                    case PAUSED:
+                        pausedGames.remove(game);
+                        break;
+                }
+                if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
+                completedGames.add(game);
+                game.abort();
+            }
+        }
     }
 
     public static class NamedPlayerClass {
-        private String name;
-        private Class<? extends Player> classRef;
+        private final String name;
+        private final Class<? extends Player> classRef;
+        private final String fileName;
 
         @Override
         public String toString() {
             return name;
         }
 
-        public NamedPlayerClass(Class<? extends Player> classRef) {
+        public NamedPlayerClass(Class<? extends Player> classRef, String fileName) {
             try {
 
                 Player playerInstance = classRef.getConstructor(new Class[]{}).newInstance();
 
                 name = playerInstance.getName();
+
+                this.fileName = fileName;
 
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Insufficient Privileges for instantiating bots", e);
@@ -140,21 +212,27 @@ public class Manager {
     }
 
     public static NamedPlayerClass[] getPossiblePlayers() {
-        List<NamedPlayerClass> players = new ArrayList<NamedPlayerClass>();
-        players.add(new NamedPlayerClass(HumanPlayer.class));
-        players.add(new NamedPlayerClass(IdleBot.class));
-        players.add(new NamedPlayerClass(TestBot.class));
+        List<NamedPlayerClass> players = new ArrayList<>();
+        players.add(new NamedPlayerClass(HumanPlayer.class, "HumanPlayer"));
+        players.add(new NamedPlayerClass(IdleBot.class, "IdleBot"));
+        players.add(new NamedPlayerClass(TestBot.class, "TestBot"));
         File botDir = new File("bots");
+        System.out.println(new File("").getAbsolutePath());
         if (botDir.exists()) {
             try {
                 URL url = new File(".").toURI().toURL();
                 URL[] urls = new URL[]{url};
                 ClassLoader loader = new URLClassLoader(urls);
-                for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))
-                ) {
+
+                for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))) {
                     try {
+                        if (containsIllegalTerms(botFile)) {
+                            System.err.printf("File %s contains illegal terms. -> Exclude from Loading%n", botFile);
+                            continue;
+                        }
                         Class<?> nextClass = loader.loadClass("bots." + botFile.getName().replace(".class", ""));
-                        if(Bot.class.isAssignableFrom(nextClass)) players.add(new NamedPlayerClass((Class<? extends Player>) nextClass));
+                        if (Bot.class.isAssignableFrom(nextClass))
+                            players.add(new NamedPlayerClass((Class<? extends Player>) nextClass, botFile.getName().replace(".class", "")));
 
                     } catch (ClassNotFoundException e) {
                         System.err.println("Could not find class for " + botFile.getName());
@@ -163,163 +241,96 @@ public class Manager {
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
+        } else {
+            System.err.println("Warning: No Bot-Dir found at " + botDir.getAbsolutePath());
         }
         NamedPlayerClass[] array = new NamedPlayerClass[players.size()];
         players.toArray(array);
         return array;
     }
 
-    /**
-     * @return The state of the underlying simulation
-     */
-    public GameState getState() {
-        return state;
+    private static boolean containsIllegalTerms(File botFile) {
+        if (botFile == null) return false;
+        if (!botFile.exists()) return false;
+        if (!botFile.isFile()) return false;
+        StringBuilder resultStringBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(botFile.toPath())))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                resultStringBuilder.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        String fileContent = resultStringBuilder.toString();
+
+        if (fileContent.contains("java/lang/Thread")) return true;
+        if (fileContent.contains("java/util/concurrent/")) return true;
+
+        return false;
     }
 
-    /**
-     * Controls Player Execution
-     */
-    private void run() {
-        while (!pendingShutdown && state.isActive()) {
-            GameCharacterController gcController = simulation.getController();
-            int currentPlayerIndex = gcController.getGameCharacter().getTeam();
-            int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
-
-            Player currentPlayer = players[currentPlayerIndex];
-            Controller controller = new Controller(this, gcController);
-
-            Thread futureExecutor;
-            Future<?> future;
-            switch (currentPlayer.getType()) {
-                case Human:
-                    future = executor.submit(() -> currentPlayer.executeTurn(state, controller));
-                    futureExecutor = new Thread(() -> {
-                        inputGenerator.activateTurn((HumanPlayer) currentPlayer);
-                        try {
-                            Thread.currentThread().setName("Run_Thread_Player_Human");
-                            future.get(HUMAN_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException e) {
-                            future.cancel(true);//Executor was interrupted: Interrupt Player
-                            System.out.println("bot was interrupted");
-                        } catch (ExecutionException e) {
-                            System.out.println("human player failed with exception: " + e.getCause());
-                            e.printStackTrace();
-                        } catch (TimeoutException e) {
-                            future.cancel(true);
-
-                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
-                                    + ") computation surpassed timeout");
-                        }
-                        inputGenerator.endTurn();
-                        //Add Empty command to break command Execution
-                        try {
-                            commandQueue.put(new EndTurnCommand());
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    break;
-                case AI:
-                    future = executor.submit(() -> {
-                        Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
-                        currentPlayer.executeTurn(state, controller);
-                    });
-                    futureExecutor = new Thread(() -> {
-                        Thread.currentThread().setName("Future_Executor_Player_" + currentPlayer.getName());
-                        try {
-                            future.get(AI_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException e) {
-                            future.cancel(true);//Executor was interrupted: Interrupt Bot
-                            System.out.println("bot was interrupted");
-                        } catch (ExecutionException e) {
-                            System.out.println("bot failed with exception: " + e.getCause());
-                            e.printStackTrace();
-                        } catch (TimeoutException e) {
-                            future.cancel(true);
-
-                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName()
-                                    + ") computation surpassed timeout");
-                        }
-                        //Add Empty command to break command Execution
-                        try {
-                            commandQueue.put(new EndTurnCommand());
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    break;
-                default:
-                    throw new IllegalStateException("Player of type: " + currentPlayer.getType() + " can not be executed by the Manager");
-            }
-
-            futureExecutor.start();
-            if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
-                //Contains Action produced by entering new turn
-                animationLogProcessor.animate(simulation.clearAndReturnActionLog());
-            }
-            try {
-                while (true) {
-                    Command nextCmd = commandQueue.take();
-                    if (nextCmd.isEndTurn()) break;
-                    //Contains action produced by the commands execution
-                    ActionLog log = nextCmd.run();
-
-                    if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
-                        animationLogProcessor.animate(log);
-                        //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
-                    }
-                }
-            } catch (InterruptedException e) {
-                System.err.println("Interrupted while processing cmds");
-                if (pendingShutdown) {
-                    futureExecutor.interrupt();
-                    break;
-                }
-                throw new RuntimeException(e);
-            }
-            controller.deactivate();
-
-            //Contains actions produced by ending the turn (after last command is executed)
-            ActionLog finalLog = simulation.endTurn();
-            if (gui) {
-                animationLogProcessor.animate(finalLog);
-                animationLogProcessor.awaitNotification();
-                if (pendingShutdown) {
-                    executor.shutdown();
-                    futureExecutor.interrupt();
+    public static ArrayList<Class<? extends Player>> getPlayers(String[] names, boolean noGUI) {
+        NamedPlayerClass[] allPlayers = getPossiblePlayers();
+        ArrayList<Class<? extends Player>> selectedPlayers = new ArrayList<>();
+        for (String cur : names) {
+            boolean playerFound = false;
+            for (NamedPlayerClass candidate : allPlayers) {
+                if (candidate.fileName.equals(cur)) {
+                    if (noGUI && candidate.classRef.equals(HumanPlayer.class))
+                        throw new RuntimeException("Human Players cannot be used with option --nogui");
+                    selectedPlayers.add(candidate.classRef);
+                    playerFound = true;
                     break;
                 }
             }
-            try {
-                futureExecutor.join(); //Wait for the executor to shutdown to prevent spamming the executor service
-            } catch (InterruptedException e) {
-                System.out.printf("Interrupted while shutting down future executor\n");
-                if (pendingShutdown) {
-                    futureExecutor.interrupt();
-                    break;
-                }
-                throw new RuntimeException(e);
-            }
+            if (!playerFound) throw new RuntimeException(String.format("Couldn't find bots.%s.class", cur));
         }
-//        System.out.println("Shutdown complete");
+        return selectedPlayers;
+    }
+
+    @SuppressWarnings({"removal"})
+    private Manager() {
+        java.security.Policy.setPolicy(new BotSecurityPolicy());
+
+        System.err.println("Please Ignore the following Warning---------------------");
+        System.setSecurityManager(new SecurityManager());
+        executionManager = new Thread(this::executionManager);
+        executionManager.start();
     }
 
     public void dispose() {
         //Shutdown all running threads
         pendingShutdown = true;
-        if (simulationThread != null) {
-            System.out.println("Interrupting simulation thread");
-            simulationThread.interrupt();
-            executor.shutdown();
+        executionManager.interrupt();
+        synchronized (games) {
+            for (Game cur :
+                    games) {
+                cur.dispose();
+            }
         }
     }
 
-    public List<HumanPlayer> getHumanList() {
-        return humanList;
+    public static int getSystemReservedProcessorCount() {
+        return systemReservedProcessorCount;
     }
 
-    protected void queueCommand(Command cmd) {
-        commandQueue.add(cmd);
+    public static void setSystemReservedProcessorCount(int systemReservedProcessorCount) {
+        Manager.systemReservedProcessorCount = systemReservedProcessorCount;
+        getManager().executionManager.notify();
     }
 
+    @Override
+    public String toString() {
+        return "Manager{" +
+                "pendingShutdown=" + pendingShutdown +
+                ", executionManager=" + executionManager +
+                ", threadPoolExecutor=" + threadPoolExecutor +
+                ", games=" + games +
+                ", scheduledGames=" + scheduledGames +
+                ", activeGames=" + activeGames +
+                ", pausedGames=" + pausedGames +
+                ", completedGames=" + completedGames +
+                '}';
+    }
 }

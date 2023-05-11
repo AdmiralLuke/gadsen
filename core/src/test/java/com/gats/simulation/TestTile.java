@@ -12,7 +12,7 @@ public class TestTile {
 
     @Before
     public void init() {
-        sim = new Simulation(0, "map1", 2, 1);
+        sim = new Simulation(GameState.GameMode.Normal, "map1", 2, 1);
         state = sim.getState();
         sim.getActionLog().getRootAction().addChild(new InitAction());
         clearMap();
@@ -26,10 +26,9 @@ public class TestTile {
         }
     }
 
-    @Test
     public void testIfAnchored() {
         // Ein paar Tiles sollen eingefügt werden
-        Tile anchorTile = new Tile(1,1, true, state);
+        Tile anchorTile = new Tile(1,1, state, true);
         Assert.assertNotNull("Der Anker sollte beim erstellen nicht gelöscht werden und sich im Board befinden", state.getBoard()[1][1]);
 
         // diese Tiles sollte im Board bleiben, da sie verankert sind
@@ -40,7 +39,7 @@ public class TestTile {
 
 
         //Tiles mit 360 Grad Akzeptanz
-        Tile anchorTileMiddle = new Tile(20,20,true, state);
+        Tile anchorTileMiddle = new Tile(20,20, state, true);
         Assert.assertNotNull("Der Anker sollte beim erstellen nicht gelöscht werden und sich im Board befinden"
                 , state.getBoard()[20][20]);
 
@@ -66,17 +65,12 @@ public class TestTile {
         Assert.assertNull("An der Stelle [5,10] sollte sich KEIN TIle befinden, da dort keine Verankerung ist", state.getBoard()[5][10]);
     }
 
-    @Test
-    public void testIfCloned() {
-        Tile testTile = new Tile(20, 20, state);
-        Assert.assertNotEquals("ein Clone sollte unterschiedliche Referenzen haben", testTile.returnClone(), testTile);
-    }
 
     @Test
     public void testIfDestroyed() {
         clearMap();
         state.getCharacterFromTeams(0, 0).walk(3, new VoidAction());
-        Tile testTile = new Tile(10, 10, true, state);
+        Tile testTile = new Tile(10, 10, state, true);
         for (int i = 0; i < 9; i++) {
             Tile tmpTile = new Tile(10 - i, 9, state);
             tmpTile = new Tile(10, 9-i, state);

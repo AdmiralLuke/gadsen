@@ -16,7 +16,6 @@ public final class CharacterWalkAction extends CharacterAction{
      * Base walking speed of all characters in world-coordinates per second
      */
     private final static float V = 10;
-    private final float duration;
 
     /**
      * Stores the event of a Character walking
@@ -32,7 +31,6 @@ public final class CharacterWalkAction extends CharacterAction{
         super(delay, team, character);
         LinearPath linPath = new LinearPath(posBef, posAft, V);
         this.path = linPath;
-        this.duration = linPath.getEndTime();
     }
 
 
@@ -47,6 +45,18 @@ public final class CharacterWalkAction extends CharacterAction{
      * @return The duration of the event in seconds
      */
     public float getDuration() {
-        return duration;
+        return path.getDuration();
+    }
+    @Override
+       public String toString() {
+
+        String output=  super.toString();
+
+        output += path.toString();
+
+        output += " ";
+
+        return output;
+
     }
 }

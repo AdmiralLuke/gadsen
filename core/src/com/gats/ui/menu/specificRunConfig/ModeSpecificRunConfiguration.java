@@ -1,6 +1,7 @@
 package com.gats.ui.menu.specificRunConfig;
 
 import com.gats.manager.RunConfiguration;
+import com.gats.simulation.GameState;
 
 /**
  * Creates a RunConfig from another, but only replaces null values;
@@ -17,9 +18,7 @@ public abstract class ModeSpecificRunConfiguration extends RunConfiguration {
 	 */
 	public void passSettings(RunConfiguration settings){
 
-		if(gameMode==0){
-			gameMode = settings.gameMode;
-		}
+		gameMode = settings.gameMode;
 
 		if(!gui){
 			gui = settings.gui;
@@ -29,8 +28,8 @@ public abstract class ModeSpecificRunConfiguration extends RunConfiguration {
 			animationLogProcessor=settings.animationLogProcessor;
 		}
 
-		if(hud==null){
-			hud = settings.hud;
+		if(inputProcessor ==null){
+			inputProcessor = settings.inputProcessor;
 		}
 
 		if(mapName==null){

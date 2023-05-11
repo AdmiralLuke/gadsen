@@ -23,4 +23,14 @@ public class GameOverAction extends Action{
     public int getTeam() {
         return team;
     }
+       @Override
+
+    public String toString() {
+
+        String output = "GameOver, Team: " + team;
+
+        return output;
+
+    }
+
 }

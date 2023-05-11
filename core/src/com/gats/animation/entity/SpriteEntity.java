@@ -1,10 +1,10 @@
 package com.gats.animation.entity;
 
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.gats.animation.entity.Entity;
 
 /**
  * Verhält sich wie ein Entity mit dem Unterschied, dass beim draw() Aufruf
@@ -13,10 +13,21 @@ import com.gats.animation.entity.Entity;
 public class SpriteEntity extends Entity {
 
     private TextureRegion textureRegion;
-    private Vector2 scale = new Vector2(1, 1);
-    private Vector2 size = new Vector2(1, 1);
 
-    private Vector2 relPos = new Vector2().Zero;
+    private Color color = null;
+    private Vector2 size = null;
+
+    private boolean flipped = false;
+
+
+    private boolean rotate = true;
+    /**
+     * When mirror is set to true, the character will be flipped once the angle is 180 or higher on the x axis
+     */
+
+    private boolean mirror = false;
+
+    private Vector2 origin = new Vector2();
 
     public SpriteEntity(TextureRegion textureRegion) {
         super();
@@ -33,52 +44,130 @@ public class SpriteEntity extends Entity {
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         super.draw(batch, deltaTime, parentAlpha);
-        batch.draw(textureRegion, getPos().x, getPos().y,0,0, size.x,
-                size.y, scale.x, scale.y,getRotationAngle());
+        if (color != null)
+            batch.setColor(color);
+
+        Vector2 scale = getScale();
+        if (size == null)
+            batch.draw(textureRegion,
+                    getPos().x - origin.x,
+                    getPos().y - origin.y,
+                    origin.x,
+                    origin.y,
+                    textureRegion.getRegionWidth(),
+                    textureRegion.getRegionHeight(),
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
+                    getRotationAngle());
+        else
+            batch.draw(textureRegion,
+                    getPos().x - origin.x,
+                    getPos().y - origin.y,
+                    origin.x,
+                    origin.y,
+                    size.x,
+                    size.y,
+                    (flipped ? -1 : 1) * (scale.x),
+                    (scale.y),
+                    getRotationAngle());
+
+        //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
+
+        if (color != null)
+            batch.setColor(Color.WHITE);
     }
 
-    public Vector2 getScale() {
-        return scale;
-    }
-
-    public void setScale(Vector2 scale) {
-        this.scale = scale;
-    }
 
     public Vector2 getSize() {
-        return new Vector2(size);
+        if(size!=null) {
+            return new Vector2(size);
+        }
+        return new Vector2(0,0);
     }
 
     public void setSize(Vector2 size) {
         this.size = size;
     }
 
-    public void setRelPos(Vector2 newRelPos){
-        this.relPos = new Vector2(newRelPos);
+
+    public Vector2 getOrigin() {
+        return origin;
     }
 
-    @Override
-    public Vector2 getRelPos() {
-        return new Vector2(relPos);
+    public void setOrigin(Vector2 origin) {
+        this.origin = origin;
     }
-
-   public Vector2 getPos(){
-        return new Vector2(getRelPos().add(super.getPos()));
-   }
 
 
     /**
      * Returns the center of the rendered Sprite as a Vector.
-     * This is calculated with the {@link SpriteEntity#scale};
+     * This is calculated with the Sprites Scale
+     *
      * @return Vector of the sprite center.
      */
-    public Vector2 getSpriteCenter()
-    {
-        if(this.textureRegion!=null){
-            return new Vector2(size.x/2f,size.y/2f);
+    public Vector2 getSpriteCenter() {
+        if (this.textureRegion != null) {
+            return new Vector2(size.x / 2f, size.y / 2f);
         }
-        return new Vector2(0,0);
+        return new Vector2(0, 0);
     }
 
+    /**
+     * Will tint the sprite with the specified color during rendering.
+     * Null will not tint the sprite.
+     *
+     * @param color specified tint of the sprite
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public TextureRegion getTextureRegion() {
+        return textureRegion;
+    }
+
+    public void setTextureRegion(TextureRegion textureRegion) {
+        this.textureRegion = textureRegion;
+    }
+
+    /**
+     * @return specified tint of the sprite
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    public boolean isFlipped() {
+        return flipped;
+    }
+
+    private void setFlipped(boolean flipped) {
+        this.flipped = flipped;
+    }
+
+    public void setRotate(boolean rotate) {
+        this.rotate = rotate;
+    }
+
+    public void setMirror(boolean mirror) {
+        this.mirror = mirror;
+    }
+
+    /**
+     * Sets the angle of this entity
+     *
+     * @param angle angle in degrees
+     */
+    @Override
+    public void setRelRotationAngle(float angle) {
+        angle = ((angle % 360) + 360) % 360;
+        super.setRelRotationAngle(rotate ? angle : 0);
+        if (angle >= 90f && angle <= 270f) {
+            super.setRelRotationAngle(mirror ? angle-180 : angle);
+            setFlipped(mirror);
+        } else {
+            setFlipped(false);
+        }
+    }
 
 }

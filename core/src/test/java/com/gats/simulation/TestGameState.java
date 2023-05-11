@@ -12,7 +12,7 @@ public class TestGameState {
 
     @Before
     public void init() {
-        sim = new Simulation(0, "map1", 2, 1);
+        sim = new Simulation(GameState.GameMode.Normal, "map1", 2, 1);
         state = sim.getState();
     }
 
@@ -22,7 +22,7 @@ public class TestGameState {
     @Test
     public void testIfBoardFilled() {
         Assert.assertNull("Board sollte beim Erstellen null Objekte enthalten",state.getBoard()[0][0]);
-        Tile testTile = new Tile(0,0,true, state);
+        Tile testTile = new Tile(0,0, state, true);
         Assert.assertNotNull("Board sollte eine Tile enthalten, nachdem sie erstellt wurde",state.getBoard()[0][0]);
     }
 

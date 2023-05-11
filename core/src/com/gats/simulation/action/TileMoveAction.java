@@ -12,14 +12,12 @@ import com.gats.simulation.Tile;
 public final class TileMoveAction extends TileAction{
     private final Path path;
 
-    private final float duration;
     private final IntVector2 posAft;
 
     /**
      * Stores the event of a {@link Tile} being moved linearly, from one tile-coordinate to another.
      * Works similarly to the {@link ProjectileAction}, as in that it stores the event of a Tile being removed from the tile-map at the start-position,
      * being moved along a path and finally being returned to the tile-map at the end-position
-     * ToDo: cleanup either remove duration or move getEndTime out of path interface
      * @param posBef    start-position of the Tile in tile-coordinates
      * @param posAft    end-position of the Tile in tile-coordinates
      * @param duration  The duration of the event in seconds
@@ -27,8 +25,7 @@ public final class TileMoveAction extends TileAction{
     public TileMoveAction(IntVector2 posBef, IntVector2 posAft, float duration) {
         super(0, posBef);
         this.posAft = posAft;
-        this.path = new LinearPath(posBef.toFloat().scl(Tile.TileSizeX), posAft.toFloat().scl(Tile.TileSizeY), 0.05f);
-        this.duration = path.getEndTime();
+        this.path = new LinearPath(posBef.toFloat().scl(Tile.TileSizeX), posAft.toFloat().scl(Tile.TileSizeY), duration * 100);
     }
 
 
@@ -44,7 +41,7 @@ public final class TileMoveAction extends TileAction{
      * @return The duration of the event in seconds
      */
     public float getDuration() {
-        return duration;
+        return path.getDuration();
     }
 
     /**
@@ -52,5 +49,17 @@ public final class TileMoveAction extends TileAction{
      */
     public IntVector2 getPosAfter() {
         return posAft;
+    }
+
+
+
+       @Override
+
+    public String toString() {
+
+        String output = "TileMove: "+ path.toString();
+
+        return output;
+
     }
 }

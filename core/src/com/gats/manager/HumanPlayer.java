@@ -1,12 +1,20 @@
 package com.gats.manager;
 
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Vector2;
+import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
+import com.gats.ui.hud.UiMessenger;
 
+import java.time.Clock;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Arrays;
 
+//ToDo migrate to UI
 public class HumanPlayer extends Player {
 
     private static final float NO_TICK = -10000.0f;
@@ -58,12 +66,11 @@ public class HumanPlayer extends Player {
     //if the time limit is reached, the execute turn will wait for turnOverhead seconds
     // to make sure everything is calculated and no GameState inconsistency is created
     private int turnDuration = 60;
-    private long nanoTurnDuration = turnDuration * 1000000000;
-    private int turnEndWaitTime = 5;
+    private int turnStartWaitTime = 2;
 
-    private long nanoStartTime;
-    private long elapsedTime;
 
+    private Vector2 playerCenterOffset = new Vector2(GameCharacter.getSize()).scl(0.5f);
+    private int aimIndicatorLength = 4*16;
     private int angle = 0;
 
     private float strength = 0.5f;
@@ -71,11 +78,8 @@ public class HumanPlayer extends Player {
     private Queue<WeaponType> weaponTypeStack = new LinkedList<>();
 
     {
-        weaponTypeStack.add(WeaponType.COOKIE);
-        weaponTypeStack.add(WeaponType.SUGAR_CANE);
-
-        WeaponType nextType = weaponTypeStack.poll();
-        weaponTypeStack.add(nextType);
+        weaponTypeStack.addAll(Arrays.asList(WeaponType.values()));
+        weaponTypeStack.remove(WeaponType.NOT_SELECTED);
     }
 
     private boolean turnInProgress;
@@ -95,7 +99,7 @@ public class HumanPlayer extends Player {
     /**
      * Started den Zug des {@link HumanPlayer} und erlaubt es diesem mithilfe von Tasteneingaben, zu bewegen.
      * Der Zug dauert {@link HumanPlayer#turnDuration} Sekunden, danach wird für
-     * {@link HumanPlayer#turnEndWaitTime} gewartet und dann die Methode beendet.
+     * {@link HumanPlayer#turnStartWaitTime} gewartet und dann die Methode beendet.
      *
      * @param state      Der {@link GameState Spielzustand} während des Zuges
      * @param controller Der {@link Controller Controller}, der zum Charakter gehört
@@ -103,26 +107,33 @@ public class HumanPlayer extends Player {
 
     @Override
     protected void executeTurn(GameState state, Controller controller) {
-        //ToDo move input processing to UI package
         this.state = state;
         this.controller = controller;
         for (int i = 0; i < lastTick.length; i++) lastTick[i] = NO_TICK;
-        synchronized (this) {
-            try {
-                this.wait(20000);
-            } catch (InterruptedException ignored) {
+
 //                System.out.println("Turn has been ended preemptively");
+
+
+       synchronized (this) {
+            try {
+
+
+                this.wait(turnDuration* 1000L);
+
+            } catch (InterruptedException ignored) {
 
             }
         }
+
     }
 
+    //ToDo: make protected after migration to UI
     /**
      * Ends the current turn of the player preemptively.
      * Callen when pressing {@link HumanPlayer#KEY_CHARACTER_END_TURN}.
      * notifies itself, so the wait will end.
      */
-    protected void endCurrentTurn() {
+    public void endCurrentTurn() {
         synchronized (this) {
             this.notify();
         }
@@ -229,6 +240,27 @@ public class HumanPlayer extends Player {
         //ToDo implement holding keys
     }
 
+    public void aim(int angle,float strength){
+        this.angle = angle;
+        this.strength = strength;
+       controller.aim(angle,strength);
+    }
+
+    /**
+     * Makes the controller aim to the provided position in regards to the center of the Character.
+     * @param target position to aim towards.
+     */
+    public void aimToVector(Vector2 target){
+        GameCharacter currentChar =controller.getGameCharacter();
+        Vector2 playerPos = currentChar.getPlayerPos();
+        //add characterCenteroffset defined at top of class
+        playerPos.add(playerCenterOffset);
+        target.sub(playerPos);
+
+        float currentDistance = target.len();
+        //call aim with the targetAngle and strength ratio(maximum distance before strenght decreases -> is relativ to the indicator length)
+        this.aim((int) target.angleDeg(),currentDistance/aimIndicatorLength);
+    }
 
     public void processKeyUp(int keycode) {
 
@@ -268,4 +300,9 @@ public class HumanPlayer extends Player {
         return PlayerType.Human;
     }
 
+
+
+    public int getTurnDuration(){
+        return this.turnDuration;
+    }
 }

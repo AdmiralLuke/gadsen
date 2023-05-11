@@ -7,31 +7,39 @@ import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.GameState;
 import com.gats.simulation.IntVector2;
 import com.gats.simulation.Tile;
+import com.gats.simulation.action.TileSummonAction;
+import com.gats.ui.assets.AssetContainer;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class TileMap extends Entity{
 
     public static final int TYLE_TYPE_NONE = -1;
-
-    private TextureRegion[] tileTextures;
     private int[][] tiles;
     private int sizeX;
     private int sizeY;
 
     private int tileSize = 12;
 
-    public TileMap(TextureRegion[] tileTextures, GameState state) {
-        this.tileTextures = tileTextures;
+    public TileMap(GameState state) {
         sizeX = state.getBoardSizeX();
         sizeY = state.getBoardSizeY();
-        if(tileTextures.length > 0) tileSize = tileTextures[0].getRegionWidth();
+        if(AssetContainer.IngameAssets.tileTextures.length > 0) tileSize = AssetContainer.IngameAssets.tileTextures[0].getRegionWidth();
         this.tiles = new int[sizeX][sizeY];
         for (int i = 0; i<sizeX; i++)
             for (int j = 0; j<sizeY; j++){
                 Tile tile = state.getTile(i,j);
-                tiles[i][j] = tile == null? TYLE_TYPE_NONE : tile.getType();
+                tiles[i][j] = getTileID(tile);
             }
+    }
+
+    private int getTileID(Tile tile){
+        if (tile == null) return TYLE_TYPE_NONE;
+        Tile.TileType type = tile.getTileType();
+        if (type == Tile.TileType.HEALTH_BOX) return 5;
+        if (type == Tile.TileType.STANDARD) return tile.isAnchor()?0:1;
+        if (type == Tile.TileType.WEAPON_BOX) return tile.isAnchor()?3:4;
+        return TYLE_TYPE_NONE;
     }
 
     @Override
@@ -43,7 +51,7 @@ public class TileMap extends Entity{
             for (int j = 0; j<sizeY; j++){
                 int type = tiles[i][j];
                 if (type != TYLE_TYPE_NONE){
-                    batch.draw(tileTextures[type],pos.x + i * tileSize, pos.y + j * tileSize);
+                    batch.draw(AssetContainer.IngameAssets.tileTextures[type],pos.x + i * tileSize, pos.y + j * tileSize);
                 }
             }
     }

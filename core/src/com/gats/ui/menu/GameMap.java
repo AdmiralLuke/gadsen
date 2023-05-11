@@ -4,13 +4,18 @@ public class GameMap {
 
 	private final String mapName;
 	private final int numberOfSpawnpoints;
+	private final int numberOfTeams;
 
 
-	public GameMap(String name, int spawnpoints){
+	public GameMap(String name, int spawnpoints,int numberOfTeams){
 		this.mapName=name;
 		this.numberOfSpawnpoints=spawnpoints;
+		this.numberOfTeams = numberOfTeams;
 
-		readFromFile();
+	}
+
+	public GameMap(String name,int spawnpoints){
+		this(name,spawnpoints,0);
 	}
 
 
@@ -22,11 +27,12 @@ public class GameMap {
 		return getName();
 	}
 
+	/**
+	 * Returns the number of spawnpoints per team
+	 * @return
+	 */
 	public int getNumberOfSpawnpoints(){
 		return this.numberOfSpawnpoints;
 	}
-
-	public void readFromFile(){
-
-	}
+	public int getNuberOfTeams(){return this.numberOfTeams;}
 }

@@ -34,4 +34,13 @@ public final class TileSummonAction extends TileAction{
     public TileType getType() {
         return type;
     }
+
+
+   @Override
+
+    public String toString() {
+
+        return "TileSummon: " + super.getPos().toString();
+
+    }
 }

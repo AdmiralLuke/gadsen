@@ -15,6 +15,12 @@ import com.gats.manager.RunConfiguration;
  */
 public class GADS extends Game {
 	GADSAssetManager assetManager;
+	private RunConfiguration runConfig;
+
+
+	public GADS(RunConfiguration runConfig) {
+		this.runConfig = runConfig;
+	}
 
 	public void startGame(RunConfiguration config){
 		setScreenIngame(config);
@@ -26,7 +32,7 @@ public class GADS extends Game {
 
 		//ToDo: add Loading Screen
 
-		setScreen(new MenuScreen(this));
+		setScreen(new MenuScreen(this, runConfig));
 	}
 
 	public void render() {
@@ -41,6 +47,9 @@ public class GADS extends Game {
 	public void dispose() {
 		if (screen != null) this.screen.dispose();
 		assetManager.unloadAtlas();
+		//apparently Gdx.app.exit() does not close the game completely
+		//probably the runtime survives and needs to be killed via System.exit
+		System.exit(0);
 	}
 
 	public void setScreenIngame(RunConfiguration runConfig) {
@@ -48,12 +57,13 @@ public class GADS extends Game {
 	}
 
 	public void setScreenMenu() {
-		setScreen(new MenuScreen(this));
+		//ToDo we can use runconfig to save the users selection while we are at it
+		setScreen(new MenuScreen(this, new RunConfiguration()));
 	}
 
 
 	public String[] getGameModes() {
-		//Todo, maybe move to simulation?
+		//Todo, ~maybe move to simulation?~ -> move to RunConfig
 
 		return new String[]{"Normal","Weihnachtsaufgabe"};
 	}
