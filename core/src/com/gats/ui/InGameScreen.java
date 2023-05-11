@@ -58,8 +58,6 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
         //ToDo this should be happening in Menu
         run = manager.startRun(runConfig);
-        //ToDo Handle case size >= 1
-        if (run.getGames().size() > 1) System.err.println("Warning: RunConfig produced more than one game: Only showing the first game!");
         Game game = run.getGames().get(0);
     }
 
@@ -84,6 +82,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     @Override
     public void init(GameState state) {
         //ToDo the game is starting remove waiting screen etc.
+        hud.newGame();
         animator.init(state);
     }
 
@@ -94,7 +93,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
      */
     public void animate(ActionLog log) {
         animator.animate(log);
-    debugView.add(log);
+        debugView.add(log);
     }
 
 

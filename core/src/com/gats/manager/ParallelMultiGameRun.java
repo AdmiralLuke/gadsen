@@ -1,20 +1,40 @@
 package com.gats.manager;
 
 
+import com.gats.simulation.GameState;
+import com.gats.simulation.campaign.CampaignResources;
+
 import java.util.*;
 
 public class ParallelMultiGameRun extends Run {
 
 
-    int completed=0;
+    int completed = 0;
 
-    int gameCount =0;
+    int gameCount = 0;
 
     private final float[] scores;
     private final Map<Game, Integer[]> playerIndices = new HashMap<>();
 
     protected ParallelMultiGameRun(Manager manager, RunConfiguration runConfig) {
         super(manager, runConfig);
+        if (runConfig.gameMode == GameState.GameMode.Exam_Admission) {
+            if (runConfig.players.size() != 1) {
+                System.err.println("Exam Admission only accepts exactly 1 player");
+                scores = new float[1];
+                complete();
+                return;
+            }
+
+            runConfig.players.add(AguadseBot.class);
+            runConfig.players.add(KamigadseBot.class);
+            runConfig.players.add(BobBot.class);
+            runConfig.teamCount = runConfig.players.size();
+            getPlayers().clear();
+            getPlayers().addAll(runConfig.players);
+            runConfig.teamSize = 3;
+            runConfig.mapName = "MangoMap";
+        }
         ArrayList<Integer> indices = new ArrayList<>();
         for (int i = 0; i < runConfig.players.size(); i++) {
             indices.add(i);
@@ -26,6 +46,8 @@ public class ParallelMultiGameRun extends Run {
             permListOfMatchUps.addAll(permutations(matchUp));
         }
         List<Game> games = new ArrayList<>();
+        Game lastGame = null;
+        Game firstGame = null;
         for (List<Integer> matchUp : permListOfMatchUps
         ) {
             GameConfig cur = new GameConfig(runConfig);
@@ -36,29 +58,40 @@ public class ParallelMultiGameRun extends Run {
             cur.players = players;
             Game curGame = new Game(cur);
             curGame.addCompletionListener(this::onGameCompletion);
+            if (runConfig.gui) {
+                if (lastGame != null) {
+                    lastGame.addCompletionListener(g -> {
+                        manager.schedule(curGame);
+                    });
+                } else firstGame = curGame;
+                lastGame = curGame;
+                getGames().add(curGame);
+            }
             playerIndices.put(curGame, matchUp.toArray(new Integer[0]));
             gameCount++;
             games.add(curGame);
         }
 
-
-        for (Game game : games) {
-            addGame(game);
-        }
+        if (!runConfig.gui) {
+            for (Game game : games) {
+                addGame(game);
+            }
+        } else {
+            manager.schedule(firstGame);}
 
     }
 
     public void onGameCompletion(Game game) {
         Integer[] matchup = playerIndices.get(game);
         int i = 0;
-        synchronized (scores){
-            for (float score:game.getState().getScores()){
+        synchronized (scores) {
+            for (float score : game.getState().getScores()) {
                 scores[matchup[i++]] += score;
             }
             completed++;
         }
-        if (completed == gameCount){
-            for (int j =0; j<scores.length; j++){
+        if (completed == gameCount) {
+            for (int j = 0; j < scores.length; j++) {
                 scores[j] /= gameCount;
             }
             complete();
@@ -128,15 +161,15 @@ public class ParallelMultiGameRun extends Run {
     }
 
     protected static <T> ArrayList<T> insertInCopy(List<T> list, T element, int index) {
-        ArrayList<T> copy = new ArrayList<>(list.size()+1);
+        ArrayList<T> copy = new ArrayList<>(list.size() + 1);
         ListIterator<T> iter = list.listIterator();
         int i = 0;
-        while (iter.hasNext() && i <index){
+        while (iter.hasNext() && i < index) {
             copy.add(iter.next());
             i++;
         }
         copy.add(element);
-        while (iter.hasNext()){
+        while (iter.hasNext()) {
             copy.add(iter.next());
         }
         return copy;

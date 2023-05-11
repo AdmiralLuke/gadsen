@@ -3,10 +3,8 @@ package com.gats.simulation.weapons;
 import com.gats.simulation.GameCharacter;
 
 public class WeaponWrapper {
-    public static int instanceCounter = 0;
 
     private WeaponWrapper() {
-        instanceCounter++;
     }
 
     /**
@@ -14,10 +12,7 @@ public class WeaponWrapper {
      * @return
      */
     public static WeaponWrapper instance() {
-        if (instanceCounter == 0) {
             return new WeaponWrapper();
-        }
-        return null;
     }
 
     public void addAmmo(Weapon weapon, int addAmmo) {

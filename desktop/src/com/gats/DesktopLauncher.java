@@ -115,12 +115,12 @@ public class DesktopLauncher {
             new Lwjgl3Application(new GADS(runConfig), config);
         } else {
             boolean invalidConfig = false;
-            if (runConfig.mapName == null) {
-                System.err.println("Param -m is required for no GUI mode");
+            if (runConfig.gameMode != GameState.GameMode.Exam_Admission && runConfig.mapName == null) {
+                System.err.println("Param -m is required for no GUI mode (except Exam Admission)");
                 invalidConfig = true;
             }
             if (runConfig.players == null) {
-                System.err.println("Param -m is required for no GUI mode");
+                System.err.println("Param -p is required for no GUI mode");
                 invalidConfig = true;
             } else if (runConfig.gameMode == GameState.GameMode.Campaign){
                 if( runConfig.players.size() != 1) {
@@ -128,7 +128,12 @@ public class DesktopLauncher {
                     invalidConfig = true;
                 }
 
-            } else if (runConfig.players.size() < 2) {
+            }  else if (runConfig.gameMode == GameState.GameMode.Exam_Admission){
+                if( runConfig.players.size() != 1) {
+                    System.err.println("The Exam Admission can only be played by exactly one player");
+                    invalidConfig = true;
+                }
+            }else if (runConfig.players.size() < 2) {
 
                 System.err.println("At least two players are required");
                 invalidConfig = true;
@@ -167,12 +172,22 @@ public class DesktopLauncher {
                 builder.append("\nScores:\n");
                 int i = 0;
                 for (Class<? extends Player> cur : run.getPlayers()) {
-                    builder.append(String.format("%-10s : %-6f", cur.getName(), run.getScores()[i++]));
+                    builder.append(String.format("%-10s : %-6f%n", cur.getName(), run.getScores()[i++]));
                 }
                 break;
             case Campaign:
-            case Exam_Admission:
                 if (run.getScores()[0] > 0) builder.append("Bot completed the challenge");
+                else builder.append("Bot failed the challenge");
+                break;
+            case Exam_Admission:
+                StringBuilder scoreBuilder = new StringBuilder();
+                scoreBuilder.append("\nScores:\n");
+                int j = 0;
+                for (Class<? extends Player> cur : run.getPlayers()) {
+                    scoreBuilder.append(String.format("%-10s : %-6f%n", cur.getName(), run.getScores()[j++]));
+                }
+                System.out.println(scoreBuilder);
+                if (run.getScores()[0] >= 420) builder.append("Bot completed the challenge");
                 else builder.append("Bot failed the challenge");
                 break;
             default:

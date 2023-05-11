@@ -16,7 +16,6 @@ public class ExamAdmissionLayout extends GamemodeLayout{
 		getTeamAmountSlider().freezeSlider(true);
 		getTeamAmountSlider().setRanges(1,1);
 		getTeamSizeSlider().setRange(1,1);
-		this.add(getMapSelector()).colspan(getDefaultColspan()).pad(getDefaultPadding());
 
 		row();
 

@@ -14,8 +14,16 @@ public class InventoryDrawer extends Container<Inventory>{
 
 	Inventory[] playerInventory;
 	Inventory current;
+	RunConfiguration runConfiguration;
 
 	public InventoryDrawer(RunConfiguration runConfiguration) {
+		this.runConfiguration = runConfiguration;
+		playerInventory = new Inventory[runConfiguration.teamCount];
+		current = new Inventory(runConfiguration.inventorySize);
+		setActor(current);
+	}
+
+	public void rebuild(){
 		playerInventory = new Inventory[runConfiguration.teamCount];
 		current = new Inventory(runConfiguration.inventorySize);
 		setActor(current);

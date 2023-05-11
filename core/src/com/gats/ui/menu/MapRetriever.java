@@ -5,6 +5,9 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import java.io.*;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class MapRetriever implements FilenameFilter {
@@ -35,7 +38,8 @@ public class MapRetriever implements FilenameFilter {
 
     String campaignDirectory = internalDir + campaignMapFolder;
 
-    String[] campaignMaps = {"level1_1", "level1_2", "level1_3", "level2_1", "level2_2", "level2_3", "level3_1", "level3_2", "level3_3", "level4_1", "level4_2", "level4_3"};
+    String[] campaignMaps = {"level1_1", "level1_2", "level1_3", "level2_1", "level2_2", "level2_3","level3_1", "level3_2", "level3_3","level4_1", "level4_2", "level4_3","level5_1", "level5_2", "level5_3","level6_1", "level6_2", "level6_3",};
+
 
     /**
      * Creates a {@link MapRetriever}, wich is responsible for providing the selectable Maps
@@ -156,7 +160,9 @@ public class MapRetriever implements FilenameFilter {
         String[] mapNames = hardCodeMapNames;
         if (dir.equals(campaignMapFolder)) {
 
-            mapNames = campaignMaps;
+        mapNames =availableCampaignMaps();
+//            mapNames = campaignMaps; /*availableCampaignMaps();
+
         } else {
             dir = internalMapFolder;
 
@@ -165,6 +171,44 @@ public class MapRetriever implements FilenameFilter {
             mapList.add(readMapFromFile(map, dir,true));
         }
         return mapList;
+    }
+
+    /**
+     * Checks wich week after the campaign release date it is and puts the necessary maps into selection.
+     * @return
+     */
+    private String[] availableCampaignMaps() {
+
+        //LocalDate campaignRelease = LocalDate.of(2023, 5,15);
+
+        LocalDateTime campaignRelease = LocalDateTime.of(2023,5,15,0,0);
+
+
+       //vergleich heute mit campaign release
+
+        //LocalDateTime today = LocalDateTime.now().plusWeeks(2);
+
+        LocalDateTime today = LocalDateTime.now();
+
+        System.out.println(Duration.between(campaignRelease,today).toDays());
+        int daysFromRelease = (int)Duration.between(campaignRelease,today).toDays();
+        int weeksFromRelease = daysFromRelease/7;
+        //dont allow negative weeks
+        weeksFromRelease=Math.max(weeksFromRelease,0);
+        int upperBound = Math.min((weeksFromRelease+1)*3,campaignMaps.length);
+
+        String[] releasedMaps = new String[upperBound];
+        if(upperBound+1==campaignMaps.length){
+            return campaignMaps;
+        }
+        //getMapnames for the current and previous weeks
+        System.arraycopy(campaignMaps, 0, releasedMaps, 0, upperBound);
+
+
+
+
+        return releasedMaps;
+
     }
 
     public ArrayList<String> getFileHandleNames(FileHandle[] handles) {
@@ -211,6 +255,11 @@ public class MapRetriever implements FilenameFilter {
             return createGameMap(map,mapName);
         }
             //if map could not be loaded, return this hint in selection
+
+        if(dir.equals(campaignMapFolder)){
+
+            return new GameMap("Please update your game: " + mapName + " not found!", 0);
+        }
             return new GameMap("ProblemLoadingMap: " + mapName, 0);
     }
 
