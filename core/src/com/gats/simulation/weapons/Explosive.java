@@ -59,13 +59,11 @@ public class Explosive implements Projectile {
         if (t != null) tilesInRadius.put(t, 0);
         if (character != null) charactersInRadius.put(character, 0);
 
-
-
         if (bsProj.type != ProjectileAction.ProjectileType.WATERBOMB) {
             Set<Tile> tileToDestroy = tilesInRadius.keySet();
             if (!tileToDestroy.isEmpty()) {
                 for (Tile td : tileToDestroy) {
-                    if (td != null)  td.onDestroy(head);
+                    if (td != null)  sim.getWrapper().onDestroyTile(td, head);
                 }
             }
         }
@@ -87,6 +85,7 @@ public class Explosive implements Projectile {
                 head = BaseProjectile.traverse(head, ch, path, sim, bsProj);
             }
         }
+
         return head;
     }
 
@@ -106,7 +105,7 @@ public class Explosive implements Projectile {
             if (rad == radius) {
                 if (t != null && !tiles.containsKey(t)) tiles.put(t, 0);
             } else {
-                if (t != null && bsProj.type !=  ProjectileAction.ProjectileType.WATERBOMB) t.destroyTileDirect(head);
+                if (t != null && bsProj.type !=  ProjectileAction.ProjectileType.WATERBOMB) sim.getWrapper().destroyTileDirect(t, head);
             }
 
 

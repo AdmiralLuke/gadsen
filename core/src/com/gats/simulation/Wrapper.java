@@ -56,6 +56,9 @@ public class Wrapper {
     public Action onDestroyTile(Tile t, Action head) {
         return t.onDestroy(head);
     }
+    public Action destroyTileDirect(Tile t, Action head) {
+        return t.destroyTileDirect(head);
+    }
 
     public void addAmmoToWeapon(int weapon, int addAmmo, GameCharacter character) {
         wpWrapper.addAmmo(character.getWeapon(weapon), addAmmo);

@@ -176,7 +176,7 @@ public class Tile implements Serializable {
      * GarbageColleciton goes huii
      */
     //ToDo this should never be public
-    public void deleteFromGraph() {
+    private void deleteFromGraph() {
         if (this.right != null) this.right.left = null;
         if (this.left != null) this.left.right = null;
         if (this.up != null) this.up.down = null;
@@ -187,7 +187,7 @@ public class Tile implements Serializable {
      * wenn die Box keinen Ankerpunkt hat, soll diese Simulation ausgeführt werden, bei der die Box solange fällt, bis sie im void
      * oder auf anderer Box landet
      */
-    public Action onDestroy(Action head) {
+    protected Action onDestroy(Action head) {
         state.getSim().turnsWithoutAction = 0;
         ArrayList<Tile> rightList = new ArrayList<>();
         ArrayList<Tile> upperList = new ArrayList<>();
@@ -271,7 +271,7 @@ public class Tile implements Serializable {
         return tileDestAction;
     }
 
-    public Action destroyTileDirect(Action head) {
+    protected Action destroyTileDirect(Action head) {
         this.deleteFromGraph();
         state.getBoard()[this.getPosition().x][this.getPosition().y] = null;
         Action tileDestAction = new TileDestroyAction(this.getPosition());
