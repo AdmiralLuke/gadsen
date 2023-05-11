@@ -2,6 +2,7 @@ package com.gats.manager;
 
 import java.security.*;
 
+@SuppressWarnings("removal")
 public class BotSecurityPolicy extends Policy {
 
     @Override

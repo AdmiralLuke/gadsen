@@ -62,7 +62,7 @@ public class TestDamage {
         character2.setPosY(3*16 + 1);
 
         Weapon wp = character2.getWeapon(1);
-        wp.shoot(new VoidAction(), character.getPlayerPos().sub(character2.getPlayerPos()), 1, character.getPlayerPos(), character);
+        sim.getWrapper().shoot(new VoidAction(), wp, character.getPlayerPos().sub(character2.getPlayerPos()), 1, character.getPlayerPos(), character);
 
         Assert.assertNotEquals("Leben sollte nicht mehr 100 sein ist aber 100", character.getHealth(), 100);
     }

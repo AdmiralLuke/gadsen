@@ -1,6 +1,8 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.action.Action;
+import com.gats.simulation.weapons.Weapon;
 import com.gats.simulation.weapons.WeaponWrapper;
 
 public class Wrapper {
@@ -61,5 +63,9 @@ public class Wrapper {
 
     public GameCharacter[][] getTeam() {
         return team;
+    }
+
+    public Action shoot(Action head, Weapon weapon, Vector2 dir, float strength, Vector2 pos, GameCharacter character){
+        return wpWrapper.shoot(head, weapon, dir, strength, pos, character);
     }
 }
