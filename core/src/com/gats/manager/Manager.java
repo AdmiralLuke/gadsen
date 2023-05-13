@@ -292,9 +292,8 @@ public class Manager {
     @SuppressWarnings({"removal"})
     private Manager() {
         java.security.Policy.setPolicy(new BotSecurityPolicy());
-
-        System.err.println("Please Ignore the following Warning---------------------");
         System.setProperty("java.security.manager", "allow");
+        System.err.println("Please Ignore the following Warning---------------------");
         System.setSecurityManager(new SecurityManager());
         System.err.println("--------------------------------------------------------");
         executionManager = new Thread(this::executionManager);
