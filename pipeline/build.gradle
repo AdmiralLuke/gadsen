@@ -9,6 +9,7 @@ task dist(type: Jar) {
     manifest {
         attributes 'Main-Class': 'com.gats.assets.Pipeline'
     }
+    archiveVersion.set "1.1"
     dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -22,19 +23,19 @@ sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.main.resources.srcDirs = ["res/"]
 
 
-abstract class CompileAssets extends DefaultTask {
+class CompileAssets extends DefaultTask {
 
-    @InputDirectory
-    abstract DirectoryProperty getInputDir()
+    @InputFiles @PathSensitive(PathSensitivity.ABSOLUTE)
+    def inputDir
 
-    @InputFile
-    abstract RegularFileProperty getExecutableJar()
+    @InputFile @Classpath
+    def executableJar
 
     @Internal
-    abstract DirectoryProperty getTmpDir()
+    def tmpDir
 
     @OutputDirectory
-    abstract DirectoryProperty getOutputDir()
+    def outputDir
 
 
     @TaskAction
@@ -42,18 +43,17 @@ abstract class CompileAssets extends DefaultTask {
 
         def cmd = ["java",
                    "-jar",
-                   executableJar.get().asFile.path,
-                   inputDir.get().asFile.path,
-                   tmpDir.get().asFile.path,
-                   outputDir.get().asFile.path]
+                   executableJar.path,
+                   inputDir.path,
+                   tmpDir.path,
+                   outputDir.path]
 
         def proc = cmd.execute()
         def sout = new StringBuffer(), serr = new StringBuffer();
         proc.waitForProcessOutput(sout, serr)
-        println("exitCode: " + proc.exitValue() + "\t"+ serr.toString());
         println("\toutput: \"" + sout.toString() + "\"");
+        if(proc.exitValue() != 0) throw new GradleException("Compiling assets failed with code "+ proc.exitValue() + "\t"+ serr.toString())
     }
-
 }
 
 
@@ -61,10 +61,10 @@ tasks.register('compileAssets', CompileAssets) {
 
     dependsOn ':pipeline:dist'
 
-    getInputDir().set(rootProject.file('assets/res/').absoluteFile)
-    getExecutableJar().set(file('build/libs/pipeline-1.0.jar').absoluteFile)
-    getTmpDir().set(file('build/tmp/assets/').absoluteFile)
-    getOutputDir().set(rootProject.file('core/resources/').absoluteFile)
+    inputDir = rootProject.file('assets/res/').absoluteFile
+    executableJar = file('build/libs/pipeline-1.1.jar').absoluteFile
+    tmpDir = file('build/tmp/assets/').absoluteFile
+    outputDir = rootProject.file('core/resources/').absoluteFile
 }
 
 
