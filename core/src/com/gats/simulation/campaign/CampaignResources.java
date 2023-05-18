@@ -19,9 +19,11 @@ public class CampaignResources {
             case "level2_3":
                 enemies.add(Level2Bot.class);
                 break;
-            case "level3":
+            case "level3_1":
+                enemies.add(Level3_1Bot.class);
                 break;
-            case "level4":
+            case "level3_2":
+                enemies.add(Level3_2Bot.class);
                 break;
             case "level5":
                 break;
@@ -45,15 +47,13 @@ public class CampaignResources {
                 inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 break;
-            case "level3":
-                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
-                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
+            case "level3_1":
+                inventories.add(new int[]{0, 99, 0, 0, 0, 1});
+                inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 break;
-            case "level4":
-                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
-                inventories.add(new int[]{0, 0, 0, 0, 0, 0});
-                break;
-            case "level5":
+            case "level3_2":
+                inventories.add(new int[]{1, 99, 0, 0, 0, 0});
+                inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 break;
         }
         return inventories;
@@ -83,6 +83,14 @@ public class CampaignResources {
                 helth.add(new int[]{80});
                 helth.add(new int[]{100});
                 break;
+            case "level3_1":
+                helth.add(new int[]{20});
+                helth.add(new int[]{100});
+                break;
+            case "level3_2":
+                helth.add(new int[]{100});
+                helth.add(new int[]{100});
+                break;
             case "level5":
                 break;
         }
@@ -97,6 +105,12 @@ public class CampaignResources {
             case "level2_1":
             case "level2_2":
             case "level2_3":
+            case "level3_1":
+            case "level3_2":
+            case "level3_3":
+            case "level4_1":
+            case "level4_2":
+            case "level4_3":
                 return 1;
         }
         return 1;
