@@ -64,7 +64,7 @@ public class CampaignResources {
                 break;
             case "level3_3":
                 inventories.add(new int[]{5, 99, 0, 0, 0, 0});
-                inventories.add(new int[]{0, 99, 5, 0, 0, 0});
+                inventories.add(new int[]{0, 99, 20, 0, 0, 0});
                 break;
         }
         return inventories;

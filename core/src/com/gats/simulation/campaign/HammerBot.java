@@ -18,7 +18,7 @@ public class HammerBot extends StaticBot {
                 float X = controller.getGameCharacter().getPlayerPos().x;
                 boolean left = enemyX < X;
                 if (enemyX == X) controller.move(-1);
-                controller.aim(new Vector2(left ? -1 : 1, 0f), 1);
+                controller.aim(state.getCharacterFromTeams(0, 0).getPlayerPos().sub(controller.getGameCharacter().getPlayerPos()), 1);
                 controller.shoot();
                 controller.move((int) Math.min(30, Math.max(392 - X, -30)));
                 break;
