@@ -5,7 +5,7 @@ import com.gats.manager.Controller;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
-public class Level3_1Bot extends StaticBot{
+public class LeftRightBot extends StaticBot{
 
     @Override
     protected void executeTurn(GameState state, Controller controller) {

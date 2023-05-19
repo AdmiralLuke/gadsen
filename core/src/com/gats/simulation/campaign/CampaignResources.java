@@ -20,12 +20,16 @@ public class CampaignResources {
                 enemies.add(Level2Bot.class);
                 break;
             case "level3_1":
-                enemies.add(Level3_1Bot.class);
+            case "level4_1":
+                enemies.add(LeftRightBot.class);
                 break;
             case "level3_2":
                 enemies.add(Level3_2Bot.class);
                 break;
             case "level5":
+                break;
+            case "level4_2":
+                enemies.add(Level4_2Bot.class);
                 break;
         }
         return enemies;
@@ -44,6 +48,8 @@ public class CampaignResources {
             case "level2_1":
             case "level2_2":
             case "level2_3":
+            case "level4_1":
+            case "level4_2":
                 inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 break;
@@ -75,6 +81,8 @@ public class CampaignResources {
                 helth.add(new int[]{80});
                 break;
             case "level2_1":
+            case "level3_2":
+            case "level4_2":
                 helth.add(new int[]{100});
                 helth.add(new int[]{100});
                 break;
@@ -87,9 +95,9 @@ public class CampaignResources {
                 helth.add(new int[]{20});
                 helth.add(new int[]{100});
                 break;
-            case "level3_2":
-                helth.add(new int[]{100});
-                helth.add(new int[]{100});
+            case "level4_1":
+                helth.add(new int[]{10});
+                helth.add(new int[]{30});
                 break;
             case "level5":
                 break;
