@@ -3,10 +3,7 @@ package com.gats;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.gats.manager.Manager;
-import com.gats.manager.Player;
-import com.gats.manager.Run;
-import com.gats.manager.RunConfiguration;
+import com.gats.manager.*;
 import com.gats.simulation.GameState;
 import com.gats.ui.GADS;
 import org.apache.commons.cli.*;
@@ -114,6 +111,7 @@ public class DesktopLauncher {
             config.setWindowIcon(Files.FileType.Classpath, "icon/icon.png");
             new Lwjgl3Application(new GADS(runConfig), config);
         } else {
+            Manager.setSystemReservedProcessorCount(1);
             boolean invalidConfig = false;
             if (runConfig.gameMode != GameState.GameMode.Exam_Admission && runConfig.mapName == null) {
                 System.err.println("Param -m is required for no GUI mode (except Exam Admission)");
