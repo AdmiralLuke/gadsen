@@ -626,4 +626,8 @@ public class GameCharacter implements Serializable {
     public boolean isAlive() {
         return health>0;
     }
+
+    public IntRectangle getBoundingBox() {
+        return boundingBox.copy();
+    }
 }
