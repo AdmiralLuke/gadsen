@@ -217,8 +217,7 @@ public class GameCharacter implements Serializable {
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
             state.addScore(team, (newHealth - health));
-            lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth) {
-            };
+            lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth);
         }
         this.health = newHealth;
         head.addChild(lastAction);
