@@ -16,10 +16,11 @@ public class Level4_2Bot extends StaticBot{
         float enemyX = state.getCharacterFromTeams(0, 0).getPlayerPos().x;
         float X = controller.getGameCharacter().getPlayerPos().x;
         float Y = controller.getGameCharacter().getPlayerPos().y;
+        float d = X - enemyX;
         //Do not try to understand this code
         //It has been engineered to not be understandable, but apply in this very specific scenario
         //We want you to find you own solutions for aiming :)
-        float d = X - enemyX;
+        //(Like seriously don't. I wrote this code, and even I do not fully understand it myself.)
         controller.aim(90 + (d + d*d/5000f - 9.7f) * 1 / 16f * 0.95f, 0.69f);
         controller.shoot();
         if (Math.random() > 0.5){
