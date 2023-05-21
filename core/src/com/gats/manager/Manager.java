@@ -292,9 +292,15 @@ public class Manager {
     @SuppressWarnings({"removal"})
     private Manager() {
         java.security.Policy.setPolicy(new BotSecurityPolicy());
-
-        System.err.println("Please Ignore the following Warning---------------------");
-        System.setSecurityManager(new SecurityManager());
+        System.setProperty("java.security.manager", "allow");
+        try {
+            System.err.println("Please Ignore the following Warning---------------------");
+            System.setSecurityManager(new SecurityManager());
+            System.err.println("--------------------------------------------------------");
+        } catch (UnsupportedOperationException e) {
+            System.err.println("--------------------------------------------------------");
+            throw e;
+        }
         executionManager = new Thread(this::executionManager);
         executionManager.start();
     }
