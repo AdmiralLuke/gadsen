@@ -15,6 +15,7 @@ import com.gats.simulation.action.Action;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.debugView.DebugView;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -80,10 +81,13 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     }
 
     @Override
-    public void init(GameState state) {
+    public void init(GameState state,String[] playerNames) {
         //ToDo the game is starting remove waiting screen etc.
-        hud.newGame();
-        animator.init(state);
+
+        //how do i get the current game? currently is wonky, because this.game could not be up to date i think
+        hud.setPlayerNames(playerNames);
+        hud.newGame(state);
+        animator.init(state,playerNames);
     }
 
     /**
@@ -108,6 +112,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         hud.resizeViewport(width,height);
         gameViewport.update(width,height);
         debugView.getViewport().update(width,height);
+
     }
 
     @Override
