@@ -5,7 +5,7 @@ import com.gats.simulation.action.ActionLog;
 
 public interface AnimationLogProcessor {
 
-    void init(GameState state);
+    void init(GameState state,String[] playerNames);
 
     void animate(ActionLog log);
 
