@@ -191,4 +191,12 @@ public class IntRectangle implements Serializable, Shape2D {
     public boolean contains(float x, float y) {
         return this.x <= x && this.x + this.width >= x && this.y <= y && this.y + this.height >= y;
     }
+
+    public IntVector2 min() {
+        return new IntVector2(x, y);
+    }
+
+    public IntVector2 max() {
+        return new IntVector2(x + width, y + height);
+    }
 }
