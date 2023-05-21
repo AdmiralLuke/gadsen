@@ -59,11 +59,12 @@ public class DebugView {
 				debugText.addActionLog(log);
 			}
 
-		viewport.apply(true);
-		batch.setProjectionMatrix(viewport.getCamera().combined);
 
 		//draw the text
 		if(stage!=null&&isEnabled) {
+			viewport.apply(true);
+			batch.setProjectionMatrix(viewport.getCamera().combined);
+
 			stage.draw();
 		}
 	}

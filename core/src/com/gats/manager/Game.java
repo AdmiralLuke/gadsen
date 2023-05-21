@@ -152,7 +152,7 @@ public class Game {
         setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
-        if (gui) animationLogProcessor.init(state);
+        if (gui) animationLogProcessor.init(state,getPlayerNames());
         //Run the Game
         simulationThread = new Thread(this::run);
         simulationThread.setName("Manager_Simulation_Thread");
@@ -401,6 +401,17 @@ public class Game {
             setStatus(Status.ABORTED);
             dispose();
         }
+    }
+
+    protected String[] getPlayerNames(){
+        String[] names = new String[players.length];
+        int i=0;
+        for (Player p: players) {
+           names[i] = p.getName();
+           i++;
+        }
+        return names;
+
     }
 
     public boolean shouldSaveReplay() {

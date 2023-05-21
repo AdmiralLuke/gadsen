@@ -2,6 +2,7 @@ package com.gats.ui.hud;
 
 import com.badlogic.gdx.graphics.Color;
 import com.gats.simulation.GameCharacter;
+import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 import com.gats.ui.Hud;
 
@@ -15,7 +16,7 @@ import java.awt.*;
 public class UiMessenger {
 
 
-	Hud hud;
+	private Hud hud;
 
 	public UiMessenger(Hud hud){
 		this.hud = hud;
@@ -25,10 +26,11 @@ public class UiMessenger {
 	 * Applies the necessary changes to the Hud for a new turn.
 	 * @param currentPlayer
 	 */
-	public void turnChanged(GameCharacter currentPlayer, com.gats.animation.GameCharacter animPlayer){
+	public void turnChanged(GameState state,GameCharacter currentPlayer, com.gats.animation.GameCharacter animPlayer){
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(animPlayer.getTeamColor());
 		refillStaminaBar(currentPlayer.getStamina());
+		hud.adjustScores(state.getScores());
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
 

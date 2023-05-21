@@ -360,9 +360,8 @@ public class Animator implements Screen, AnimationLogProcessor {
             animator.getCamera().moveToVector(target.getPos());
 
             CharacterSelectAction characterSelectAction = new CharacterSelectAction(startAction.getDelay(), target, animator::setActiveGameCharacter);
-
             //ui Action
-            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(startAction.getTeam(), startAction.getCharacter()), target);
+            MessageUiTurnStartAction indicateTurnStartAction = new MessageUiTurnStartAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(startAction.getTeam(), startAction.getCharacter()), target, animator.state);
 
             characterSelectAction.setChildren(new Action[]{indicateTurnStartAction});
             return new ExpandedAction(characterSelectAction, indicateTurnStartAction);
@@ -557,7 +556,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     }
 
     @Override
-    public void init(GameState state) {
+    public void init(GameState state,String[] playerNames) {
         synchronized (root) {
             this.state = state;
             map = new TileMap(state);
@@ -771,4 +770,9 @@ public class Animator implements Screen, AnimationLogProcessor {
         if (activeCharacter != null) activeCharacter.setHoldingWeapon(true);
         return old;
     }
+
+    public static Color[] getTeamColors() {
+        return teamColors.clone();
+    }
 }
+
