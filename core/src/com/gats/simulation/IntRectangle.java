@@ -192,11 +192,45 @@ public class IntRectangle implements Serializable, Shape2D {
         return this.x <= x && this.x + this.width >= x && this.y <= y && this.y + this.height >= y;
     }
 
+    /**
+     * Gets the min point from a hitbox, to make it AABB compatible
+     * @return minimum point from the hitbox
+     */
     public IntVector2 min() {
         return new IntVector2(x, y);
     }
 
+    /**
+     * Gets the max point from a hitbox, to make it AABB compatible
+     * @return maximum point from the hitbox
+     */
     public IntVector2 max() {
         return new IntVector2(x + width, y + height);
+    }
+
+    public boolean intersects(Vector2 s, Vector2 e) {
+        float tmin = Float.NEGATIVE_INFINITY;
+        float tmax = Float.POSITIVE_INFINITY;
+
+        Vector2 dir = e.cpy().sub(s);
+        if (dir.x != 0f) {
+            float tx1 = (this.min().x - s.x) / dir.x;
+            float tx2 = (this.max().x - s.x) / dir.x;
+
+            tmin = Float.max(tmin, Float.min(tx1, tx2));
+            tmax = Float.min(tmax, Float.max(tx1, tx2));
+        }
+        if (dir.y != 0f) {
+            float ty1 = (this.min().y - s.y) / dir.y;
+            float ty2 = (this.max().y - s.y) / dir.y;
+
+            tmin = Float.max(tmin, Float.min(ty1, ty2));
+            tmax = Float.min(tmax, Float.max(ty1, ty2));
+        }
+        return tmax >= tmin;
+    }
+
+    public IntRectangle copy() {
+        return new IntRectangle(this.x, this.y, this.width, this.height);
     }
 }

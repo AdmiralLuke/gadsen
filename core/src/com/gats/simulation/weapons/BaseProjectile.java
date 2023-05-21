@@ -88,23 +88,42 @@ public class BaseProjectile implements Projectile{
         Action log = null;
         while (log == null) {
             Vector2 pos = path.getPos(t);
-            Vector2 posN = path.getPos(this.t + 0.001f);
+            Vector2 posN = path.getPos(this.t + 0.0001f);
             // DebugPointAction dbAc = new DebugPointAction(0, pos, Color.BLUE, 0.1f, true);
             // head.addChild(dbAc);
             log = checkForHit(head, dec, pos, posN);
-            if (log == null) this.t += 0.00001f;
+            if (log == null) this.t += 0.0001f;
         }
         return log;
     }
 
     Action checkForHit(Action head, Projectile dec, Vector2 pos, Vector2 posN) {
         Action lastAc = null;
+
+        ArrayList<GameCharacter> newCollisions = new ArrayList<>();
+        for (int i = 0; i < sim.getState().getTeamCount(); i++) {
+            for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
+                GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
+                if (character != null && character.isAlive()) {
+                    if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
+                        newCollisions.add(character);
+                        if (!activeCollisions.contains(character)) {
+                            return  dec.hitCharacter(head, character, dec, this);
+                        }
+                    }
+                }
+            }
+        }
+
+        activeCollisions = newCollisions;
+
+
         Tile h = sim.getState().getTile((int)posN.x / 16, (int)posN.y / 16);
         if (h != null) {
             if (lastTile == null || !lastTile.equals(h)) {
                 Tile tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
                 while (tN == null || !tN.equals(h)) {
-                    this.t += 0.000001f;
+                    this.t += 0.00001f;
                     pos = path.getPos(t);
                     if (lastTile != null && !h.equals(lastTile)) lastTile = h;
                     tN = sim.getState().getTile((int) pos.x / 16, (int) pos.y / 16);
@@ -121,23 +140,9 @@ public class BaseProjectile implements Projectile{
             return dec.hitNothing(head, dec, this);
         }
 
-        ArrayList<GameCharacter> newCollisions = new ArrayList<>();
 
-        for (int i = 0; i < sim.getState().getTeamCount(); i++) {
-            for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
-                GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
-                if (character != null && character.isAlive()) {
-                    if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
-                        newCollisions.add(character);
-                        if (!activeCollisions.contains(character)) {
-                            lastAc =  dec.hitCharacter(head, character, dec, this);
-                        }
-                    }
-                }
-            }
-        }
 
-        activeCollisions = newCollisions;
+
         // lastCharacter = null;
 
 
@@ -194,7 +199,7 @@ public class BaseProjectile implements Projectile{
                 head.addChild(cmAc);
                 return hAc;
             }
-            head.addChild(new DebugPointAction(0f, pos, Color.BLUE, 10f, true));
+            // head.addChild(new DebugPointAction(0f, pos, Color.BLUE, 10f, true));
 
 
             // posA
@@ -219,7 +224,7 @@ public class BaseProjectile implements Projectile{
                     break;
                 }
             }
-            head.addChild(new DebugPointAction(0f, pos, Color.GREEN, 10f, true));
+            // head.addChild(new DebugPointAction(0f, pos, Color.GREEN, 10f, true));
 
             // posC
             pos = pathC.getPos(t);
@@ -233,7 +238,7 @@ public class BaseProjectile implements Projectile{
                     break;
                 }
             }
-            head.addChild(new DebugPointAction(0f, pos, Color.RED, 10f, true));
+            // head.addChild(new DebugPointAction(0f, pos, Color.RED, 10f, true));
 
             // posD
             pos = pathD.getPos(t);
@@ -247,7 +252,7 @@ public class BaseProjectile implements Projectile{
                     break;
                 }
             }
-            head.addChild(new DebugPointAction(0f, pos, Color.PURPLE, 10f, true));
+            // head.addChild(new DebugPointAction(0f, pos, Color.PURPLE, 10f, true));
 
             if (t > 0.005) bsProj.lastTile = null;
             t += 0.001f;
@@ -310,8 +315,15 @@ public class BaseProjectile implements Projectile{
 
     ProjectileAction generateAction() {
         Path path = null;
-        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t),  this.path.getDir(0), this.t);
+        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), this.path.getPos(t),  this.path.getDir(0));
         if (projType == ProjType.LINEAR) path = new LinearPath(this.path.getPos(0), this.path.getPos(t), 100);
+        return new ProjectileAction(0,type, path);
+    }
+
+    ProjectileAction generateAction(Vector2 endPosition) {
+        Path path = null;
+        if (projType == ProjType.PARABLE) path = new ParablePath(this.path.getPos(0), endPosition,  this.path.getDir(0));
+        if (projType == ProjType.LINEAR) path = new LinearPath(this.path.getPos(0), endPosition, 100);
         return new ProjectileAction(0,type, path);
     }
 }
