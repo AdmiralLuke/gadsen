@@ -71,7 +71,7 @@ public class Manager {
                 System.out.println("ExecutionManager shutting down");
                 break;
             }
-            int threadLimit = Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount;
+            int threadLimit = Math.max(Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount, Game.REQUIRED_THREAD_COUNT);
             synchronized (schedulingLock) {
                 int runningThreads = activeGames.size() * Game.REQUIRED_THREAD_COUNT;
                 if (runningThreads > threadLimit) {
