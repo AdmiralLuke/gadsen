@@ -3,10 +3,7 @@ package com.gats;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.gats.manager.Manager;
-import com.gats.manager.Player;
-import com.gats.manager.Run;
-import com.gats.manager.RunConfiguration;
+import com.gats.manager.*;
 import com.gats.simulation.GameState;
 import com.gats.ui.GADS;
 import org.apache.commons.cli.*;
@@ -114,6 +111,7 @@ public class DesktopLauncher {
             config.setWindowIcon(Files.FileType.Classpath, "icon/icon.png");
             new Lwjgl3Application(new GADS(runConfig), config);
         } else {
+            Manager.setSystemReservedProcessorCount(1);
             boolean invalidConfig = false;
             if (runConfig.gameMode != GameState.GameMode.Exam_Admission && runConfig.mapName == null) {
                 System.err.println("Param -m is required for no GUI mode (except Exam Admission)");
@@ -176,8 +174,8 @@ public class DesktopLauncher {
                 }
                 break;
             case Campaign:
-                if (run.getScores()[0] > 0) builder.append("Bot completed the challenge");
-                else builder.append("Bot failed the challenge");
+                if (run.getScores()[0] > 0) builder.append("passed");
+                else builder.append("failed");
                 break;
             case Exam_Admission:
                 StringBuilder scoreBuilder = new StringBuilder();
@@ -187,8 +185,8 @@ public class DesktopLauncher {
                     scoreBuilder.append(String.format("%-10s : %-6f%n", cur.getName(), run.getScores()[j++]));
                 }
                 System.out.println(scoreBuilder);
-                if (run.getScores()[0] >= 420) builder.append("Bot completed the challenge");
-                else builder.append("Bot failed the challenge");
+                if (run.getScores()[0] >= 420) builder.append("passed");
+                else builder.append("failed");
                 break;
             default:
                 builder.append(Arrays.toString(run.getPlayers().toArray()));

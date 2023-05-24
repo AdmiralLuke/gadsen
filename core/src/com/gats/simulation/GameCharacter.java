@@ -217,8 +217,7 @@ public class GameCharacter implements Serializable {
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
             state.addScore(team, (newHealth - health));
-            lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth) {
-            };
+            lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth);
         }
         this.health = newHealth;
         head.addChild(lastAction);
@@ -266,7 +265,7 @@ public class GameCharacter implements Serializable {
         int ammoRare = (int)Math.ceil(1 + Math.log((teamCount - 1) * (cpT / 2f) + 2));
 
         Weapon[] weapons = new Weapon[6];
-        weapons[0] = new Weapon(new Explosive(new BaseProjectile(0, 0.6f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), weaponCounts.length>0?weaponCounts[0]:(2 * cpT + teamCount), WeaponType.WATERBOMB, 10);
+        weapons[0] = new Weapon(new Explosive(new BaseProjectile(0, 0.7f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), weaponCounts.length>0?weaponCounts[0]:(2 * cpT + teamCount), WeaponType.WATERBOMB, 10);
         weapons[1] = new Weapon(new BaseProjectile(10, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), weaponCounts.length>1?weaponCounts[1]:999, WeaponType.WATER_PISTOL, 9);
         weapons[2] = new Weapon(new BaseProjectile(35, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), weaponCounts.length>2?weaponCounts[2]:1, WeaponType.MIOJLNIR, 13);
         weapons[3] = new Weapon(new Explosive(new BaseProjectile(15, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), weaponCounts.length>3?weaponCounts[3]:cpT, WeaponType.GRENADE, 10);
@@ -625,5 +624,9 @@ public class GameCharacter implements Serializable {
 
     public boolean isAlive() {
         return health>0;
+    }
+
+    public IntRectangle getBoundingBox() {
+        return boundingBox.copy();
     }
 }

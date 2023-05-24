@@ -13,9 +13,12 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.gats.animation.Animator;
+import com.gats.manager.Game;
 import com.gats.manager.HumanPlayer;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.GameCharacter;
+import com.gats.simulation.GameState;
 import com.gats.ui.assets.AssetContainer;
 import com.gats.ui.hud.*;
 import com.gats.ui.hud.inventory.InventoryDrawer;
@@ -54,6 +57,10 @@ public class Hud implements Disposable {
 	private float renderingSpeed = 1;
 
 	private boolean debugVisible;
+
+	private String[] names;
+
+	private ScoreView scoreView;
 	public Hud(InGameScreen ingameScreen, RunConfiguration runConfig) {
 		this.runConfiguration = runConfig;
 
@@ -79,7 +86,7 @@ public class Hud implements Disposable {
 
 		aimInfo = new AimInformation(" Grad"," %");
 		inventory = setupInventoryDrawer(runConfig);
-		inputHandler = setupInputHandler(ingameScreen);
+		inputHandler = setupInputHandler(ingameScreen,this);
 		inputHandler.setUiMessenger(uiMessenger);
 
 		turnTimer = new TurnTimer(AssetContainer.IngameAssets.turnTimer);
@@ -97,6 +104,9 @@ public class Hud implements Disposable {
 		inputMultiplexer.addProcessor(stage);
 
 		stage.addActor(layoutTable);
+
+		scoreView = new ScoreView(null);
+
 	}
 
 
@@ -114,8 +124,8 @@ public class Hud implements Disposable {
 		return invDraw;
 	}
 
-	private InputHandler setupInputHandler(InGameScreen ingameScreen){
-		return new InputHandler(ingameScreen);
+	private InputHandler setupInputHandler(InGameScreen ingameScreen,Hud h){
+		return new InputHandler(ingameScreen,h);
 	}
 
 
@@ -131,6 +141,18 @@ public class Hud implements Disposable {
 		table.center();
 		return table;
     }
+
+	public void setupScoreboard(GameState game){
+
+		ScoreBoard scores = new ScoreBoard(Animator.getTeamColors(),names,game);
+
+		scoreView.addScoreboard(scores);
+
+	}
+
+	public void setPlayerNames(String[] names){
+		this.names = names;
+	}
 
 
 	/**
@@ -196,6 +218,9 @@ public class Hud implements Disposable {
 
 		stage.getViewport().apply(true);
        	stage.draw();
+		   if(scoreView!=null){
+			   scoreView.draw();
+		   }
 	}
 
 	protected void tick(float delta) {
@@ -231,8 +256,11 @@ public class Hud implements Disposable {
 		turnPopupContainer.maxSize(image.getWidthForContainer(),image.getHeightForContainer());
 	}
 
-	public void resizeViewport(int width, int height){
-		stage.getViewport().update(width,height,true);
+	public void resizeViewport(int width, int height) {
+		stage.getViewport().update(width, height, true);
+		if(scoreView!=null) {
+			scoreView.getViewport().update(width, height, true);
+		}
 	}
 
 	public UiMessenger getUiMessenger() {
@@ -290,6 +318,19 @@ public class Hud implements Disposable {
 		this.layoutTable.setDebug(debugVisible);
 	}
 
+	public void toggleScores(){
+		if(scoreView!=null) {
+			scoreView.toggleEnabled();
+		}
+	}
+
+	public void adjustScores(float[] scores){
+		if(scoreView!=null){
+			scoreView.adjustScores(scores);
+		}
+
+	}
+
 
 
 	public void gameEnded(boolean won,int team,boolean isDraw) {
@@ -339,11 +380,12 @@ public class Hud implements Disposable {
 	}
 
 
-	public void newGame(){
+	public void newGame(GameState state){
 		layoutTable.setBackground((Drawable) null);
 		inventory.rebuild();
 		if(turnPopupContainer.hasChildren()) {
 			turnPopupContainer.removeActorAt(0, false);
 		}
+		setupScoreboard(state);
 	}
 }

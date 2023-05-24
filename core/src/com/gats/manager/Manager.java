@@ -71,7 +71,7 @@ public class Manager {
                 System.out.println("ExecutionManager shutting down");
                 break;
             }
-            int threadLimit = Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount;
+            int threadLimit = Math.max(Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount, Game.REQUIRED_THREAD_COUNT);
             synchronized (schedulingLock) {
                 int runningThreads = activeGames.size() * Game.REQUIRED_THREAD_COUNT;
                 if (runningThreads > threadLimit) {
@@ -292,9 +292,15 @@ public class Manager {
     @SuppressWarnings({"removal"})
     private Manager() {
         java.security.Policy.setPolicy(new BotSecurityPolicy());
-
-        System.err.println("Please Ignore the following Warning---------------------");
-        System.setSecurityManager(new SecurityManager());
+        System.setProperty("java.security.manager", "allow");
+        try {
+            System.err.println("Please Ignore the following Warning---------------------");
+            System.setSecurityManager(new SecurityManager());
+            System.err.println("--------------------------------------------------------");
+        } catch (UnsupportedOperationException e) {
+            System.err.println("--------------------------------------------------------");
+            throw e;
+        }
         executionManager = new Thread(this::executionManager);
         executionManager.start();
     }

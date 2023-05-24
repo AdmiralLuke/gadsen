@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.manager.HumanPlayer;
+import com.gats.ui.Hud;
 import com.gats.ui.InGameScreen;
 
 public class InputHandler implements InputProcessor, com.gats.manager.InputProcessor {
@@ -19,6 +20,7 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
     private final int KEY_CAMERA_ZOOM_IN = Input.Keys.I;
     private final int KEY_CAMERA_ZOOM_OUT = Input.Keys.O;
     private final int KEY_CAMERA_ZOOM_RESET = Input.Keys.R;
+    private final int KEY_TOGGLE_SCORES = Input.Keys.P;
 
     private final int KEY_CAMERA_TOGGLE_PLAYER_FOCUS = Input.Keys.F;
 
@@ -47,9 +49,12 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
 
     float cameraZoomPressed = 0;
 
+    private Hud hud;
 
-    public InputHandler(InGameScreen ingameScreen) {
+
+    public InputHandler(InGameScreen ingameScreen, Hud h) {
         this.ingameScreen = ingameScreen;
+        this.hud = h;
     }
 
 
@@ -159,6 +164,8 @@ public class InputHandler implements InputProcessor, com.gats.manager.InputProce
             case KEY_TOGGLE_DEBUG:
                 ingameScreen.toggleDebugView();
                 break;
+            case KEY_TOGGLE_SCORES:
+                hud.toggleScores();
             default:
                 if (turnInProgress && currentPlayer != null) {
                     ingameScreen.skipTurnStart();

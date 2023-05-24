@@ -58,12 +58,15 @@ public class ExampleBot extends Bot {
             controller.move(16);
         }
 
-        // wähle die Zuckerstange aus
-        controller.selectWeapon(WeaponType.SUGAR_CANE);
+        // wähle die Wasserpistole aus
+        controller.selectWeapon(WeaponType.WATER_PISTOL);
         // Schusswinkel
         float angle= 20 + (int)(Math.random() * 30);
+
         // Stärke des Schusses zwischen 0-1
         float strength = 0.5f;
-        controller.shoot(angle, strength, WeaponType.SUGAR_CANE);
+        controller.aim(angle, strength);
+        // Schießen
+        controller.shoot();
     }
 }
