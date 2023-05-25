@@ -323,7 +323,9 @@ public class Manager {
 
     public static void setSystemReservedProcessorCount(int systemReservedProcessorCount) {
         Manager.systemReservedProcessorCount = systemReservedProcessorCount;
-        getManager().executionManager.notify();
+        synchronized (getManager().executionManager){
+            getManager().executionManager.notify();
+        }
     }
 
     @Override
