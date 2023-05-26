@@ -13,7 +13,7 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class TestMultiGameRun {
 
-    private final long COMPLETION_TIMEOUT = 10000;
+    private static final long GAME_COMPLETION_TIMEOUT = 500;
 
     private final RunConfiguration runConfig;
     private final Run run;
@@ -38,7 +38,9 @@ public class TestMultiGameRun {
         synchronized (lock){
             run.addCompletionListener(run ->{
                 completed = true;
-                lock.notify();
+                synchronized (lock) {
+                    lock.notify();
+                }
             });
         }
     }
@@ -51,193 +53,208 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 2;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 2;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 2;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 2;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 3;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 3;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 3;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 3;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 4;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 4;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        samples.add(new TestExample(config));
-
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
-        config.teamCount = 4;
-        config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 4;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 4;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 4;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "map1";
+        config.mapName = "MangoMap";
         config.teamCount = 4;
+        config.teamSize = 1;
         config.players = new ArrayList<>();
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
-        config.players.add(TestBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "MangoMap";
+        config.teamCount = 4;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
         return samples;
@@ -259,22 +276,22 @@ public class TestMultiGameRun {
     public void testCompletion(){
         synchronized (lock){
             try {
-                lock.wait(COMPLETION_TIMEOUT);
+                lock.wait(binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
         Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
-                "Var-Dump:%s", COMPLETION_TIMEOUT, this), completed);
+                "Var-Dump:%s", GAME_COMPLETION_TIMEOUT, this), completed);
     }
 
     @Override
     public String toString() {
         return "TestMultiGameRun{" +
-                "runConfig=" + runConfig +
-                ", run=" + run +
-                ", manager=" + manager +
-                ", completed=" + completed +
+                "\nrunConfig=" + runConfig +
+                "\n, run=" + run +
+                "\n, manager=" + manager +
+                "\n, completed=" + completed +
                 '}';
     }
 
