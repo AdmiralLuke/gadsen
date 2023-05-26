@@ -44,10 +44,12 @@ public class Game {
     private static final int AI_EXECUTION_TIMEOUT = 500;
     private static final int AI_EXECUTION_GRACE_PERIODE = 100;
     private static final int AI_INIT_TIMEOUT = 1000;
+    private static final int AI_CONTROLLER_USES = 200;
 
     private static final int HUMAN_EXECUTION_TIMEOUT = 30000;
     private static final int HUMAN_EXECUTION_GRACE_PERIODE = 5000;
     private static final int HUMAN_INIT_TIMEOUT = 30000;
+    private static final int HUMAN_CONTROLLER_USES = 100000;
 
     private static final boolean isDebug;
     static {
@@ -70,7 +72,7 @@ public class Game {
     private final ExecutorService executor = Executors.newSingleThreadExecutor(new BotThreadFactory());
     private final List<HumanPlayer> humanList = new ArrayList<>();
 
-    private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(128);
+    private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(256);
     private Thread simulationThread;
     private final UiMessenger uiMessenger;
     private boolean pendingShutdown = false;
@@ -206,7 +208,7 @@ public class Game {
             int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
 
             Player currentPlayer = players[currentPlayerIndex];
-            Controller controller = new Controller(this, gcController);
+            Controller controller = new Controller(this, gcController, currentPlayer.getType() == Player.PlayerType.Human? HUMAN_CONTROLLER_USES: AI_CONTROLLER_USES);
 
             Thread futureExecutor;
             Future<?> future;

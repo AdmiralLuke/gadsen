@@ -17,16 +17,17 @@ import com.gats.simulation.WeaponType;
  */
 public class Controller {
 
-    private boolean active = true;
+    private int uses;
     private Game game;
     private GameCharacterController gcController;
     private GameCharacter gameCharacter;
 
-    protected Controller(Game game, GameCharacterController gcController) {
+    protected Controller(Game game, GameCharacterController gcController, int uses) {
 //        System.out.println("Created new Controller: " + this);
         this.game = game;
         this.gcController = gcController;
         this.gameCharacter = gcController.getGameCharacter();
+        this.uses = uses;
     }
 
     /**
@@ -41,8 +42,17 @@ public class Controller {
      * Positive Werte bewegen den Charakter nach rechts, Negative nach links.
      */
     public void move(int dx) {
-        if (active) game.queueCommand(new MoveCommand(gcController, dx));
+        if (uses>0) game.queueCommand(new MoveCommand(gcController, dx));
 
+    }
+
+    /**
+     * Die Zahl an Nutzungen ist für Bots auf 200 beschränkt.
+     * Die maximale Zahl sinnvoller Züge beträgt ca. 70
+     * @return Die Menge an Befehlen, die dieser Controller noch ausführen kann
+     */
+    public int getRemainingUses(){
+        return uses;
     }
 
 
@@ -86,7 +96,7 @@ public class Controller {
      * @param strength Stärke des Schusses zwischen 0 und 1 (inklusive).
      */
     public void aim(Vector2 angle, float strength) {
-        if (active) game.queueCommand(new AimCommand(gcController, angle, strength));
+        if (uses>0) game.queueCommand(new AimCommand(gcController, angle, strength));
     }
 
     /**
@@ -94,7 +104,7 @@ public class Controller {
      * @param type Die Waffe die gewählt werden soll.
      */
     public void selectWeapon(WeaponType type) {
-        if (active) game.queueCommand(new WeaponSelectCommand(gcController, type));
+        if (uses>0) game.queueCommand(new WeaponSelectCommand(gcController, type));
     }
 
     /**
@@ -102,21 +112,15 @@ public class Controller {
      * Es kann nur einmal pro Zug geschossen werden.
      */
     public void shoot() {
-        if (active) game.queueCommand(new ShootCommand(gcController));
+        if (uses>0) game.queueCommand(new ShootCommand(gcController));
     }
 
-    /**
-     * Reaktiviert diesen Controller. Wird von internen Komponenten genutzt, um den Zugfolge der Charaktere zu steuern.
-     */
-    protected void activate() {
-        active = true;
-    }
 
     /**
      * Deaktiviert diesen Controller (Wenn der Zug vorbei ist). Wird von internen Komponenten genutzt, um den Zugfolge der Charaktere zu steuern.
      */
     protected void deactivate() {
-        active = false;
+        uses = -1;
         gcController.deactivate();
     }
 
