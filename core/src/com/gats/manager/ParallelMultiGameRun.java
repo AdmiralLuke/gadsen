@@ -43,11 +43,9 @@ public class ParallelMultiGameRun extends Run {
         List<List<Integer>> listOfMatchUps = subsetK(indices, runConfig.teamCount);
         List<List<Integer>> permListOfMatchUps = new ArrayList<>();
         for (List<Integer> matchUp : listOfMatchUps) {
-            if (runConfig.gameMode == GameState.GameMode.Exam_Admission) {
-                permListOfMatchUps.addAll(permutations(matchUp).subList(0, 8));
-            } else
-                permListOfMatchUps.addAll(permutations(matchUp));
+            permListOfMatchUps.addAll(permutations(matchUp));
         }
+
         List<Game> games = new ArrayList<>();
         Game lastGame = null;
         Game firstGame = null;
