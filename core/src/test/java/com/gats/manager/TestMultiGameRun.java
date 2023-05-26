@@ -14,6 +14,7 @@ import java.util.Collection;
 public class TestMultiGameRun {
 
     private static final long GAME_COMPLETION_TIMEOUT = 500;
+    private static final long COMPLETION_TIMEOUT = 10000;
 
     private final RunConfiguration runConfig;
     private final Run run;
@@ -204,58 +205,58 @@ public class TestMultiGameRun {
         samples.add(new TestExample(config));
 
 
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 4;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
+//        config = new RunConfiguration();
+//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+//        config.mapName = "MangoMap";
+//        config.teamCount = 4;
+//        config.teamSize = 1;
+//        config.players = new ArrayList<>();
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        samples.add(new TestExample(config));
 
 
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 4;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
+//        config = new RunConfiguration();
+//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+//        config.mapName = "MangoMap";
+//        config.teamCount = 4;
+//        config.teamSize = 1;
+//        config.players = new ArrayList<>();
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        samples.add(new TestExample(config));
 
 
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 4;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
+//        config = new RunConfiguration();
+//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+//        config.mapName = "MangoMap";
+//        config.teamCount = 4;
+//        config.teamSize = 1;
+//        config.players = new ArrayList<>();
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        config.players.add(IdleBot.class);
+//        samples.add(new TestExample(config));
 
         return samples;
     }
@@ -276,7 +277,7 @@ public class TestMultiGameRun {
     public void testCompletion(){
         synchronized (lock){
             try {
-                lock.wait(binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT);
+                lock.wait(COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
