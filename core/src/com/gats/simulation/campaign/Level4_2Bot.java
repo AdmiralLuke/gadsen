@@ -23,7 +23,7 @@ public class Level4_2Bot extends StaticBot{
         //(Like seriously don't. I wrote this code, and even I do not fully understand it myself.)
         controller.aim(90 + (d + d*d/4000f - 9.7f) * 1 / 16f * 0.94f, 0.69f);
         controller.shoot();
-        if (Math.random() > 0){
+        if (Math.random() > 0.5){
             if (state.getTile(((int)X)/16 -1 , ((int)Y)/16 -1)!= null)
                 controller.move(-16);
         }else{
