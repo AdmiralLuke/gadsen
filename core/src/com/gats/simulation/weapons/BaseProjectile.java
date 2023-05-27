@@ -86,18 +86,23 @@ public class BaseProjectile implements Projectile{
     @Override
     public Action move(Action head, float strength, Projectile dec) {
         Action log = null;
+        IntRectangle[][] boundingBoxes = new IntRectangle[sim.getState().getTeamCount()][sim.getState().getCharactersPerTeam()];
+        for (int i = 0; i < sim.getState().getTeamCount(); i++) {
+            for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
+                boundingBoxes[i][j] = sim.getState().getCharacterFromTeams(i, j).getBoundingBox();
+            }}
         while (log == null) {
             Vector2 pos = path.getPos(t);
             Vector2 posN = path.getPos(this.t + 0.0001f);
             // DebugPointAction dbAc = new DebugPointAction(0, pos, Color.BLUE, 0.1f, true);
             // head.addChild(dbAc);
-            log = checkForHit(head, dec, pos, posN);
+            log = checkForHit(head, dec, pos, posN, boundingBoxes);
             if (log == null) this.t += 0.0001f;
         }
         return log;
     }
 
-    Action checkForHit(Action head, Projectile dec, Vector2 pos, Vector2 posN) {
+    Action checkForHit(Action head, Projectile dec, Vector2 pos, Vector2 posN, IntRectangle[][] boundingBoxes) {
         Action lastAc = null;
 
         ArrayList<GameCharacter> newCollisions = new ArrayList<>();
@@ -105,7 +110,7 @@ public class BaseProjectile implements Projectile{
             for (int j = 0; j < sim.getState().getCharactersPerTeam(); j++) {
                 GameCharacter character = sim.getState().getCharacterFromTeams(i, j);
                 if (character != null && character.isAlive()) {
-                    if (((int) character.getPlayerPos().x / 16 == (int) pos.x / 16) && ((int) character.getPlayerPos().y / 16 == (int) pos.y / 16)) {
+                    if (boundingBoxes[i][j].contains(pos)) {
                         newCollisions.add(character);
                         if (!activeCollisions.contains(character)) {
                             return  dec.hitCharacter(head, character, dec, this);

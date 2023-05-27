@@ -7,6 +7,8 @@ dependencies {
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["resources/"]
 
+test.systemProperties["java.security.manager"] = "allow"
+
 processResources.dependsOn ':pipeline:compileAssets'
 
 eclipse.project.name = appName + "-core"
