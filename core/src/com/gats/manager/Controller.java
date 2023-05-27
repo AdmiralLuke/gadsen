@@ -94,7 +94,6 @@ public class Controller {
      */
     public void aim(Vector2 angle, float strength) {
         queue(new AimCommand(gcController, angle, strength));
-        System.out.println(uses);
     }
 
     /**
