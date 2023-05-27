@@ -21,7 +21,7 @@ public class Level4_2Bot extends StaticBot{
         //It has been engineered to not be understandable, but apply in this very specific scenario
         //We want you to find you own solutions for aiming :)
         //(Like seriously don't. I wrote this code, and even I do not fully understand it myself.)
-        controller.aim(90 + (d + d*d/4000f - 9.7f) * 1 / 16f * 0.94f, 0.69f);
+        controller.aim(90 + (d + d*d/4000f - 16.0f) * 1 / 16f * 0.94f, 0.69f);
         controller.shoot();
         if (Math.random() > 0.5){
             if (state.getTile(((int)X)/16 -1 , ((int)Y)/16 -1)!= null)
