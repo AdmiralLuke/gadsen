@@ -1,10 +1,7 @@
 package com.gats.manager;
 
 import com.badlogic.gdx.math.Vector2;
-import com.gats.manager.command.AimCommand;
-import com.gats.manager.command.MoveCommand;
-import com.gats.manager.command.ShootCommand;
-import com.gats.manager.command.WeaponSelectCommand;
+import com.gats.manager.command.*;
 import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.WeaponType;
@@ -42,7 +39,7 @@ public class Controller {
      * Positive Werte bewegen den Charakter nach rechts, Negative nach links.
      */
     public void move(int dx) {
-        if (uses>0) game.queueCommand(new MoveCommand(gcController, dx));
+        queue(new MoveCommand(gcController, dx));
 
     }
 
@@ -96,7 +93,8 @@ public class Controller {
      * @param strength Stärke des Schusses zwischen 0 und 1 (inklusive).
      */
     public void aim(Vector2 angle, float strength) {
-        if (uses>0) game.queueCommand(new AimCommand(gcController, angle, strength));
+        queue(new AimCommand(gcController, angle, strength));
+        System.out.println(uses);
     }
 
     /**
@@ -104,7 +102,7 @@ public class Controller {
      * @param type Die Waffe die gewählt werden soll.
      */
     public void selectWeapon(WeaponType type) {
-        if (uses>0) game.queueCommand(new WeaponSelectCommand(gcController, type));
+        queue(new WeaponSelectCommand(gcController, type));
     }
 
     /**
@@ -112,9 +110,17 @@ public class Controller {
      * Es kann nur einmal pro Zug geschossen werden.
      */
     public void shoot() {
-        if (uses>0) game.queueCommand(new ShootCommand(gcController));
+        queue(new ShootCommand(gcController));
     }
 
+    /**
+     * Internal utility method.
+     * Controls the remaining uses and submits cmd to the game.
+     * @param cmd the command to be queued
+     */
+    private void queue(Command cmd){
+        if (uses-->0) game.queueCommand(cmd);
+    }
 
     /**
      * Deaktiviert diesen Controller (Wenn der Zug vorbei ist). Wird von internen Komponenten genutzt, um den Zugfolge der Charaktere zu steuern.
