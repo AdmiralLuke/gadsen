@@ -35,7 +35,7 @@ public class TestDamage {
         GameCharacter character = state.getCharacterFromTeams(0, 0);
         Assert.assertEquals("Leben sollte 100 sein ist aber " + character.getHealth(), character.getHealth(), 100);
         character.setPosX(0);
-        character.setPosY(1);
+        character.setPosY(16);
 
         state.getBoard()[0][4] = new Tile(0, 4, state, true);
         state.getBoard()[0][5] = new Tile(0, 5, state);
