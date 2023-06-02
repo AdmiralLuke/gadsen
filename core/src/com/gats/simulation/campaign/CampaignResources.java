@@ -12,7 +12,7 @@ public class CampaignResources {
             case "level1_1":
             case "level1_2":
             case "level1_3":
-                enemies.add(Level1Bot.class);
+                enemies.add(Level1Bot.class); //120 72
                 break;
             case "level2_1":
             case "level2_2":
@@ -37,6 +37,7 @@ public class CampaignResources {
                 enemies.add(Level5_1Bot.class);
                 break;
             case "level5_2":
+            case "level5_3":
                 enemies.add(Level5_2Bot.class);
                 break;
         }
@@ -60,7 +61,9 @@ public class CampaignResources {
             case "level4_1":
             case "level4_2":
             case "level4_3":
+
             case "level5_2":
+            case "level5_3":
                 inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 inventories.add(new int[]{0, 99, 0, 0, 0, 0});
                 break;
@@ -114,11 +117,18 @@ public class CampaignResources {
                 helth.add(new int[]{10});
                 helth.add(new int[]{30});
                 break;
+            case "level5_2":
+                helth.add(new int[]{100, 100});
+                helth.add(new int[]{100, 100});
+                break;
+            case "level5_3":
+                helth.add(new int[]{20, 40});
+                helth.add(new int[]{100, 100});
+                break;
             case "level2_1":
             case "level3_2":
             case "level4_2":
             case "level3_3":
-            case "level5_2":
             default:
                 helth.add(new int[]{100});
                 helth.add(new int[]{100});
@@ -130,6 +140,7 @@ public class CampaignResources {
     public static int getCharacterCount(String map) {
         switch (map){
             case "level5_2":
+            case "level5_3":
                 return 2;
         }
         return 1;
