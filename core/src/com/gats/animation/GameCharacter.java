@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * Repräsentiert eine Spielfigur auf der Karte
  */
-public class GameCharacter extends AnimatedEntity implements Parent {
+public class GameCharacter extends AnimatedEntity {
 
 
     private float accSkinTime = 0;
@@ -25,8 +25,6 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     private static final float spriteOffsetLeft = 5;
 
     private static final float spriteOffsetRight = 2;
-
-    private final EntityGroup group;
 
 
     private Animation<TextureRegion> skin;
@@ -47,8 +45,6 @@ public class GameCharacter extends AnimatedEntity implements Parent {
 
     public GameCharacter(Color teamColor) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
-        group = new EntityGroup();
-        group.setParent(this);
         switch (new Random().nextInt(4)) {
             case 1:
                 skin = IngameAssets.orangeCatSkin;
@@ -66,46 +62,41 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         setRotate(true);
         TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
         setOrigin(com.gats.simulation.GameCharacter.getSize().scl(0.5f).add(5, 0));
+
         this.teamColor = new Color(teamColor.r, teamColor.g, teamColor.b, OUTLINE_ALPHA);
+
+        setShaderHandler((batch) -> {
+            ShaderProgram shader = IngameAssets.lookupOutlineShader;
+            batch.setShader(shader);
+            shader.setUniformf("outline_color", this.teamColor);
+            shader.setUniformf("line_thickness", 1f);
+            Texture frame = getAnimation().getKeyFrame(0).getTexture();
+            shader.setUniformf("tex_size", new Vector2(frame.getWidth(), frame.getHeight()));
+            shader.setUniformi("u_skin", 1);
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
+            TextureRegion skinFrame = this.skin.getKeyFrame(accSkinTime);
+            skinFrame.getTexture().bind();
+            shader.setUniformf("flipped", isFlipped() ? 1 : 0);
+            shader.setUniformf("v_skinBounds",
+                    skinFrame.getU(),
+                    skinFrame.getV(),
+                    skinFrame.getU2() - skinFrame.getU(),
+                    skinFrame.getV2() - skinFrame.getV());
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+        });
     }
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         accSkinTime += deltaTime;
-
         if (!holdingWeapon && weapon != null) {
             weapon.draw(batch, deltaTime, parentAlpha);
+            weapon.setVisible(false);
         }
-        if (healthbar!=null){
-            healthbar.draw(batch,deltaTime,parentAlpha);
-        }
-        batch.flush();
-
-        ShaderProgram shader = IngameAssets.lookupOutlineShader;
-        batch.setShader(shader);
-        shader.setUniformf("outline_color", teamColor);
-        shader.setUniformf("line_thickness", 1f);
-        Texture texture = getAnimation().getKeyFrame(0).getTexture();
-        shader.setUniformf("tex_size", new Vector2(texture.getWidth(), texture.getHeight()));
-        shader.setUniformi("u_skin", 1);
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
-        TextureRegion skinFrame = this.skin.getKeyFrame(accSkinTime);
-        skinFrame.getTexture().bind();
-        shader.setUniformf("flipped", isFlipped() ? 1 : 0);
-        shader.setUniformf("v_skinBounds",
-                skinFrame.getU(),
-                skinFrame.getV(),
-                skinFrame.getU2() - skinFrame.getU(),
-                skinFrame.getV2() - skinFrame.getV());
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
         super.draw(batch, deltaTime, parentAlpha);
-        batch.flush();
-        batch.setShader(null);
-
-        if (aimingIndicator != null) aimingIndicator.draw(batch, deltaTime, parentAlpha);
-        if (holdingWeapon && weapon != null) weapon.draw(batch, deltaTime, parentAlpha);
-        group.draw(batch, deltaTime, parentAlpha);
-
+        if (!holdingWeapon && weapon != null) {
+            weapon.setVisible(true);
+        }
     }
 
     public void setAnimation(GameCharacterAnimationType type) {
@@ -132,28 +123,28 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     }
 
 
-    public Healthbar getHealthbar(){
+    public Healthbar getHealthbar() {
         return this.healthbar;
     }
 
     public void setAimingIndicator(AimIndicator aimIndicator) {
-        if (this.aimingIndicator != null && this.aimingIndicator.getParent() != null) remove(aimIndicator);
+        if (this.aimingIndicator != null) remove(aimIndicator);
         this.aimingIndicator = aimIndicator;
         if (aimIndicator == null) return;
         if (aimIndicator.getParent() != null) aimIndicator.getParent().remove(aimIndicator);
         aimIndicator.setParent(this);
+        super.add(aimIndicator);
 
 
         //Farbe/Transparenz des Indicators setzen
         Color c;
-        if(this.teamColor!=null){
+        if (this.teamColor != null) {
             c = new Color(teamColor);
 
-        }
-        else {
+        } else {
             c = new Color(Color.WHITE);
         }
-        c.a=0.75f;
+        c.a = 0.75f;
         aimIndicator.setColor(c);
     }
 
@@ -162,8 +153,8 @@ public class GameCharacter extends AnimatedEntity implements Parent {
         super.setPos(pos);
         if (aimingIndicator != null) aimingIndicator.updatePos();
         if (weapon != null) weapon.updatePos();
-        if (healthbar!=null)healthbar.updatePos();
-        group.updatePos();
+        if (healthbar != null) healthbar.updatePos();
+        //group.updatePos();
     }
 
     public static float getAnimationDuration(GameCharacterAnimationType type) {
@@ -185,21 +176,29 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     }
 
     public void setWeapon(Weapon weapon) {
-        if (this.weapon != null && this.weapon.getParent() != null) {
-            remove(weapon);
+        if (this.weapon != null) {
+            remove(this.weapon);
         }
         this.weapon = weapon;
         if (weapon == null) return;
         if (weapon.getParent() != null) weapon.getParent().remove(weapon);
         weapon.setParent(this);
         weapon.setHolding(holdingWeapon);
+        super.add(weapon);
     }
 
 
-    public void setHealthbar(Healthbar healthbar){
-        if(healthbar==null) {return;}
+    public void setHealthbar(Healthbar healthbar) {
+        if (this.healthbar != null) {
+            remove(this.healthbar);
+        }
         this.healthbar = healthbar;
+        if (healthbar == null) {
+            return;
+        }
+        if (healthbar.getParent() != null) healthbar.getParent().remove(healthbar);
         this.healthbar.setParent(this);
+        super.add(healthbar);
     }
 
     @Override
@@ -211,37 +210,31 @@ public class GameCharacter extends AnimatedEntity implements Parent {
     }
 
     @Override
-    public Entity asEntity() {
-        return this;
-    }
-
-    @Override
     public void add(Entity child) {
         if (child instanceof AimIndicator) {
             setAimingIndicator((AimIndicator) child);
         } else if (child instanceof Weapon) {
             setWeapon((Weapon) child);
         } else if (child instanceof Healthbar) {
-           setHealthbar((Healthbar)child);
-        }else {
-            group.add(child);
+            setHealthbar((Healthbar) child);
+        } else {
+            super.add(child);
         }
     }
 
     @Override
     public void remove(Entity child) {
-        if (child == weapon) {
-            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
-            weapon.setParent(null);
-            weapon = null;
-        } else if (child == aimingIndicator) {
-            aimingIndicator.setParent(null);
+        if (child == aimingIndicator) {
             aimingIndicator = null;
-        }else {
-            group.remove(child);
+        } else if (child == healthbar) {
+            healthbar = null;
+        } else if (child == weapon) {
+            weapon = null;
         }
+        super.remove(child);
     }
-    public Color getTeamColor(){
+
+    public Color getTeamColor() {
         return new Color(teamColor);
     }
 }

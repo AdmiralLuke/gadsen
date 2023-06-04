@@ -12,7 +12,14 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class SpriteEntity extends Entity {
 
+    public interface ShaderHandler {
+        void beforeDraw(Batch batch);
+    }
+
+    private ShaderHandler shaderHandler;
     private TextureRegion textureRegion;
+
+    private boolean visible = true;
 
     private Color color = null;
     private Vector2 size = null;
@@ -43,46 +50,53 @@ public class SpriteEntity extends Entity {
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
+        if (visible) {
+            if (shaderHandler != null) shaderHandler.beforeDraw(batch);
+            if (color != null)
+                batch.setColor(color);
+
+            Vector2 scale = getScale();
+            if (size == null)
+                batch.draw(textureRegion,
+                        getPos().x - origin.x,
+                        getPos().y - origin.y,
+                        origin.x,
+                        origin.y,
+                        textureRegion.getRegionWidth(),
+                        textureRegion.getRegionHeight(),
+                        (flipped ? -1 : 1) * (scale.x),
+                        (scale.y),
+                        getRotationAngle());
+            else
+                batch.draw(textureRegion,
+                        getPos().x - origin.x,
+                        getPos().y - origin.y,
+                        origin.x,
+                        origin.y,
+                        size.x,
+                        size.y,
+                        (flipped ? -1 : 1) * (scale.x),
+                        (scale.y),
+                        getRotationAngle());
+
+            //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
+
+            if (color != null)
+                batch.setColor(Color.WHITE);
+            if (shaderHandler != null) {
+                batch.flush();
+                batch.setShader(null);
+            }
+        }
         super.draw(batch, deltaTime, parentAlpha);
-        if (color != null)
-            batch.setColor(color);
-
-        Vector2 scale = getScale();
-        if (size == null)
-            batch.draw(textureRegion,
-                    getPos().x - origin.x,
-                    getPos().y - origin.y,
-                    origin.x,
-                    origin.y,
-                    textureRegion.getRegionWidth(),
-                    textureRegion.getRegionHeight(),
-                    (flipped ? -1 : 1) * (scale.x),
-                    (scale.y),
-                    getRotationAngle());
-        else
-            batch.draw(textureRegion,
-                    getPos().x - origin.x,
-                    getPos().y - origin.y,
-                    origin.x,
-                    origin.y,
-                    size.x,
-                    size.y,
-                    (flipped ? -1 : 1) * (scale.x),
-                    (scale.y),
-                    getRotationAngle());
-
-        //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
-
-        if (color != null)
-            batch.setColor(Color.WHITE);
     }
 
 
     public Vector2 getSize() {
-        if(size!=null) {
+        if (size != null) {
             return new Vector2(size);
         }
-        return new Vector2(0,0);
+        return new Vector2(0, 0);
     }
 
     public void setSize(Vector2 size) {
@@ -163,11 +177,26 @@ public class SpriteEntity extends Entity {
         angle = ((angle % 360) + 360) % 360;
         super.setRelRotationAngle(rotate ? angle : 0);
         if (angle >= 90f && angle <= 270f) {
-            super.setRelRotationAngle(mirror ? angle-180 : angle);
+            super.setRelRotationAngle(mirror ? angle - 180 : angle);
             setFlipped(mirror);
         } else {
             setFlipped(false);
         }
     }
 
+    public ShaderHandler getShaderHandler() {
+        return shaderHandler;
+    }
+
+    public void setShaderHandler(ShaderHandler shaderHandler) {
+        this.shaderHandler = shaderHandler;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 }

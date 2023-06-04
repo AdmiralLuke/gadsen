@@ -6,9 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.animation.entity.AnimatedEntity;
 import com.gats.animation.entity.Entity;
-import com.gats.animation.entity.Parent;
 
-public class Weapon extends AnimatedEntity implements Parent {
+public class Weapon extends AnimatedEntity {
 
     private final Animation<TextureRegion> holdingAnimation;
 
@@ -68,37 +67,24 @@ public class Weapon extends AnimatedEntity implements Parent {
     }
 
     @Override
-    public Entity asEntity() {
-        return this;
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        carryEntity.setVisible(visible);
     }
 
     @Override
     public void add(Entity child) {
         if (child instanceof AnimatedEntity || child == null) {
-            if (this.carryEntity != null && this.carryEntity.getParent() != null) {
+            if (this.carryEntity != null) {
                 remove(carryEntity);
             }
             this.carryEntity = (AnimatedEntity) child;
             if (carryEntity == null) return;
             if (carryEntity.getParent() != null) carryEntity.getParent().remove(carryEntity);
             carryEntity.setParent(this);
+            super.add(child);
         }
     }
-
-    @Override
-    public void remove(Entity child) {
-        if (child == null) return;
-        if (carryEntity == child) {
-            carryEntity.setParent(null);
-            carryEntity = null;
-        }
-    }
-    @Override
-    protected void setPos(Vector2 pos) {
-        super.setPos(pos);
-        if (carryEntity != null) carryEntity.updatePos();
-    }
-
 
 
 }
