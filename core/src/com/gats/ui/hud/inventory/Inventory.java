@@ -10,18 +10,15 @@ import java.util.*;
 
 public class Inventory extends VerticalGroup {
 
-	public Map<WeaponType, Integer> itemsIndex;
-
 
 	private int selectedItemIndex;
-	private ArrayList<InventoryCell> items;
+	private InventoryCell[] items;
 
 	public Inventory(int size){
-		itemsIndex = new HashMap<WeaponType, Integer>(size);
-		items = new ArrayList<InventoryCell>();
+		items = new InventoryCell[WeaponType.values().length];
 		for(int i =0;i<size;i++){
-			InventoryCell cell = new InventoryCell(AssetContainer.IngameAssets.inventoryCell);
-			items.add(cell);
+			InventoryCell cell = new InventoryCell(AssetContainer.IngameAssets.inventoryCell, WeaponType.values()[i]);
+			items[i]=cell;
 			addActor(cell);
 		}
 
@@ -32,23 +29,16 @@ public class Inventory extends VerticalGroup {
 	 * @param character
 	 */
 	public Inventory(GameCharacter character){
-		this(6);
+		this(WeaponType.values().length);
 		for(int i=0;i<character.getWeaponAmount();i++){
-			updateItem(character,i);
+			updateItem(WeaponType.values()[i], character.getWeapon(i).getAmmo());
 		}
 	}
 
-	public void updateItem(GameCharacter character,int index){
-
-		Weapon current = character.getWeapon(index);
-		items.get(index).setWeapon(current);
-		itemsIndex.put(current.getType(),index);
-
+	public void updateItem(WeaponType weaponType, int amount){
+		items[weaponType.ordinal()].setAmmo(amount);
 	}
 
-	public void updateItem(GameCharacter character,WeaponType weaponType){
-		updateItem(character,itemsIndex.get(weaponType));
-	}
 
 	/**
 	 * Sets the selected weapon in the inventory, to draw the outline
@@ -56,52 +46,18 @@ public class Inventory extends VerticalGroup {
 	 */
 	public void setSelectedItem(WeaponType newSelected){
 
-		//Todo remove not-selected/-1 if it is removed
 		InventoryCell selectedweapon;
 
-		int	newSelectedIndex = -1;
-		//only try to get item from the map, if one is selected
+		int	newSelectedIndex = newSelected == null? -1:newSelected.ordinal();
 
-		if(selectedItemIndex>=0) {
-			 selectedweapon = items.get(selectedItemIndex);
-		}
-		//check if the selected weapon exitst/has a sprite
-		if(itemsIndex.get(newSelected)!= null){
-			newSelectedIndex = itemsIndex.get(newSelected);
-		}
 		//if current weapon was selected, set to false
 		if(selectedItemIndex >=0) {
-			items.get(selectedItemIndex).setSelected(false);
+			items[selectedItemIndex].setSelected(false);
 		}
+		if(newSelectedIndex>=0)
+			items[newSelectedIndex].setSelected(true);
 
-		//if new selected is a selectable weapon type, set selected
-		if((newSelectedIndex>=0)&&(newSelectedIndex < items.size())){
-
-			items.get(newSelectedIndex).setSelected(true);
-		}
-		//otherwise dont select any weapon
-		else {
-			if(selectedItemIndex>0&&selectedItemIndex<items.size()) {
-				items.get(selectedItemIndex).setSelected(false);
-			}
-		}
 		selectedItemIndex = newSelectedIndex;
-
-	}
-	/**
-	 * Returns a list of InventoryWeapons of the Characters inventory.
-	 * @param character
-	 * @return
-	 */
-	public List<InventoryWeapon> getCharacterWeapons(GameCharacter character){
-		List<InventoryWeapon> weapons = new ArrayList<InventoryWeapon>(character.getWeaponAmount());
-
-		for(int i=0;i<character.getWeaponAmount();i++) {
-			Weapon current = character.getWeapon(i);
-			weapons.add(new InventoryWeapon(current, AssetContainer.IngameAssets.weaponIcons.get(current.getType())));
-		}
-
-		return weapons;
 	}
 
 

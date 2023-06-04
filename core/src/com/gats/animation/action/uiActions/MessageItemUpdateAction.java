@@ -9,17 +9,19 @@ import com.gats.ui.hud.UiMessenger;
  */
 public class MessageItemUpdateAction extends MessageUiAction {
 
-	GameCharacter currentPlayer;
+	int team;
 	WeaponType weaponType;
-	public MessageItemUpdateAction(float start, UiMessenger uiMessenger, GameCharacter currentPlayer, WeaponType type) {
+	int amount;
+	public MessageItemUpdateAction(float start, UiMessenger uiMessenger, int team, WeaponType type, int amount) {
 		super(start, uiMessenger);
-		this.currentPlayer = currentPlayer;
+		this.team = team;
 		this.weaponType = type;
+		this.amount = amount;
 	}
 
 	@Override
 	protected void runAction(float oldTime, float current) {
-		uiMessenger.updateInventoryItem(currentPlayer,weaponType);
+		uiMessenger.updateInventoryItem(team, weaponType, amount);
 		endAction(oldTime);
 	}
 }
