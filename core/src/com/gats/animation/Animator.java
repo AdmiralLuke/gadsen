@@ -142,6 +142,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(GameOverAction.class, ActionConverters::convertGameOverAction);
                         put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
                         put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
+                        put(InventoryAction.class, ActionConverters::convertInventoryAction);
                     }
                 };
 
@@ -390,10 +391,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 return anim != null ? anim.getAnimationDuration() : 0;
             });
 
-            //uiaction
-            MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0, animator.uiMessenger, currentPlayer, currentPlayer.getSelectedWeapon());
-            shotExecutorAction.setChildren(new Action[]{updateInventoryItem});
-            return new ExpandedAction(shotExecutorAction, updateInventoryItem);
+            return new ExpandedAction(shotExecutorAction);
         }
 
         private static ExpandedAction convertCharacterHitAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -532,6 +530,15 @@ public class Animator implements Screen, AnimationLogProcessor {
             animMoveAction.setChildren(new Action[]{stopWalking});
 
             return new ExpandedAction(startWalking, stopWalking);
+        }
+
+        private static ExpandedAction convertInventoryAction(com.gats.simulation.action.Action action, Animator animator) {
+            InventoryAction inventoryAction = (InventoryAction) action;
+
+            //uiaction
+            MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0, animator.uiMessenger, inventoryAction.getTeam(), inventoryAction.getWpType(), inventoryAction.getAmount());
+
+            return new ExpandedAction(updateInventoryItem);
         }
 
     }

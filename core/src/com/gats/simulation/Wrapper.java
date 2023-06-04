@@ -37,8 +37,8 @@ public class Wrapper {
             int w1 = GameState.getWeaponFromCycleIndex(state.cycleWeapon(character.getTeam()));
             int w2 = GameState.getWeaponFromCycleIndex(state.cycleWeapon(character.getTeam()));
 
-            addAmmoToWeapon(w1, 1, character);
-            addAmmoToWeapon(w2, 1, character);
+            head = addAmmoToWeapon(head, w1, 1, character);
+            head = addAmmoToWeapon(head, w2, 1, character);
         } else if (t.getTileType() == Tile.TileType.HEALTH_BOX) {
             // health-box
 
@@ -60,8 +60,8 @@ public class Wrapper {
         return t.destroyTileDirect(head);
     }
 
-    public void addAmmoToWeapon(int weapon, int addAmmo, GameCharacter character) {
-        wpWrapper.addAmmo(character.getWeapon(weapon), addAmmo);
+    public Action addAmmoToWeapon(Action head, int weapon, int addAmmo, GameCharacter character) {
+        return wpWrapper.addAmmo(head, character.getWeapon(weapon), addAmmo, character);
     }
 
     public GameCharacter[][] getTeam() {

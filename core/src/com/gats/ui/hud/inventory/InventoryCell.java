@@ -24,7 +24,7 @@ public class InventoryCell extends Image {
 
 	private Color selectedColor;
 	private ColoredLabelWithBackground ammoLabel;
-	public InventoryCell(TextureRegion background) {
+	public InventoryCell(TextureRegion background, WeaponType type) {
 		super(background);
 		//Todo make size adjustable, either by implementing it, so it can be resized easily, or just creating a size parameter for the constructor.
 		//hardcoded size, because i could not figure out a nice way with to set it via the table
@@ -37,26 +37,29 @@ public class InventoryCell extends Image {
 		ammoLabel = new ColoredLabelWithBackground("", AssetContainer.MainMenuAssets.skin);
 		ammoLabel.setFontScale(2);
 
+		TextureRegion weaponIcon = AssetContainer.IngameAssets.weaponIcons.get(type);
+		if(weaponIcon==null){
+			weaponIcon = AssetContainer.IngameAssets.coolCat.getKeyFrame(0);
+		}
+		this.weapon = new InventoryWeapon(type, weaponIcon);
+
+		ammoLabel.setText(0);
 
 		positionAmmoLabel();
 	}
 
-	void setWeapon(Weapon weapon){
-		TextureRegion weaponIcon = AssetContainer.IngameAssets.weaponIcons.get(weapon.getType());
-		if(weaponIcon==null){
-			weaponIcon = AssetContainer.IngameAssets.coolCat.getKeyFrame(0);
-		}
-		this.weapon = new InventoryWeapon(weapon, weaponIcon);
+
+	void setAmmo(int count){
+		weapon.setCount(count);
 
 		if(ammoLabel!=null) {
-			if (weapon.getAmmo() > 99) {
+			if (count > 99) {
 				ammoLabel.setText("€");
 			} else {
-				ammoLabel.setText(weapon.getAmmo());
+				ammoLabel.setText(count);
 			}
 		}
 	}
-
 
 	void setSelected(boolean selected){
 		this.selected = selected;

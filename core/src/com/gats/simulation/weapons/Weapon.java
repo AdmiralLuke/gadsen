@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.*;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.action.CharacterShootAction;
+import com.gats.simulation.action.InventoryAction;
 import com.gats.simulation.action.ProjectileAction;
 
 import java.io.Serializable;
@@ -42,8 +43,10 @@ public class Weapon implements Serializable {
         if (type == WeaponType.WOOL || type == WeaponType.WATER_PISTOL || type == WeaponType.GRENADE || type == WeaponType.WATERBOMB) path = new ParablePath(pos.cpy(), duration, v);
         else if(type == WeaponType.MIOJLNIR ||  type == WeaponType.CLOSE_COMBAT) path = new LinearPath(pos.cpy(), dir.cpy(), duration, 40);
         projectile.setPath(path);
+        InventoryAction inventoryAction = new InventoryAction(character.getTeam(), character.getTeamPos(), type, ammo);
+        head.getChildren().add(inventoryAction);
         CharacterShootAction shootAction = new CharacterShootAction(character.getTeam(), character.getTeamPos());
-        head.getChildren().add(shootAction);
+        inventoryAction.getChildren().add(shootAction);
         return projectile.shoot(shootAction, dir, strength, projectile, character);
     }
 
@@ -55,8 +58,12 @@ public class Weapon implements Serializable {
         return new Weapon(this);
     }
 
-    protected void setAmmo(int ammo) {
+    protected Action setAmmo(Action head, int ammo, GameCharacter character) {
         this.ammo = ammo;
+
+        InventoryAction inventoryAction = new InventoryAction(character.getTeam(), character.getTeamPos(), type, ammo);
+        head.getChildren().add(inventoryAction);
+        return inventoryAction;
     }
 
     public int getAmmo() {

@@ -15,22 +15,28 @@ import java.util.List;
  */
 public class InventoryWeapon {
 
-	private Weapon weapon;
-	private TextureRegion icon;
+	private final WeaponType weaponType;
+	private int count;
+	private final TextureRegion icon;
 
-	private int index;
-	public InventoryWeapon(Weapon weapon, TextureRegion icon){
+	public InventoryWeapon(WeaponType type, TextureRegion icon){
 		{
-			this.weapon = weapon;
+			this.weaponType = type;
+			this.count = 0;
 			this.icon = icon;
 		}
 	}
 
-	public Weapon getWeapon(){
-		return weapon;
+	public void setCount(int count) {
+		this.count = count;
 	}
+
 	public WeaponType getWeaponType(){
-		return weapon.getType();
+		return weaponType;
+	}
+
+	public int getCount() {
+		return count;
 	}
 
 	public TextureRegion getIcon() {
