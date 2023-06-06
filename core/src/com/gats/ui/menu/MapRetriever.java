@@ -12,34 +12,38 @@ import java.util.*;
 
 public class MapRetriever implements FilenameFilter {
     static FileHandle dirHandler;
-    final String defaultMapFiletype = ".json";
-    String filetype = defaultMapFiletype;
+    private static final String defaultMapFiletype = ".json";
+    private static final String filetype = defaultMapFiletype;
 
-    boolean debug = true;
+    boolean debug = false;
 
     /**
      * For dev use in the Project/Ide.
      */
-    String internalDir = "core/resources/";
+    private static final String internalDir = "core/resources/";
 
-    String internalMapFolder = "maps/";
-    String internalMapDirectory = internalDir + internalMapFolder;
+    private static final String internalMapFolder = "maps/";
+    private static final String internalMapDirectory = internalDir + internalMapFolder;
     /**
      * /**
      * Path relative to the jar after building
      */
-    String externalMapDirectory = "map/";
+    private static final String externalMapDirectory = "map/";
 
-    String[] hardCodeMapNames = new String[]{"christmasMap", "kratzbaumMap", "MangoMap"};
+    private static final String[] hardCodeMapNames = new String[]{"christmasMap", "kratzbaumMap", "MangoMap"};
 
-    ArrayList<String> internalMaps = new ArrayList<String>(Arrays.asList(hardCodeMapNames));
+    private static final ArrayList<String> internalMaps = new ArrayList<String>(Arrays.asList(hardCodeMapNames));
 
-    String campaignMapFolder = "maps/campaign/";
+    private static final String campaignMapFolder = "maps/campaign/";
 
-    String campaignDirectory = internalDir + campaignMapFolder;
+    private static final String campaignDirectory = internalDir + campaignMapFolder;
 
-    String[] campaignMaps = {"level1_1", "level1_2", "level1_3", "level2_1", "level2_2", "level2_3","level3_1", "level3_2", "level3_3","level4_1", "level4_2", "level4_3","level5_1", "level5_2", "level5_3","level6_1", "level6_2", "level6_3",};
+    private static final String[] campaignMaps = {"level1_1", "level1_2", "level1_3", "level2_1", "level2_2", "level2_3","level3_1", "level3_2", "level3_3","level4_1", "level4_2", "level4_3","level5_1", "level5_2", "level5_3","level6_1", "level6_2", "level6_3",};
 
+    static {
+        if(!new File(externalMapDirectory).isDirectory())
+            System.err.println("Warning: No Map-Dir found at " + new File(externalMapDirectory).getAbsolutePath());
+    }
 
     /**
      * Creates a {@link MapRetriever}, wich is responsible for providing the selectable Maps
@@ -130,7 +134,6 @@ public class MapRetriever implements FilenameFilter {
 
         if (!directory.isDirectory()) {
             //the directory is not valid
-            System.out.println(dir + " is not a valid directory.");
             return new ArrayList<GameMap>();
         }
 
