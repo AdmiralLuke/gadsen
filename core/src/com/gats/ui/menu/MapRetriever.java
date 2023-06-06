@@ -188,7 +188,7 @@ public class MapRetriever implements FilenameFilter {
 
         //LocalDateTime today = LocalDateTime.now().plusWeeks(2);
 
-        LocalDateTime today = LocalDateTime.now().plusWeeks(10);
+        LocalDateTime today = LocalDateTime.now();
 
         System.out.println(Duration.between(campaignRelease,today).toDays());
         int daysFromRelease = (int)Duration.between(campaignRelease,today).toDays();
