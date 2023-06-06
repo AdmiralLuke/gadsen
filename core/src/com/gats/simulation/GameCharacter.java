@@ -454,9 +454,12 @@ public class GameCharacter implements Serializable {
      */
     Action walk(int dx, Action head) {
 
+
         if (dx == 0 || stamina <= 0 || health <= 0) {
             return head;
         }
+
+        int oldStamina = stamina;
 
         Vector2 bef = getPlayerPos();
         int sign = dx < 0 ? -1 : 1;
@@ -551,7 +554,7 @@ public class GameCharacter implements Serializable {
 
         }
         //Movement completed for some reason, log action
-        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
+        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y), oldStamina, stamina);
 
 
         head.addChild(lastAction);
