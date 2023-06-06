@@ -154,7 +154,7 @@ public class Game {
         setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
-        if (gui) animationLogProcessor.init(state,getPlayerNames());
+        if (gui) animationLogProcessor.init(state.copy(), getPlayerNames());
         //Run the Game
         simulationThread = new Thread(this::run);
         simulationThread.setName("Manager_Simulation_Thread");
