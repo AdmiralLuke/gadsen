@@ -188,6 +188,10 @@ public class Tile implements Serializable, Comparable<Tile> {
      * oder auf anderer Box landet
      */
     protected Action onDestroy(Action head) {
+        ArrayList<GameCharacter> fallable = new ArrayList<>();
+
+
+
         state.getSim().turnsWithoutAction = 0;
         ArrayList<Tile> rightList = new ArrayList<>();
         ArrayList<Tile> upperList = new ArrayList<>();
@@ -204,6 +208,15 @@ public class Tile implements Serializable, Comparable<Tile> {
         this.deleteFromGraph();
         Action destroyAction = new TileDestroyAction(this.position);
         head.addChild(destroyAction);
+        for (GameCharacter[] characters : state.getTeams()) {
+            for (GameCharacter character : characters) {
+                if (this.getPosition().x == (int)(character.getPlayerPos().x / 16) && this.getPosition().y + 1== (int)(character.getPlayerPos().y / 16))
+                    fallable.add(character);
+            }
+        }
+        for (GameCharacter character : fallable) {
+            character.fall(head);
+        }
         if (hasRight()) right.convertGraphToList(rightList, mapRight);
         if (hasUp()) up.convertGraphToList(upperList, mapUp);
         if (hasDown()) down.convertGraphToList(lowerList, mapDown);
