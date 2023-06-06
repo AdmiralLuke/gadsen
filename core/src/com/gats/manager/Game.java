@@ -154,12 +154,20 @@ public class Game {
         setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
-        if (gui) animationLogProcessor.init(state.copy(), getPlayerNames());
+        if (gui) animationLogProcessor.init(state.copy(), getPlayerNames(), getSkins(players));
         //Run the Game
         simulationThread = new Thread(this::run);
         simulationThread.setName("Manager_Simulation_Thread");
         simulationThread.setUncaughtExceptionHandler(this::crashHandler);
         simulationThread.start();
+    }
+
+    private String[][] getSkins(Player[] players){
+        String[][] skins = new String[players.length][simulation.getState().getCharactersPerTeam()];
+        for (int i=0; i< players.length;i++)
+            for (int j=0; j< simulation.getState().getCharactersPerTeam();j++)
+                skins[i][j] = players[i].getSkin(j);
+        return skins;
     }
 
     private void crashHandler(Thread thread, Throwable throwable) {

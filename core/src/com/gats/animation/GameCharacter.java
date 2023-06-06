@@ -43,21 +43,11 @@ public class GameCharacter extends AnimatedEntity {
     private static final float OUTLINE_ALPHA = 0.5f;
 
 
-    public GameCharacter(Color teamColor) {
+    public GameCharacter(Color teamColor, String skin) {
         super(IngameAssets.gameCharacterAnimations[GameCharacterAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
-        switch (new Random().nextInt(4)) {
-            case 1:
-                skin = IngameAssets.orangeCatSkin;
-                break;
-            case 2:
-                skin = IngameAssets.yinYangSkin;
-                break;
-            case 3:
-                skin = IngameAssets.mioSkin;
-                break;
-            default:
-                skin = IngameAssets.coolCatSkin;
-        }
+        if (skin == null) this.skin = IngameAssets.coolCatSkin;
+        else
+            this.skin = IngameAssets.skins.getOrDefault(skin, IngameAssets.coolCatSkin);
         setMirror(true);
         setRotate(true);
         TextureRegion texture = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
