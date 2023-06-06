@@ -19,6 +19,8 @@ public class Simulation {
     public static final float SCORE_ELIMINATION = 50;
     protected static final float[] SCORE_WIN = new float[]{200, 100, 50};
 
+    public static final float SCORE_ERROR_PENALTY = -50;
+
     public static float getWinScore(int placement){
         if (placement>=SCORE_WIN.length) return 0;
         return SCORE_WIN[placement];
@@ -184,5 +186,9 @@ public class Simulation {
         IntVector2 character = gameState.getTurn().peek();
         if (character == null) return false;
         return gameState.getCharacterFromTeams(character.x, character.y).isAlive();
+    }
+
+    public void penalizeCurrentPlayer(){
+        gameState.addScore(getActiveTeam(), SCORE_ERROR_PENALTY);
     }
 }

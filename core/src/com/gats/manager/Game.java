@@ -8,6 +8,7 @@ import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.ui.hud.UiMessenger;
+import org.lwjgl.Sys;
 import sun.java2d.loops.ProcessPath;
 
 import java.lang.reflect.InvocationTargetException;
@@ -232,12 +233,12 @@ public class Game {
                             System.out.println("bot was interrupted");
                             e.printStackTrace(System.err);
                         } catch (ExecutionException e) {
-                            System.out.println("human player failed with exception: " + e.getCause());
+                            System.err.println("human player failed with exception: " + e.getCause());
                             e.printStackTrace();
                         } catch (TimeoutException e) {
                             future.cancel(true);
 
-                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
+                            System.err.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                         }
                         inputGenerator.endTurn();
                         //Add Empty command to break command Execution
@@ -267,10 +268,14 @@ public class Game {
                         } catch (ExecutionException e) {
                             System.out.println("bot failed with exception: " + e.getCause());
                             e.printStackTrace();
+                            System.err.println("The failed player has been penalized!");
+                            simulation.penalizeCurrentPlayer();
                         } catch (TimeoutException e) {
                             future.cancel(true);
 
                             System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
+                            System.err.println("The failed player has been penalized!");
+                            simulation.penalizeCurrentPlayer();
                         }
                         //Add Empty command to break command Execution
                         try {
