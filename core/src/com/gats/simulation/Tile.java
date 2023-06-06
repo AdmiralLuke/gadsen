@@ -7,13 +7,14 @@ import com.gats.simulation.action.TileMoveAction;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
  * Represents one of the Tiles the map is made of.
  * Special behaviors of certain Tile-Types will be implemented by the {@link Wrapper Wrapper}
  */
-public class Tile implements Serializable {
+public class Tile implements Serializable, Comparable<Tile> {
 
     public static final int TileSizeX = 16;
     public static final int TileSizeY = 16;
@@ -175,7 +176,6 @@ public class Tile implements Serializable {
      * entfernt eine Tile aus dem Graphen (und alle Referenzen)
      * GarbageColleciton goes huii
      */
-    //ToDo this should never be public
     private void deleteFromGraph() {
         if (this.right != null) this.right.left = null;
         if (this.left != null) this.left.right = null;
@@ -230,9 +230,20 @@ public class Tile implements Serializable {
                 return;
             }
         }
+        list.sort(Comparator.comparingInt(o -> o.getPosition().y));
+        ArrayList<GameCharacter> fallable = new ArrayList<>();
         for (Tile tile : list) {
+            for (GameCharacter[] characters : state.getTeams()) {
+                for (GameCharacter character : characters) {
+                    if (tile.getPosition().x == (int)(character.getPlayerPos().x / 16) && tile.getPosition().y + 1== (int)(character.getPlayerPos().y / 16))
+                        fallable.add(character);
+                }
+            }
             state.getBoard()[tile.position.x][tile.position.y] = null;
             tile.destroyTile(head);
+            for (GameCharacter character : fallable) {
+                character.fall(head);
+            }
         }
         list.clear();
     }
@@ -369,5 +380,10 @@ public class Tile implements Serializable {
 
     protected Tile copy(GameState state) {
         return new Tile(this, state);
+    }
+
+    @Override
+    public int compareTo(Tile o) {
+        return o.getPosition().y - this.getPosition().y;
     }
 }
