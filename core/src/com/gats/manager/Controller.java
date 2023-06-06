@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.gats.manager.command.*;
 import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameCharacterController;
+import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
 /**
@@ -19,11 +20,11 @@ public class Controller {
     private GameCharacterController gcController;
     private GameCharacter gameCharacter;
 
-    protected Controller(Game game, GameCharacterController gcController, int uses) {
+    protected Controller(Game game, GameCharacterController gcController, GameState stateCopy, int uses) {
 //        System.out.println("Created new Controller: " + this);
         this.game = game;
         this.gcController = gcController;
-        this.gameCharacter = gcController.getGameCharacter();
+        this.gameCharacter = stateCopy.getCharacterFromTeams(gcController.getGameCharacter().getTeam(), gcController.getGameCharacter().getTeamPos());
         this.uses = uses;
     }
 

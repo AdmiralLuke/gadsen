@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Pool;
 public class ParticleEntity extends Entity implements Disposable, Pool.Poolable {
     private ParticleEffectPool.PooledEffect effect;
 
-    private static Pool<ParticleEntity> particleEntityPool = new Pool<ParticleEntity>() {
+    private static final Pool<ParticleEntity> particleEntityPool = new Pool<ParticleEntity>() {
 
         @Override
         protected ParticleEntity newObject() {
@@ -69,7 +69,8 @@ public class ParticleEntity extends Entity implements Disposable, Pool.Poolable 
 
     @Override
     public void dispose() {
-        effect.free();
+        if (effect != null)
+            effect.free();
         effect = null;
     }
 

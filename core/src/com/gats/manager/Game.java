@@ -208,11 +208,11 @@ public class Game {
             int currentCharacterIndex = gcController.getGameCharacter().getTeamPos();
 
             Player currentPlayer = players[currentPlayerIndex];
-            Controller controller = new Controller(this, gcController, currentPlayer.getType() == Player.PlayerType.Human? HUMAN_CONTROLLER_USES: AI_CONTROLLER_USES);
+            GameState stateCopy = state.copy();
+            Controller controller = new Controller(this, gcController, stateCopy, currentPlayer.getType() == Player.PlayerType.Human? HUMAN_CONTROLLER_USES: AI_CONTROLLER_USES);
 
             Thread futureExecutor;
             Future<?> future;
-            GameState stateCopy = state.copy();
             switch (currentPlayer.getType()) {
                 case Human:
                     future = executor.submit(() -> {
