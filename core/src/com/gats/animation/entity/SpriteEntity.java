@@ -118,7 +118,7 @@ public class SpriteEntity extends Entity {
      */
     public Vector2 getSpriteCenter() {
         if (this.textureRegion != null) {
-            return new Vector2(size.x / 2f, size.y / 2f);
+            return new Vector2(textureRegion.getRegionWidth() / 2f, textureRegion.getRegionHeight() / 2f);
         }
         return new Vector2(0, 0);
     }

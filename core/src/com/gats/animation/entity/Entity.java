@@ -137,7 +137,7 @@ public class Entity {
         if (parent == null) setPos(relPos);
         else {
             if (parent.flipped)
-                setPos(parent.getPos().cpy().sub(relPos.cpy().rotateDeg(180-parent.getAngle())));
+                setPos(parent.getPos().cpy().sub(relPos.cpy().rotateDeg(180+parent.getAngle()).scl(-1,1)));
             else
                 setPos(parent.getPos().cpy().add(relPos.cpy().rotateDeg(parent.getAngle())));
         }

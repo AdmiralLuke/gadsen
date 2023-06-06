@@ -17,7 +17,7 @@ public class AnimatedEntity extends SpriteEntity {
 
 
     public AnimatedEntity(Animation<TextureRegion> animation) {
-        super(null);
+        super(animation.getKeyFrame(0));
         this.animation = animation;
     }
 

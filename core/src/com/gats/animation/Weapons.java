@@ -54,6 +54,9 @@ public class Weapons {
                 System.err.println("Warning: Weapon-Type " + type + " is not Supported!");
         }
 
+        weapon.setOrigin(weapon.getSpriteCenter());
+        weapon.setRelPos(weapon.getSpriteCenter().add(weapon.getRelPos()));
+
         return weapon;
     }
 }
