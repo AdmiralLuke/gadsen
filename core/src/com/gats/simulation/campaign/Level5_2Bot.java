@@ -5,7 +5,7 @@ import com.gats.simulation.GameCharacter;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
-public class Level5_2Bot extends StaticBot {
+public class Level5_2Bot extends CampaignBot {
 
 
     @Override
@@ -26,7 +26,7 @@ public class Level5_2Bot extends StaticBot {
         //(Like seriously don't. I wrote this code, and even I do not fully understand it myself.)
         controller.aim(90 + Math.signum(d) * (Math.abs(d)*0.99f + d*d/3000f - 20.0f + Math.max(0, Math.abs(d) - 440)) * 1 / 16f * 0.94f, 0.69f + Math.max(0, Math.abs(d) - 530)/2000f);
         controller.shoot();
-        if (Math.random() > 0.5f) {
+        if (rnd.nextFloat() > 0.5f) {
             if (state.getTile(((int) X) / 16 - 1, ((int) Y) / 16 - 1) != null)
                 controller.move(-16);
         } else {

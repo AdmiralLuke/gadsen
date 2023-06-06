@@ -77,7 +77,6 @@ public class Game {
     private final UiMessenger uiMessenger;
     private boolean pendingShutdown = false;
     private GameConfig config;
-
     private boolean saveReplay;
 
 
@@ -126,6 +125,7 @@ public class Game {
 
                     Future<?> future = executor.submit(() -> {
                         Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
+                        ((Bot) curPlayer).setRnd(Manager.getSeed());
                         curPlayer.init(state);
                     });
 

@@ -5,7 +5,7 @@ import com.gats.manager.Controller;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
-public class Level5_1Bot extends StaticBot {
+public class Level5_1Bot extends CampaignBot {
 
 
     @Override
