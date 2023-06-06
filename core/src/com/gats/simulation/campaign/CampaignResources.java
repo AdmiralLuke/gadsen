@@ -32,6 +32,7 @@ public class CampaignResources {
                 break;
             case "level4_2":
             case "level4_3":
+            case "level6_1":
                 enemies.add(Level4_2Bot.class);
                 break;
             case "level5_1":
@@ -40,9 +41,6 @@ public class CampaignResources {
             case "level5_2":
             case "level5_3":
                 enemies.add(Level5_2Bot.class);
-                break;
-            case "level6_1":
-                enemies.add(IdleBot.class);
                 break;
         }
         return enemies;
@@ -133,6 +131,10 @@ public class CampaignResources {
             case "level5_3":
                 helth.add(new int[]{20, 40});
                 helth.add(new int[]{100, 100});
+                break;
+            case "level6_1":
+                helth.add(new int[]{40});
+                helth.add(new int[]{100});
                 break;
             case "level2_1":
             case "level3_2":
