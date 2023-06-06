@@ -15,13 +15,12 @@ public class Inventory extends VerticalGroup {
 	private InventoryCell[] items;
 
 	public Inventory(int size){
-		items = new InventoryCell[WeaponType.values().length];
-		for(int i =0;i<size;i++){
+		items = new InventoryCell[WeaponType.values().length -1];
+		for(int i =0;i<size-1;i++){
 			InventoryCell cell = new InventoryCell(AssetContainer.IngameAssets.inventoryCell, WeaponType.values()[i]);
 			items[i]=cell;
 			addActor(cell);
 		}
-
 	}
 
 	/**
