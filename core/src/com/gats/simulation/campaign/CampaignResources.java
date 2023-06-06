@@ -1,7 +1,6 @@
 package com.gats.simulation.campaign;
 
-import com.gats.manager.IdleBot;
-import com.gats.manager.Player;
+import com.gats.manager.*;
 
 import java.util.ArrayList;
 
@@ -46,6 +45,11 @@ public class CampaignResources {
                 enemies.add(Level5_2Bot.class);
                 enemies.add(Level5_2Bot.class);
                 enemies.add(Level5_2Bot.class);
+                break;
+            case "level6_3":
+                enemies.add(AguadseBot.class);
+                enemies.add(KamigadseBot.class);
+                enemies.add(BobBot.class);
                 break;
         }
         return enemies;
@@ -172,7 +176,8 @@ public class CampaignResources {
             case "level5_2":
             case "level5_3":
                 return 2;
-
+            case  "level6_3":
+                return 3;
         }
         return 1;
     }
