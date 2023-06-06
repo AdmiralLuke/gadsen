@@ -15,6 +15,7 @@ import com.gats.simulation.WeaponType;
 import com.gats.simulation.action.ProjectileAction;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Contains Loaded Instances of Assets
@@ -67,6 +68,9 @@ public class AssetContainer {
         public static Animation<TextureRegion>[] gameCharacterAnimations;
 
         public static TextureRegion pixel;
+        public static Texture compressedBaseSkin;
+        public static Texture uncompressedBaseSkin;
+        public static Map<String, Animation<TextureRegion>> skins;
 
         static {
             Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
