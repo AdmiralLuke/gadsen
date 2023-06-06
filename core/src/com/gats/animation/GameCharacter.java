@@ -148,14 +148,6 @@ public class GameCharacter extends AnimatedEntity {
         aimIndicator.setColor(c);
     }
 
-    @Override
-    protected void setPos(Vector2 pos) {
-        super.setPos(pos);
-        if (aimingIndicator != null) aimingIndicator.updatePos();
-        if (weapon != null) weapon.updatePos();
-        if (healthbar != null) healthbar.updatePos();
-        //group.updatePos();
-    }
 
     public static float getAnimationDuration(GameCharacterAnimationType type) {
         return IngameAssets.gameCharacterAnimations[type.ordinal()].getAnimationDuration();
@@ -205,7 +197,7 @@ public class GameCharacter extends AnimatedEntity {
     public void updateAngle() {
         super.updateAngle();
         if (weapon != null) {
-            if (isFlipped()) weapon.setRelRotationAngle(-weapon.getRelRotationAngle());
+            if (isFlipped()) weapon.setRelAngle(-weapon.getRelAngle());
         }
     }
 

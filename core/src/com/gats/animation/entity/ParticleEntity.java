@@ -35,9 +35,9 @@ public class ParticleEntity extends Entity implements Disposable, Pool.Poolable 
     }
 
     @Override
-    public void setRelRotationAngle(float angle) {
-        float oldAngle = getRotationAngle();
-        super.setRelRotationAngle(angle);
+    public void setRelAngle(float angle) {
+        float oldAngle = getAngle();
+        super.setRelAngle(angle);
         float diff = angle - oldAngle;
 //        ToDo: Implement dynamic rotation
 //        for (ParticleEmitter emitter : effect.getEmitters()

@@ -3,10 +3,7 @@ package com.gats.animation.entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.gats.animation.entity.Entity;
-import com.gats.animation.entity.SpriteEntity;
 
 public class NinePatchEntity extends Entity {
 
@@ -37,7 +34,7 @@ public class NinePatchEntity extends Entity {
 				size.y,
 				scale.x,
 				(flipped ? -1 : 1) * (scale.y),
-				getRotationAngle());
+				getAngle());
 	}
 
 	public void setOrigin(Vector2 origin){
@@ -87,9 +84,9 @@ public class NinePatchEntity extends Entity {
 	//copied from spritentity
 
 	@Override
-	public void setRelRotationAngle(float angle) {
+	public void setRelAngle(float angle) {
 		angle = ((angle % 360) + 360) % 360;
-		super.setRelRotationAngle(angle);
+		super.setRelAngle(angle);
 	}
 
 	public Vector2 getMaxSize(){

@@ -24,10 +24,7 @@ public class SpriteEntity extends Entity {
     private Color color = null;
     private Vector2 size = null;
 
-    private boolean flipped = false;
 
-
-    private boolean rotate = true;
     /**
      * When mirror is set to true, the character will be flipped once the angle is 180 or higher on the x axis
      */
@@ -64,9 +61,9 @@ public class SpriteEntity extends Entity {
                         origin.y,
                         textureRegion.getRegionWidth(),
                         textureRegion.getRegionHeight(),
-                        (flipped ? -1 : 1) * (scale.x),
+                        (isFlipped() ? -1 : 1) * (scale.x),
                         (scale.y),
-                        getRotationAngle());
+                        getAngle());
             else
                 batch.draw(textureRegion,
                         getPos().x - origin.x,
@@ -75,9 +72,9 @@ public class SpriteEntity extends Entity {
                         origin.y,
                         size.x,
                         size.y,
-                        (flipped ? -1 : 1) * (scale.x),
+                        (isFlipped() ? -1 : 1) * (scale.x),
                         (scale.y),
-                        getRotationAngle());
+                        getAngle());
 
             //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
 
@@ -151,18 +148,6 @@ public class SpriteEntity extends Entity {
         return color;
     }
 
-    public boolean isFlipped() {
-        return flipped;
-    }
-
-    private void setFlipped(boolean flipped) {
-        this.flipped = flipped;
-    }
-
-    public void setRotate(boolean rotate) {
-        this.rotate = rotate;
-    }
-
     public void setMirror(boolean mirror) {
         this.mirror = mirror;
     }
@@ -173,14 +158,14 @@ public class SpriteEntity extends Entity {
      * @param angle angle in degrees
      */
     @Override
-    public void setRelRotationAngle(float angle) {
+    public void setRelAngle(float angle) {
         angle = ((angle % 360) + 360) % 360;
-        super.setRelRotationAngle(rotate ? angle : 0);
         if (angle >= 90f && angle <= 270f) {
-            super.setRelRotationAngle(mirror ? angle - 180 : angle);
-            setFlipped(mirror);
+            super.setRelAngle(mirror ? angle - 180 : angle);
+            setRelFlipped(mirror);
         } else {
-            setFlipped(false);
+            super.setRelAngle(angle);
+            setRelFlipped(false);
         }
     }
 

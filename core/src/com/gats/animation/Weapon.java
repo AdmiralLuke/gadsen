@@ -69,7 +69,7 @@ public class Weapon extends AnimatedEntity {
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-        carryEntity.setVisible(visible);
+        if (carryEntity!= null) carryEntity.setVisible(visible);
     }
 
     @Override

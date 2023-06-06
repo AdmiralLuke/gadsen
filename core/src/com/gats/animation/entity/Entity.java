@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,6 +16,9 @@ public class Entity {
     private final List<Entity> children = new ArrayList<>();
 
     protected Entity parent = null;
+    protected boolean flipped = false;
+
+    protected boolean relFlipped = false;
     private Vector2 scale = new Vector2(1, 1);
     private Vector2 pos = new Vector2(0, 0);
     private Vector2 relPos = new Vector2(0, 0);
@@ -26,6 +28,7 @@ public class Entity {
      */
     private float angle = 0f;
     private float relAngle = 0f;
+    private boolean rotate = true;
 
     public Entity(){}
 
@@ -53,10 +56,10 @@ public class Entity {
     public Vector2 getRelPos() {
         return relPos;
     }
-    public float getRotationAngle() {
+    public float getAngle() {
         return angle;
     }
-    public float getRelRotationAngle() {
+    public float getRelAngle() {
         return relAngle;
     }
 
@@ -73,21 +76,51 @@ public class Entity {
     }
 
 
+    public void setRotate(boolean rotate) {
+        this.rotate = rotate;
+    }
+
+    public boolean isFlipped() {
+        return flipped;
+    }
+
+    protected void setFlipped(boolean flipped) {
+        this.flipped = flipped;
+        for (Entity child : children) {
+            child.updateFlipped();
+        }
+    }
+
+    protected void setRelFlipped(boolean flipped) {
+        this.relFlipped = flipped;
+        updateFlipped();
+    }
+
+    public void updateFlipped(){
+        if (parent == null) setFlipped(relFlipped);
+        else {
+            setFlipped(parent.flipped ^ relFlipped);
+        }
+    }
+
     /**
      * Sets the angle of this entity
      * @param angle
      */
-    public void setRelRotationAngle(float angle) {
+    public void setRelAngle(float angle) {
         this.relAngle = angle;
         updateAngle();
     }
 
     protected void setAngle(float angle) {
         this.angle = angle;
+        for (Entity child : children) {
+            child.updateAngle();
+        }
     }
 
     public void updateAngle(){
-        if (parent == null) setAngle(relAngle);
+        if (parent == null || !rotate) setAngle(relAngle);
         else {
             setAngle(parent.angle + relAngle);
         }
@@ -95,12 +128,18 @@ public class Entity {
 
     protected void setPos(Vector2 pos) {
         this.pos.set(pos);
+        for (Entity child : children) {
+            child.updatePos();
+        }
     }
 
     public void updatePos(){
         if (parent == null) setPos(relPos);
         else {
-            setPos(parent.getPos().cpy().add(relPos.cpy().rotateDeg(parent.getRotationAngle())));
+            if (parent.flipped)
+                setPos(parent.getPos().cpy().sub(relPos.cpy().rotateDeg(180-parent.getAngle())));
+            else
+                setPos(parent.getPos().cpy().add(relPos.cpy().rotateDeg(parent.getAngle())));
         }
     }
 
@@ -145,10 +184,19 @@ public class Entity {
     public void setParent(Entity parent){
         this.parent = parent;
         updatePos();
+        updateAngle();
+        updateFlipped();
     }
 
     public Entity getParent() {
         return parent;
     }
 
+    public boolean isRelFlipped() {
+        return relFlipped;
+    }
+
+    public List<Entity> getChildren() {
+        return children;
+    }
 }

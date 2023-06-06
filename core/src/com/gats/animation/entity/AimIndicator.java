@@ -83,16 +83,12 @@ public class AimIndicator extends NinePatchEntity implements Toggleable {
        // circleTexture[0] = new TextureRegion(new Texture(circle));
        // circleTexture.notify();
        // int circleTextureRegionHeight = circleTexture[0].getRegionHeight();
-        int circleTextureRegionHeight = AssetContainer.IngameAssets.aimCircle.getRegionHeight();
-        aimCircle = new SpriteEntity(AssetContainer.IngameAssets.aimCircle,new Vector2(circleTextureRegionHeight/2f,circleTextureRegionHeight/2f),new Vector2(circleTextureRegionHeight,circleTextureRegionHeight));
-    }
-
-    @Override
-    public void updatePos() {
-        super.updatePos();
-        if(aimCircle!=null&&aimCircle.getSize()!=null) {
-            aimCircle.setPos(new Vector2(getPos().x-aimCircle.getSize().x/2,getPos().y-aimCircle.getSize().x/2));
-        }
+        int circleTextureRegionDiameter = AssetContainer.IngameAssets.aimCircle.getRegionHeight();
+        aimCircle = new SpriteEntity(AssetContainer.IngameAssets.aimCircle);
+        aimCircle.setSize(new Vector2(circleTextureRegionDiameter, circleTextureRegionDiameter));
+        aimCircle.setOrigin(new Vector2(circleTextureRegionDiameter/2f,circleTextureRegionDiameter/2f));
+        aimCircle.setRotate(false);
+        add(aimCircle);
     }
 
     @Override
