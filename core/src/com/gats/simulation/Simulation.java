@@ -123,7 +123,7 @@ public class Simulation {
                 remainingTeams--;
                 //Reward points for team eliminations
                 if (i != activeTeam) {
-                    gameState.addScore(activeTeam, SCORE_ELIMINATION);
+                    gameState.addScore(actionLog.getRootAction(), activeTeam, SCORE_ELIMINATION);
                 }
             } else if (remainingCharacters[i] > 0) remaining++;
         }
@@ -140,7 +140,7 @@ public class Simulation {
             }
             float score = scoreSum/teamKills;
             for (int i = 0; i < teamCount; i++) {
-                if (eliminated[i]) gameState.addScore(i, score);
+                if (eliminated[i]) gameState.addScore(actionLog.getRootAction(), i, score);
             }
         }
 
@@ -150,7 +150,7 @@ public class Simulation {
                 //Reward score to surviving winner
                 for (int i = 0; i < teamCount; i++) {
                     if (remainingCharacters[i] > 0) {
-                        gameState.addScore(i, SCORE_WIN[0]);
+                        gameState.addScore(actionLog.getRootAction(), i, SCORE_WIN[0]);
                         actionLog.getRootAction().addChild(new GameOverAction(i));
                         break;
                     }
@@ -189,6 +189,6 @@ public class Simulation {
     }
 
     public void penalizeCurrentPlayer(){
-        gameState.addScore(getActiveTeam(), SCORE_ERROR_PENALTY);
+        gameState.addScore(actionLog.getRootAction(), getActiveTeam(), SCORE_ERROR_PENALTY);
     }
 }

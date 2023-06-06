@@ -143,6 +143,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
                         put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
                         put(InventoryAction.class, ActionConverters::convertInventoryAction);
+                        put(ScoreAction.class, ActionConverters::convertScoreAction);
                     }
                 };
 
@@ -541,6 +542,13 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(updateInventoryItem);
         }
 
+        private static ExpandedAction convertScoreAction(com.gats.simulation.action.Action action, Animator animator) {
+            ScoreAction scoreAction = (ScoreAction) action;
+            //ui Action
+            MessageUiScoreAction indicateScoreChangeAction = new MessageUiScoreAction(0, animator.uiMessenger, scoreAction.getTeam(), scoreAction.getNewScore());
+
+            return new ExpandedAction(indicateScoreChangeAction);
+        }
     }
 
 

@@ -58,6 +58,8 @@ public class Hud implements Disposable {
 
 	private boolean debugVisible;
 
+	private float[] scores;
+
 	private String[] names;
 
 	private ScoreView scoreView;
@@ -144,7 +146,9 @@ public class Hud implements Disposable {
 
 	public void setupScoreboard(GameState game){
 
-		ScoreBoard scores = new ScoreBoard(Animator.getTeamColors(),names,game);
+		ScoreBoard scores = new ScoreBoard(Animator.getTeamColors(),names, game);
+
+		this.scores = game.getScores();
 
 		scoreView.addScoreboard(scores);
 
@@ -325,11 +329,23 @@ public class Hud implements Disposable {
 	}
 
 	public void adjustScores(float[] scores){
+		this.scores = scores;
+
 		if(scoreView!=null){
 			scoreView.adjustScores(scores);
 		}
 
 	}
+
+	public void adjustScores(int team, float score){
+		this.scores[team] = score;
+
+		if(scoreView!=null){
+			scoreView.adjustScores(scores);
+		}
+
+	}
+
 
 
 
