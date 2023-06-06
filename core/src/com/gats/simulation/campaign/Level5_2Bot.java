@@ -22,7 +22,7 @@ public class Level5_2Bot extends CampaignBot {
         float d = X - enemyX;
         //Do not try to understand this code
         //It has been engineered to not be understandable, but apply in this very specific scenario
-        //We want you to find you own solutions for aiming :)
+        //We want you to find your own solutions for aiming :)
         //(Like seriously don't. I wrote this code, and even I do not fully understand it myself.)
         controller.aim(90 + Math.signum(d) * (Math.abs(d)*0.99f + d*d/3000f - 20.0f + Math.max(0, Math.abs(d) - 440)) * 1 / 16f * 0.94f, 0.69f + Math.max(0, Math.abs(d) - 530)/2000f);
         controller.shoot();

@@ -19,8 +19,8 @@ public class Level4_2Bot extends CampaignBot {
         float d = X - enemyX;
         //Do not try to understand this code
         //It has been engineered to not be understandable, but apply in this very specific scenario
-        //We want you to find you own solutions for aiming :)
-        //(Like seriously don't. I wrote this code, and even I do not fully understand it myself.)
+        //We want you to find your own solutions for aiming :)
+        //(Like seriously don't. I wrote this code, and even I do not fully understand it myself)
         controller.aim(90 + (d*0.99f + d*d/3000f - 20.0f) * 1 / 16f * 0.94f, 0.69f);
         controller.shoot();
         if (rnd.nextFloat() > 0.5f){
