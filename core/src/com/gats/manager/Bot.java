@@ -1,5 +1,7 @@
 package com.gats.manager;
 
+import java.util.Random;
+
 /**
  * Superklasse für alle Bot-Implementationen.
  * Erbt von dieser Klasse, wenn ihr einen Bot implementieren wollt.
@@ -19,5 +21,11 @@ public abstract class Bot extends Player{
     @Override
     protected final PlayerType getType() {
         return PlayerType.AI;
+    }
+
+    protected Random rnd;
+
+    public final void setRnd(long seed){
+        if (rnd == null) rnd = new Random(seed);
     }
 }

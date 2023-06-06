@@ -47,6 +47,8 @@ public class Manager {
 
     private final Object schedulingLock = new Object();
 
+    private static long seed = 345342624;
+
 
     @SuppressWarnings("removal")
     public static Manager getManager() {
@@ -217,6 +219,7 @@ public class Manager {
         players.add(new NamedPlayerClass(IdleBot.class, "IdleBot"));
         players.add(new NamedPlayerClass(TestBot.class, "TestBot"));
         File botDir = new File("bots");
+        seed = 345342624;
         System.out.println(new File("").getAbsolutePath());
         if (botDir.exists()) {
             try {
@@ -257,6 +260,7 @@ public class Manager {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(Files.newInputStream(botFile.toPath())))) {
             String line;
             while ((line = br.readLine()) != null) {
+                seed = seed + br.hashCode();
                 resultStringBuilder.append(line).append("\n");
             }
         } catch (IOException e) {
@@ -315,6 +319,10 @@ public class Manager {
                 cur.dispose();
             }
         }
+    }
+
+    public static long getSeed() {
+        return seed;
     }
 
     public static int getSystemReservedProcessorCount() {

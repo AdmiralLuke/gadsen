@@ -4,7 +4,10 @@ import com.gats.manager.Bot;
 import com.gats.manager.Controller;
 import com.gats.simulation.GameState;
 
-public class StaticBot extends Bot {
+import java.util.Random;
+
+public class CampaignBot extends Bot {
+
     @Override
     public String getStudentName() {
         return "Cornelius Zenker";
