@@ -47,7 +47,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private final Batch batch;
 
-    private final EntityGroup root;
+    private final Entity root;
 
     private TileMap map;
 
@@ -75,7 +75,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private int charactersPerTeam;
     private final List<Action> actionList = new LinkedList<>();
 
-    private EntityGroup characterGroup;
+    private Entity characterGroup;
 
     public AnimatorCamera getCamera() {
         return this.camera;
@@ -553,7 +553,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         this.gameMode = gameMode;
         this.uiMessenger = uiMessenger;
         this.batch = new SpriteBatch();
-        this.root = new EntityGroup();
+        this.root = new Entity();
 
         setupView(viewport);
 
@@ -578,7 +578,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             TextureRegion animationFrame = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
             //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
             Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth() / 2f, animationFrame.getRegionHeight() / 2f);
-            characterGroup = new EntityGroup();
+            characterGroup = new Entity();
 
             root.add(characterGroup);
             for (int curTeam = 0; curTeam < teamCount; curTeam++)
