@@ -6,17 +6,27 @@ import com.gats.ui.hud.UiMessenger;
 /**
  * Calls ui Functions to update based on Player movement
  */
-public class MessageUiPlayerMoveAction extends MessageUiAction{
+public class MessageUiPlayerMoveAction extends MessageUiAction {
 
-	GameCharacter currPlayer;
-	public MessageUiPlayerMoveAction(float start, UiMessenger uiMessenger, GameCharacter currentPlayer) {
-		super(start, uiMessenger);
-		this.currPlayer = currentPlayer;
-	}
+    private float endTime;
+    private int staminaBefore;
+    private int staminaAfter;
+    private float duration;
+    GameCharacter currPlayer;
 
-	@Override
-	protected void runAction(float oldTime, float current) {
-		uiMessenger.playerMoved(currPlayer);
-		endAction(oldTime);
-	}
+    public MessageUiPlayerMoveAction(float start, float duration, UiMessenger uiMessenger, GameCharacter currentPlayer, int staminaBefore, int staminaAfter) {
+        super(start, uiMessenger);
+        this.duration = duration;
+        this.currPlayer = currentPlayer;
+        this.endTime = delay + duration;
+
+        this.staminaBefore = staminaBefore;
+        this.staminaAfter = staminaAfter;
+    }
+
+    @Override
+    protected void runAction(float oldTime, float current) {
+        uiMessenger.playerMoved(currPlayer, (int) (staminaBefore + (Math.min(current, endTime) - delay) / duration * (staminaAfter - staminaBefore)));
+        if (current > endTime) endAction(endTime);
+    }
 }

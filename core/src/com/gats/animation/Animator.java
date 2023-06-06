@@ -202,7 +202,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             //notify ui
-            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()));
+            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, moveAction.getDuration(), animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()), moveAction.getStaminaBefore(), moveAction.getStaminaAfter());
             animMoveAction.setChildren(new Action[]{stopWalking, messageUiPlayerMoveAction});
             return new ExpandedAction(startWalking, messageUiPlayerMoveAction);
         }

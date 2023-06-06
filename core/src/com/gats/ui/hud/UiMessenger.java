@@ -34,8 +34,8 @@ public class UiMessenger {
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
 
-	public void playerMoved(GameCharacter currentPlayer){
-		playerStaminaChanged(currentPlayer.getStamina());
+	public void playerMoved(GameCharacter currentPlayer, int stamina){
+		playerStaminaChanged(stamina);
 	}
 	/**
 	 * Will update the current Inventory Display, with Information from the player but only on the item with the weaponType.
