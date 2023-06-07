@@ -5,6 +5,8 @@ import com.gats.simulation.GameCharacterController;
 import com.gats.simulation.GameState;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.Random;
+
 public abstract class Player {
 
     enum PlayerType{
@@ -40,5 +42,25 @@ public abstract class Player {
      * @return What kind of implementation the Player is
      */
     protected abstract PlayerType getType();
+
+    /**
+     * @param characterIndex Index des Charakters
+     * @return der Name des Skins, der der angegebene Charakter im UI modus haben soll
+     */
+    public String getSkin(int characterIndex){
+        switch (new Random().nextInt(4)) {
+            case 1:
+                return "orangeCatSkin";
+
+            case 2:
+                return "yinYangSkin";
+
+            case 3:
+                return "mioSkin";
+
+            default:
+                return "coolCatSkin";
+        }
+    }
 
 }

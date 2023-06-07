@@ -1,5 +1,7 @@
 package com.gats.manager;
 
+import com.gats.ui.assets.AssetContainer;
+
 import java.util.Random;
 
 /**

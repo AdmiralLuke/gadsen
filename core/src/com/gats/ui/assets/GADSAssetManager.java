@@ -1,10 +1,13 @@
 package com.gats.ui.assets;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
@@ -12,7 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.gats.animation.entity.SpriteEntity;
+import com.gats.assets.RGBColor;
+import com.gats.manager.*;
 import com.gats.simulation.WeaponType;
 import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer.IngameAssets;
@@ -20,6 +26,16 @@ import com.gats.ui.assets.AssetContainer.IngameAssets.GameCharacterAnimationType
 import com.gats.ui.assets.AssetContainer.MainMenuAssets;
 import com.gats.ui.hud.InputHandler;
 import com.gats.ui.hud.inventory.InventoryCell;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 
 public class GADSAssetManager {
     //dedicatod to loading and mangaing assets used in the application
@@ -46,6 +62,11 @@ public class GADSAssetManager {
     public static final String outlineShader = resourceDirectory + "shader/outline.frag";
     public static final String lookupShader = resourceDirectory + "shader/lookup.frag";
     public static final String lookupOutlineShader = resourceDirectory + "shader/lookupOutline.frag";
+
+
+    public static final String skin_compressed = "lookupBase/cat/skin_compressed.png";
+
+    public static final String skin_uncompressed = "lookupBase/cat/skin_uncompressed.png";
 
     private boolean finishedLoading = false;
 
@@ -81,6 +102,8 @@ public class GADSAssetManager {
      * </p>
      */
     public void loadTextures() {
+        manager.load(skin_compressed, Texture.class);
+        manager.load(skin_uncompressed, Texture.class);
         manager.load(atlas, TextureAtlas.class);
     }
 
@@ -237,6 +260,10 @@ public class GADSAssetManager {
         IngameAssets.turnChange = atlas.findRegion("ui/turnChange");
         IngameAssets.turnTimer = atlas.findRegion("ui/clockSprite");
 
+        IngameAssets.compressedBaseSkin = manager.get(skin_compressed);
+        IngameAssets.uncompressedBaseSkin = manager.get(skin_uncompressed);
+
+        loadSkins();
 
         createCircleTexture();
         createHealthHealthbarAssets(atlas);
@@ -318,5 +345,124 @@ public class GADSAssetManager {
         return manager.getProgress();
     }
 
+    private static void loadSkins() {
+        int[] size = new int[2];
+        int[][][] skinEncoding = generateSkinEncoding(IngameAssets.compressedBaseSkin, IngameAssets.uncompressedBaseSkin, size);
+        Map<String, Animation<TextureRegion>> skins = new HashMap<>();
+        skins.put("coolCatSkin", IngameAssets.coolCatSkin);
+        skins.put("orangeCatSkin", IngameAssets.orangeCatSkin);
+        skins.put("yinYangSkin", IngameAssets.yinYangSkin);
+        skins.put("mioSkin", IngameAssets.mioSkin);
+        Map<String, Map<Integer, Texture>> namedFrames = new HashMap<>();
+        File skinDir = new File("skins");
+        System.out.println(new File("").getAbsolutePath());
+        if (skinDir.exists()) {
 
+            for (File skinFile : Objects.requireNonNull(skinDir.listFiles(path -> path.getName().endsWith(".png") || path.getName().endsWith(".jpg")))) {
+                try {
+                    String fullName = skinFile.getName();
+                    int lastPointIndex = fullName.lastIndexOf('.');
+                    String noEndingName = fullName.substring(0, lastPointIndex);
+                    int lastUnderscoreIndex = fullName.lastIndexOf('_');
+                    int index = -1;
+                    if (lastUnderscoreIndex > 1) {
+                        String indexString = noEndingName.substring(lastUnderscoreIndex + 1);
+                        try {
+                            index = Integer.parseInt(indexString);
+                            noEndingName = noEndingName.substring(0, lastUnderscoreIndex);
+                        } catch (NumberFormatException ignored) {
+                        }
+
+                    }
+                    Pixmap src = new Pixmap(Gdx.files.absolute(skinFile.getAbsolutePath()));
+                    Pixmap frame = compressSkin(skinEncoding, src, size);
+                    Map<Integer, Texture> frames = namedFrames.computeIfAbsent(noEndingName, k -> new HashMap<>());
+                    frames.put(index, new Texture(frame));
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            for (String name :
+                    namedFrames.keySet()) {
+                if (skins.containsKey(name)) {
+                    System.err.println("Warning: Skin with name " + name + " is hidden by another skin!");
+                    continue;
+                }
+                Map<Integer, Texture> indexedFrames = namedFrames.get(name);
+                int[] indices = new int[indexedFrames.size()];
+                int i=0;
+                for (Integer cur: indexedFrames.keySet())
+                    indices[i++] = cur;
+                int s = indexedFrames.size();
+                Array<TextureRegion> frames = new Array<>(indexedFrames.size());
+                frames.size = indexedFrames.size();
+                Arrays.sort(indices);
+                i =0;
+                for (int cur: indices) frames.set(i++, new TextureRegion(indexedFrames.get(cur)));
+                skins.put(name, new IndexedAnimation<>(1 / 10f, frames, indices, Animation.PlayMode.LOOP));
+            }
+
+        } else {
+            System.err.println("Warning: No Skin-Dir found at " + skinDir.getAbsolutePath());
+        }
+        IngameAssets.skins = skins;
+    }
+
+    private static Pixmap compressSkin(int[][][] skinEncoding, Pixmap src, int[] size) {
+
+            Pixmap result = new Pixmap(size[0], size[1], Pixmap.Format.RGBA8888);
+
+            for (int x = 0; x < size[0]; x++)
+                for (int y = 0; y < size[1]; y++) {
+                    int[] pos = skinEncoding[x][y];
+                    if (!Arrays.equals(pos, new int[]{-1, -1}))
+                        result.drawPixel(x, y, src.getPixel(pos[0], pos[1]));
+                }
+            return result;
+    }
+
+    /**
+     * Generates the encoding used for compressing skins
+     *
+     * @param compressedBaseSkin     A compressed Skin colored with the reference colors
+     * @param uncompressedBaseSkin   An uncompressed Skin colored with the reference colors
+     * @param out_compressedSkinSize an int[2] Array where the size of the compressed skin will be written to
+     * @return Maps positions on the compressed skin to positions on the uncompressed skin, where colors should be retrieved from
+     */
+    private static int[][][] generateSkinEncoding(Texture compressedBaseSkin, Texture uncompressedBaseSkin, int[] out_compressedSkinSize) {
+
+        int width = compressedBaseSkin.getWidth();
+        int width2 = uncompressedBaseSkin.getWidth();
+        out_compressedSkinSize[0] = width;
+        int height = compressedBaseSkin.getHeight();
+        int height2 = uncompressedBaseSkin.getHeight();
+        out_compressedSkinSize[1] = height;
+        int[][][] skinEncoding = new int[width][height][2];
+        int[] defaultPos = new int[]{-1, -1};
+        TextureData compressedRaster = compressedBaseSkin.getTextureData();
+        TextureData uncompressedRaster = uncompressedBaseSkin.getTextureData();
+
+        if (!compressedRaster.isPrepared()) compressedRaster.prepare();
+        if (!uncompressedRaster.isPrepared()) uncompressedRaster.prepare();
+
+        Pixmap compressedPixmap = compressedRaster.consumePixmap();
+        Pixmap uncompressedPixmap = uncompressedRaster.consumePixmap();
+
+        for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++) {
+                int colorA = compressedPixmap.getPixel(x, y);
+                if (colorA == 0) continue;
+                int[] pos = defaultPos;
+                for (int x2 = 0; x2 < width2; x2++)
+                    for (int y2 = 0; y2 < height2; y2++) {
+                        if (colorA == uncompressedPixmap.getPixel(x2, y2)) {
+                            pos = new int[]{x2, y2};
+                        }
+                    }
+                skinEncoding[x][y] = pos;
+            }
+        return skinEncoding;
+    }
 }

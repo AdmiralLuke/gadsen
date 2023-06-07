@@ -563,7 +563,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     }
 
     @Override
-    public void init(GameState state,String[] playerNames) {
+    public void init(GameState state,String[] playerNames, String[][] skins) {
         synchronized (root) {
             this.state = state;
             map = new TileMap(state);
@@ -585,7 +585,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                     com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                     GameCharacter animGameCharacter;
-                    animGameCharacter = new GameCharacter(teamColors[curTeam]);
+                    animGameCharacter = new GameCharacter(teamColors[curTeam], skins[curTeam][curCharacter]);
 
                     AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                     aimIndicator.setScale(new Vector2(0.5f, 1));
