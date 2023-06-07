@@ -48,14 +48,19 @@ public class BotThread {
 
     public void forceStop(){
         worker.stop();
-        target.cancel(true);
+
+        if(target!=null) {
+            target.cancel(true);
+        }
         target = null;
         worker = new Thread(Game.PLAYER_THREAD_GROUP, this::waitAndExecute);
         worker.start();
     }
 
     public void shutdown(){
-        target.cancel(true);
+        if(target!=null) {
+            target.cancel(true);
+        }
         worker.interrupt();
     }
 
