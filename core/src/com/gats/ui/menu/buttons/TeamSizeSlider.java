@@ -20,4 +20,14 @@ public class TeamSizeSlider extends RelationSlider {
 	public void adjustRelatedSliders(float min, float max) {
 
 	}
+
+	@Override
+	public boolean setValue(float value){
+
+
+		value = Math.max(this.getMinValue(),value);
+		value = Math.min(this.getMaxValue(),value);
+
+		return super.setValue(value);
+	}
 }

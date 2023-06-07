@@ -194,6 +194,12 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		if (config != null) {
 
 			gameModeSelector.setSelected(config.gameMode);
+			teamAmountSlider.setValue(config.teamCount);
+			config.teamCount = (int)teamAmountSlider.getValue();
+
+			//adjust teamSize
+			teamSizeSlider.setValue(config.teamSize);
+			config.teamSize = (int) teamSizeSlider.getValue();
 
 			switch (config.gameMode) {
 				case Campaign:
@@ -224,14 +230,9 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			if (config.teamSize < 1 && config.players != null) {
 				//	config.teamSize = config.players.size();
 			}
-			teamAmountSlider.setValue(config.teamCount);
-
-			//adjust teamSize
-			teamSizeSlider.setValue(config.teamSize);
-			config.teamSize = (int) teamSizeSlider.getValue();
 
 			if (config.players != null) {
-				config.players = new ArrayList<>(config.players.subList(0, Math.min(config.teamSize, config.players.size())));
+				config.players = new ArrayList<>(config.players.subList(0, Math.min(config.teamCount, config.players.size())));
 				botSelector.setSelected(config.players);
 			}
 
