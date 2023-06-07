@@ -30,7 +30,7 @@ public class MapRetriever implements FilenameFilter {
      */
     String externalMapDirectory = "map/";
 
-    String[] hardCodeMapNames = new String[]{"christmasMap", "kratzbaumMap", "MangoMap"};
+    String[] hardCodeMapNames = new String[]{"testLevel","christmasMap", "kratzbaumMap", "MangoMap"};
 
     ArrayList<String> internalMaps = new ArrayList<String>(Arrays.asList(hardCodeMapNames));
 
