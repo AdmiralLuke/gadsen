@@ -8,15 +8,12 @@ import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.ui.hud.UiMessenger;
-import org.lwjgl.Sys;
-import sun.java2d.loops.ProcessPath;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 
@@ -54,9 +51,10 @@ public class Game {
 
     private static final boolean isDebug;
     static {
-        isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
-                getInputArguments().toString().contains("-agentlib:jdwp");
+        isDebug = false;// java.lang.management.ManagementFactory.getRuntimeMXBean().
+                //getInputArguments().toString().contains("-agentlib:jdwp");
         if (isDebug) System.err.println("Warning: Debugger engaged; Disabling Bot-Timeout!");
+
     }
 
     private final InputProcessor inputGenerator;
@@ -70,10 +68,7 @@ public class Game {
     private GameState state;
     private Player[] players;
 
-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
-            0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(),
-            new BotThreadFactory());
+    private final BotThread executor = new BotThread();
     private final List<HumanPlayer> humanList = new ArrayList<>();
 
     private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(256);
@@ -127,12 +122,11 @@ public class Game {
                     break;
                 case AI:
 
-                    Future<?> future = executor.submit(() -> {
+                    Future<?> future = executor.execute(() -> {
                         Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
                         ((Bot) curPlayer).setRnd(Manager.getSeed());
                         curPlayer.init(state);
                     });
-
                     try {
                         if (isDebug) future.get();
                         else
@@ -219,7 +213,7 @@ public class Game {
             Future<?> future;
             switch (currentPlayer.getType()) {
                 case Human:
-                    future = executor.submit(() -> {
+                    future = executor.execute(() -> {
                         Thread.currentThread().setName("Run_Thread_Player_Human");
                         simulation.setTurnTimer(new Timer(1000 * HUMAN_EXECUTION_TIMEOUT));
                         currentPlayer.executeTurn(stateCopy, controller);
@@ -240,7 +234,7 @@ public class Game {
                             e.printStackTrace();
                         } catch (TimeoutException e) {
                             future.cancel(true);
-                            executor.purge();
+                            executor.forceStop();
                             System.err.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                         }
                         inputGenerator.endTurn();
@@ -253,7 +247,7 @@ public class Game {
                     });
                     break;
                 case AI:
-                    future = executor.submit(() -> {
+                    future = executor.execute(() -> {
                         Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
                         simulation.setTurnTimer(new Timer(1000 * AI_EXECUTION_TIMEOUT));
                         currentPlayer.executeTurn(stateCopy, controller);
@@ -275,7 +269,7 @@ public class Game {
                             simulation.penalizeCurrentPlayer();
                         } catch (TimeoutException e) {
                             future.cancel(true);
-                            executor.purge();
+                            executor.forceStop();
 
                             System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                             System.err.println("The failed player has been penalized!");
