@@ -85,4 +85,40 @@ public class BotSelectorTable extends LimitedWidthTable {
 			box.setItems(availableBots);
 		}
 	}
+
+	/**
+	 * Tries to set the passed List as the selected values, if a value can not bo set, the default value stays set.
+	 * @param players
+	 */
+	public void setSelected(ArrayList<Class<? extends Player>> players) {
+
+		if(players==null){return;}
+		resizeTable(players.size());
+		Iterator<SelectBox<Manager.NamedPlayerClass>> select = botSelectors.iterator();
+		int availBotIndex;
+		for ( Class<? extends Player> bot:players) {
+			SelectBox<Manager.NamedPlayerClass> box = select.next();
+			availBotIndex = botAvailable(availableBots,bot);
+			if(availBotIndex>-1){
+				box.setSelected(availableBots[availBotIndex]);
+			}
+		}
+	}
+
+	/**
+	 * Checks if a bot is available in the provided list
+	 * @param bots
+	 * @param toSearch
+	 * @return
+	 */
+	private int botAvailable(Manager.NamedPlayerClass[] bots, Class<? extends Player> toSearch){
+		int index = 0;
+		for (Manager.NamedPlayerClass bot: bots) {
+			if (bot.getClassRef().equals(toSearch)){
+				return index;
+			}
+			index++;
+		}
+		return -1;
+	}
 }

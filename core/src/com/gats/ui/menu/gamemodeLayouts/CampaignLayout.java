@@ -21,7 +21,7 @@ public class CampaignLayout extends GamemodeLayout{
 		this.add(getBotSelector()).colspan(getDefaultColspan());
 
 
-		menu.setMaps(getMapSelector(), GameState.GameMode.Campaign,"");
+		menu.setMaps(getMapSelector(), GameState.GameMode.Campaign);
 
 
 		getBotSelector().resizeTable(1);
