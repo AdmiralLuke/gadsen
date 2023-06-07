@@ -4,10 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.gats.manager.Game;
-import com.gats.manager.IdleBot;
-import com.gats.manager.Manager;
-import com.gats.manager.RunConfiguration;
+import com.gats.manager.*;
 import com.gats.simulation.GameState;
 import com.gats.ui.MenuScreen;
 import com.gats.ui.menu.buttons.*;
@@ -19,7 +16,9 @@ import com.gats.ui.menu.specificRunConfig.ChristmasModeConfig;
 import com.gats.ui.menu.specificRunConfig.ExamAdmissionConfig;
 import com.gats.ui.menu.specificRunConfig.NormalModeConfig;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Menu {
 
@@ -123,282 +122,303 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
  */
 
 
-	private SelectBox<GameState.GameMode> gameModeSelector;
-	private SelectBox<GameMap> mapSelector;
-	private TeamSizeSlider teamSizeSlider;
-	private TeamAmountSlider teamAmountSlider;
+    private SelectBox<GameState.GameMode> gameModeSelector;
+    private SelectBox<GameMap> mapSelector;
+    private TeamSizeSlider teamSizeSlider;
+    private TeamAmountSlider teamAmountSlider;
 
-	private BotSelectorTable botSelector;
+    private BotSelectorTable botSelector;
 
 
-	private Image title;
-
+    private Image title;
 
 
 //--------;
 
 
-	Table menuTable;
-	MenuScreen menuScreen;
-	public Menu(Skin skin, TextureRegion titleSprite, Manager.NamedPlayerClass[] availableBots, RunConfiguration runConfig, MenuScreen menuScreen) {
-		menuTable = new Table(skin);
-		if(gameModeSelector==null) {
-			createButtons(skin, availableBots, runConfig,titleSprite);
-		}
+    Table menuTable;
+    MenuScreen menuScreen;
 
-		this.menuScreen=menuScreen;
-	}
+    public Menu(Skin skin, TextureRegion titleSprite, Manager.NamedPlayerClass[] availableBots, RunConfiguration runConfig, MenuScreen menuScreen) {
+        menuTable = new Table(skin);
+        if (gameModeSelector == null) {
+            createButtons(skin, availableBots, runConfig, titleSprite);
+        }
 
-	public Table buildMenuLayout(Skin skin) {
+        this.menuScreen = menuScreen;
+    }
 
-		StartButton startButton = new StartButton("Spiel starten", skin, this);
-		ExitButton exitButton = new ExitButton("Beenden", skin);
-		//------------------------
+    public Table buildMenuLayout(Skin skin) {
 
-		menuTable.clear();
-		menuTable.setFillParent(true);
+        StartButton startButton = new StartButton("Spiel starten", skin, this);
+        ExitButton exitButton = new ExitButton("Beenden", skin);
+        //------------------------
 
-
-		//platziert den Table an der oberen Kante des Bildschirms
-		menuTable.top();
-
-		//titelbild/überschrift
-
-		//Todo get title image sprite
-
-		//Spieltitel wird in der ersten Zeile hinzugefügt und hat eine breite von 4 Spalten
-		menuTable.add(title).colspan(4).pad(15).height(80).minWidth(title.getImageWidth());
-
-		//menuTable.row(); erzeugt eine neue Zeile in der Tabelle
-		menuTable.row();
-
-		menuTable.add(startButton).colspan(4);
-		menuTable.row();
-
-		menuTable.add(gameModeSelector).pad(10).colspan(4);
-		menuTable.row();
-
-		menuTable.add(getGameModeLayout(gameModeSelector.getSelected())).colspan(4);
-		menuTable.row();
-
-		//ganz unten im  ist der Exit button
-		menuTable.add(exitButton).colspan(4).pad(10);
-		return menuTable;
-	}
-
-	/**
-	 * Gets called when start button is pressed.
-	 *
-	 * Will pass button settings to the RunConfiguration
-	 */
-	public void startGame() {
+        menuTable.clear();
+        menuTable.setFillParent(true);
 
 
-		RunConfiguration config = this.toRunConfig();
-		config = applyGamemodeSettings(config);
-		System.out.println(config.toString());
+        //platziert den Table an der oberen Kante des Bildschirms
+        menuTable.top();
 
-		if(config.isValid()) {
+        //titelbild/überschrift
 
-		menuScreen.startGame(config);
+        //Todo get title image sprite
 
-		}
-	}
+        //Spieltitel wird in der ersten Zeile hinzugefügt und hat eine breite von 4 Spalten
+        menuTable.add(title).colspan(4).pad(15).height(80).minWidth(title.getImageWidth());
 
-	public RunConfiguration toRunConfig(){
+        //menuTable.row(); erzeugt eine neue Zeile in der Tabelle
+        menuTable.row();
 
-		RunConfiguration configuration = new RunConfiguration();
+        menuTable.add(startButton).colspan(4);
+        menuTable.row();
 
+        menuTable.add(gameModeSelector).pad(10).colspan(4);
+        menuTable.row();
 
-		configuration.gui = true;
+        menuTable.add(getGameModeLayout(gameModeSelector.getSelected())).colspan(4);
+        menuTable.row();
 
-		//Todo make sure the gamemodes are in correct order
-		configuration.gameMode = GameState.GameMode.values()[gameModeSelector.getSelectedIndex()];
-		configuration.mapName = this.mapSelector.getSelected().getName();
-		configuration.teamCount = (int)this.teamAmountSlider.getValue();
-		configuration.teamSize = (int)this.teamSizeSlider.getValue();
-		configuration.players = this.botSelector.evaluateSelected();
+        //ganz unten im  ist der Exit button
+        menuTable.add(exitButton).colspan(4).pad(10);
+        return menuTable;
+    }
 
-		return configuration;
-	}
-
-	public RunConfiguration applyGamemodeSettings(RunConfiguration configuration){
-
-		RunConfiguration modeSettings;
-
-		switch (configuration.gameMode){
-			case Normal:
-				modeSettings = new NormalModeConfig(configuration);
-				break;
-			//case Christmas:
-			//	//Todo deal with hardcoded values, might be neede for later gameModes
-			//	modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
-			//	break;
-
-			case Exam_Admission:
-				modeSettings = new ExamAdmissionConfig(configuration);
-				break;
-			default:
-				modeSettings = new NormalModeConfig(configuration);
-
-		}
+    /**
+     * Gets called when start button is pressed.
+     * <p>
+     * Will pass button settings to the RunConfiguration
+     */
+    public void startGame() {
 
 
-		return modeSettings;
-	}
-	public Table getGameModeLayout(GameState.GameMode gameMode) {
+        RunConfiguration config = this.toRunConfig();
+        config = applyGamemodeSettings(config);
+        System.out.println(config.toString());
+
+        if (config.isValid()) {
+
+            menuScreen.startGame(config);
+
+        }
+    }
+
+    public RunConfiguration toRunConfig() {
+
+        RunConfiguration configuration = new RunConfiguration();
+
+
+        configuration.gui = true;
+
+        //Todo make sure the gamemodes are in correct order
+        configuration.gameMode = GameState.GameMode.values()[gameModeSelector.getSelectedIndex()];
+        configuration.mapName = this.mapSelector.getSelected().getName();
+        configuration.teamCount = (int) this.teamAmountSlider.getValue();
+        configuration.teamSize = (int) this.teamSizeSlider.getValue();
+        configuration.players = this.botSelector.evaluateSelected();
+
+        return configuration;
+    }
+
+    public RunConfiguration applyGamemodeSettings(RunConfiguration configuration) {
+
+        RunConfiguration modeSettings;
+
+        switch (configuration.gameMode) {
+            case Normal:
+                modeSettings = new NormalModeConfig(configuration);
+                break;
+            //case Christmas:
+            //	//Todo deal with hardcoded values, might be neede for later gameModes
+            //	modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
+            //	break;
+
+            case Exam_Admission:
+                modeSettings = new ExamAdmissionConfig(configuration);
+                break;
+            default:
+                modeSettings = new NormalModeConfig(configuration);
+
+        }
+
+
+        return modeSettings;
+    }
+
+    public Table getGameModeLayout(GameState.GameMode gameMode) {
 //Todo  fix hardcoded gamemode evaluation but passing String[] gameModes to buildTable
-		Skin skin = menuTable.getSkin();
+        Skin skin = menuTable.getSkin();
 
-		if(gameMode == GameState.GameMode.Normal) {
-			return new NormalLayout(skin, this);
-		}
-		if(gameMode == GameState.GameMode.Campaign) {
-			return new CampaignLayout(skin, this);
-		}
-		if(gameMode == GameState.GameMode.Exam_Admission) {
-			return new ExamAdmissionLayout(skin, this);
-		}
+        if (gameMode == GameState.GameMode.Normal) {
+            return new NormalLayout(skin, this);
+        }
+        if (gameMode == GameState.GameMode.Campaign) {
+            return new CampaignLayout(skin, this);
+        }
+        if (gameMode == GameState.GameMode.Exam_Admission) {
+            return new ExamAdmissionLayout(skin, this);
+        }
 
-		//default case
-		return new NormalLayout(skin, this);
-	}
+        //default case
+        return new NormalLayout(skin, this);
+    }
 
-	public void rebuildTable(){
-		this.menuTable=buildMenuLayout(this.menuTable.getSkin());
-	}
+    public void rebuildTable() {
+        this.menuTable = buildMenuLayout(this.menuTable.getSkin());
+    }
 
 	/*-----------------------------------------------------
 	* Button creation Zone
 	/*
 	 */
 
-	public void createButtons(Skin skin, Manager.NamedPlayerClass[] availableBots, RunConfiguration runConfig, TextureRegion titleImage){
-		//Todo load settings from runConfig
-		if(titleImage!=null){
-		this.title = new Image(titleImage);
-		}
-		else{
-			System.err.println("TitleSprite Texture Region was is null! ");
-		}
-		this.gameModeSelector = createGameModeSelector(skin, runConfig.gameMode);
-		this.mapSelector = createMapSelector(skin,runConfig.mapName,runConfig.gameMode);
-		this.botSelector = createBotSelector(skin,availableBots);
-		this.teamAmountSlider = createTeamAmountSlider(skin);
-		this.teamSizeSlider = createTeamSizeSlider(skin);
+    public void createButtons(Skin skin, Manager.NamedPlayerClass[] availableBots, RunConfiguration runConfig, TextureRegion titleImage) {
+        //Todo load settings from runConfig
+        if (titleImage != null) {
+            this.title = new Image(titleImage);
+        } else {
+            System.err.println("TitleSprite Texture Region was is null! ");
+        }
+        this.gameModeSelector = createGameModeSelector(skin, runConfig.gameMode);
+        this.mapSelector = createMapSelector(skin, runConfig.mapName, runConfig.gameMode);
+        this.botSelector = createBotSelector(skin, availableBots);
+        this.teamAmountSlider = createTeamAmountSlider(skin);
+        this.teamSizeSlider = createTeamSizeSlider(skin);
 
-		//needs to be called to set teamSizeSlider to the correct starting range
-		teamAmountSlider.addRelatedSlider(teamSizeSlider);
-		teamAmountSlider.addBotSelector(botSelector);
-		teamSizeSlider.addRelatedSlider(teamAmountSlider);
+        //needs to be called to set teamSizeSlider to the correct starting range
+        teamAmountSlider.addRelatedSlider(teamSizeSlider);
+        teamAmountSlider.addBotSelector(botSelector);
+        teamSizeSlider.addRelatedSlider(teamAmountSlider);
 
-		teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
-
-
-		GameState.GameMode[] gameModes = runConfig.getGameModes();
-		//translate modes
-		String[] modeNames = new String[gameModes.length];
-		int i=0;
-
-		gameModeSelector.setItems(GameState.GameMode.Normal, GameState.GameMode.Campaign, GameState.GameMode.Exam_Admission);
-
-	}
+        teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(), mapSelector.getSelected().getNuberOfTeams());
 
 
+        GameState.GameMode[] gameModes = runConfig.getGameModes();
+        //translate modes
+        String[] modeNames = new String[gameModes.length];
+        int i = 0;
 
-	private <T> SelectBox<T> createGameModeSelector(Skin skin,T selected){
-		SelectBox<T> gameModeSelect = new SelectBox<T>(skin);
-		gameModeSelect.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				rebuildTable();
-			}
-		});
-		gameModeSelect.setSelected(selected);
-		return gameModeSelect;
-	}
-
-	/**
-	 * Initializes the map selecter with the normal maps
-	 * @param skin
-	 * @return
-	 */
-	private SelectBox<GameMap> createMapSelector(Skin skin, String selected, GameState.GameMode mode) {
-
-		//Todo, adjust maps based on first gamemode, dynamically -> if gamemodeselector is initialized, use selected value
-		//-> use function for evaluating the selected mode
-		SelectBox<GameMap> mapSelector = new SelectBox<>(skin);
+        gameModeSelector.setItems(GameState.GameMode.Normal, GameState.GameMode.Campaign, GameState.GameMode.Exam_Admission);
 
 
-		setMaps(mapSelector,mode,selected);
-
-		return mapSelector;
-	}
-	private TeamAmountSlider createTeamAmountSlider(Skin skin) {
-
-		return new TeamAmountSlider(1,9,1,false,skin);
-	}
-
-	private TeamSizeSlider createTeamSizeSlider(Skin skin){
-		return new TeamSizeSlider(1,9,1,false,skin);
-	}
-
-	private BotSelectorTable createBotSelector(Skin skin, Manager.NamedPlayerClass[] availableBots){
-		BotSelectorTable botSelector = new BotSelectorTable(skin,3);
-		botSelector.setAvailableBots(availableBots);
-		return botSelector;
-	}
-
-	/**
-	 * Adds the maps from the passed mode, to the {@link Menu#mapSelector}
-	 * @param mapSelector to add maps to.
-	 * @param mode gamemode to use for the maps
-	 */
-	public void setMaps(SelectBox<GameMap> mapSelector, GameState.GameMode mode, String selected){
+    }
 
 
-		if(mode== GameState.GameMode.Campaign){
+    private <T> SelectBox<T> createGameModeSelector(Skin skin, T selected) {
+        SelectBox<T> gameModeSelect = new SelectBox<T>(skin);
+        gameModeSelect.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                rebuildTable();
+            }
+        });
+        gameModeSelect.setSelected(selected);
+        return gameModeSelect;
+    }
 
-			mapSelector.setItems(new MapRetriever().getCampaignMaps());
+    /**
+     * Initializes the map selecter with the normal maps
+     *
+     * @param skin
+     * @return
+     */
+    private SelectBox<GameMap> createMapSelector(Skin skin, String selected, GameState.GameMode mode) {
 
-		}
-		//Todo examAdmission maps
-
-
-		else{
-			//default case
-
-			mapSelector.setItems(new MapRetriever().getMaps());
-			mapSelector.addListener(new ChangeListener() {
-				@Override
-				public void changed(ChangeEvent event, Actor actor) {
-					teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
-				}
-			});
-		}
-
-		if (mapSelector.getItems().size==0){
-			mapSelector.setItems(new GameMap("no Maps found",0));
-		}
-
-		//need to change GameMap, for this to work
-		//mapSelector.setSelected(selected);
-	}
+        //Todo, adjust maps based on first gamemode, dynamically -> if gamemodeselector is initialized, use selected value
+        //-> use function for evaluating the selected mode
+        SelectBox<GameMap> mapSelector = new SelectBox<>(skin);
 
 
-	public SelectBox<GameMap> getMapSelector() {
-		return mapSelector;
-	}
+        setMaps(mapSelector, mode, selected);
 
-	public TeamSizeSlider getTeamSizeSlider() {
-		return teamSizeSlider;
-	}
+        return mapSelector;
+    }
 
-	public TeamAmountSlider getTeamAmountSlider() {
-		return teamAmountSlider;
-	}
+    private TeamAmountSlider createTeamAmountSlider(Skin skin) {
 
-	public BotSelectorTable getBotSelector() {
-		return botSelector;
-	}
+        return new TeamAmountSlider(1, 9, 1, false, skin);
+    }
+
+    private TeamSizeSlider createTeamSizeSlider(Skin skin) {
+        return new TeamSizeSlider(1, 9, 1, false, skin);
+    }
+
+    private BotSelectorTable createBotSelector(Skin skin, Manager.NamedPlayerClass[] availableBots) {
+        BotSelectorTable botSelector = new BotSelectorTable(skin, 3);
+        botSelector.setAvailableBots(availableBots);
+        return botSelector;
+    }
+
+    /**
+     * Adds the maps from the passed mode, to the {@link Menu#mapSelector}
+     *
+     * @param mapSelector to add maps to.
+     * @param mode        gamemode to use for the maps
+     */
+    public void setMaps(SelectBox<GameMap> mapSelector, GameState.GameMode mode, String selected) {
+
+
+        if (mode == GameState.GameMode.Campaign) {
+
+            mapSelector.setItems(new MapRetriever().getCampaignMaps());
+
+        }
+        //Todo examAdmission maps
+
+
+        else {
+            //default case
+
+            mapSelector.setItems(new MapRetriever().getMaps());
+            mapSelector.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(), mapSelector.getSelected().getNuberOfTeams());
+                }
+            });
+        }
+
+        if (mapSelector.getItems().size == 0) {
+            mapSelector.setItems(new GameMap("no Maps found", 0));
+        }
+        //need to change GameMap, for this to work
+        //mapSelector.setSelected(selected);
+    }
+
+
+    public SelectBox<GameMap> getMapSelector() {
+        return mapSelector;
+    }
+
+    public TeamSizeSlider getTeamSizeSlider() {
+        return teamSizeSlider;
+    }
+
+    public TeamAmountSlider getTeamAmountSlider() {
+        return teamAmountSlider;
+    }
+
+    public BotSelectorTable getBotSelector() {
+        return botSelector;
+    }
+
+    public void loadRunconfig(RunConfiguration runConfig){
+
+        this.gameModeSelector.setSelected(runConfig.gameMode);
+
+        GameMap map = null;
+        for (GameMap cur : mapSelector.getItems()
+        ) {
+            if (cur.getName().equals(runConfig.mapName)) {
+                map = cur;
+                break;
+            }
+        }
+        if (map!= null) mapSelector.setSelected(map);
+
+        botSelector.setSelection(runConfig.players);
+        this.teamAmountSlider.setValue(runConfig.teamCount);
+        this.teamSizeSlider.setValue(runConfig.teamSize);
+    }
 }

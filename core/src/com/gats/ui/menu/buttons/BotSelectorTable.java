@@ -85,4 +85,18 @@ public class BotSelectorTable extends LimitedWidthTable {
 			box.setItems(availableBots);
 		}
 	}
+
+	public void setSelection(ArrayList<Class<? extends Player>> selection){
+		if (selection==null) selection = new ArrayList<>();
+		int i=0;
+		for (SelectBox<Manager.NamedPlayerClass> box:botSelectors) {
+			for (Manager.NamedPlayerClass playerClass: availableBots){
+				if (selection.size()>i && playerClass.getClassRef().equals(selection.get(i))){
+					box.setSelected(playerClass);
+					break;
+				}
+				i++;
+			}
+		}
+	}
 }
