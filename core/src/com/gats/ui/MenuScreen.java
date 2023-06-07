@@ -68,12 +68,10 @@ private SpriteBatch menuBatch;
      */
     public void setupMenuScreen(Stage menuStage, RunConfiguration runConfig) {
 
-        //ToDo forward runconfig and process
         this.menuBuilder = new Menu(AssetContainer.MainMenuAssets.skin, AssetContainer.MainMenuAssets.titleSprite, Manager.getPossiblePlayers(),runConfig,this);
 
         menuStage.addActor(menuBuilder.buildMenuLayout(AssetContainer.MainMenuAssets.skin));
 
-        menuBuilder.loadRunconfig(runConfig);
     }
 
 
