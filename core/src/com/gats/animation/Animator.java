@@ -200,11 +200,12 @@ public class Animator implements Screen, AnimationLogProcessor {
             summonParticle.setChildren(new Action[]{destroyParticle});
             //rotateAction to set the angle/direction of movement, to flip the character sprite
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
-            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle});
+
+            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, moveAction.getDuration(), animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()), moveAction.getStaminaBefore(), moveAction.getStaminaAfter());
+            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle,messageUiPlayerMoveAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             //notify ui
-            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, moveAction.getDuration(), animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()), moveAction.getStaminaBefore(), moveAction.getStaminaAfter());
-            animMoveAction.setChildren(new Action[]{stopWalking, messageUiPlayerMoveAction});
+            animMoveAction.setChildren(new Action[]{stopWalking});
             return new ExpandedAction(startWalking, messageUiPlayerMoveAction);
         }
 
