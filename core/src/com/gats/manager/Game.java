@@ -70,7 +70,10 @@ public class Game {
     private GameState state;
     private Player[] players;
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(new BotThreadFactory());
+    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(),
+            new BotThreadFactory());
     private final List<HumanPlayer> humanList = new ArrayList<>();
 
     private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(256);
@@ -237,7 +240,7 @@ public class Game {
                             e.printStackTrace();
                         } catch (TimeoutException e) {
                             future.cancel(true);
-
+                            executor.purge();
                             System.err.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                         }
                         inputGenerator.endTurn();
@@ -272,6 +275,7 @@ public class Game {
                             simulation.penalizeCurrentPlayer();
                         } catch (TimeoutException e) {
                             future.cancel(true);
+                            executor.purge();
 
                             System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                             System.err.println("The failed player has been penalized!");
