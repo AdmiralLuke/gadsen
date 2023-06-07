@@ -72,6 +72,8 @@ private SpriteBatch menuBatch;
         this.menuBuilder = new Menu(AssetContainer.MainMenuAssets.skin, AssetContainer.MainMenuAssets.titleSprite, Manager.getPossiblePlayers(),runConfig,this);
 
         menuStage.addActor(menuBuilder.buildMenuLayout(AssetContainer.MainMenuAssets.skin));
+
+        menuBuilder.loadRunconfig(runConfig);
     }
 
 
