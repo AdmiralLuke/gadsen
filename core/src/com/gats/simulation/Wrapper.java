@@ -71,4 +71,20 @@ public class Wrapper {
     public Action shoot(Action head, Weapon weapon, Vector2 dir, float strength, Vector2 pos, GameCharacter character){
         return wpWrapper.shoot(head, weapon, dir, strength, pos, character);
     }
+
+    public boolean getsKnockback(int teamN, int posInTeam) {
+        return team[teamN][posInTeam].getKnockback();
+    }
+
+    public void toggleKnockback(int teamN, int posInTeam) {
+        team[teamN][posInTeam].toggleGetKnockback();
+    }
+
+    public void resetKnockback() {
+        for (GameCharacter[] gameCharacters : state.getTeams()) {
+            for (GameCharacter gameCharacter : gameCharacters) {
+                if (gameCharacter.getKnockback()) gameCharacter.toggleGetKnockback();
+            }
+        }
+    }
 }

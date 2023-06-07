@@ -211,7 +211,7 @@ public class Tile implements Serializable, Comparable<Tile> {
         for (GameCharacter[] characters : state.getTeams()) {
             for (GameCharacter character : characters) {
                 if (this.getPosition().x == (int)(character.getPlayerPos().x / 16) && this.getPosition().y + 1== (int)(character.getPlayerPos().y / 16))
-                    fallable.add(character);
+                    if (!character.getKnockback()) fallable.add(character);
             }
         }
         for (GameCharacter character : fallable) {
@@ -249,7 +249,7 @@ public class Tile implements Serializable, Comparable<Tile> {
             for (GameCharacter[] characters : state.getTeams()) {
                 for (GameCharacter character : characters) {
                     if (tile.getPosition().x == (int)(character.getPlayerPos().x / 16) && tile.getPosition().y + 1== (int)(character.getPlayerPos().y / 16))
-                        fallable.add(character);
+                        if (!character.getKnockback()) fallable.add(character);
                 }
             }
             state.getBoard()[tile.position.x][tile.position.y] = null;

@@ -53,11 +53,15 @@ public class Explosive implements Projectile {
     }
 
     public Action explode(Action head, Tile t, GameCharacter character, Vector2 midPos, Simulation sim, BaseProjectile bsProj) {
+        sim.getWrapper().resetKnockback();
         HashMap<Tile, Integer> tilesInRadius = new HashMap<>();
         HashMap<GameCharacter, Integer> charactersInRadius = new HashMap<>();
         traverseCircle(tilesInRadius, charactersInRadius, this.radius, midPos, sim, head, bsProj);
         if (t != null) tilesInRadius.put(t, 0);
         if (character != null) charactersInRadius.put(character, 0);
+        Set<GameCharacter> charactersToMove = charactersInRadius.keySet();
+        for (GameCharacter ch : charactersToMove)
+            sim.getWrapper().toggleKnockback(ch.getTeam(), ch.getTeamPos());
 
         if (bsProj.type != ProjectileAction.ProjectileType.WATERBOMB) {
             Set<Tile> tileToDestroy = tilesInRadius.keySet();
@@ -69,7 +73,7 @@ public class Explosive implements Projectile {
         }
 
 
-        Set<GameCharacter> charactersToMove = charactersInRadius.keySet();
+
         // System.out.println(tileToDestroy.size());
         // System.out.println(charactersToMove.size());
         if (!charactersToMove.isEmpty()) {
