@@ -23,7 +23,7 @@ public class ExamAdmissionLayout extends GamemodeLayout{
 		this.add(getBotSelector()).colspan(getDefaultColspan());
 
 
-		menu.setMaps(getMapSelector(), GameState.GameMode.Exam_Admission,"");
+		menu.setMaps(getMapSelector(), GameState.GameMode.Exam_Admission);
 
 
 		getBotSelector().resizeTable(1);

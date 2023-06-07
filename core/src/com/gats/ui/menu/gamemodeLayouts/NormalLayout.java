@@ -1,5 +1,6 @@
 package com.gats.ui.menu.gamemodeLayouts;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.gats.simulation.GameState;
 import com.gats.ui.menu.Menu;
@@ -20,7 +21,7 @@ public class NormalLayout extends GamemodeLayout {
 		getTeamAmountSlider().freezeSlider(false);
 
 		this.add(menu.getMapSelector()).colspan(getDefaultColspan()).pad(getDefaultPadding());
-		menu.setMaps(getMapSelector(), GameState.GameMode.Normal,"");
+		menu.setMaps(getMapSelector(), GameState.GameMode.Normal);
 		this.row();
 
 		this.add(new SliderLabel("Teamanzahl: ",this.getSkin(),menu.getTeamAmountSlider()));
@@ -30,6 +31,8 @@ public class NormalLayout extends GamemodeLayout {
 		this.add(new SliderLabel("Teamgröße: ",this.getSkin(),menu.getTeamSizeSlider()));
 		this.add(menu.getTeamSizeSlider());
 
+		this.row();
+		this.add(new Label("",this.getSkin()));
 		this.row();
 
 		this.add(menu.getBotSelector()).colspan(getDefaultColspan());

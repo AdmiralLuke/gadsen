@@ -23,6 +23,7 @@ public class GADS extends Game {
 	}
 
 	public void startGame(RunConfiguration config){
+		this.runConfig = config;
 		setScreenIngame(config);
 	}
 	@Override
@@ -58,7 +59,7 @@ public class GADS extends Game {
 
 	public void setScreenMenu() {
 		//ToDo we can use runconfig to save the users selection while we are at it
-		setScreen(new MenuScreen(this, new RunConfiguration()));
+		setScreen(new MenuScreen(this, this.runConfig));
 	}
 
 
