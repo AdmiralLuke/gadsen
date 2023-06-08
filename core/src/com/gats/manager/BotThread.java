@@ -42,7 +42,8 @@ public class BotThread {
 
     public Future<?> execute(Runnable runnable){
         if (target != null) return null;
-        target = new FutureTask<>(runnable, null);
+        FutureTask<?> target = new FutureTask<>(runnable, null);
+        this.target = target;
         synchronized (lock) {
             lock.notify();
         }
