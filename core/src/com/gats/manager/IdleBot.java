@@ -36,8 +36,6 @@ public class IdleBot extends Bot{
         if (state.getTile((int)(controller.getGameCharacter().getPlayerPos().x / 16) + newPosX, (int)(controller.getGameCharacter().getPlayerPos().y / 16) - 1) != null) {
             controller.move(newPosX);
         }
-
-        while (true){}
     }
 
 
