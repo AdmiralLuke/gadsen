@@ -52,7 +52,9 @@ public class BotThread {
     public void forceStop(){
 
         synchronized (lock) {
+
             if (target!= null) target.cancel(true);
+            else return;
             target = null;
         }
         worker.stop();
@@ -70,6 +72,7 @@ public class BotThread {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
         }
+        if (worker.isAlive()) worker.stop();
     }
 
 }
