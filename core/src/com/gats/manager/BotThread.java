@@ -10,8 +10,6 @@ public class BotThread {
     private static final String namePrefix = "BotThread";
     private static final AtomicInteger threadNumber = new AtomicInteger(1);
 
-    private final ReentrantLock mainLock = new ReentrantLock();
-
     private final Object lock = new Object();
 
     private final Object completion = new Object();
@@ -35,7 +33,6 @@ public class BotThread {
                 }
             }
             target.run();
-
             synchronized (lock) {
                 synchronized (completion) {
                     target = null;
@@ -58,10 +55,11 @@ public class BotThread {
     public void forceStop() {
 
         synchronized (lock) {
-
+            synchronized (completion){
             if (target != null) target.cancel(true);
             else return;
             target = null;
+            }
         }
         worker.stop();
         worker = new Thread(Game.PLAYER_THREAD_GROUP, this::waitAndExecute);
@@ -82,7 +80,6 @@ public class BotThread {
     }
 
     public void waitForCompletion() {
-        synchronized (lock) {
             synchronized (completion) {
                 if (target != null) {
                     try {
@@ -91,6 +88,6 @@ public class BotThread {
                     }
                 }
             }
-        }
+
     }
 }
