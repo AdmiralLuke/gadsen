@@ -120,7 +120,7 @@ public class Game {
                     humanList.add((HumanPlayer) curPlayer);
                     break;
                 case AI:
-
+                    executor.waitForCompletion();
                     Future<?> future = executor.execute(() -> {
                         Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
                         ((Bot) curPlayer).setRnd(Manager.getSeed());
@@ -216,6 +216,7 @@ public class Game {
             GameState stateCopy = state.copy();
             Controller controller = new Controller(this, gcController, stateCopy, currentPlayer.getType() == Player.PlayerType.Human? HUMAN_CONTROLLER_USES: AI_CONTROLLER_USES);
 
+            executor.waitForCompletion();
             Thread futureExecutor;
             Future<?> future;
             switch (currentPlayer.getType()) {
