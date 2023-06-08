@@ -51,8 +51,7 @@ public class Game {
 
     private static final boolean isDebug;
     static {
-        isDebug = false;// java.lang.management.ManagementFactory.getRuntimeMXBean().
-                //getInputArguments().toString().contains("-agentlib:jdwp");
+        isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("-agentlib:jdwp");
         if (isDebug) System.err.println("Warning: Debugger engaged; Disabling Bot-Timeout!");
 
     }
