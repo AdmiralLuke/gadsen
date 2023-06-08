@@ -18,6 +18,8 @@ public abstract class Run {
 
     protected GameState.GameMode gameMode;
     private final ArrayList<Game> games = new ArrayList<>();
+
+    private boolean disposed = false;
     private final ArrayList<Class<? extends Player>> players;
 
     public Run(Manager manager, RunConfiguration runConfig) {
@@ -46,8 +48,22 @@ public abstract class Run {
     }
 
     protected void addGame(Game game) {
-        games.add(game);
-        manager.schedule(game);
+        synchronized (schedulingLock) {
+            if (!disposed) {
+                games.add(game);
+                manager.schedule(game);
+            }
+        }
+    }
+
+    public void dispose() {
+        synchronized (schedulingLock) {
+            disposed = true;
+            for (Game game : games
+            ) {
+                manager.stop(game);
+            }
+        }
     }
 
     public GameState.GameMode getGameMode() {

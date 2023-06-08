@@ -1,7 +1,6 @@
 package bots;
 
 import com.gats.manager.Bot;
-import com.gats.manager.BotThreadFactory;
 import com.gats.manager.Controller;
 import com.gats.simulation.GameState;
 import java.util.*;

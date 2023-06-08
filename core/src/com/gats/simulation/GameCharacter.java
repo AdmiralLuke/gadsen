@@ -204,18 +204,18 @@ public class GameCharacter implements Serializable {
             int activeTeam = sim.getActiveTeam();
             damageReceived[activeTeam] += health - newHealth;
             if (activeTeam != team) {
-                state.addScore(activeTeam, environmental ? 1.5f : 1.0f * (health - Math.max(newHealth, 0)));
+                head = state.addScore(head, activeTeam, environmental ? 1.5f : 1.0f * (health - Math.max(newHealth, 0)));
                 if (newHealth <= 0 && health > 0) {
-                    state.addScore(activeTeam, Simulation.SCORE_KILL);
+                    head = state.addScore(head, activeTeam, Simulation.SCORE_KILL);
                     for (int i = 0; i< damageReceived.length; i++){
                         if (i!=activeTeam && damageReceived[i]>=50)
-                            state.addScore(activeTeam, Simulation.SCORE_ASSIST);
+                            head = state.addScore(head, activeTeam, Simulation.SCORE_ASSIST);
                     }
                 }
             }
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
-            state.addScore(team, (newHealth - health));
+            head = state.addScore(head, team, (newHealth - health));
             lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth);
         }
         this.health = newHealth;
@@ -454,9 +454,12 @@ public class GameCharacter implements Serializable {
      */
     Action walk(int dx, Action head) {
 
+
         if (dx == 0 || stamina <= 0 || health <= 0) {
             return head;
         }
+
+        int oldStamina = stamina;
 
         Vector2 bef = getPlayerPos();
         int sign = dx < 0 ? -1 : 1;
@@ -551,7 +554,7 @@ public class GameCharacter implements Serializable {
 
         }
         //Movement completed for some reason, log action
-        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
+        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y), oldStamina, stamina);
 
 
         head.addChild(lastAction);

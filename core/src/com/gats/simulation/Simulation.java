@@ -19,6 +19,8 @@ public class Simulation {
     public static final float SCORE_ELIMINATION = 50;
     protected static final float[] SCORE_WIN = new float[]{200, 100, 50};
 
+    public static final float SCORE_ERROR_PENALTY = -50;
+
     public static float getWinScore(int placement){
         if (placement>=SCORE_WIN.length) return 0;
         return SCORE_WIN[placement];
@@ -121,7 +123,7 @@ public class Simulation {
                 remainingTeams--;
                 //Reward points for team eliminations
                 if (i != activeTeam) {
-                    gameState.addScore(activeTeam, SCORE_ELIMINATION);
+                    gameState.addScore(actionLog.getRootAction(), activeTeam, SCORE_ELIMINATION);
                 }
             } else if (remainingCharacters[i] > 0) remaining++;
         }
@@ -138,7 +140,7 @@ public class Simulation {
             }
             float score = scoreSum/teamKills;
             for (int i = 0; i < teamCount; i++) {
-                if (eliminated[i]) gameState.addScore(i, score);
+                if (eliminated[i]) gameState.addScore(actionLog.getRootAction(), i, score);
             }
         }
 
@@ -148,7 +150,7 @@ public class Simulation {
                 //Reward score to surviving winner
                 for (int i = 0; i < teamCount; i++) {
                     if (remainingCharacters[i] > 0) {
-                        gameState.addScore(i, SCORE_WIN[0]);
+                        gameState.addScore(actionLog.getRootAction(), i, SCORE_WIN[0]);
                         actionLog.getRootAction().addChild(new GameOverAction(i));
                         break;
                     }
@@ -184,5 +186,9 @@ public class Simulation {
         IntVector2 character = gameState.getTurn().peek();
         if (character == null) return false;
         return gameState.getCharacterFromTeams(character.x, character.y).isAlive();
+    }
+
+    public void penalizeCurrentPlayer(){
+        gameState.addScore(actionLog.getRootAction(), getActiveTeam(), SCORE_ERROR_PENALTY);
     }
 }

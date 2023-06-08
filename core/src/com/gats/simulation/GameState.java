@@ -4,6 +4,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gats.manager.Timer;
+import com.gats.simulation.action.Action;
+import com.gats.simulation.action.ScoreAction;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.simulation.weapons.Weapon;
 
@@ -194,9 +196,17 @@ public class GameState implements Serializable {
         return active;
     }
 
-    protected void addScore(int team, float score) {
-        if (!winnerTakesAll) scores[team] += score;
-        else if (score == Simulation.SCORE_WIN[0]) scores[team] = 1;
+    protected Action addScore(Action head, int team, float score) {
+        if (!winnerTakesAll) {
+
+            scores[team] += score;
+        } else if (score == Simulation.SCORE_WIN[0]) {
+            scores[team] = 1;
+        }else
+            return head;
+        ScoreAction scoreAction = new ScoreAction(0, team, -1, scores[team]);
+        head.addChild(scoreAction);
+        return scoreAction;
     }
 
     //ToDo migrate to Simulation
@@ -347,7 +357,7 @@ public class GameState implements Serializable {
 
     protected int cycleWeapon(int team) {
         int result = weaponBoxCycle[team];
-        weaponBoxCycle[team] = (weaponBoxCycle[team]+1)%10;
+        weaponBoxCycle[team] = (weaponBoxCycle[team] + 1) % 10;
         return result;
     }
 

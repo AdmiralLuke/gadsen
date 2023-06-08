@@ -30,12 +30,11 @@ public class UiMessenger {
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(animPlayer.getTeamColor());
 		refillStaminaBar(currentPlayer.getStamina());
-		hud.adjustScores(state.getScores());
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
 
-	public void playerMoved(GameCharacter currentPlayer){
-		playerStaminaChanged(currentPlayer.getStamina());
+	public void playerMoved(GameCharacter currentPlayer, int stamina){
+		playerStaminaChanged(stamina);
 	}
 	/**
 	 * Will update the current Inventory Display, with Information from the player but only on the item with the weaponType.
@@ -137,4 +136,7 @@ public class UiMessenger {
 	}
 
 
+	public void teamScore(int team, float score) {
+		hud.adjustScores(team, score);
+	}
 }

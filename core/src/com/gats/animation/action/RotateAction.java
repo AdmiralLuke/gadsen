@@ -58,7 +58,6 @@ public class RotateAction extends Action {
         }
 
         if (current > endTime) {
-            System.out.println("Final rotation: " + this.target.getClass() + this.target.getRelAngle());
             endAction(endTime);
         }
     }

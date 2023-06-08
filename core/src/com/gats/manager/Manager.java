@@ -124,6 +124,7 @@ public class Manager {
     protected void schedule(Game game) {
         synchronized (schedulingLock) {
             if (pendingShutdown) return;
+            if (game.getStatus() == Game.Status.ABORTED) return;
             game.addCompletionListener(this::notifyExecutionManager);
             games.add(game);
             game.schedule();
@@ -148,9 +149,7 @@ public class Manager {
     }
 
     public void stop(Run run) {
-        for (Game game : run.getGames()) {
-            stop(game);
-        }
+        run.dispose();
     }
 
     protected void stop(Game game) {

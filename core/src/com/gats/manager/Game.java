@@ -8,14 +8,12 @@ import com.gats.simulation.Simulation;
 import com.gats.simulation.action.ActionLog;
 import com.gats.simulation.campaign.CampaignResources;
 import com.gats.ui.hud.UiMessenger;
-import sun.java2d.loops.ProcessPath;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 
@@ -53,9 +51,9 @@ public class Game {
 
     private static final boolean isDebug;
     static {
-        isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
-                getInputArguments().toString().contains("-agentlib:jdwp");
+        isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("-agentlib:jdwp");
         if (isDebug) System.err.println("Warning: Debugger engaged; Disabling Bot-Timeout!");
+
     }
 
     private final InputProcessor inputGenerator;
@@ -69,7 +67,7 @@ public class Game {
     private GameState state;
     private Player[] players;
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(new BotThreadFactory());
+    private final BotThread executor = new BotThread();
     private final List<HumanPlayer> humanList = new ArrayList<>();
 
     private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(256);
@@ -123,12 +121,11 @@ public class Game {
                     break;
                 case AI:
 
-                    Future<?> future = executor.submit(() -> {
+                    Future<?> future = executor.execute(() -> {
                         Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
                         ((Bot) curPlayer).setRnd(Manager.getSeed());
                         curPlayer.init(state);
                     });
-
                     try {
                         if (isDebug) future.get();
                         else
@@ -223,7 +220,7 @@ public class Game {
             Future<?> future;
             switch (currentPlayer.getType()) {
                 case Human:
-                    future = executor.submit(() -> {
+                    future = executor.execute(() -> {
                         Thread.currentThread().setName("Run_Thread_Player_Human");
                         simulation.setTurnTimer(new Timer(1000 * HUMAN_EXECUTION_TIMEOUT));
                         currentPlayer.executeTurn(stateCopy, controller);
@@ -240,12 +237,12 @@ public class Game {
                             System.out.println("bot was interrupted");
                             e.printStackTrace(System.err);
                         } catch (ExecutionException e) {
-                            System.out.println("human player failed with exception: " + e.getCause());
+                            System.err.println("human player failed with exception: " + e.getCause());
                             e.printStackTrace();
                         } catch (TimeoutException e) {
                             future.cancel(true);
-
-                            System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
+                            executor.forceStop();
+                            System.err.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
                         }
                         inputGenerator.endTurn();
                         //Add Empty command to break command Execution
@@ -257,7 +254,7 @@ public class Game {
                     });
                     break;
                 case AI:
-                    future = executor.submit(() -> {
+                    future = executor.execute(() -> {
                         Thread.currentThread().setName("Run_Thread_Player_" + currentPlayer.getName());
                         simulation.setTurnTimer(new Timer(1000 * AI_EXECUTION_TIMEOUT));
                         currentPlayer.executeTurn(stateCopy, controller);
@@ -275,10 +272,15 @@ public class Game {
                         } catch (ExecutionException e) {
                             System.out.println("bot failed with exception: " + e.getCause());
                             e.printStackTrace();
+                            System.err.println("The failed player has been penalized!");
+                            simulation.penalizeCurrentPlayer();
                         } catch (TimeoutException e) {
                             future.cancel(true);
+                            executor.forceStop();
 
                             System.out.println("player" + currentPlayerIndex + "(" + currentPlayer.getName() + ") computation surpassed timeout");
+                            System.err.println("The failed player has been penalized!");
+                            simulation.penalizeCurrentPlayer();
                         }
                         //Add Empty command to break command Execution
                         try {

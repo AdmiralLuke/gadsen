@@ -14,7 +14,7 @@ public class MessageUiTurnStartAction extends MessageUiAction {
 	com.gats.animation.GameCharacter animPlayer;
 	GameState state;
 
-	public MessageUiTurnStartAction(float start, UiMessenger uiMessenger, GameCharacter currentPlayer, com.gats.animation.GameCharacter animPlayer,GameState state) {
+	public MessageUiTurnStartAction(float start, UiMessenger uiMessenger, GameCharacter currentPlayer, com.gats.animation.GameCharacter animPlayer, GameState state) {
 		super(start, uiMessenger);
 		this.currentPlayer = currentPlayer;
 		this.animPlayer = animPlayer;
@@ -23,7 +23,7 @@ public class MessageUiTurnStartAction extends MessageUiAction {
 
 	@Override
 	protected void runAction(float oldTime, float current) {
-		uiMessenger.turnChanged(state,currentPlayer,animPlayer);
+		uiMessenger.turnChanged(state, currentPlayer,animPlayer);
 		endAction(oldTime);
 	}
 }
