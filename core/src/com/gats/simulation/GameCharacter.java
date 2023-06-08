@@ -43,6 +43,8 @@ public class GameCharacter implements Serializable {
     private com.gats.simulation.weapons.Weapon[] weapons;
     private int selectedWeapon = -1;
 
+    private boolean getsKnockback = false;
+
 
     /**
      * Creates a new Character within the simulation
@@ -156,6 +158,13 @@ public class GameCharacter implements Serializable {
         }
     }
 
+    boolean getKnockback() {
+        return getsKnockback;
+    }
+
+    void toggleGetKnockback() {
+        getsKnockback = !getsKnockback;
+    }
     /**
      * Resets the attribute, that prevents a Character from shooting twice
      */
