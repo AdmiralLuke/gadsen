@@ -1,15 +1,13 @@
 package com.gats.animation.action;
 
-import com.gats.animation.GameCharacter;
 import com.gats.animation.entity.Entity;
-import com.gats.animation.entity.Parent;
 
 public class AddAction extends Action{
 
-    private final Parent target;
+    private final Entity target;
     private final Entity toAdd;
 
-    public AddAction(float delay, Parent target, Entity toAdd) {
+    public AddAction(float delay, Entity target, Entity toAdd) {
         super(delay);
         this.target = target;
         this.toAdd = toAdd;

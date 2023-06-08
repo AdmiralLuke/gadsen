@@ -60,15 +60,14 @@ public class InventoryDrawer extends Container<Inventory>{
 	 * Call whenever an Event happens, changing a characters inventory.
 	 * (e.g. shooting and reducing ammo, gaining a new Weapon)
 	 *
-	 * @param character
+	 * @param team
 	 * @param weaponType
+	 * @param amount
 	 */
 
-	public void updateItem(GameCharacter character, WeaponType weaponType) {
-
-		checkPlayerInventoryExists(character);
-		current = playerInventory[character.getTeam()];
-		current.updateItem(character, weaponType);
+	public void updateItem(int team, WeaponType weaponType, int amount) {
+		current = playerInventory[team];
+		current.updateItem(weaponType, amount);
 	}
 
 	/**checks if the current inventory exists, if not creates a new inventory from the game characters current one

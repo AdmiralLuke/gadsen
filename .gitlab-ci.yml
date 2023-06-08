@@ -19,6 +19,7 @@ debug:
   only:
     - beta
     - main
+    - merge_requests
   script:
     - echo $PWD
 
@@ -27,6 +28,7 @@ debug-file-tree:
   only:
     - beta
     - main
+    - merge_requests
   script:
     - ls -R
 
@@ -35,6 +37,7 @@ asset-pipeline:
   only:
     - beta
     - main
+    - merge_requests
   script:
     - gradle --build-cache pipeline:build
   cache:
@@ -49,6 +52,7 @@ build-core:
   only:
     - beta
     - main
+    - merge_requests
   script:
     - echo $PWD
     - gradle --build-cache core:assemble
@@ -64,6 +68,7 @@ build-desktop:
   only:
     - beta
     - main
+    - merge_requests
   script:
     - gradle --build-cache desktop:assemble
   cache:
@@ -78,8 +83,9 @@ test-core:
   only:
     - beta
     - main
+    - merge_requests
   script:
-      - gradle core:check
+    - gradle core:check
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
@@ -97,6 +103,7 @@ test-pipeline:
   only:
     - beta
     - main
+    - merge_requests
   script:
     - gradle pipeline:check
   cache:
@@ -116,6 +123,7 @@ test-util:
   only:
     - beta
     - main
+    - merge_requests
   script:
     - gradle util:check
   cache:

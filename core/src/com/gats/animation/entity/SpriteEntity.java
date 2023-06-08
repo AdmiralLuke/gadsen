@@ -12,15 +12,19 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class SpriteEntity extends Entity {
 
+    public interface ShaderHandler {
+        void beforeDraw(Batch batch);
+    }
+
+    private ShaderHandler shaderHandler;
     private TextureRegion textureRegion;
+
+    private boolean visible = true;
 
     private Color color = null;
     private Vector2 size = null;
 
-    private boolean flipped = false;
 
-
-    private boolean rotate = true;
     /**
      * When mirror is set to true, the character will be flipped once the angle is 180 or higher on the x axis
      */
@@ -43,46 +47,53 @@ public class SpriteEntity extends Entity {
 
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
+        if (visible) {
+            if (shaderHandler != null) shaderHandler.beforeDraw(batch);
+            if (color != null)
+                batch.setColor(color);
+
+            Vector2 scale = getScale();
+            if (size == null)
+                batch.draw(textureRegion,
+                        getPos().x - origin.x,
+                        getPos().y - origin.y,
+                        origin.x,
+                        origin.y,
+                        textureRegion.getRegionWidth(),
+                        textureRegion.getRegionHeight(),
+                        (isFlipped() ? -1 : 1) * (scale.x),
+                        (scale.y),
+                        getAngle());
+            else
+                batch.draw(textureRegion,
+                        getPos().x - origin.x,
+                        getPos().y - origin.y,
+                        origin.x,
+                        origin.y,
+                        size.x,
+                        size.y,
+                        (isFlipped() ? -1 : 1) * (scale.x),
+                        (scale.y),
+                        getAngle());
+
+            //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
+
+            if (color != null)
+                batch.setColor(Color.WHITE);
+            if (shaderHandler != null) {
+                batch.flush();
+                batch.setShader(null);
+            }
+        }
         super.draw(batch, deltaTime, parentAlpha);
-        if (color != null)
-            batch.setColor(color);
-
-        Vector2 scale = getScale();
-        if (size == null)
-            batch.draw(textureRegion,
-                    getPos().x - origin.x,
-                    getPos().y - origin.y,
-                    origin.x,
-                    origin.y,
-                    textureRegion.getRegionWidth(),
-                    textureRegion.getRegionHeight(),
-                    (flipped ? -1 : 1) * (scale.x),
-                    (scale.y),
-                    getRotationAngle());
-        else
-            batch.draw(textureRegion,
-                    getPos().x - origin.x,
-                    getPos().y - origin.y,
-                    origin.x,
-                    origin.y,
-                    size.x,
-                    size.y,
-                    (flipped ? -1 : 1) * (scale.x),
-                    (scale.y),
-                    getRotationAngle());
-
-        //    batch.draw(textureRegion, getPos().x, getPos().y, 0, 0, size.x, size.y, scale.x, scale.y, getRotationAngle());
-
-        if (color != null)
-            batch.setColor(Color.WHITE);
     }
 
 
     public Vector2 getSize() {
-        if(size!=null) {
+        if (size != null) {
             return new Vector2(size);
         }
-        return new Vector2(0,0);
+        return new Vector2(0, 0);
     }
 
     public void setSize(Vector2 size) {
@@ -107,7 +118,7 @@ public class SpriteEntity extends Entity {
      */
     public Vector2 getSpriteCenter() {
         if (this.textureRegion != null) {
-            return new Vector2(size.x / 2f, size.y / 2f);
+            return new Vector2(textureRegion.getRegionWidth() / 2f, textureRegion.getRegionHeight() / 2f);
         }
         return new Vector2(0, 0);
     }
@@ -137,18 +148,6 @@ public class SpriteEntity extends Entity {
         return color;
     }
 
-    public boolean isFlipped() {
-        return flipped;
-    }
-
-    private void setFlipped(boolean flipped) {
-        this.flipped = flipped;
-    }
-
-    public void setRotate(boolean rotate) {
-        this.rotate = rotate;
-    }
-
     public void setMirror(boolean mirror) {
         this.mirror = mirror;
     }
@@ -159,15 +158,30 @@ public class SpriteEntity extends Entity {
      * @param angle angle in degrees
      */
     @Override
-    public void setRelRotationAngle(float angle) {
+    public void setRelAngle(float angle) {
         angle = ((angle % 360) + 360) % 360;
-        super.setRelRotationAngle(rotate ? angle : 0);
         if (angle >= 90f && angle <= 270f) {
-            super.setRelRotationAngle(mirror ? angle-180 : angle);
-            setFlipped(mirror);
+            super.setRelAngle(mirror ? angle - 180 : angle);
+            setRelFlipped(mirror);
         } else {
-            setFlipped(false);
+            super.setRelAngle(angle);
+            setRelFlipped(false);
         }
     }
 
+    public ShaderHandler getShaderHandler() {
+        return shaderHandler;
+    }
+
+    public void setShaderHandler(ShaderHandler shaderHandler) {
+        this.shaderHandler = shaderHandler;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 }

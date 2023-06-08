@@ -1,18 +1,13 @@
 package com.gats.animation;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.gats.animation.entity.AnimatedEntity;
 import com.gats.animation.entity.Entity;
-import com.gats.animation.entity.EntityGroup;
 import com.gats.animation.entity.ParticleEntity;
 import com.gats.simulation.action.ProjectileAction;
 import com.gats.ui.assets.AssetContainer;
-import com.gats.ui.assets.AtlasAnimation;
-import org.lwjgl.Sys;
 
 public class Projectiles {
 
@@ -40,7 +35,7 @@ public class Projectiles {
                 animatedEntity.setOrigin(new Vector2(animation.getKeyFrame(0).getRegionWidth()/2f, animation.getKeyFrame(0).getRegionHeight()/2f));
                 ParticleEntity particleEntity = ParticleEntity.getParticleEntity(AssetContainer.IngameAssets.waterParticle);
                 particleEntity.setLoop(true);
-                projectile = new EntityGroup(animatedEntity, particleEntity);
+                projectile = new Entity(animatedEntity, particleEntity);
                 break;
             default:
                 animation = AssetContainer.IngameAssets.coolCat;

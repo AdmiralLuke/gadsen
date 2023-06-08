@@ -176,6 +176,9 @@ public class BaseProjectile implements Projectile{
     }
 
     static Action traverse(Action head, GameCharacter character, Path path, Simulation sim, BaseProjectile bsProj) {
+        if (sim.getWrapper().getsKnockback(character.getTeam(), character.getTeamPos()))
+            sim.getWrapper().toggleKnockback(character.getTeam(), character.getTeamPos());
+
         if (bsProj.knockback == 0) return head;
         if (path.getDir(0).x == 0 && path.getDir(0).y == 0) return head;
         float t = 0f;

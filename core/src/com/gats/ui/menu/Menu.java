@@ -2,24 +2,21 @@ package com.gats.ui.menu;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.gats.manager.Game;
-import com.gats.manager.IdleBot;
 import com.gats.manager.Manager;
 import com.gats.manager.RunConfiguration;
 import com.gats.simulation.GameState;
 import com.gats.ui.MenuScreen;
 import com.gats.ui.menu.buttons.*;
 import com.gats.ui.menu.gamemodeLayouts.CampaignLayout;
-import com.gats.ui.menu.gamemodeLayouts.ChristmasLayout;
 import com.gats.ui.menu.gamemodeLayouts.ExamAdmissionLayout;
 import com.gats.ui.menu.gamemodeLayouts.NormalLayout;
-import com.gats.ui.menu.specificRunConfig.ChristmasModeConfig;
-import com.gats.ui.menu.specificRunConfig.ExamAdmissionConfig;
-import com.gats.ui.menu.specificRunConfig.NormalModeConfig;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Menu {
 
@@ -123,30 +120,28 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
  */
 
 
+	Table menuTable;
+	MenuScreen menuScreen;
 	private SelectBox<GameState.GameMode> gameModeSelector;
 	private SelectBox<GameMap> mapSelector;
 	private TeamSizeSlider teamSizeSlider;
 	private TeamAmountSlider teamAmountSlider;
-
 	private BotSelectorTable botSelector;
 
 
+//Todo Clean up spaghet
+//some things are not really used/duplicate
+//--------;
+	private RunConfiguration passedRunConfig;
 	private Image title;
 
-
-
-//--------;
-
-
-	Table menuTable;
-	MenuScreen menuScreen;
 	public Menu(Skin skin, TextureRegion titleSprite, Manager.NamedPlayerClass[] availableBots, RunConfiguration runConfig, MenuScreen menuScreen) {
 		menuTable = new Table(skin);
-		if(gameModeSelector==null) {
-			createButtons(skin, availableBots, runConfig,titleSprite);
+		if (gameModeSelector == null) {
+			createButtons(skin, availableBots, runConfig, titleSprite);
 		}
 
-		this.menuScreen=menuScreen;
+		this.menuScreen = menuScreen;
 	}
 
 	public Table buildMenuLayout(Skin skin) {
@@ -183,29 +178,89 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 
 		//ganz unten im  ist der Exit button
 		menuTable.add(exitButton).colspan(4).pad(10);
+
+		if (passedRunConfig != null) {
+			if (gameModeSelector.getSelected() == passedRunConfig.gameMode) {
+				applyRunConfiguration(passedRunConfig);
+			}
+		}
+
 		return menuTable;
+	}
+
+	public void applyRunConfiguration(RunConfiguration config) {
+
+
+		if (config != null) {
+
+			gameModeSelector.setSelected(config.gameMode);
+			teamAmountSlider.setValue(config.teamCount);
+			config.teamCount = (int)teamAmountSlider.getValue();
+
+			//adjust teamSize
+			teamSizeSlider.setValue(config.teamSize);
+			config.teamSize = (int) teamSizeSlider.getValue();
+
+			switch (config.gameMode) {
+				case Campaign:
+					config.teamSize = 1;
+					config.teamCount = 1;
+					break;
+				case Exam_Admission:
+					config.teamSize = 1;
+					config.teamCount = 1;
+					break;
+
+
+				default:
+					break;
+			}
+			//config = applyGamemodeSettings(config);
+
+
+			//set map
+			String selectedMap = config.mapName;
+			if (selectedMap != null && !selectedMap.equals("")) {
+
+				setSelectedMap(mapSelector, selectedMap);
+			}
+
+
+			//adjust teamAmount
+			if (config.teamSize < 1 && config.players != null) {
+				//	config.teamSize = config.players.size();
+			}
+
+			if (config.players != null) {
+				config.players = new ArrayList<>(config.players.subList(0, Math.min(config.teamCount, config.players.size())));
+				botSelector.setSelected(config.players);
+			}
+
+		}
+		passedRunConfig = config;
 	}
 
 	/**
 	 * Gets called when start button is pressed.
-	 *
+	 * <p>
 	 * Will pass button settings to the RunConfiguration
 	 */
 	public void startGame() {
 
 
 		RunConfiguration config = this.toRunConfig();
-		config = applyGamemodeSettings(config);
+		//config = applyGamemodeSettings(config);
 		System.out.println(config.toString());
 
-		if(config.isValid()) {
+		if (config.isValid()) {
 
-		menuScreen.startGame(config);
+			passedRunConfig = config;
+			menuScreen.startGame(config);
 
 		}
 	}
 
-	public RunConfiguration toRunConfig(){
+	public RunConfiguration toRunConfig() {
 
 		RunConfiguration configuration = new RunConfiguration();
 
@@ -215,20 +270,20 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		//Todo make sure the gamemodes are in correct order
 		configuration.gameMode = GameState.GameMode.values()[gameModeSelector.getSelectedIndex()];
 		configuration.mapName = this.mapSelector.getSelected().getName();
-		configuration.teamCount = (int)this.teamAmountSlider.getValue();
-		configuration.teamSize = (int)this.teamSizeSlider.getValue();
+		configuration.teamCount = (int) this.teamAmountSlider.getValue();
+		configuration.teamSize = (int) this.teamSizeSlider.getValue();
 		configuration.players = this.botSelector.evaluateSelected();
 
 		return configuration;
 	}
 
-	public RunConfiguration applyGamemodeSettings(RunConfiguration configuration){
+	public RunConfiguration applyGamemodeSettings(RunConfiguration configuration) {
 
-		RunConfiguration modeSettings;
+		RunConfiguration modeSettings = configuration;
 
-		switch (configuration.gameMode){
+		switch (configuration.gameMode) {
 			case Normal:
-				modeSettings = new NormalModeConfig(configuration);
+				//	modeSettings = new NormalModeConfig(configuration);
 				break;
 			//case Christmas:
 			//	//Todo deal with hardcoded values, might be neede for later gameModes
@@ -236,27 +291,28 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 			//	break;
 
 			case Exam_Admission:
-				modeSettings = new ExamAdmissionConfig(configuration);
+				//	modeSettings = new ExamAdmissionConfig(configuration);
 				break;
 			default:
-				modeSettings = new NormalModeConfig(configuration);
+				//	modeSettings = new NormalModeConfig(configuration);
 
 		}
 
 
 		return modeSettings;
 	}
+
 	public Table getGameModeLayout(GameState.GameMode gameMode) {
 //Todo  fix hardcoded gamemode evaluation but passing String[] gameModes to buildTable
 		Skin skin = menuTable.getSkin();
 
-		if(gameMode == GameState.GameMode.Normal) {
+		if (gameMode == GameState.GameMode.Normal) {
 			return new NormalLayout(skin, this);
 		}
-		if(gameMode == GameState.GameMode.Campaign) {
+		if (gameMode == GameState.GameMode.Campaign) {
 			return new CampaignLayout(skin, this);
 		}
-		if(gameMode == GameState.GameMode.Exam_Admission) {
+		if (gameMode == GameState.GameMode.Exam_Admission) {
 			return new ExamAdmissionLayout(skin, this);
 		}
 
@@ -264,8 +320,9 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		return new NormalLayout(skin, this);
 	}
 
-	public void rebuildTable(){
-		this.menuTable=buildMenuLayout(this.menuTable.getSkin());
+	public void rebuildTable() {
+		this.menuTable = buildMenuLayout(this.menuTable.getSkin());
+		//	applyRunConfiguration(passedRunConfig);
 	}
 
 	/*-----------------------------------------------------
@@ -273,17 +330,16 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 	/*
 	 */
 
-	public void createButtons(Skin skin, Manager.NamedPlayerClass[] availableBots, RunConfiguration runConfig, TextureRegion titleImage){
+	public void createButtons(Skin skin, Manager.NamedPlayerClass[] availableBots, RunConfiguration runConfig, TextureRegion titleImage) {
 		//Todo load settings from runConfig
-		if(titleImage!=null){
-		this.title = new Image(titleImage);
-		}
-		else{
+		if (titleImage != null) {
+			this.title = new Image(titleImage);
+		} else {
 			System.err.println("TitleSprite Texture Region was is null! ");
 		}
-		this.gameModeSelector = createGameModeSelector(skin, runConfig.gameMode);
-		this.mapSelector = createMapSelector(skin,runConfig.mapName,runConfig.gameMode);
-		this.botSelector = createBotSelector(skin,availableBots);
+		this.gameModeSelector = createGameModeSelector(skin);
+		this.mapSelector = createMapSelector(skin, runConfig.gameMode);
+		this.botSelector = createBotSelector(skin, availableBots);
 		this.teamAmountSlider = createTeamAmountSlider(skin);
 		this.teamSizeSlider = createTeamSizeSlider(skin);
 
@@ -292,21 +348,24 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		teamAmountSlider.addBotSelector(botSelector);
 		teamSizeSlider.addRelatedSlider(teamAmountSlider);
 
-		teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
+
+		teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(), mapSelector.getSelected().getNuberOfTeams());
 
 
 		GameState.GameMode[] gameModes = runConfig.getGameModes();
 		//translate modes
 		String[] modeNames = new String[gameModes.length];
-		int i=0;
+		int i = 0;
 
 		gameModeSelector.setItems(GameState.GameMode.Normal, GameState.GameMode.Campaign, GameState.GameMode.Exam_Admission);
+		gameModeSelector.setSelected(runConfig.gameMode);
+
+		this.passedRunConfig = runConfig;
 
 	}
 
 
-
-	private <T> SelectBox<T> createGameModeSelector(Skin skin,T selected){
+	private <T> SelectBox<T> createGameModeSelector(Skin skin) {
 		SelectBox<T> gameModeSelect = new SelectBox<T>(skin);
 		gameModeSelect.addListener(new ChangeListener() {
 			@Override
@@ -314,50 +373,54 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 				rebuildTable();
 			}
 		});
-		gameModeSelect.setSelected(selected);
 		return gameModeSelect;
 	}
 
 	/**
 	 * Initializes the map selecter with the normal maps
+	 *
 	 * @param skin
 	 * @return
 	 */
-	private SelectBox<GameMap> createMapSelector(Skin skin, String selected, GameState.GameMode mode) {
+	private SelectBox<GameMap> createMapSelector(Skin skin, GameState.GameMode mode) {
 
 		//Todo, adjust maps based on first gamemode, dynamically -> if gamemodeselector is initialized, use selected value
 		//-> use function for evaluating the selected mode
 		SelectBox<GameMap> mapSelector = new SelectBox<>(skin);
 
 
-		setMaps(mapSelector,mode,selected);
+		setMaps(mapSelector, mode);
 
 		return mapSelector;
 	}
+
 	private TeamAmountSlider createTeamAmountSlider(Skin skin) {
+		TeamAmountSlider team = new TeamAmountSlider(1, 9, 1, false, skin);
 
-		return new TeamAmountSlider(1,9,1,false,skin);
+		return team;
 	}
 
-	private TeamSizeSlider createTeamSizeSlider(Skin skin){
-		return new TeamSizeSlider(1,9,1,false,skin);
+	private TeamSizeSlider createTeamSizeSlider(Skin skin) {
+		TeamSizeSlider teamSl = new TeamSizeSlider(1, 9, 1, false, skin);
+		return teamSl;
 	}
 
-	private BotSelectorTable createBotSelector(Skin skin, Manager.NamedPlayerClass[] availableBots){
-		BotSelectorTable botSelector = new BotSelectorTable(skin,3);
+	private BotSelectorTable createBotSelector(Skin skin, Manager.NamedPlayerClass[] availableBots) {
+		BotSelectorTable botSelector = new BotSelectorTable(skin, 3);
 		botSelector.setAvailableBots(availableBots);
 		return botSelector;
 	}
 
 	/**
 	 * Adds the maps from the passed mode, to the {@link Menu#mapSelector}
+	 *
 	 * @param mapSelector to add maps to.
-	 * @param mode gamemode to use for the maps
+	 * @param mode        gamemode to use for the maps
 	 */
-	public void setMaps(SelectBox<GameMap> mapSelector, GameState.GameMode mode, String selected){
+	public void setMaps(SelectBox<GameMap> mapSelector, GameState.GameMode mode) {
 
 
-		if(mode== GameState.GameMode.Campaign){
+		if (mode == GameState.GameMode.Campaign) {
 
 			mapSelector.setItems(new MapRetriever().getCampaignMaps());
 
@@ -365,24 +428,40 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		//Todo examAdmission maps
 
 
-		else{
+		else {
 			//default case
 
 			mapSelector.setItems(new MapRetriever().getMaps());
 			mapSelector.addListener(new ChangeListener() {
 				@Override
 				public void changed(ChangeEvent event, Actor actor) {
-					teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(),mapSelector.getSelected().getNuberOfTeams());
+					teamAmountSlider.changeValues(mapSelector.getSelected().getNumberOfSpawnpoints(), mapSelector.getSelected().getNuberOfTeams());
 				}
 			});
 		}
 
-		if (mapSelector.getItems().size==0){
-			mapSelector.setItems(new GameMap("no Maps found",0));
+		if (mapSelector.getItems().size == 0) {
+			mapSelector.setItems(new GameMap("no Maps found", 0));
 		}
 
 		//need to change GameMap, for this to work
 		//mapSelector.setSelected(selected);
+	}
+
+
+	private void setSelectedMap(SelectBox<GameMap> mapSelect, String toSelect) {
+		int index = -1;
+		boolean found = false;
+		for (GameMap map : mapSelect.getItems()) {
+			index++;
+			if (map.getName().equalsIgnoreCase(toSelect)) {
+				found = true;
+				break;
+			}
+		}
+		if (found) {
+			mapSelect.setSelected(mapSelect.getItems().get(index));
+		}
 	}
 
 

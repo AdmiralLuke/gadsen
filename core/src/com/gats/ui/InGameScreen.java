@@ -81,13 +81,13 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
     }
 
     @Override
-    public void init(GameState state,String[] playerNames) {
+    public void init(GameState state,String[] playerNames, String[][] skins) {
         //ToDo the game is starting remove waiting screen etc.
 
         //how do i get the current game? currently is wonky, because this.game could not be up to date i think
         hud.setPlayerNames(playerNames);
         hud.newGame(state);
-        animator.init(state,playerNames);
+        animator.init(state,playerNames, skins);
     }
 
     /**

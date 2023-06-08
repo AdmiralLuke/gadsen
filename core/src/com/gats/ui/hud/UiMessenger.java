@@ -30,12 +30,11 @@ public class UiMessenger {
 		changeInventory(currentPlayer);
 		drawTurnChangePopup(animPlayer.getTeamColor());
 		refillStaminaBar(currentPlayer.getStamina());
-		hud.adjustScores(state.getScores());
 		//Todo update/notify every element so it sets its status to that of the current player
 	}
 
-	public void playerMoved(GameCharacter currentPlayer){
-		playerStaminaChanged(currentPlayer.getStamina());
+	public void playerMoved(GameCharacter currentPlayer, int stamina){
+		playerStaminaChanged(stamina);
 	}
 	/**
 	 * Will update the current Inventory Display, with Information from the player but only on the item with the weaponType.
@@ -45,9 +44,6 @@ public class UiMessenger {
 	public void changeSelectedWeapon(WeaponType weaponType){
 		hud.getInventoryDrawer().setSelectedItem(weaponType);
 	}
-	public void updateInventoryItem(GameCharacter currentPlayer, WeaponType weaponType){
-		hud.getInventoryDrawer().updateItem(currentPlayer,weaponType);
-	};
 
 
 	/**
@@ -62,7 +58,7 @@ public class UiMessenger {
 	/**
 	 * Will update the current Inventory Display, with Information from the player.
 	 * Call whenever the inventory of a player is changed.
-	 * If only a single value changed call {@link UiMessenger#updateInventoryItem(GameCharacter, WeaponType)} with an additional parameter being the weapon index.
+	 * If only a single value changed call {@link UiMessenger#updateInventoryItem(GameCharacter, WeaponType, int)} with an additional parameters being the weapon index and new ammo.
 	 * (e.g. new Weapon pickup or loss of ammunition)
 	 *
 	 */
@@ -70,6 +66,9 @@ public class UiMessenger {
 		hud.getInventoryDrawer().changeInventory(currentPlayer);
 	}
 
+	public void updateInventoryItem(int team, WeaponType weaponType, int amount){
+		hud.getInventoryDrawer().updateItem(team, weaponType, amount);
+	};
 
 	/**
 	 * Will call {@link Hud#createTurnChangePopup(Color)} to temporarily draw it to the Hud.
@@ -123,17 +122,6 @@ public class UiMessenger {
 
 	}
 
-	/**
-	 * Calls necessary functions to update Ui Elements after a player shot.
-	 * @param currentPlayer
-	 * @param weapon
-	 */
-
-
-
-	public void playerShot(GameCharacter currentPlayer, WeaponType weapon){
-		updateInventoryItem(currentPlayer,weapon);
-	}
 
 	/**
 	 * Update the stamina of the current player
@@ -148,4 +136,7 @@ public class UiMessenger {
 	}
 
 
+	public void teamScore(int team, float score) {
+		hud.adjustScores(team, score);
+	}
 }

@@ -47,7 +47,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     private final Batch batch;
 
-    private final EntityGroup root;
+    private final Entity root;
 
     private TileMap map;
 
@@ -75,7 +75,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     private int charactersPerTeam;
     private final List<Action> actionList = new LinkedList<>();
 
-    private EntityGroup characterGroup;
+    private Entity characterGroup;
 
     public AnimatorCamera getCamera() {
         return this.camera;
@@ -142,6 +142,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(GameOverAction.class, ActionConverters::convertGameOverAction);
                         put(DebugPointAction.class, ActionConverters::convertDebugPointAction);
                         put(CharacterMoveAction.class, ActionConverters::convertCharacterMoveAction);
+                        put(InventoryAction.class, ActionConverters::convertInventoryAction);
+                        put(ScoreAction.class, ActionConverters::convertScoreAction);
                     }
                 };
 
@@ -198,11 +200,12 @@ public class Animator implements Screen, AnimationLogProcessor {
             summonParticle.setChildren(new Action[]{destroyParticle});
             //rotateAction to set the angle/direction of movement, to flip the character sprite
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
-            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle});
+
+            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, moveAction.getDuration(), animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()), moveAction.getStaminaBefore(), moveAction.getStaminaAfter());
+            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle,messageUiPlayerMoveAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             //notify ui
-            MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()));
-            animMoveAction.setChildren(new Action[]{stopWalking, messageUiPlayerMoveAction});
+            animMoveAction.setChildren(new Action[]{stopWalking});
             return new ExpandedAction(startWalking, messageUiPlayerMoveAction);
         }
 
@@ -390,10 +393,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                 return anim != null ? anim.getAnimationDuration() : 0;
             });
 
-            //uiaction
-            MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0, animator.uiMessenger, currentPlayer, currentPlayer.getSelectedWeapon());
-            shotExecutorAction.setChildren(new Action[]{updateInventoryItem});
-            return new ExpandedAction(shotExecutorAction, updateInventoryItem);
+            return new ExpandedAction(shotExecutorAction);
         }
 
         private static ExpandedAction convertCharacterHitAction(com.gats.simulation.action.Action action, Animator animator) {
@@ -534,6 +534,22 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(startWalking, stopWalking);
         }
 
+        private static ExpandedAction convertInventoryAction(com.gats.simulation.action.Action action, Animator animator) {
+            InventoryAction inventoryAction = (InventoryAction) action;
+
+            //uiaction
+            MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0, animator.uiMessenger, inventoryAction.getTeam(), inventoryAction.getWpType(), inventoryAction.getAmount());
+
+            return new ExpandedAction(updateInventoryItem);
+        }
+
+        private static ExpandedAction convertScoreAction(com.gats.simulation.action.Action action, Animator animator) {
+            ScoreAction scoreAction = (ScoreAction) action;
+            //ui Action
+            MessageUiScoreAction indicateScoreChangeAction = new MessageUiScoreAction(0, animator.uiMessenger, scoreAction.getTeam(), scoreAction.getNewScore());
+
+            return new ExpandedAction(indicateScoreChangeAction);
+        }
     }
 
 
@@ -546,7 +562,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         this.gameMode = gameMode;
         this.uiMessenger = uiMessenger;
         this.batch = new SpriteBatch();
-        this.root = new EntityGroup();
+        this.root = new Entity();
 
         setupView(viewport);
 
@@ -556,7 +572,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     }
 
     @Override
-    public void init(GameState state,String[] playerNames) {
+    public void init(GameState state,String[] playerNames, String[][] skins) {
         synchronized (root) {
             this.state = state;
             map = new TileMap(state);
@@ -571,14 +587,14 @@ public class Animator implements Screen, AnimationLogProcessor {
             TextureRegion animationFrame = IngameAssets.gameCharacterAnimations[0].getKeyFrame(0);
             //calculate the center of the gameCharacter sprite, so the aim Indicator will be drawn relative to it
             Vector2 centerOfCharacterSprite = new Vector2(animationFrame.getRegionWidth() / 2f, animationFrame.getRegionHeight() / 2f);
-            characterGroup = new EntityGroup();
+            characterGroup = new Entity();
 
             root.add(characterGroup);
             for (int curTeam = 0; curTeam < teamCount; curTeam++)
                 for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                     com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);
                     GameCharacter animGameCharacter;
-                    animGameCharacter = new GameCharacter(teamColors[curTeam]);
+                    animGameCharacter = new GameCharacter(teamColors[curTeam], skins[curTeam][curCharacter]);
 
                     AimIndicator aimIndicator = new AimIndicator(IngameAssets.aimingIndicatorSprite, animGameCharacter);
                     aimIndicator.setScale(new Vector2(0.5f, 1));

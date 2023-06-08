@@ -17,8 +17,8 @@ public class WeaponWrapper {
             return new WeaponWrapper();
     }
 
-    public void addAmmo(Weapon weapon, int addAmmo) {
-        weapon.setAmmo(weapon.getAmmo() + addAmmo);
+    public Action addAmmo(Action head, Weapon weapon, int addAmmo, GameCharacter character) {
+        return weapon.setAmmo(head, weapon.getAmmo() + addAmmo, character);
     }
 
     public Action shoot(Action head, Weapon weapon, Vector2 dir, float strength, Vector2 pos, GameCharacter character){

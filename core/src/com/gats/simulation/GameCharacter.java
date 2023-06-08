@@ -43,6 +43,8 @@ public class GameCharacter implements Serializable {
     private com.gats.simulation.weapons.Weapon[] weapons;
     private int selectedWeapon = -1;
 
+    private boolean getsKnockback = false;
+
 
     /**
      * Creates a new Character within the simulation
@@ -149,14 +151,20 @@ public class GameCharacter implements Serializable {
             return false;
         }
         if (selectedWeapon != -1) {
-            sim.getWrapper().shoot(head, weapons[selectedWeapon], dir, strength, this.getPlayerPos(), this);
-            alreadyShot = true;
+            alreadyShot = head != sim.getWrapper().shoot(head, weapons[selectedWeapon], dir, strength, this.getPlayerPos(), this);
             return true;
         } else {
             return false;
         }
     }
 
+    boolean getKnockback() {
+        return getsKnockback;
+    }
+
+    void toggleGetKnockback() {
+        getsKnockback = !getsKnockback;
+    }
     /**
      * Resets the attribute, that prevents a Character from shooting twice
      */
@@ -205,18 +213,18 @@ public class GameCharacter implements Serializable {
             int activeTeam = sim.getActiveTeam();
             damageReceived[activeTeam] += health - newHealth;
             if (activeTeam != team) {
-                state.addScore(activeTeam, environmental ? 1.5f : 1.0f * (health - Math.max(newHealth, 0)));
+                head = state.addScore(head, activeTeam, environmental ? 1.5f : 1.0f * (health - Math.max(newHealth, 0)));
                 if (newHealth <= 0 && health > 0) {
-                    state.addScore(activeTeam, Simulation.SCORE_KILL);
+                    head = state.addScore(head, activeTeam, Simulation.SCORE_KILL);
                     for (int i = 0; i< damageReceived.length; i++){
                         if (i!=activeTeam && damageReceived[i]>=50)
-                            state.addScore(activeTeam, Simulation.SCORE_ASSIST);
+                            head = state.addScore(head, activeTeam, Simulation.SCORE_ASSIST);
                     }
                 }
             }
             lastAction = new CharacterHitAction(team, teamPos, this.health, newHealth);
         } else {
-            state.addScore(team, (newHealth - health));
+            head = state.addScore(head, team, (newHealth - health));
             lastAction = new CharacterHealAction(team, teamPos, this.health, newHealth);
         }
         this.health = newHealth;
@@ -268,7 +276,7 @@ public class GameCharacter implements Serializable {
         weapons[0] = new Weapon(new Explosive(new BaseProjectile(0, 0.7f, 0, sim, ProjectileAction.ProjectileType.WATERBOMB),2), weaponCounts.length>0?weaponCounts[0]:(2 * cpT + teamCount), WeaponType.WATERBOMB, 10);
         weapons[1] = new Weapon(new BaseProjectile(10, 0f, 0, sim, ProjectileAction.ProjectileType.WATER), weaponCounts.length>1?weaponCounts[1]:999, WeaponType.WATER_PISTOL, 9);
         weapons[2] = new Weapon(new BaseProjectile(35, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), weaponCounts.length>2?weaponCounts[2]:1, WeaponType.MIOJLNIR, 13);
-        weapons[3] = new Weapon(new Explosive(new BaseProjectile(15, 0.7f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), weaponCounts.length>3?weaponCounts[3]:cpT, WeaponType.GRENADE, 10);
+        weapons[3] = new Weapon(new Explosive(new BaseProjectile(15, 0.3f, 0, sim, ProjectileAction.ProjectileType.GRENADE), 3), weaponCounts.length>3?weaponCounts[3]:cpT, WeaponType.GRENADE, 10);
         weapons[4] = new Weapon(new Bounceable(new BaseProjectile(1, 0, 0, sim, ProjectileAction.ProjectileType.WOOL), 5, 0.8f), weaponCounts.length>4?weaponCounts[4]:ammoRare, WeaponType.WOOL, 15);
         weapons[5] = new Weapon(new BaseProjectile(20, 0.9f, 0, sim, ProjectileAction.ProjectileType.CLOSE_COMB), weaponCounts.length>5?weaponCounts[5]:ammoRare / 2, WeaponType.CLOSE_COMBAT, 0.5f);
         return weapons;
@@ -455,9 +463,12 @@ public class GameCharacter implements Serializable {
      */
     Action walk(int dx, Action head) {
 
+
         if (dx == 0 || stamina <= 0 || health <= 0) {
             return head;
         }
+
+        int oldStamina = stamina;
 
         Vector2 bef = getPlayerPos();
         int sign = dx < 0 ? -1 : 1;
@@ -552,7 +563,7 @@ public class GameCharacter implements Serializable {
 
         }
         //Movement completed for some reason, log action
-        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y));
+        Action lastAction = new CharacterWalkAction(0, team, teamPos, bef, new Vector2(boundingBox.x, boundingBox.y), oldStamina, stamina);
 
 
         head.addChild(lastAction);

@@ -1,5 +1,6 @@
 package com.gats.simulation.action;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.gats.simulation.LinearPath;
 import com.gats.simulation.Path;
@@ -16,6 +17,8 @@ public final class CharacterWalkAction extends CharacterAction{
      * Base walking speed of all characters in world-coordinates per second
      */
     private final static float V = 10;
+    private final int staminaBefore;
+    private final int staminaAfter;
 
     /**
      * Stores the event of a Character walking
@@ -27,8 +30,10 @@ public final class CharacterWalkAction extends CharacterAction{
      * @param posAft    end-position of the character in world-coordinates
      */
 
-    public CharacterWalkAction(float delay, int team, int character, Vector2 posBef, Vector2 posAft) {
+    public CharacterWalkAction(float delay, int team, int character, Vector2 posBef, Vector2 posAft, int staminaBefore, int staminaAfter) {
         super(delay, team, character);
+        this.staminaBefore = staminaBefore;
+        this.staminaAfter = staminaAfter;
         LinearPath linPath = new LinearPath(posBef, posAft, V);
         this.path = linPath;
     }
@@ -39,6 +44,14 @@ public final class CharacterWalkAction extends CharacterAction{
      */
     public Path getPath() {
         return path;
+    }
+
+    public int getStaminaBefore() {
+        return staminaBefore;
+    }
+
+    public int getStaminaAfter() {
+        return staminaAfter;
     }
 
     /**

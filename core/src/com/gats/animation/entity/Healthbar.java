@@ -1,14 +1,8 @@
 package com.gats.animation.entity;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.gats.animation.GameCharacter;
 import com.gats.ui.assets.AssetContainer;
 
@@ -84,7 +78,10 @@ public class Healthbar extends Entity implements Toggleable {
 
 	@Override
 	public void updatePos() {
-		super.updatePos();
+		if (parent == null) setPos(getRelPos());
+		else {
+			setPos(parent.getPos().cpy().add(getRelPos().cpy()));
+		}
 		Vector2 pos = getPos();
 		healthProgressBar.setPosition(pos.x, pos.y);
 	}
@@ -100,8 +97,8 @@ public class Healthbar extends Entity implements Toggleable {
 	}
 
 	@Override
-	public void setRelRotationAngle(float angle) {
-		super.setRelRotationAngle(angle);
-		healthProgressBar.setRotation(angle);
+	public void setRelAngle(float angle) {
+		super.setRelAngle(angle);
+		//healthProgressBar.setRotation(angle);
 	}
 }

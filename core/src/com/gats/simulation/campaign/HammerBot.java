@@ -1,11 +1,10 @@
 package com.gats.simulation.campaign;
 
-import com.badlogic.gdx.math.Vector2;
 import com.gats.manager.Controller;
 import com.gats.simulation.GameState;
 import com.gats.simulation.WeaponType;
 
-public class HammerBot extends StaticBot {
+public class HammerBot extends CampaignBot {
 
     @Override
     protected void executeTurn(GameState state, Controller controller) {

@@ -32,7 +32,7 @@ public class TeamAmountSlider extends RelationSlider {
 	 * ruft {@link BotSelectorTable#resizeTable(int value)} auf um die Anzahl der Auszuwählenden bots anzupassen
 	 * @param value
 	 */
-	private void adjustBotSelector(int value) {
+	public void adjustBotSelector(int value) {
 		if(!freeze) {
 			if (this.botSelectorTable != null) {
 				this.botSelectorTable.resizeTable(value);
@@ -40,7 +40,18 @@ public class TeamAmountSlider extends RelationSlider {
 		}
 	}
 
-	///** Ändert die Intervalgrenzen von this und dem {@link TeamSizeSlider} in relation zu der Anzahl an Spawnpunkten auf der Map.
+	@Override
+	public boolean setValue(float value) {
+
+		value = Math.max(this.getMinValue(),value);
+		value = Math.min(this.getMaxValue(),value);
+
+		adjustBotSelector((int) value);
+
+		return super.setValue(value);
+	}
+
+///** Ändert die Intervalgrenzen von this und dem {@link TeamSizeSlider} in relation zu der Anzahl an Spawnpunkten auf der Map.
 	// * @param numberOfspawnpoints
 	// */
 	//public void adjustTeamSizeToSpawnpoints(int numberOfspawnpoints) {

@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Pool;
 public class ParticleEntity extends Entity implements Disposable, Pool.Poolable {
     private ParticleEffectPool.PooledEffect effect;
 
-    private static Pool<ParticleEntity> particleEntityPool = new Pool<ParticleEntity>() {
+    private static final Pool<ParticleEntity> particleEntityPool = new Pool<ParticleEntity>() {
 
         @Override
         protected ParticleEntity newObject() {
@@ -35,9 +35,9 @@ public class ParticleEntity extends Entity implements Disposable, Pool.Poolable 
     }
 
     @Override
-    public void setRelRotationAngle(float angle) {
-        float oldAngle = getRotationAngle();
-        super.setRelRotationAngle(angle);
+    public void setRelAngle(float angle) {
+        float oldAngle = getAngle();
+        super.setRelAngle(angle);
         float diff = angle - oldAngle;
 //        ToDo: Implement dynamic rotation
 //        for (ParticleEmitter emitter : effect.getEmitters()
@@ -69,7 +69,8 @@ public class ParticleEntity extends Entity implements Disposable, Pool.Poolable 
 
     @Override
     public void dispose() {
-        effect.free();
+        if (effect != null)
+            effect.free();
         effect = null;
     }
 

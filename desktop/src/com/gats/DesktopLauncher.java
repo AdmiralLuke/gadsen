@@ -105,6 +105,7 @@ public class DesktopLauncher {
         runConfig.gameMode = GameState.GameMode.values()[gameMode];
         runConfig.teamSize = Integer.parseInt(params.getOptionValue("s", "3"));
         if (runConfig.gui) {
+            if(runConfig.players!=null) runConfig.teamCount = runConfig.players.size();
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setForegroundFPS(60);
             config.setTitle("G.A.D.S.E.N.");
