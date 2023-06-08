@@ -33,7 +33,10 @@ public class BotThread {
                 }
             }
             target.run();
+
+            synchronized (lock) {
             target = null;
+            }
         }
     }
 
@@ -47,16 +50,26 @@ public class BotThread {
     }
 
     public void forceStop(){
+
+        synchronized (lock) {
+            if (target!= null) target.cancel(true);
+            target = null;
+        }
         worker.stop();
-        target.cancel(true);
-        target = null;
         worker = new Thread(Game.PLAYER_THREAD_GROUP, this::waitAndExecute);
         worker.start();
     }
 
     public void shutdown(){
-        target.cancel(true);
+        synchronized (lock) {
+            if (target!= null) target.cancel(true);
+            target = null;
+        }
         worker.interrupt();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
     }
 
 }
