@@ -14,6 +14,8 @@ public class BotThread {
 
     private final Object lock = new Object();
 
+    private final Object completion = new Object();
+
     private Thread worker;
 
     private FutureTask<?> target = null;
@@ -35,25 +37,29 @@ public class BotThread {
             target.run();
 
             synchronized (lock) {
-            target = null;
+                synchronized (completion) {
+                    target = null;
+                    completion.notifyAll();
+                }
             }
         }
     }
 
-    public Future<?> execute(Runnable runnable){
-        if (target != null) return null;
-        target = new FutureTask<>(runnable, null);
+    public Future<?> execute(Runnable runnable) {
+        FutureTask<?> target = new FutureTask<>(runnable, null);
         synchronized (lock) {
+            if (this.target != null) return null;
+            this.target = target;
             lock.notify();
         }
         return target;
     }
 
-    public void forceStop(){
+    public void forceStop() {
 
         synchronized (lock) {
 
-            if (target!= null) target.cancel(true);
+            if (target != null) target.cancel(true);
             else return;
             target = null;
         }
@@ -62,9 +68,9 @@ public class BotThread {
         worker.start();
     }
 
-    public void shutdown(){
+    public void shutdown() {
         synchronized (lock) {
-            if (target!= null) target.cancel(true);
+            if (target != null) target.cancel(true);
             target = null;
         }
         worker.interrupt();
@@ -75,4 +81,16 @@ public class BotThread {
         if (worker.isAlive()) worker.stop();
     }
 
+    public void waitForCompletion() {
+        synchronized (lock) {
+            synchronized (completion) {
+                if (target != null) {
+                    try {
+                        completion.wait();
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            }
+        }
+    }
 }
