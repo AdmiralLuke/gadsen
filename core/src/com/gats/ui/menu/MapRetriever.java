@@ -28,7 +28,7 @@ public class MapRetriever implements FilenameFilter {
      * /**
      * Path relative to the jar after building
      */
-    private static final String externalMapDirectory = "map/";
+    private static final String externalMapDirectory = "./maps/";
 
     private static final String[] hardCodeMapNames = new String[]{"christmasMap", "kratzbaumMap", "MangoMap"};
 
