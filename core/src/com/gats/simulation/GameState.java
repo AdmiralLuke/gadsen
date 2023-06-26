@@ -1,7 +1,6 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.gats.manager.Timer;
@@ -269,7 +268,7 @@ public class GameState implements Serializable {
         JsonValue tileData = map.get("layers").get(0).get("data");
 
        // List<List<IntVector2>> spawnpoints = new LinkedList<>();
-        HashMap<Integer,List<IntVector2>> teams=new LinkedHashMap<>();
+        Map<Integer,List<IntVector2>> teams=new TreeMap<>();
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -305,7 +304,10 @@ public class GameState implements Serializable {
             }
         }
 
-        return new LinkedList<>(teams.values());
+        List<List<IntVector2>> spawns = new LinkedList<>(teams.values());
+
+        return spawns;
+
     }
 
 
