@@ -15,6 +15,7 @@ import com.gats.ui.menu.buttons.*;
 import com.gats.ui.menu.gamemodeLayouts.CampaignLayout;
 import com.gats.ui.menu.gamemodeLayouts.ExamAdmissionLayout;
 import com.gats.ui.menu.gamemodeLayouts.NormalLayout;
+import com.gats.ui.menu.gamemodeLayouts.ReplayLayout;
 
 import java.util.ArrayList;
 
@@ -306,18 +307,18 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 //Todo  fix hardcoded gamemode evaluation but passing String[] gameModes to buildTable
 		Skin skin = menuTable.getSkin();
 
-		if (gameMode == GameState.GameMode.Normal) {
-			return new NormalLayout(skin, this);
+		switch (gameMode){
+			case Normal:
+				return new NormalLayout(skin, this);
+			case Campaign:
+				return new CampaignLayout(skin, this);
+			case Exam_Admission:
+				return new ExamAdmissionLayout(skin, this);
+			case Replay:
+				return new ReplayLayout(skin,this);
+			default:
+				return new NormalLayout(skin, this);
 		}
-		if (gameMode == GameState.GameMode.Campaign) {
-			return new CampaignLayout(skin, this);
-		}
-		if (gameMode == GameState.GameMode.Exam_Admission) {
-			return new ExamAdmissionLayout(skin, this);
-		}
-
-		//default case
-		return new NormalLayout(skin, this);
 	}
 
 	public void rebuildTable() {
@@ -357,7 +358,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		String[] modeNames = new String[gameModes.length];
 		int i = 0;
 
-		gameModeSelector.setItems(GameState.GameMode.Normal, GameState.GameMode.Campaign, GameState.GameMode.Exam_Admission);
+		gameModeSelector.setItems(GameState.GameMode.Normal, GameState.GameMode.Campaign, GameState.GameMode.Exam_Admission, GameState.GameMode.Replay);
 		gameModeSelector.setSelected(runConfig.gameMode);
 
 		this.passedRunConfig = runConfig;
