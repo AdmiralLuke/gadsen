@@ -12,7 +12,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 
 /**
- * Class that starts a JFileChooser to select a File, when pressed.
+ * Class that starts a FileChooser to select a File, when pressed.
  * Not the fanciest way but works rn
  */
 public class FileChooserButton extends TextButton {
@@ -21,6 +21,7 @@ public class FileChooserButton extends TextButton {
 	private final JFileChooser chooser;
 	private final FileDialog fileDialog;
 	private String selectedFilePath = "";
+
 public FileChooserButton(Skin skin) {
 	super("Select a Replay to start", skin);
 	chooser = new JFileChooser();
@@ -45,7 +46,8 @@ class ChooseFile implements Runnable{
 
 	@Override
 	public void run() {
-		selectFile();
+		//selectFile();
+		dialogSelect();
 
 	}
 
@@ -85,4 +87,9 @@ private void setSelected(String selected){
 	this.selectedFilePath = selected;
 }
 
+	@Override
+	public boolean remove() {
+
+		return super.remove();
+	}
 }
