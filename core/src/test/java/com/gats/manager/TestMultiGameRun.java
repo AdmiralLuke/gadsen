@@ -24,7 +24,7 @@ public class TestMultiGameRun {
     private final Object lock = new Object();
 
     static class TestExample{
-        private RunConfiguration config;
+        private final RunConfiguration config;
 
         public TestExample(RunConfiguration config) {
             this.config = config;
@@ -205,65 +205,65 @@ public class TestMultiGameRun {
         samples.add(new TestExample(config));
 
 
-//        config = new RunConfiguration();
-//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-//        config.mapName = "MangoMap";
-//        config.teamCount = 4;
-//        config.teamSize = 1;
-//        config.players = new ArrayList<>();
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        samples.add(new TestExample(config));
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "MangoMap";
+        config.teamCount = 4;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
 
 
-//        config = new RunConfiguration();
-//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-//        config.mapName = "MangoMap";
-//        config.teamCount = 4;
-//        config.teamSize = 1;
-//        config.players = new ArrayList<>();
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        samples.add(new TestExample(config));
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "MangoMap";
+        config.teamCount = 4;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
 
 
-//        config = new RunConfiguration();
-//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-//        config.mapName = "MangoMap";
-//        config.teamCount = 4;
-//        config.teamSize = 1;
-//        config.players = new ArrayList<>();
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        samples.add(new TestExample(config));
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "MangoMap";
+        config.teamCount = 4;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
 
         return samples;
     }
 
     @Test
     public void testStats(){
-        int expectedCount = binCoeff(run.getPlayers().size(), runConfig.teamCount);
+        long expectedCount = binCoeff(run.getPlayers().size(), runConfig.teamCount);
         expectedCount *= factorial(runConfig.teamCount);
         Assert.assertEquals("Run contains the wrong manager instance", manager, run.manager);
         Assert.assertEquals("Number of games doesn't equal to the calculated theoretical amount", expectedCount, run.getGames().size());
@@ -283,7 +283,7 @@ public class TestMultiGameRun {
             }
         }
         Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
-                "Var-Dump:%s", GAME_COMPLETION_TIMEOUT, this), completed);
+                "Var-Dump:%s", COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT, this), completed);
     }
 
     @Override
@@ -296,12 +296,18 @@ public class TestMultiGameRun {
                 '}';
     }
 
-    private int binCoeff(int n, int k){
-        return (factorial(n)/factorial(k)) / factorial(n-k);
+    private long binCoeff(int n, int k){
+        long res = 1;
+        for (int i =1; i<=k; i++){
+            res = res * (n + 1 -i ) / i;
+        }
+        return res;
     }
 
-    private int factorial(int n){
-        int res = 1;
+
+
+    private long factorial(int n){
+        long res = 1;
         for (int i = 1; i <= n; i++) {
             res*= i;
         }
