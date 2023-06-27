@@ -64,6 +64,7 @@ public class Manager {
     }
 
     private void executionManager() {
+        Thread.currentThread().setName("Execution_Manager");
         while (!Thread.interrupted()) {
             try {
                 synchronized (executionManager) {
@@ -87,7 +88,8 @@ public class Manager {
                         pausedGames.add(game);
                         runningThreads -= 2;
                     }
-                } else while (runningThreads + 2 <= threadLimit) {
+                } else
+                    while (runningThreads + 2 <= threadLimit) {
                     if (pausedGames.size() > 0) {
                         Game game = pausedGames.remove(pausedGames.size() - 1);
                         game.resume();
@@ -142,6 +144,7 @@ public class Manager {
                 System.err.printf("Warning unsuccessfully attempted to complete Game %s\nInstance: %s", game, this);
             if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
             completedGames.add(game);
+            game.dispose();
         }
         synchronized (executionManager) {
             executionManager.notify();
@@ -169,6 +172,7 @@ public class Manager {
                 if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
                 completedGames.add(game);
                 game.abort();
+                game.dispose();
             }
         }
     }

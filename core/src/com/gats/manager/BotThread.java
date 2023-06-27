@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class BotThread {
 
     private static final String namePrefix = "BotThread";
-    private static final AtomicInteger threadNumber = new AtomicInteger(1);
+    private static final AtomicInteger threadNumber = new AtomicInteger(0);
 
     private final Object lock = new Object();
 

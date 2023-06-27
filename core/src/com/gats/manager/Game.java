@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 
@@ -67,7 +68,9 @@ public class Game {
     private GameState state;
     private Player[] players;
 
-    private final BotThread executor = new BotThread();
+    private static final AtomicInteger gameNumber = new AtomicInteger(0);
+
+    private BotThread executor;
     private final List<HumanPlayer> humanList = new ArrayList<>();
 
     private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(256);
@@ -136,6 +139,7 @@ public class Game {
                         System.out.println("bot failed initialization with exception: " + e.getCause());
                     } catch (TimeoutException e) {
                         future.cancel(true);
+                        executor.forceStop();
 
                         System.out.println("bot" + i + "(" + curPlayer.getName() + ") initialization surpassed timeout");
                     }
@@ -148,13 +152,14 @@ public class Game {
 
     public void start() {
         if (status == Status.ABORTED) return;
+        executor = new BotThread();
         setStatus(Status.ACTIVE);
         create();
         //Init the Log Processor
         if (gui) animationLogProcessor.init(state.copy(), getPlayerNames(), getSkins(players));
         //Run the Game
         simulationThread = new Thread(this::run);
-        simulationThread.setName("Manager_Simulation_Thread");
+        simulationThread.setName("Game_Simulation_Thread-" + gameNumber.getAndIncrement());
         simulationThread.setUncaughtExceptionHandler(this::crashHandler);
         simulationThread.start();
     }
@@ -191,6 +196,7 @@ public class Game {
      * Controls Player Execution
      */
     private void run() {
+        Thread.currentThread().setName("Game_Thread_");
         while (!pendingShutdown && state.isActive()) {
             synchronized (schedulingLock) {
                 if (status == Status.PAUSED)
@@ -371,8 +377,8 @@ public class Game {
         pendingShutdown = true;
         if (simulationThread != null) {
             simulationThread.interrupt();
-            executor.shutdown();
         }
+        executor.shutdown();
     }
 
     public List<HumanPlayer> getHumanList() {
