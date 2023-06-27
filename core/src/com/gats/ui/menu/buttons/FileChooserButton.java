@@ -24,18 +24,18 @@ public class FileChooserButton extends TextButton {
 public FileChooserButton(Skin skin) {
 	super("Select a Replay to start", skin);
 	chooser = new JFileChooser();
-	//FileNameExtensionFilter filter = new FileNameExtensionFilter(
+	FileNameExtensionFilter filter = new FileNameExtensionFilter(
 			"Gadsen Replay Files: .replay", "replay");
-//		chooser.setFileFilter(filter);
+	chooser.setFileFilter(filter);
 
-	JFrame frame = setupFrame();
-	fileDialog = new FileDialog(yourJFrame, "Choose a file", FileDialog.LOAD);
+	JFrame frame = new JFrame();
+	fileDialog = new FileDialog(frame, "Choose a file", FileDialog.LOAD);
 
 
 	this.addListener(new ChangeListener() {
 		@Override
 		public void changed(ChangeEvent event, Actor actor) {
-		//	SwingUtilities.invokeLater(new ChooseFile());
+			SwingUtilities.invokeLater(new ChooseFile());
 		}
 	});
 }
@@ -45,13 +45,13 @@ class ChooseFile implements Runnable{
 
 	@Override
 	public void run() {
-		//selectFile();
+		selectFile();
 
 	}
 
 	private void dialogSelect(){
-		fd.setVisible(true);
-		String filename = fd.getFile();
+		fileDialog.setVisible(true);
+		String filename = fileDialog.getFile();
 		if (filename == null)
 			System.out.println("You cancelled the choice");
 		else
