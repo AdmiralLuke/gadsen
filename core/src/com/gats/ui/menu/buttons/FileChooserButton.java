@@ -1,15 +1,15 @@
 package com.gats.ui.menu.buttons;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * Class that starts a FileChooser to select a File, when pressed.
@@ -18,78 +18,51 @@ import java.awt.*;
 public class FileChooserButton extends TextButton {
 
 	private final String labelText = "Selected Replay: ";
-	private final JFileChooser chooser;
 	private final FileDialog fileDialog;
 	private String selectedFilePath = "";
 
-public FileChooserButton(Skin skin) {
-	super("Select a Replay to start", skin);
-	chooser = new JFileChooser();
-	FileNameExtensionFilter filter = new FileNameExtensionFilter(
-			"Gadsen Replay Files: .replay", "replay");
-	chooser.setFileFilter(filter);
+	public FileChooserButton(Skin skin) {
+		super("Select a Replay to start", skin);
 
-	JFrame frame = new JFrame();
-	fileDialog = new FileDialog(frame, "Choose a file", FileDialog.LOAD);
+		JFrame frame = new JFrame();
+		fileDialog = new FileDialog(frame, "Choose a file", FileDialog.LOAD);
 
+		fileDialog.setFilenameFilter(new FilenameFilter() {
+			@Override
+			public boolean accept(File file, String s) {
+				return s.endsWith(".replay");
+			}
+		});
 
-	this.addListener(new ChangeListener() {
-		@Override
-		public void changed(ChangeEvent event, Actor actor) {
-			SwingUtilities.invokeLater(new ChooseFile());
-		}
-	});
-}
-
-
-class ChooseFile implements Runnable{
-
-	@Override
-	public void run() {
-		//selectFile();
-		dialogSelect();
-
+		this.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				dialogSelectFile();
+			}
+		});
 	}
 
-	private void dialogSelect(){
+	private void dialogSelectFile() {
 		fileDialog.setVisible(true);
 		String filename = fileDialog.getFile();
-		if (filename == null)
+		String path = fileDialog.getDirectory();
+		if (filename == null) {
 			System.out.println("You cancelled the choice");
-		else
-			System.out.println("You chose " + filename);
-	}
-	private JFrame setupJFrame(){
-		JFrame frame = new JFrame();
-		frame.setVisible(true);
-		frame.toFront();
-		frame.setVisible(false);
-
-		return frame;
-	}
-	private void selectFile() {
-		//opens filechooser
-
-		JFrame frame = setupJFrame();
-		int returnVal = chooser.showOpenDialog(frame);
-		frame.dispose();
-
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			System.out.println("You chose to open this file: " +
-									   chooser.getSelectedFile().getName());
-
-			setSelected(selectedFilePath);
+		}
+		else {
+			setSelected(filename,path);
+			System.out.println("You chose " +path+ filename);
 		}
 	}
-}
 
-private void setSelected(String selected){
-	this.selectedFilePath = selected;
-}
+	private void setSelected(String selectedName,String selectedFilePath) {
 
-	@Override
-	public boolean remove() {
+		setText(labelText + selectedName);
+		this.selectedFilePath = selectedFilePath+selectedName;
+	}
 
-		return super.remove();
+
+	public String getSelectedFilePath(){
+		return selectedFilePath;
 	}
 }
