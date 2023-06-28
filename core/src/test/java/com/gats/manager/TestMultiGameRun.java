@@ -275,15 +275,17 @@ public class TestMultiGameRun {
 
     @Test
     public void testCompletion(){
+        long timeOut = COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT;
+        System.out.println(String.format("Waiting %d ms for Completion.", timeOut));
         synchronized (lock){
             try {
-                lock.wait(COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT);
+                lock.wait(timeOut);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
         Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
-                "Var-Dump:%s", COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT, this), completed);
+                "Var-Dump:%s", timeOut, this), completed);
     }
 
     @Override
