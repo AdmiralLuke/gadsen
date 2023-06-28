@@ -17,7 +17,7 @@ public class ReplayLayout extends GamemodeLayout{
 	@Override
 	protected void positionButtons(Menu menu) {
 
-		add(new FileChooserButton(menu.getBotSelector().getSkin()));
+		add(menu.getFileChooserButton());
 
 
 	}

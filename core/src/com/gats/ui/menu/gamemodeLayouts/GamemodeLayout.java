@@ -3,6 +3,7 @@ package com.gats.ui.menu.gamemodeLayouts;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.gats.manager.RunConfiguration;
 import com.gats.ui.menu.GameMap;
 import com.gats.ui.menu.Menu;
 import com.gats.ui.menu.buttons.BotSelectorTable;
@@ -55,5 +56,4 @@ public abstract class GamemodeLayout extends Table {
 	public TeamSizeSlider getTeamSizeSlider(){
 		return menu.getTeamSizeSlider();
 	}
-
 }

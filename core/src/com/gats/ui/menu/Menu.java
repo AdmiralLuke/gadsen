@@ -17,6 +17,7 @@ import com.gats.ui.menu.gamemodeLayouts.ExamAdmissionLayout;
 import com.gats.ui.menu.gamemodeLayouts.NormalLayout;
 import com.gats.ui.menu.gamemodeLayouts.ReplayLayout;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class Menu {
@@ -128,6 +129,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 	private TeamSizeSlider teamSizeSlider;
 	private TeamAmountSlider teamAmountSlider;
 	private BotSelectorTable botSelector;
+	private FileChooserButton fileChooserButton;
 
 
 //Todo Clean up spaghet
@@ -269,38 +271,17 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		configuration.gui = true;
 
 		//Todo make sure the gamemodes are in correct order
-		configuration.gameMode = GameState.GameMode.values()[gameModeSelector.getSelectedIndex()];
+		configuration.gameMode = gameModeSelector.getSelected();
 		configuration.mapName = this.mapSelector.getSelected().getName();
 		configuration.teamCount = (int) this.teamAmountSlider.getValue();
 		configuration.teamSize = (int) this.teamSizeSlider.getValue();
 		configuration.players = this.botSelector.evaluateSelected();
 
-		return configuration;
-	}
-
-	public RunConfiguration applyGamemodeSettings(RunConfiguration configuration) {
-
-		RunConfiguration modeSettings = configuration;
-
-		switch (configuration.gameMode) {
-			case Normal:
-				//	modeSettings = new NormalModeConfig(configuration);
-				break;
-			//case Christmas:
-			//	//Todo deal with hardcoded values, might be neede for later gameModes
-			//	modeSettings = new ChristmasModeConfig(configuration,"christmasMap",new Manager.NamedPlayerClass(IdleBot.class, "HumanPlayer").getClassRef());
-			//	break;
-
-			case Exam_Admission:
-				//	modeSettings = new ExamAdmissionConfig(configuration);
-				break;
-			default:
-				//	modeSettings = new NormalModeConfig(configuration);
-
+		if(configuration.gameMode == GameState.GameMode.Replay){
+			configuration.mapName = fileChooserButton.getSelectedFilePath();
 		}
 
-
-		return modeSettings;
+		return configuration;
 	}
 
 	public Table getGameModeLayout(GameState.GameMode gameMode) {
@@ -308,8 +289,6 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		Skin skin = menuTable.getSkin();
 
 		switch (gameMode){
-			case Normal:
-				return new NormalLayout(skin, this);
 			case Campaign:
 				return new CampaignLayout(skin, this);
 			case Exam_Admission:
@@ -323,7 +302,6 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 
 	public void rebuildTable() {
 		this.menuTable = buildMenuLayout(this.menuTable.getSkin());
-		//	applyRunConfiguration(passedRunConfig);
 	}
 
 	/*-----------------------------------------------------
@@ -343,6 +321,7 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 		this.botSelector = createBotSelector(skin, availableBots);
 		this.teamAmountSlider = createTeamAmountSlider(skin);
 		this.teamSizeSlider = createTeamSizeSlider(skin);
+		this.fileChooserButton = new FileChooserButton(skin);
 
 		//needs to be called to set teamSizeSlider to the correct starting range
 		teamAmountSlider.addRelatedSlider(teamSizeSlider);
@@ -480,5 +459,8 @@ an sich ist die Hirarchie der Einstellungen bestimmt durch
 
 	public BotSelectorTable getBotSelector() {
 		return botSelector;
+	}
+	public FileChooserButton getFileChooserButton(){
+		return fileChooserButton;
 	}
 }
