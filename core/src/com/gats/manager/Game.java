@@ -63,7 +63,7 @@ public class Game {
 
     private final boolean gui;
 
-    private final GameResults gameResults;
+    private GameResults gameResults;
     private Simulation simulation;
     private GameState state;
     private Player[] players;
@@ -105,7 +105,8 @@ public class Game {
 
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
-        gameResults.setInitialState(state);
+        if (saveReplay)
+            gameResults.setInitialState(state);
 
         players = new Player[config.teamCount];
 
@@ -209,7 +210,8 @@ public class Game {
             }
 
             ActionLog firstLog = simulation.clearAndReturnActionLog();
-            gameResults.addActionLog(firstLog);
+            if (saveReplay)
+                gameResults.addActionLog(firstLog);
             if (gui) {
                 animationLogProcessor.animate(firstLog);
             }
@@ -303,7 +305,8 @@ public class Game {
 
             futureExecutor.start();
             ActionLog log = simulation.clearAndReturnActionLog();
-            gameResults.addActionLog(log);
+            if (saveReplay)
+                gameResults.addActionLog(log);
             if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                 //Contains Action produced by entering new turn
                 animationLogProcessor.animate(log);
@@ -319,7 +322,8 @@ public class Game {
                     //Contains action produced by the commands execution
                     log = nextCmd.run();
                     if (log == null) continue;
-                    gameResults.addActionLog(log);
+                    if (saveReplay)
+                        gameResults.addActionLog(log);
                     if (gui) {
                         animationLogProcessor.animate(log);
                         //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
@@ -338,7 +342,8 @@ public class Game {
 
             //Contains actions produced by ending the turn (after last command is executed)
             ActionLog finalLog = simulation.endTurn();
-            gameResults.addActionLog(finalLog);
+            if (saveReplay)
+                gameResults.addActionLog(finalLog);
             if (gui) {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
@@ -379,6 +384,11 @@ public class Game {
             simulationThread.interrupt();
         }
         executor.shutdown();
+        simulation = null;
+        state = null;
+        executor = null;
+        simulationThread = null;
+        gameResults = null;
     }
 
     public List<HumanPlayer> getHumanList() {
