@@ -201,10 +201,7 @@ public class GADSAssetManager {
 
         IngameAssets.mioSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/mioSkin"), Animation.PlayMode.LOOP);
 
-        IngameAssets.godseSkin = new AtlasAnimation(1f, atlas.findRegions("skin/godseSkin"), Animation.PlayMode.LOOP);
-
         IngameAssets.coolCat = new AtlasAnimation(1f, atlas.findRegions("cat/coolCat"), Animation.PlayMode.LOOP);
-
 
         IngameAssets.Cookie = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/cookieTumblingCroppedR"), Animation.PlayMode.LOOP);
 
