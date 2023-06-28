@@ -111,6 +111,7 @@ public class Game {
 
         for (int i = 0; i < config.teamCount; i++) {
             final Player curPlayer;
+            executor.waitForCompletion();
             try {
                 players[i] = (Player) config.players.get(i).getDeclaredConstructors()[0].newInstance();
                 curPlayer = players[i];
@@ -123,7 +124,6 @@ public class Game {
                     humanList.add((HumanPlayer) curPlayer);
                     break;
                 case AI:
-                    executor.waitForCompletion();
                     Future<?> future = executor.execute(() -> {
                         Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
                         ((Bot) curPlayer).setRnd(Manager.getSeed());

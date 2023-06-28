@@ -27,7 +27,8 @@ public class BotThread {
         while (!Thread.interrupted()) {
             synchronized (lock) {
                 try {
-                    lock.wait();
+                    if (target == null)
+                        lock.wait();
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -55,10 +56,10 @@ public class BotThread {
     public void forceStop() {
 
         synchronized (lock) {
-            synchronized (completion){
-            if (target != null) target.cancel(true);
-            else return;
-            target = null;
+            synchronized (completion) {
+                if (target != null) target.cancel(true);
+                else return;
+                target = null;
             }
         }
         worker.stop();
@@ -76,18 +77,21 @@ public class BotThread {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
         }
-        if (worker.isAlive()) worker.stop();
+        if (worker.isAlive())
+            synchronized (lock) {
+                worker.stop();
+            }
     }
 
     public void waitForCompletion() {
-            synchronized (completion) {
-                if (target != null) {
-                    try {
-                        completion.wait();
-                    } catch (InterruptedException ignored) {
-                    }
+        synchronized (completion) {
+            if (target != null) {
+                try {
+                    completion.wait();
+                } catch (InterruptedException ignored) {
                 }
             }
+        }
 
     }
 }
