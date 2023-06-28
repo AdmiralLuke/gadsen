@@ -6,7 +6,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.lwjgl.Sys;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -262,6 +264,11 @@ public class TestMultiGameRun {
     }
 
     @Test
+    public void testConfig() throws NoSuchFieldException, IllegalAccessException{
+        testStats();
+        testCompletion();
+    }
+
     public void testStats(){
         long expectedCount = binCoeff(run.getPlayers().size(), runConfig.teamCount);
         expectedCount *= factorial(runConfig.teamCount);
@@ -273,8 +280,7 @@ public class TestMultiGameRun {
     }
 
 
-    @Test
-    public void testCompletion(){
+    public void testCompletion() throws NoSuchFieldException, IllegalAccessException {
         long timeOut = COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT;
         System.out.println(String.format("Waiting %d ms for Completion.", timeOut));
         synchronized (lock){
@@ -286,6 +292,29 @@ public class TestMultiGameRun {
         }
         Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
                 "Var-Dump:%s", timeOut, this), completed);
+
+        Field activeGamesField
+                = Manager.class.getDeclaredField("activeGames");
+        Field scheduledGamesField
+                = Manager.class.getDeclaredField("scheduledGames");
+        Field pausedGamesField
+                = Manager.class.getDeclaredField("pausedGames");
+
+        activeGamesField.setAccessible(true);
+        scheduledGamesField.setAccessible(true);
+        pausedGamesField.setAccessible(true);
+
+        ArrayList<Game> scheduledGames = (ArrayList<Game>) scheduledGamesField.get(manager);
+
+        ArrayList<Game> activeGames = (ArrayList<Game>) activeGamesField.get(manager);
+
+        ArrayList<Game> pausedGames = (ArrayList<Game>) pausedGamesField.get(manager);
+
+        Assert.assertEquals("List of scheduled Games in Manager should be empty after run completed", 0,scheduledGames.size());
+
+        Assert.assertEquals("List of active Games in Manager should be empty after run completed", 0,activeGames.size());
+
+        Assert.assertEquals("List of paused Games in Manager should be empty after run completed", 0,pausedGames.size());
     }
 
     @Override
