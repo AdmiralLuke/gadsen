@@ -365,6 +365,7 @@ public class Game {
                 throw new RuntimeException(e);
             }
         }
+        executor.waitForCompletion();
         setStatus(Status.COMPLETED);
         for (CompletionHandler<Game> completionListener : completionListeners) {
             completionListener.onComplete(this);
