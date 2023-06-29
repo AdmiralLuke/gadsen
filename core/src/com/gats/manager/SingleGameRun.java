@@ -1,23 +1,27 @@
 package com.gats.manager;
 
+import com.gats.simulation.GameState;
+
 import java.util.Arrays;
 
-public class SingleGameRun extends Run{
+public class SingleGameRun extends Run {
 
     private float[] scores;
 
 
     public SingleGameRun(Manager manager, RunConfiguration runConfig) {
         super(manager, runConfig);
-        Game game = new Game(new GameConfig(runConfig));
+        Executable game = runConfig.gameMode == GameState.GameMode.Replay ? new ReplayGame(new GameConfig(runConfig)) : new Game(new GameConfig(runConfig));
         game.addCompletionListener(this::onGameCompletion);
         addGame(game);
     }
 
-    public void onGameCompletion(Executable exec){
-        Game game = (Game) exec;
+    public void onGameCompletion(Executable exec) {
         if (isCompleted()) throw new RuntimeException("In a single game run only one game may complete");
-        scores = game.getState().getScores();
+        if (exec instanceof Game) {
+            Game game = (Game) exec;
+            scores = game.getState().getScores();
+        }
         complete();
     }
 

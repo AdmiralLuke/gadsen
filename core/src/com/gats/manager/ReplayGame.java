@@ -1,5 +1,6 @@
 package com.gats.manager;
 
+import com.gats.simulation.GameState;
 import com.gats.simulation.Simulation;
 import com.gats.simulation.action.Action;
 import com.gats.simulation.action.ActionLog;
@@ -27,6 +28,9 @@ public class ReplayGame extends Executable{
         if (!config.gui) {
             System.err.println("Replays require a gui");
             abort();
+        }
+        if (config.gameMode != GameState.GameMode.Replay) {
+            throw new RuntimeException("Invalid state detected");
         }
         loadGameResults(config.mapName);
     }
@@ -58,7 +62,7 @@ public class ReplayGame extends Executable{
 
     private void run(){
         Iterator<ActionLog> actionLogs = replay.getActionLogs().iterator();
-        while (!pendingShutdown && !actionLogs.hasNext()) {
+        while (!pendingShutdown && actionLogs.hasNext()) {
             synchronized (schedulingLock) {
                 if (getStatus() == Status.PAUSED)
                     try {
