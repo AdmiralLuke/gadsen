@@ -15,30 +15,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class Game {
+import com.gats.manager.Executable.Status;
 
+public class Game extends Executable {
 
-    protected static final int REQUIRED_THREAD_COUNT = 2;
 
     protected static final ThreadGroup PLAYER_THREAD_GROUP = new ThreadGroup("players");
 
 
-    enum Status {
-        INITIALIZED,
-        CREATED,
-
-        SCHEDULED,
-        ACTIVE,
-        PAUSED,
-        COMPLETED,
-        ABORTED
-    }
-
     protected final Object schedulingLock = new Object();
-
-    private Status status = Status.INITIALIZED;
-
-    private final ArrayList<CompletionHandler<Game>> completionListeners = new ArrayList<>();
     private static final int AI_EXECUTION_TIMEOUT = 500;
     private static final int AI_EXECUTION_GRACE_PERIODE = 100;
     private static final int AI_INIT_TIMEOUT = 1000;
@@ -50,17 +35,12 @@ public class Game {
     private static final int HUMAN_CONTROLLER_USES = 100000;
 
     private static final boolean isDebug;
+
     static {
         isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("-agentlib:jdwp");
         if (isDebug) System.err.println("Warning: Debugger engaged; Disabling Bot-Timeout!");
 
     }
-
-    private final InputProcessor inputGenerator;
-
-    private final AnimationLogProcessor animationLogProcessor;
-
-    private final boolean gui;
 
     private final GameResults gameResults;
     private Simulation simulation;
@@ -72,14 +52,10 @@ public class Game {
 
     private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(256);
     private Thread simulationThread;
-    private final UiMessenger uiMessenger;
-    private boolean pendingShutdown = false;
-    private GameConfig config;
-    private boolean saveReplay;
 
 
     protected Game(GameConfig config) {
-        this.config = config;
+        super(config);
         if (config.gameMode == GameState.GameMode.Campaign) {
             if (config.players.size() != 1) {
                 System.err.println("Campaign only accepts exactly 1 player");
@@ -89,13 +65,8 @@ public class Game {
             config.teamCount = config.players.size();
             config.teamSize = CampaignResources.getCharacterCount(config.mapName);
         }
-        gui = config.gui;
-        saveReplay = config.replay;
-        animationLogProcessor = config.animationLogProcessor;
-        inputGenerator = config.inputProcessor;
-        uiMessenger = config.uiMessenger;
         gameResults = new GameResults(config);
-        gameResults.setStatus(status);
+        gameResults.setStatus(getStatus());
     }
 
     private void create() {
@@ -142,42 +113,38 @@ public class Game {
                     break;
             }
         }
+        gameResults.setPlayerNames(getPlayerNames());
+        gameResults.setSkins(getSkins(players));
         config = null;
-        setStatus(Status.CREATED);
     }
 
     public void start() {
-        if (status == Status.ABORTED) return;
-        setStatus(Status.ACTIVE);
-        create();
-        //Init the Log Processor
-        if (gui) animationLogProcessor.init(state.copy(), getPlayerNames(), getSkins(players));
-        //Run the Game
-        simulationThread = new Thread(this::run);
-        simulationThread.setName("Manager_Simulation_Thread");
-        simulationThread.setUncaughtExceptionHandler(this::crashHandler);
-        simulationThread.start();
+        synchronized (schedulingLock) {
+            if (getStatus() == Status.ABORTED) return;
+            setStatus(Status.ACTIVE);
+            create();
+            //Init the Log Processor
+            if (gui) animationLogProcessor.init(state.copy(), getPlayerNames(), getSkins(players));
+            //Run the Game
+            simulationThread = new Thread(this::run);
+            simulationThread.setName("Game_Simulation_Thread");
+            simulationThread.setUncaughtExceptionHandler(this::crashHandler);
+            simulationThread.start();
+        }
     }
 
-    private String[][] getSkins(Player[] players){
+    private String[][] getSkins(Player[] players) {
         String[][] skins = new String[players.length][simulation.getState().getCharactersPerTeam()];
-        for (int i=0; i< players.length;i++)
-            for (int j=0; j< simulation.getState().getCharactersPerTeam();j++)
+        for (int i = 0; i < players.length; i++)
+            for (int j = 0; j < simulation.getState().getCharactersPerTeam(); j++)
                 skins[i][j] = players[i].getSkin(j);
         return skins;
     }
 
-    private void crashHandler(Thread thread, Throwable throwable) {
-        System.err.println("Error in game: " + this);
-        System.err.println("Error in thread: " + thread);
-        throwable.printStackTrace();
-        System.err.println("Game crashed during execution\nIf you see this message, please forward all console logs to wettbewerb@acagamics.de");
-        Manager.getManager().stop(this);
-    }
-
-    private void setStatus(Status newStatus) {
-        status = newStatus;
-        gameResults.setStatus(status);
+    @Override
+    protected void setStatus(Status newStatus) {
+        super.setStatus(newStatus);
+        gameResults.setStatus(newStatus);
     }
 
     /**
@@ -193,7 +160,7 @@ public class Game {
     private void run() {
         while (!pendingShutdown && state.isActive()) {
             synchronized (schedulingLock) {
-                if (status == Status.PAUSED)
+                if (getStatus() == Status.PAUSED)
                     try {
                         schedulingLock.wait();
 
@@ -214,7 +181,7 @@ public class Game {
 
             Player currentPlayer = players[currentPlayerIndex];
             GameState stateCopy = state.copy();
-            Controller controller = new Controller(this, gcController, stateCopy, currentPlayer.getType() == Player.PlayerType.Human? HUMAN_CONTROLLER_USES: AI_CONTROLLER_USES);
+            Controller controller = new Controller(this, gcController, stateCopy, currentPlayer.getType() == Player.PlayerType.Human ? HUMAN_CONTROLLER_USES : AI_CONTROLLER_USES);
 
             executor.waitForCompletion();
             Thread futureExecutor;
@@ -355,20 +322,15 @@ public class Game {
             }
         }
         setStatus(Status.COMPLETED);
-        for (CompletionHandler<Game> completionListener : completionListeners) {
+        for (CompletionHandler<Executable> completionListener : completionListeners) {
             completionListener.onComplete(this);
         }
-//        System.out.println("Shutdown complete");
     }
 
-    public void addCompletionListener(CompletionHandler<Game> handler) {
-        completionListeners.add(handler);
-        if (status == Status.COMPLETED) handler.onComplete(this);
-    }
-
+@Override
     public void dispose() {
         //Shutdown all running threads
-        pendingShutdown = true;
+        super.dispose();
         if (simulationThread != null) {
             simulationThread.interrupt();
             executor.shutdown();
@@ -383,52 +345,19 @@ public class Game {
         commandQueue.add(cmd);
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    protected void schedule() {
-        synchronized (schedulingLock) {
-            if (status == Status.CREATED)
-                setStatus(Status.SCHEDULED);
-        }
-    }
-
-    protected void pause() {
-        synchronized (schedulingLock) {
-            if (status == Status.ACTIVE)
-                setStatus(Status.PAUSED);
-        }
-    }
-
-    protected void resume() {
-        synchronized (schedulingLock) {
-            if (status != Status.PAUSED) return;
-            setStatus(Status.ACTIVE);
-            schedulingLock.notify();
-        }
-    }
-
-    protected void abort() {
-        synchronized (schedulingLock) {
-            setStatus(Status.ABORTED);
-            dispose();
-        }
-    }
-
-    protected String[] getPlayerNames(){
+    protected String[] getPlayerNames() {
         String[] names = new String[players.length];
-        int i=0;
-        for (Player p: players) {
-           names[i] = p.getName();
-           i++;
+        int i = 0;
+        for (Player p : players) {
+            names[i] = p.getName();
+            i++;
         }
         return names;
 
     }
 
     public boolean shouldSaveReplay() {
-        return saveReplay;
+        return super.saveReplay;
     }
 
     public GameResults getGameResults() {
@@ -438,8 +367,8 @@ public class Game {
     @Override
     public String toString() {
         return "Game{" +
-                "status=" + status +
-                ", completionListeners=" + completionListeners +
+                "status=" + getStatus() +
+                ", completionListeners=" + super.completionListeners +
                 ", inputGenerator=" + inputGenerator +
                 ", animationLogProcessor=" + animationLogProcessor +
                 ", gui=" + gui +

@@ -14,7 +14,8 @@ public class SingleGameRun extends Run{
         addGame(game);
     }
 
-    public void onGameCompletion(Game game){
+    public void onGameCompletion(Executable exec){
+        Game game = (Game) exec;
         if (isCompleted()) throw new RuntimeException("In a single game run only one game may complete");
         scores = game.getState().getScores();
         complete();

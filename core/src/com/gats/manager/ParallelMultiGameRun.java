@@ -83,7 +83,8 @@ public class ParallelMultiGameRun extends Run {
 
     }
 
-    public void onGameCompletion(Game game) {
+    public void onGameCompletion(Executable exec) {
+        Game game = (Game) exec;
         Integer[] matchup = playerIndices.get(game);
         int i = 0;
         synchronized (scores) {
