@@ -21,7 +21,7 @@ class GameConfig implements Serializable {
         players = runConfiguration.players;
         mapName = runConfiguration.mapName;
         teamSize = runConfiguration.teamSize;
-        teamCount = runConfiguration.players.size();
+        teamCount = runConfiguration.teamCount;
         replay = runConfiguration.replay;
     }
 
