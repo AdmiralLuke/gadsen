@@ -264,7 +264,7 @@ public class TestMultiGameRun {
     }
 
     @Test
-    public void testConfig() throws NoSuchFieldException, IllegalAccessException{
+    public void testConfig() throws NoSuchFieldException, IllegalAccessException, InterruptedException {
         testStats();
         testCompletion();
     }
@@ -280,18 +280,16 @@ public class TestMultiGameRun {
     }
 
 
-    public void testCompletion() throws NoSuchFieldException, IllegalAccessException {
+    public void testCompletion() throws NoSuchFieldException, IllegalAccessException, InterruptedException {
         long timeOut = COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT;
-        System.out.println(String.format("Waiting %d ms for Completion.", timeOut));
+        System.out.printf("Waiting %d ms for Completion.%n", timeOut);
         synchronized (lock){
-            try {
-                lock.wait(timeOut);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            lock.wait(timeOut);
         }
         Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
                 "Var-Dump:%s", timeOut, this), completed);
+
+        wait(10000);
 
         Field activeGamesField
                 = Manager.class.getDeclaredField("activeGames");
