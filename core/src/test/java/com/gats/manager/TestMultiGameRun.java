@@ -25,7 +25,7 @@ public class TestMultiGameRun {
     private boolean completed = false;
     private final Object lock = new Object();
 
-    static class TestExample{
+    static class TestExample {
         private final RunConfiguration config;
 
         public TestExample(RunConfiguration config) {
@@ -38,8 +38,8 @@ public class TestMultiGameRun {
         this.runConfig = testSet.config;
         manager = Manager.getManager();
         run = manager.startRun(testSet.config);
-        synchronized (lock){
-            run.addCompletionListener(run ->{
+        synchronized (lock) {
+            run.addCompletionListener(run -> {
                 completed = true;
                 synchronized (lock) {
                     lock.notify();
@@ -269,7 +269,7 @@ public class TestMultiGameRun {
         testCompletion();
     }
 
-    public void testStats(){
+    public void testStats() {
         long expectedCount = binCoeff(run.getPlayers().size(), runConfig.teamCount);
         expectedCount *= factorial(runConfig.teamCount);
         Assert.assertEquals("Run contains the wrong manager instance", manager, run.manager);
@@ -283,13 +283,15 @@ public class TestMultiGameRun {
     public void testCompletion() throws NoSuchFieldException, IllegalAccessException, InterruptedException {
         long timeOut = COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT;
         System.out.printf("Waiting %d ms for Completion.%n", timeOut);
-        synchronized (lock){
+        synchronized (lock) {
             lock.wait(timeOut);
         }
         Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
                 "Var-Dump:%s", timeOut, this), completed);
 
-        wait(10000);
+        synchronized (this) {
+            this.wait(10000);
+        }
 
         Field activeGamesField
                 = Manager.class.getDeclaredField("activeGames");
@@ -308,11 +310,11 @@ public class TestMultiGameRun {
 
         ArrayList<Game> pausedGames = (ArrayList<Game>) pausedGamesField.get(manager);
 
-        Assert.assertEquals("List of scheduled Games in Manager should be empty after run completed", 0,scheduledGames.size());
+        Assert.assertEquals("List of scheduled Games in Manager should be empty after run completed", 0, scheduledGames.size());
 
-        Assert.assertEquals("List of active Games in Manager should be empty after run completed", 0,activeGames.size());
+        Assert.assertEquals("List of active Games in Manager should be empty after run completed", 0, activeGames.size());
 
-        Assert.assertEquals("List of paused Games in Manager should be empty after run completed", 0,pausedGames.size());
+        Assert.assertEquals("List of paused Games in Manager should be empty after run completed", 0, pausedGames.size());
     }
 
     @Override
@@ -325,20 +327,19 @@ public class TestMultiGameRun {
                 '}';
     }
 
-    private long binCoeff(int n, int k){
+    private long binCoeff(int n, int k) {
         long res = 1;
-        for (int i =1; i<=k; i++){
-            res = res * (n + 1 -i ) / i;
+        for (int i = 1; i <= k; i++) {
+            res = res * (n + 1 - i) / i;
         }
         return res;
     }
 
 
-
-    private long factorial(int n){
+    private long factorial(int n) {
         long res = 1;
         for (int i = 1; i <= n; i++) {
-            res*= i;
+            res *= i;
         }
         return res;
     }
