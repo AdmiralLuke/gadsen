@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.gats.manager.Executable.Status;
 
@@ -42,12 +43,14 @@ public class Game extends Executable {
 
     }
 
-    private final GameResults gameResults;
+    private GameResults gameResults;
     private Simulation simulation;
     private GameState state;
     private Player[] players;
 
-    private final BotThread executor = new BotThread();
+    private static final AtomicInteger gameNumber = new AtomicInteger(0);
+
+    private BotThread executor;
     private final List<HumanPlayer> humanList = new ArrayList<>();
 
     private final BlockingQueue<Command> commandQueue = new ArrayBlockingQueue<>(256);
@@ -73,12 +76,14 @@ public class Game extends Executable {
 
         simulation = new Simulation(config.gameMode, config.mapName, config.teamCount, config.teamSize);
         state = simulation.getState();
-        gameResults.setInitialState(state);
+        if (saveReplay)
+            gameResults.setInitialState(state);
 
         players = new Player[config.teamCount];
 
         for (int i = 0; i < config.teamCount; i++) {
             final Player curPlayer;
+            executor.waitForCompletion();
             try {
                 players[i] = (Player) config.players.get(i).getDeclaredConstructors()[0].newInstance();
                 curPlayer = players[i];
@@ -91,7 +96,6 @@ public class Game extends Executable {
                     humanList.add((HumanPlayer) curPlayer);
                     break;
                 case AI:
-                    executor.waitForCompletion();
                     Future<?> future = executor.execute(() -> {
                         Thread.currentThread().setName("Init_Thread_Player_" + curPlayer.getName());
                         ((Bot) curPlayer).setRnd(Manager.getSeed());
@@ -107,6 +111,7 @@ public class Game extends Executable {
                         System.out.println("bot failed initialization with exception: " + e.getCause());
                     } catch (TimeoutException e) {
                         future.cancel(true);
+                        executor.forceStop();
 
                         System.out.println("bot" + i + "(" + curPlayer.getName() + ") initialization surpassed timeout");
                     }
@@ -122,6 +127,7 @@ public class Game extends Executable {
         synchronized (schedulingLock) {
             if (getStatus() == Status.ABORTED) return;
             setStatus(Status.ACTIVE);
+            executor = new BotThread();
             create();
             //Init the Log Processor
             if (gui) animationLogProcessor.init(state.copy(), getPlayerNames(), getSkins(players));
@@ -158,6 +164,7 @@ public class Game extends Executable {
      * Controls Player Execution
      */
     private void run() {
+        Thread.currentThread().setName("Game_Thread_" + gameNumber.getAndIncrement());
         while (!pendingShutdown && state.isActive()) {
             synchronized (schedulingLock) {
                 if (getStatus() == Status.PAUSED)
@@ -170,7 +177,8 @@ public class Game extends Executable {
             }
 
             ActionLog firstLog = simulation.clearAndReturnActionLog();
-            gameResults.addActionLog(firstLog);
+            if (saveReplay)
+                gameResults.addActionLog(firstLog);
             if (gui) {
                 animationLogProcessor.animate(firstLog);
             }
@@ -264,7 +272,8 @@ public class Game extends Executable {
 
             futureExecutor.start();
             ActionLog log = simulation.clearAndReturnActionLog();
-            gameResults.addActionLog(log);
+            if (saveReplay)
+                gameResults.addActionLog(log);
             if (gui && currentPlayer.getType() == Player.PlayerType.Human) {
                 //Contains Action produced by entering new turn
                 animationLogProcessor.animate(log);
@@ -280,7 +289,8 @@ public class Game extends Executable {
                     //Contains action produced by the commands execution
                     log = nextCmd.run();
                     if (log == null) continue;
-                    gameResults.addActionLog(log);
+                    if (saveReplay)
+                        gameResults.addActionLog(log);
                     if (gui) {
                         animationLogProcessor.animate(log);
                         //animationLogProcessor.awaitNotification(); ToDo: discuss synchronisation for human players
@@ -299,7 +309,8 @@ public class Game extends Executable {
 
             //Contains actions produced by ending the turn (after last command is executed)
             ActionLog finalLog = simulation.endTurn();
-            gameResults.addActionLog(finalLog);
+            if (saveReplay)
+                gameResults.addActionLog(finalLog);
             if (gui) {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
@@ -321,6 +332,7 @@ public class Game extends Executable {
                 throw new RuntimeException(e);
             }
         }
+        executor.waitForCompletion();
         setStatus(Status.COMPLETED);
         for (CompletionHandler<Executable> completionListener : completionListeners) {
             completionListener.onComplete(this);
@@ -333,8 +345,13 @@ public class Game extends Executable {
         super.dispose();
         if (simulationThread != null) {
             simulationThread.interrupt();
-            executor.shutdown();
         }
+        executor.shutdown();
+        simulation = null;
+        state = null;
+        executor = null;
+        simulationThread = null;
+        gameResults = null;
     }
 
     public List<HumanPlayer> getHumanList() {
