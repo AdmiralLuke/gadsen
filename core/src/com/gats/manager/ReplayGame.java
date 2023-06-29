@@ -97,6 +97,8 @@ public class ReplayGame extends Executable{
         if (executionThread != null) {
             executionThread.interrupt();
         }
+        replay = null;
+        executionThread = null;
     }
 
     public boolean shouldSaveReplay() {

@@ -346,7 +346,8 @@ public class Game extends Executable {
         if (simulationThread != null) {
             simulationThread.interrupt();
         }
-        executor.shutdown();
+        if (executor!= null)
+            executor.shutdown();
         simulation = null;
         state = null;
         executor = null;

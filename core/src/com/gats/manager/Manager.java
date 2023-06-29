@@ -172,7 +172,6 @@ public class Manager {
                 if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
                 completedGames.add(game);
                 game.abort();
-                game.dispose();
             }
         }
     }
