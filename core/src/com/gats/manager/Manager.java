@@ -49,6 +49,8 @@ public class Manager {
 
     private static long seed = 345342624;
 
+    private static int availableCores = 0;
+
 
     @SuppressWarnings("removal")
     public static Manager getManager() {
@@ -75,6 +77,10 @@ public class Manager {
                 break;
             }
             int threadLimit = Math.max(Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount, Executable.REQUIRED_THREAD_COUNT);
+            if (threadLimit != availableCores){
+                availableCores = threadLimit;
+                System.out.printf("Resource load changed to %d cores, adapting...\n", threadLimit);
+            }
             synchronized (schedulingLock) {
                 int runningThreads = activeGames.size() * Executable.REQUIRED_THREAD_COUNT;
                 if (runningThreads > threadLimit) {

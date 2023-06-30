@@ -103,9 +103,9 @@ public class DesktopLauncher {
             printHelp();
             return;
         }
+        runConfig.gameMode = GameState.GameMode.values()[gameMode];
         if (runConfig.gameMode == GameState.GameMode.Tournament_Phase_1)
             runConfig.teamCount = 4;
-        runConfig.gameMode = GameState.GameMode.values()[gameMode];
         runConfig.teamSize = Integer.parseInt(params.getOptionValue("s", "3"));
         if (runConfig.gui) {
             if(runConfig.players!=null) runConfig.teamCount = runConfig.players.size();
