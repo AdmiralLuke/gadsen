@@ -36,8 +36,6 @@ public class ParallelMultiGameRun extends Run {
             runConfig.teamSize = 3;
             runConfig.mapName = "MangoMap";
         }
-        if (runConfig.gameMode == GameState.GameMode.Tournament_Phase_1)
-            runConfig.teamCount = 4;
         ArrayList<Integer> indices = new ArrayList<>();
         for (int i = 0; i < runConfig.players.size(); i++) {
             indices.add(i);
@@ -97,7 +95,7 @@ public class ParallelMultiGameRun extends Run {
                 scores[matchup[i++]] += score;
             }
             if ((completed*100)/gameCount < (completed*100 + 100)/gameCount)
-                System.out.printf("MultiGameRun(%d)-Completion: %d %% %n", hashCode(),(completed*100)/gameCount);
+                System.out.printf("MultiGameRun(%d)-Completion: %d %% \n", hashCode(),(completed*100)/gameCount);
             completed++;
         }
         System.out.println();
