@@ -174,8 +174,19 @@ public class DesktopLauncher {
                 builder.append("\nScores:\n");
                 int i = 0;
                 for (Class<? extends Player> cur : run.getPlayers()) {
-                    builder.append(String.format("%-10s : %-6f%n", cur.getName(), run.getScores()[i++]));
+                    String name = "";
+                    int matrikel = 0;
+                    if (Bot.class.isAssignableFrom(cur))
+                        try {
+                            Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
+                            name = player.getStudentName();
+                            matrikel = player.getMatrikel();
+                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                            System.err.println("Unable to fetch Player instance");
+                        }
+                    builder.append(String.format("%-10s (%s, %d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[i++]));
                 }
+                builder.append("\n");
                 break;
             case Campaign:
                 if (run.getScores()[0] > 0) builder.append("passed");
