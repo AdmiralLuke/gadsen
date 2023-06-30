@@ -88,7 +88,7 @@ public class ParallelMultiGameRun extends Run {
         Integer[] matchup = playerIndices.get(game);
         int i = 0;
         synchronized (scores) {
-            for (float score : game.getState().getScores()) {
+            for (float score : game.getScores()) {
                 scores[matchup[i++]] += score;
             }
             completed++;

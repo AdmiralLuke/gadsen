@@ -88,7 +88,7 @@ public class TournamentRun extends Run {
             Game game = (Game) exec;
             synchronized (handlerLock) {
                 completed = true;
-                winner = (game.getState().getScores()[0] < game.getState().getScores()[1]);
+                winner = (game.getScores()[0] < game.getScores()[1]);
                 for (CompletionHandler<BracketNode> handler : handlers) {
                     handler.onComplete(this);
                 }

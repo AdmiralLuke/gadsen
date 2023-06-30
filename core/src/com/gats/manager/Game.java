@@ -48,6 +48,8 @@ public class Game extends Executable {
     private GameState state;
     private Player[] players;
 
+    private float[] scores;
+
     private static final AtomicInteger gameNumber = new AtomicInteger(0);
 
     private BotThread executor;
@@ -150,7 +152,7 @@ public class Game extends Executable {
     @Override
     protected void setStatus(Status newStatus) {
         super.setStatus(newStatus);
-        gameResults.setStatus(newStatus);
+        if (gameResults!= null) gameResults.setStatus(newStatus);
     }
 
     /**
@@ -332,7 +334,6 @@ public class Game extends Executable {
                 throw new RuntimeException(e);
             }
         }
-        executor.waitForCompletion();
         setStatus(Status.COMPLETED);
         for (CompletionHandler<Executable> completionListener : completionListeners) {
             completionListener.onComplete(this);
@@ -348,6 +349,7 @@ public class Game extends Executable {
         }
         if (executor!= null)
             executor.shutdown();
+        if (state!=null) scores = state.getScores();
         simulation = null;
         state = null;
         executor = null;
@@ -372,6 +374,10 @@ public class Game extends Executable {
         }
         return names;
 
+    }
+
+    public float[] getScores() {
+        return scores;
     }
 
     public boolean shouldSaveReplay() {

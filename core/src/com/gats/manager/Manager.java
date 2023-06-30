@@ -168,6 +168,8 @@ public class Manager {
                     case PAUSED:
                         pausedGames.remove(game);
                         break;
+                    case COMPLETED:
+                        return;
                 }
                 if (game.shouldSaveReplay()) pendingSaves.add(game.getGameResults());
                 completedGames.add(game);
