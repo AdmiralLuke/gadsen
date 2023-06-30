@@ -92,6 +92,7 @@ public class GameState implements Serializable {
         Exam_Admission,
         Tournament_Phase_1,
         Tournament_Phase_2,
+        Replay
     }
 
     private final GameMode gameMode;

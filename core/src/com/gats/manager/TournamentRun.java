@@ -84,10 +84,11 @@ public class TournamentRun extends Run {
             manager.schedule(game);
         }
 
-        void onGameComplete(Game game) {
+        void onGameComplete(Executable exec){
+            Game game = (Game) exec;
             synchronized (handlerLock) {
                 completed = true;
-                winner = (game.getState().getScores()[0] < game.getState().getScores()[1]);
+                winner = (game.getScores()[0] < game.getScores()[1]);
                 for (CompletionHandler<BracketNode> handler : handlers) {
                     handler.onComplete(this);
                 }

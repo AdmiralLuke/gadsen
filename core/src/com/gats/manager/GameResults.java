@@ -11,11 +11,16 @@ public class GameResults implements Serializable {
     private final GameConfig config;
     private GameState initialState;
 
+    private String[] playerNames;
+
+    private String[][] skins;
+
     private Game.Status status;
     private float[] scores;
 
     protected GameResults(GameConfig config) {
         this.config = config;
+
     }
 
     protected void setInitialState(GameState initialState) {
@@ -48,5 +53,25 @@ public class GameResults implements Serializable {
 
     protected void setStatus(Game.Status status) {
         this.status = status;
+    }
+
+    public String[] getPlayerNames() {
+        return playerNames;
+    }
+
+    protected void setPlayerNames(String[] playerNames) {
+        this.playerNames = playerNames;
+    }
+
+    public String[][] getSkins() {
+        return skins;
+    }
+
+    public void setSkins(String[][] skins) {
+        this.skins = skins;
+    }
+
+    public void setScores(float[] scores) {
+        this.scores = scores;
     }
 }
