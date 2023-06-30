@@ -9,6 +9,7 @@ import com.gats.ui.GADS;
 import org.apache.commons.cli.*;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
@@ -183,7 +184,17 @@ public class DesktopLauncher {
                 scoreBuilder.append("\nScores:\n");
                 int j = 0;
                 for (Class<? extends Player> cur : run.getPlayers()) {
-                    scoreBuilder.append(String.format("%-10s : %-6f%n", cur.getName(), run.getScores()[j++]));
+                    String name = "";
+                    int matrikel = 0;
+                    if (Bot.class.isAssignableFrom(cur))
+                    try {
+                        Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
+                        name = player.getStudentName();
+                        matrikel = player.getMatrikel();
+                    } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                        System.err.println("Unable to fetch Player instance");
+                    }
+                    scoreBuilder.append(String.format("%-10s (%-10s, %-6d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[j++]));
                 }
                 System.out.println(scoreBuilder);
                 if (run.getScores()[0] >= 420) builder.append("passed");

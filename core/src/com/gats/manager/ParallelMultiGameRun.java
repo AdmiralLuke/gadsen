@@ -3,6 +3,7 @@ package com.gats.manager;
 
 import com.gats.simulation.GameState;
 import com.gats.simulation.campaign.CampaignResources;
+import org.lwjgl.Sys;
 
 import java.util.*;
 
@@ -35,6 +36,8 @@ public class ParallelMultiGameRun extends Run {
             runConfig.teamSize = 3;
             runConfig.mapName = "MangoMap";
         }
+        if (runConfig.gameMode == GameState.GameMode.Tournament_Phase_1)
+            runConfig.teamCount = 4;
         ArrayList<Integer> indices = new ArrayList<>();
         for (int i = 0; i < runConfig.players.size(); i++) {
             indices.add(i);
@@ -73,6 +76,8 @@ public class ParallelMultiGameRun extends Run {
             games.add(curGame);
         }
 
+        System.out.println("Running Multigame of size " + games.size());
+
         if (!runConfig.gui) {
             for (Game game : games) {
                 addGame(game);
@@ -91,8 +96,11 @@ public class ParallelMultiGameRun extends Run {
             for (float score : game.getScores()) {
                 scores[matchup[i++]] += score;
             }
+            if ((completed*100)/gameCount < (completed*100 + 100)/gameCount)
+                System.out.printf("MultiGameRun(%d)-Completion: %d %% %n", hashCode(),(completed*100)/gameCount);
             completed++;
         }
+        System.out.println();
         if (completed == gameCount) {
             for (int j = 0; j < scores.length; j++) {
                 scores[j] /= gameCount;

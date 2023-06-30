@@ -334,6 +334,7 @@ public class Game extends Executable {
                 throw new RuntimeException(e);
             }
         }
+        scores = state.getScores();
         setStatus(Status.COMPLETED);
         for (CompletionHandler<Executable> completionListener : completionListeners) {
             completionListener.onComplete(this);

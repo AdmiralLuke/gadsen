@@ -226,6 +226,7 @@ public class Manager {
         seed = 345342624;
         System.out.println(new File("").getAbsolutePath());
         if (botDir.exists()) {
+            System.out.println("Attempting to load Bots from " + botDir.getAbsolutePath());
             try {
                 URL url = new File(".").toURI().toURL();
                 URL[] urls = new URL[]{url};
