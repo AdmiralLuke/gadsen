@@ -77,7 +77,7 @@ public class Manager {
                 break;
             }
             int threadLimit = Math.max(Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount, Executable.REQUIRED_THREAD_COUNT);
-            if (threadLimit != availableCores){
+            if (threadLimit != availableCores) {
                 availableCores = threadLimit;
                 System.out.printf("Resource load changed to %d cores, adapting...\n", threadLimit);
             }
@@ -96,25 +96,25 @@ public class Manager {
                     }
                 } else
                     while (runningThreads + 2 <= threadLimit) {
-                    if (pausedGames.size() > 0) {
-                        Executable game = pausedGames.remove(pausedGames.size() - 1);
-                        game.resume();
-                        activeGames.add(game);
-                    } else if (scheduledGames.size() > 0) {
-                        Executable game = scheduledGames.remove(scheduledGames.size() - 1);
-                        try {
-                            game.start();
+                        if (pausedGames.size() > 0) {
+                            Executable game = pausedGames.remove(pausedGames.size() - 1);
+                            game.resume();
                             activeGames.add(game);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.err.println("Game crashed on start(); Aborting...\n" + game);
-                            game.abort();
+                        } else if (scheduledGames.size() > 0) {
+                            Executable game = scheduledGames.remove(scheduledGames.size() - 1);
+                            try {
+                                game.start();
+                                activeGames.add(game);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                System.err.println("Game crashed on start(); Aborting...\n" + game);
+                                game.abort();
+                            }
+                        } else {
+                            break;
                         }
-                    } else {
-                        break;
+                        runningThreads += 2;
                     }
-                    runningThreads += 2;
-                }
             }
             while (!pendingSaves.isEmpty()) {
                 GameResults results = pendingSaves.poll();
@@ -342,22 +342,24 @@ public class Manager {
 
     public static void setSystemReservedProcessorCount(int systemReservedProcessorCount) {
         Manager.systemReservedProcessorCount = systemReservedProcessorCount;
-        synchronized (getManager().executionManager){
+        synchronized (getManager().executionManager) {
             getManager().executionManager.notify();
         }
     }
 
     @Override
     public String toString() {
-        return "Manager{" +
-                "pendingShutdown=" + pendingShutdown +
-                ", executionManager=" + executionManager +
-                ", threadPoolExecutor=" + threadPoolExecutor +
-                ", games=" + games +
-                ", scheduledGames=" + scheduledGames +
-                ", activeGames=" + activeGames +
-                ", pausedGames=" + pausedGames +
-                ", completedGames=" + completedGames +
-                '}';
+        synchronized (schedulingLock) {
+            return "Manager{" +
+                    "pendingShutdown=" + pendingShutdown +
+                    ", executionManager=" + executionManager +
+                    ", threadPoolExecutor=" + threadPoolExecutor +
+                    ", games=" + games +
+                    ", scheduledGames=" + scheduledGames +
+                    ", activeGames=" + activeGames +
+                    ", pausedGames=" + pausedGames +
+                    ", completedGames=" + completedGames +
+                    '}';
+        }
     }
 }
