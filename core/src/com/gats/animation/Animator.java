@@ -395,7 +395,6 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterShootAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterShootAction shootAction = (CharacterShootAction) action;
-            com.gats.simulation.GameCharacter currentPlayer = animator.state.getCharacterFromTeams(shootAction.getTeam(), shootAction.getCharacter());
 
             GameCharacter target;
             if (shootAction.getTeam() == -1 && shootAction.getCharacter() == -1) {
