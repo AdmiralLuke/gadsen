@@ -13,7 +13,7 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class TestMultiGameRun {
 
-    private static final long GAME_COMPLETION_TIMEOUT = 500;
+    private static final long GAME_COMPLETION_TIMEOUT = 1000;
     private static final long COMPLETION_TIMEOUT = 10000;
 
     private final RunConfiguration runConfig;
@@ -54,7 +54,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -64,7 +64,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -75,7 +75,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -87,8 +87,44 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "christmasMap";
+        config.teamCount = 3;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "christmasMap";
+        config.teamCount = 3;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "christmasMap";
+        config.teamCount = 3;
         config.teamSize = 1;
         config.players = new ArrayList<>();
         config.players.add(IdleBot.class);
@@ -107,15 +143,6 @@ public class TestMultiGameRun {
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 3;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
@@ -123,34 +150,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 3;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 3;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 4;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -162,7 +162,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 4;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -176,7 +176,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 4;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -191,7 +191,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 4;
         config.teamSize = 1;
         config.players = new ArrayList<>();
