@@ -355,8 +355,6 @@ public class GameState implements Serializable {
      * @return ausgewählter Charakter im ausgewählten Team
      */
     public GameCharacter getCharacterFromTeams(int team, int member) {
-        if(team>teamCount) return null;
-        if(member>charactersPerTeam) return null;
         return teams[team][member];
     }
 

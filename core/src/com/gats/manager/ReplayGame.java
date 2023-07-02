@@ -40,6 +40,7 @@ public class ReplayGame extends Executable{
             this.replay = (GameResults) new ObjectInputStream(fs).readObject();
         } catch (IOException e) {
             System.err.printf("Unable to read replay at %s %n", path);
+            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

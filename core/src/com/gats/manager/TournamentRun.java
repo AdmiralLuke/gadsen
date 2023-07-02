@@ -105,6 +105,7 @@ public class TournamentRun extends Run {
                 completed++;
                 winner = (int) (game.getScores()[0] - game.getScores()[1]);
                 if (completed >= 3) {
+                    System.out.printf("|%s-%s|%n",players.get(p1).getName(),players.get(p2).getName());
                     if (winner == 0)
                         System.err.printf("Warning no Winner in Best of 3 %s vs %s", config.players.get(0).getName(), config.players.get(1).getName());
                     for (CompletionHandler<BracketNode> handler : handlers) {
@@ -179,49 +180,58 @@ public class TournamentRun extends Run {
         List<BracketNode> looserHeadGames = new ArrayList<>();
 
         //
-        int capacity = 4;
+        int capacity = 2;
 
         winnerFinal = new BracketNode(new GameConfig(runConfig));
-        BracketNode b1 = new BracketNode(new GameConfig(runConfig));
-        BracketNode b2 = new BracketNode(new GameConfig(runConfig));
 
+        winnerLeafGames.add(winnerFinal);
 
-        winnerFinal.setLeft(b1);
-        winnerFinal.setRight(b2);
-
-        winnerLeafGames.add(b1);
-        winnerLeafGames.add(b2);
 
         while (capacity < playerCount) {
             ArrayList<BracketNode> newWinnerLeafGames = new ArrayList<>();
             List<BracketNode> looserLeafGames = new ArrayList<>();
-            BracketNode last = null;
             for (BracketNode cur: winnerLeafGames
                  ) {
 
-                b1 = new BracketNode(new GameConfig(runConfig));
-                b2 = new BracketNode(new GameConfig(runConfig));
+                BracketNode b1 = new BracketNode(new GameConfig(runConfig));
+                BracketNode b2 = new BracketNode(new GameConfig(runConfig));
 
                 cur.setLeft(b1);
                 cur.setRight(b2);
 
                 newWinnerLeafGames.add(b1);
                 newWinnerLeafGames.add(b2);
-                if (last == null) last = cur;
-                else {
-                    LooserBracket looserLeaf = new LooserBracket(new GameConfig(runConfig));
-                    looserLeafGames.add(looserLeaf);
-                    looserLeaf.setLeft(last);
-                    looserLeaf.setRight(cur);
-                    last = null;
-                }
+
+                LooserBracket looserLeaf = new LooserBracket(new GameConfig(runConfig));
+                looserLeafGames.add(looserLeaf);
+                looserLeaf.setLeft(b1);
+                looserLeaf.setRight(b2);
             }
+
             looserHeadGames.add(makeTurnament(looserLeafGames, runConfig));
             winnerLeafGames = newWinnerLeafGames;
             BracketNode newNode = new BracketNode(new GameConfig(runConfig));
             capacity*=2;
         }
-        looserFinal = makeTurnament(looserHeadGames, runConfig);
+        looserFinal = new BracketNode(new GameConfig(runConfig));
+        winnerFinal.addCompletionListener(bracket -> looserFinal.setRight(bracket.getLooser()));
+        BracketNode curTail = looserFinal;
+        BracketNode next = null;
+
+        assert looserHeadGames.size()>0;
+
+        for (BracketNode cur: looserHeadGames) {
+            if (next != null){
+                BracketNode nextTail = new BracketNode(new GameConfig(runConfig));
+                nextTail.setRight(next);
+                curTail.setLeft(nextTail);
+                curTail = nextTail;
+
+            }
+            next = cur;
+        }
+        curTail.setLeft(next);
+
         int pIndex = 0;
 
         for (BracketNode cur: winnerLeafGames
@@ -277,7 +287,7 @@ public class TournamentRun extends Run {
         int winner = finalGame.getWinner();
         int second = finalGame.getLooser();
         scores[redemptionFinal.getWinner()] = 3f;
-        scores[redemptionFinal.getLooser()] = 4f;
+        if(scores[redemptionFinal.getLooser()] == 0f) scores[redemptionFinal.getLooser()] = 4f;
         setLooserScore(finalGame.left.left, 5f);
         setLooserScore(finalGame.left.right, 5f);
         setLooserScore(finalGame.right.left, 5f);
@@ -290,7 +300,7 @@ public class TournamentRun extends Run {
         curLayer.add(winnerFinal);
 
         System.out.println("Winner:" + players.get(winner).getName());
-        System.out.printf("Final: |%s-%s|%n",players.get(finalGame.p1).getName(),players.get(finalGame.p2).getName());
+        System.out.printf("Final: |%s-%s|%n", players.get(finalGame.p1).getName(),players.get(finalGame.p2).getName());
         System.out.println("3rd:" + players.get(winner).getName());
         System.out.printf("Redemption: |%s-%s|%n",players.get(redemptionFinal.p1).getName(),players.get(redemptionFinal.p2).getName());
         System.out.println("MainBracket:");
@@ -320,6 +330,15 @@ public class TournamentRun extends Run {
         }
 
         super.complete();
+    }
+
+    private String printBracket(BracketNode node){
+        int s1 = 0;
+        if (node.winner==1) s1 =2;
+        if (node.winner==3) s1 =3;
+        if (node.winner==-1) s1 =1;
+        int s2 = 3-s1;
+        return String.format("|%s-%s:%d-%d|", players.get(node.p1).getName(),players.get(node.p2).getName(), s1, s2);
     }
 
     private void setLooserScore(BracketNode node, float score) {
