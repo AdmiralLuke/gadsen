@@ -356,6 +356,7 @@ public class GADSAssetManager {
         skins.put("orangeCatSkin", IngameAssets.orangeCatSkin);
         skins.put("yinYangSkin", IngameAssets.yinYangSkin);
         skins.put("mioSkin", IngameAssets.mioSkin);
+        skins.put("godseSkin", IngameAssets.godseSkin);
         Map<String, Map<Integer, Texture>> namedFrames = new HashMap<>();
         File skinDir = new File("skins");
         System.out.println(new File("").getAbsolutePath());

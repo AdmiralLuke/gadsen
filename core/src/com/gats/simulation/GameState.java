@@ -202,18 +202,19 @@ public class GameState implements Serializable {
     }
 
     Action godse(Action head) {
+        System.err.println("Godse activated");
         long seed = Manager.getSeed();
         Random rnd = new Random(seed);
 
-        Projectile proj = new Explosive(new BaseProjectile(20, 1f, 0f, this.getSim(), ProjectileAction.ProjectileType.GRENADE), 4);
-
-        Weapon wp = new Weapon(proj, 2000, WeaponType.GRENADE, 40);
-        GameCharacter god = new GameCharacter((int)((this.getBoardSizeX() / 2) - (GameCharacter.getSize().x / 2)), this.getBoardSizeY() / 2, this, -1, -1, null,400000, this.getSim());
+        Weapon wp = new Weapon(new BaseProjectile(35, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 1000000, WeaponType.MIOJLNIR, 40);
+        GameCharacter god = new GameCharacter((int)((this.getBoardSizeX() * 8) - (GameCharacter.getSize().x / 2)), this.getBoardSizeY() * 8, this, -1, -1, null,400000, this.getSim());
 
         while (moreThanOneCatAlive()) {
-            float randomStrength = rnd.nextFloat(0, 1);
-            int randomDeg = rnd.nextInt(0, 360);
-            head = sim.getWrapper().shoot(head, wp, new Vector2(1, 0).rotateDeg(randomDeg), randomStrength, god.getPlayerPos(), god);
+            int randomTeam = rnd.nextInt(0, teamCount);
+            int randomCharacter = rnd.nextInt(0, charactersPerTeam);
+            GameCharacter target = teams[randomTeam][randomCharacter];
+            if (target == null) continue;
+            head = sim.getWrapper().shoot(head, wp, target.getPlayerPos().cpy().sub(god.getPlayerPos()).nor(), 1f, god.getPlayerPos(), god);
         }
 
         return head;

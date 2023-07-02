@@ -74,4 +74,12 @@ public class TileMap extends Entity{
     public int getTileSize() {
         return tileSize;
     }
+
+    public int getSizeX() {
+        return sizeX;
+    }
+
+    public int getSizeY() {
+        return sizeY;
+    }
 }

@@ -399,7 +399,9 @@ public class Animator implements Screen, AnimationLogProcessor {
             GameCharacter target;
             if (shootAction.getTeam() == -1 && shootAction.getCharacter() == -1) {
                 if (animator.godse == null){
-                    animator.godse = new GameCharacter(Color.GOLD, "godse");
+                    animator.godse = new GameCharacter(Color.GOLD, "godseSkin");
+                    animator.godse.setWeapon(Weapons.summon(WeaponType.MIOJLNIR));
+                    animator.godse.setRelPos(animator.map.getSizeX() * 8, animator.map.getSizeY() * 8 + 7.5f);
                     animator.characterGroup.add(animator.godse);
                 }
                 target = animator.godse;
@@ -567,7 +569,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertInventoryAction(com.gats.simulation.action.Action action, Animator animator) {
             InventoryAction inventoryAction = (InventoryAction) action;
-
+            if (inventoryAction.getTeam() == -1) return new ExpandedAction(new IdleAction(0,0));
             //uiaction
             MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0, animator.uiMessenger, inventoryAction.getTeam(), inventoryAction.getWpType(), inventoryAction.getAmount());
 
