@@ -98,6 +98,7 @@ public class GameState implements Serializable {
         Exam_Admission,
         Tournament_Phase_1,
         Tournament_Phase_2,
+        Replay
     }
 
     private final GameMode gameMode;
@@ -302,16 +303,21 @@ public class GameState implements Serializable {
 
         JsonValue tileData = map.get("layers").get(0).get("data");
 
-        List<List<IntVector2>> spawnpoints = new LinkedList<>();
+       // List<List<IntVector2>> spawnpoints = new LinkedList<>();
+        Map<Integer,List<IntVector2>> teams=new TreeMap<>();
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int type = tileData.get(i + (height - j - 1) * width).asInt();
                 if (type > 100) {
-                    int team = type - 101; //teams starting at 0
-                    while (spawnpoints.size() <= team)
-                        spawnpoints.add(new LinkedList<>()); //Increase list of spawnpoints as necessary
-                    spawnpoints.get(team).add(new IntVector2(i, j)); // Add current tile
+                    //int team = type - 101; //teams starting at 0
+                    if(teams.containsKey(type)){
+                        teams.get(type).add(new IntVector2(i,j));
+                    }
+                    else{teams.put(type,new LinkedList<>());teams.get(type).add(new IntVector2(i,j));}
+                    //while (spawnpoints.size() <= team)
+                    //    spawnpoints.add(new LinkedList<>()); //Increase list of spawnpoints as necessary
+                    //spawnpoints.get(team).add(new IntVector2(i, j)); // Add current tile
                 } else
                     switch (type) {
                         case 0:
@@ -334,7 +340,10 @@ public class GameState implements Serializable {
             }
         }
 
-        return spawnpoints;
+        List<List<IntVector2>> spawns = new LinkedList<>(teams.values());
+
+        return spawns;
+
     }
 
 

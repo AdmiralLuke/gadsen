@@ -17,7 +17,7 @@ public abstract class Run {
     protected final Manager manager;
 
     protected GameState.GameMode gameMode;
-    private final ArrayList<Game> games = new ArrayList<>();
+    private final ArrayList<Executable> games = new ArrayList<>();
 
     private boolean disposed = false;
     private final ArrayList<Class<? extends Player>> players;
@@ -31,6 +31,7 @@ public abstract class Run {
     public static Run getRun(Manager manager, RunConfiguration runConfig) {
         switch (runConfig.gameMode) {
             case Campaign:
+            case Replay:
             case Normal:
                 return new SingleGameRun(manager, runConfig);
             case Exam_Admission:
@@ -43,11 +44,11 @@ public abstract class Run {
         }
     }
 
-    public ArrayList<Game> getGames() {
+    public ArrayList<Executable> getGames() {
         return games;
     }
 
-    protected void addGame(Game game) {
+    protected void addGame(Executable game) {
         synchronized (schedulingLock) {
             if (!disposed) {
                 games.add(game);
@@ -59,7 +60,7 @@ public abstract class Run {
     public void dispose() {
         synchronized (schedulingLock) {
             disposed = true;
-            for (Game game : games
+            for (Executable game : games
             ) {
                 manager.stop(game);
             }
