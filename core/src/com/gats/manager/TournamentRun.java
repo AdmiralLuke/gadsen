@@ -333,10 +333,7 @@ public class TournamentRun extends Run {
     }
 
     private String printBracket(BracketNode node){
-        int s1 = 0;
-        if (node.winner==1) s1 =2;
-        if (node.winner==3) s1 =3;
-        if (node.winner==-1) s1 =1;
+        int s1 = (node.winner + 3)/2;
         int s2 = 3-s1;
         return String.format("|%s-%s:%d-%d|", players.get(node.p1).getName(),players.get(node.p2).getName(), s1, s2);
     }
