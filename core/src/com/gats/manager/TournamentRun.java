@@ -1,9 +1,11 @@
 package com.gats.manager;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TournamentRun extends Run {
 
+    AtomicInteger completed = new AtomicInteger(0);
 
     private class BracketNode {
 
@@ -82,13 +84,13 @@ public class TournamentRun extends Run {
             config.players = new ArrayList<>();
             config.players.add(players.get(p1));
             config.players.add(players.get(p2));
-            config.mapName = ""; //ToDo make dynamic
+            config.mapName = "lukeMap"; //ToDo make dynamic
             game1 = new Game(config);
             game1.addCompletionListener(this::onGameComplete);
-            config.mapName = ""; //ToDo make dynamic
+            config.mapName = "Gadsrena"; //ToDo make dynamic
             game2 = new Game(config);
             game2.addCompletionListener(this::onGameComplete);
-            config.mapName = ""; //ToDo make dynamic
+            config.mapName = "mondlandschaft"; //ToDo make dynamic
             game3 = new Game(config);
             game3.addCompletionListener(this::onGameComplete);
             manager.schedule(game1);
@@ -98,10 +100,11 @@ public class TournamentRun extends Run {
 
         void onGameComplete(Executable exec) {
             Game game = (Game) exec;
+            System.out.println("Completed: " + TournamentRun.this.completed.incrementAndGet());
             synchronized (handlerLock) {
                 completed++;
                 winner = (int) (game.getScores()[0] - game.getScores()[1]);
-                if (completedGames >= 3) {
+                if (completed >= 3) {
                     if (winner == 0)
                         System.err.printf("Warning no Winner in Best of 3 %s vs %s", config.players.get(0).getName(), config.players.get(1).getName());
                     for (CompletionHandler<BracketNode> handler : handlers) {
@@ -273,12 +276,12 @@ public class TournamentRun extends Run {
 
         int winner = finalGame.getWinner();
         int second = finalGame.getLooser();
-            scores[redemptionFinal.getWinner()] = 3f;
-            scores[redemptionFinal.getLooser()] = 4f;
-            setLooserScore(finalGame.left.left, 5f);
-            setLooserScore(finalGame.left.right, 5f);
-            setLooserScore(finalGame.right.left, 5f);
-            setLooserScore(finalGame.right.right, 5f);
+        scores[redemptionFinal.getWinner()] = 3f;
+        scores[redemptionFinal.getLooser()] = 4f;
+        setLooserScore(finalGame.left.left, 5f);
+        setLooserScore(finalGame.left.right, 5f);
+        setLooserScore(finalGame.right.left, 5f);
+        setLooserScore(finalGame.right.right, 5f);
         scores[winner] = 1f;
         scores[second] = 2f;
 
@@ -287,9 +290,9 @@ public class TournamentRun extends Run {
         curLayer.add(winnerFinal);
 
         System.out.println("Winner:" + players.get(winner).getName());
-        System.out.printf("Final: |%s-%s|",players.get(finalGame.p1).getName(),players.get(finalGame.p2).getName());
+        System.out.printf("Final: |%s-%s|%n",players.get(finalGame.p1).getName(),players.get(finalGame.p2).getName());
         System.out.println("3rd:" + players.get(winner).getName());
-        System.out.printf("Redemption: |%s-%s|",players.get(redemptionFinal.p1).getName(),players.get(redemptionFinal.p2).getName());
+        System.out.printf("Redemption: |%s-%s|%n",players.get(redemptionFinal.p1).getName(),players.get(redemptionFinal.p2).getName());
         System.out.println("MainBracket:");
         while (!curLayer.isEmpty()){
             nextLayer = new ArrayList<>();
