@@ -300,15 +300,15 @@ public class TournamentRun extends Run {
         curLayer.add(winnerFinal);
 
         System.out.println("Winner:" + players.get(winner).getName());
-        System.out.printf("Final: |%s-%s|%n", players.get(finalGame.p1).getName(),players.get(finalGame.p2).getName());
-        System.out.println("3rd:" + players.get(winner).getName());
-        System.out.printf("Redemption: |%s-%s|%n",players.get(redemptionFinal.p1).getName(),players.get(redemptionFinal.p2).getName());
+        System.out.printf("Final: " + printBracket(finalGame));
+        System.out.println("3rd:" + players.get(redemptionFinal.getWinner()).getName());
+        System.out.printf("Redemption: " + printBracket(redemptionFinal));
         System.out.println("MainBracket:");
         while (!curLayer.isEmpty()){
             nextLayer = new ArrayList<>();
             for (BracketNode cur : curLayer
             ) {
-                System.out.printf("|%s-%s|",players.get(cur.p1).getName(),players.get(cur.p2).getName());
+                System.out.print(printBracket(cur));
                 if (cur.left != null) nextLayer.add(cur.left);
                 if (cur.right != null) nextLayer.add(cur.right);
             }
@@ -321,7 +321,7 @@ public class TournamentRun extends Run {
             nextLayer = new ArrayList<>();
             for (BracketNode cur : curLayer
             ) {
-                System.out.printf("|%s-%s|",players.get(cur.p1).getName(),players.get(cur.p2).getName());
+                System.out.print(printBracket(cur));
                 if (cur.left != null) nextLayer.add(cur.left);
                 if (cur.right != null) nextLayer.add(cur.right);
             }
