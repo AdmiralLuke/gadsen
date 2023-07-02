@@ -36,6 +36,8 @@ public class Animator implements Screen, AnimationLogProcessor {
     private AnimatorCamera camera;
     private GameState state;
 
+    private GameCharacter godse;
+
     private GameCharacter activeCharacter;
 
     private Viewport viewport;
@@ -202,7 +204,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             RotateAction animRotateAction = new RotateAction(0, target, moveAction.getDuration(), moveAction.getPath());
 
             MessageUiPlayerMoveAction messageUiPlayerMoveAction = new MessageUiPlayerMoveAction(0, moveAction.getDuration(), animator.uiMessenger, animator.state.getCharacterFromTeams(moveAction.getTeam(), moveAction.getCharacter()), moveAction.getStaminaBefore(), moveAction.getStaminaAfter());
-            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle,messageUiPlayerMoveAction});
+            startWalking.setChildren(new Action[]{animMoveAction, animRotateAction, summonParticle, messageUiPlayerMoveAction});
             SetAnimationAction stopWalking = new SetAnimationAction(0, target, GameCharacterAnimationType.ANIMATION_TYPE_IDLE);
             //notify ui
             animMoveAction.setChildren(new Action[]{stopWalking});
@@ -372,7 +374,16 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterSwitchWeaponAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterSwitchWeaponAction switchWeaponAction = (CharacterSwitchWeaponAction) action;
-            GameCharacter target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
+            GameCharacter target;
+            if (switchWeaponAction.getTeam() == -1 && switchWeaponAction.getCharacter() == -1) {
+                if (animator.godse == null){
+                    animator.godse = new GameCharacter(Color.GOLD, "godse");
+                    animator.characterGroup.add(animator.godse);
+                }
+                target = animator.godse;
+            } else {
+                target = animator.teams[switchWeaponAction.getTeam()][switchWeaponAction.getCharacter()];
+            }
             AddAction addAction = new AddAction(action.getDelay(), target, Weapons.summon(switchWeaponAction.getWpType()));
 
             MessageUiWeaponSelectAction selectedWeaponAction = new MessageUiWeaponSelectAction(0, animator.uiMessenger, switchWeaponAction.getWpType());
@@ -384,8 +395,19 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterShootAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterShootAction shootAction = (CharacterShootAction) action;
-            com.gats.simulation.GameCharacter currentPlayer = animator.state.getCharacterFromTeams(shootAction.getTeam(), shootAction.getCharacter());
-            GameCharacter target = animator.teams[shootAction.getTeam()][shootAction.getCharacter()];
+
+            GameCharacter target;
+            if (shootAction.getTeam() == -1 && shootAction.getCharacter() == -1) {
+                if (animator.godse == null){
+                    animator.godse = new GameCharacter(Color.GOLD, "godseSkin");
+                    animator.godse.setWeapon(Weapons.summon(WeaponType.MIOJLNIR));
+                    animator.godse.setRelPos(animator.map.getSizeX() * 8, animator.map.getSizeY() * 8 + 7.5f);
+                    animator.characterGroup.add(animator.godse);
+                }
+                target = animator.godse;
+            } else {
+                target = animator.teams[shootAction.getTeam()][shootAction.getCharacter()];
+            }
 
             ExecutorAction shotExecutorAction = new ExecutorAction(shootAction.getDelay(), () -> {
                 target.getWeapon().shoot();
@@ -519,8 +541,19 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertCharacterMoveAction(com.gats.simulation.action.Action action, Animator animator) {
             CharacterMoveAction moveAction = (CharacterMoveAction) action;
+            GameCharacter target;
 
-            GameCharacter target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            if (moveAction.getTeam() == -1 && moveAction.getCharacter() == -1) {
+                if (animator.godse == null){
+                    animator.godse = new GameCharacter(Color.GOLD, "godse");
+                    animator.characterGroup.add(animator.godse);
+                }
+                target = animator.godse;
+            } else {
+                target = animator.teams[moveAction.getTeam()][moveAction.getCharacter()];
+            }
+
+
             Path path = moveAction.getPath();
             SetAnimationAction startWalking = new SetAnimationAction(action.getDelay(), target, GameCharacterAnimationType.ANIMATION_TYPE_HIT);
             CharacterPath characterPath = new CharacterPath(moveAction.getPath());
@@ -536,7 +569,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertInventoryAction(com.gats.simulation.action.Action action, Animator animator) {
             InventoryAction inventoryAction = (InventoryAction) action;
-
+            if (inventoryAction.getTeam() == -1) return new ExpandedAction(new IdleAction(0,0));
             //uiaction
             MessageItemUpdateAction updateInventoryItem = new MessageItemUpdateAction(0, animator.uiMessenger, inventoryAction.getTeam(), inventoryAction.getWpType(), inventoryAction.getAmount());
 
@@ -550,6 +583,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             return new ExpandedAction(indicateScoreChangeAction);
         }
+
     }
 
 
@@ -572,7 +606,7 @@ public class Animator implements Screen, AnimationLogProcessor {
     }
 
     @Override
-    public void init(GameState state,String[] playerNames, String[][] skins) {
+    public void init(GameState state, String[] playerNames, String[][] skins) {
         synchronized (root) {
             this.state = state;
             map = new TileMap(state);
@@ -590,6 +624,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             characterGroup = new Entity();
 
             root.add(characterGroup);
+
             for (int curTeam = 0; curTeam < teamCount; curTeam++)
                 for (int curCharacter = 0; curCharacter < charactersPerTeam; curCharacter++) {
                     com.gats.simulation.GameCharacter simGameCharacter = state.getCharacterFromTeams(curTeam, curCharacter);

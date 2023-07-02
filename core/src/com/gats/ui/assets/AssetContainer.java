@@ -112,6 +112,8 @@ public class AssetContainer {
         public static Animation<TextureRegion> yinYangSkin;
         public static Animation<TextureRegion> mioSkin;
 
+        public static Animation<TextureRegion> godseSkin;
+
 
         public static Animation<TextureRegion> coolCat;
 

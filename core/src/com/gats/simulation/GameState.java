@@ -1,12 +1,18 @@
 package com.gats.simulation;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.gats.manager.Manager;
 import com.gats.manager.Timer;
 import com.gats.simulation.action.Action;
+import com.gats.simulation.action.ProjectileAction;
 import com.gats.simulation.action.ScoreAction;
 import com.gats.simulation.campaign.CampaignResources;
+import com.gats.simulation.weapons.BaseProjectile;
+import com.gats.simulation.weapons.Explosive;
+import com.gats.simulation.weapons.Projectile;
 import com.gats.simulation.weapons.Weapon;
 
 import java.io.Serializable;
@@ -184,6 +190,35 @@ public class GameState implements Serializable {
                 turn.add(new IntVector2(i, j));
             }
         }
+    }
+
+    boolean moreThanOneCatAlive() {
+        int count = 0;
+        for (GameCharacter[] characters : this.getTeams()) {
+            for (GameCharacter character : characters) {
+                if (character.isAlive()) count++;
+            }
+        }
+        return count > 1;
+    }
+
+    Action godse(Action head) {
+        System.err.println("Godse activated");
+        long seed = Manager.getSeed();
+        Random rnd = new Random(seed);
+
+        Weapon wp = new Weapon(new BaseProjectile(35, 0f, 0, sim, ProjectileAction.ProjectileType.MIOJLNIR), 1000000, WeaponType.MIOJLNIR, 40);
+        GameCharacter god = new GameCharacter((int)((this.getBoardSizeX() * 8) - (GameCharacter.getSize().x / 2)), this.getBoardSizeY() * 8, this, -1, -1, null,400000, this.getSim());
+
+        while (moreThanOneCatAlive()) {
+            int randomTeam = rnd.nextInt(0, teamCount);
+            int randomCharacter = rnd.nextInt(0, charactersPerTeam);
+            GameCharacter target = teams[randomTeam][randomCharacter];
+            if (target == null) continue;
+            head = sim.getWrapper().shoot(head, wp, target.getPlayerPos().cpy().sub(god.getPlayerPos()).nor(), 1f, god.getPlayerPos(), god);
+        }
+
+        return head;
     }
 
     //ToDo migrate to Simulation

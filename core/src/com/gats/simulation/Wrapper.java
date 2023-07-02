@@ -32,6 +32,7 @@ public class Wrapper {
 
     public Action destroyTile(Tile t, GameCharacter character, Action head) {
         head = onDestroyTile(t, head);
+        if (character.getTeam() == -1) return head;
         if (t.getTileType() == Tile.TileType.WEAPON_BOX) {
             //roll two weapons according to the cycle
             int w1 = GameState.getWeaponFromCycleIndex(state.cycleWeapon(character.getTeam()));

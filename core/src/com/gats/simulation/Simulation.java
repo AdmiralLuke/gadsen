@@ -1,11 +1,14 @@
 package com.gats.simulation;
 
+import com.badlogic.gdx.math.Vector2;
+import com.gats.manager.Manager;
 import com.gats.manager.Timer;
-import com.gats.simulation.action.ActionLog;
-import com.gats.simulation.action.GameOverAction;
-import com.gats.simulation.action.InitAction;
-import com.gats.simulation.action.TurnStartAction;
+import com.gats.simulation.action.*;
 import com.gats.simulation.GameState.GameMode;
+import com.gats.simulation.weapons.BaseProjectile;
+import com.gats.simulation.weapons.Explosive;
+import com.gats.simulation.weapons.Projectile;
+import com.gats.simulation.weapons.Weapon;
 
 import java.util.*;
 
@@ -90,6 +93,9 @@ public class Simulation {
     }
 
 
+
+
+
     public ActionLog endTurn() {
         turnsWithoutAction++;
 
@@ -144,7 +150,8 @@ public class Simulation {
             }
         }
 
-        if (remainingTeams <= 1 || turnsWithoutAction >= gameState.getTeamCount() * 10) {
+
+        if (remainingTeams <= 1) {
 
             if (remainingTeams == 1) {
                 //Reward score to surviving winner
@@ -168,6 +175,9 @@ public class Simulation {
         assert turnChar != null;
         gameState.getCharacterFromTeams(turnChar.x, turnChar.y).reset();
         this.actionLog = new ActionLog(new TurnStartAction(0, turnChar.x, turnChar.y));
+        if (turnsWithoutAction >= gameState.getTeamCount() * 10) {
+            this.gameState.godse(lastTurn.getRootAction());
+        }
         return lastTurn;
 
     }
