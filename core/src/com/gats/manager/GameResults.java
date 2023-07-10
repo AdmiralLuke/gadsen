@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class GameResults implements Serializable {
     private final ArrayList<ActionLog> actionLogs = new ArrayList<>();
-    private final GameConfig config;
+    private transient final GameConfig config;
     private GameState initialState;
 
     private String[] playerNames;

@@ -18,7 +18,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * This is more a workaround, ReplayGame and Game should really be implementing a common Interface
  */
-public class ReplayGame extends Executable{
+public class ReplayGame extends Executable {
 
     private GameResults replay = null;
     private Thread executionThread;
@@ -35,11 +35,12 @@ public class ReplayGame extends Executable{
         loadGameResults(config.mapName);
     }
 
-    private void loadGameResults(String path){
+    private void loadGameResults(String path) {
         try (FileInputStream fs = new FileInputStream(path)) {
             this.replay = (GameResults) new ObjectInputStream(fs).readObject();
         } catch (IOException e) {
             System.err.printf("Unable to read replay at %s %n", path);
+            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -48,19 +49,19 @@ public class ReplayGame extends Executable{
     @Override
     public void start() {
         synchronized (schedulingLock) {
-        if (getStatus() == Status.ABORTED) return;
-        setStatus(Status.ACTIVE);
-        //Init the Log Processor
-        animationLogProcessor.init(replay.getInitialState().copy(), getPlayerNames(), getSkins());
-        //Run the Game
+            if (getStatus() == Status.ABORTED) return;
+            setStatus(Status.ACTIVE);
+            //Init the Log Processor
+            animationLogProcessor.init(replay.getInitialState().copy(), getPlayerNames(), getSkins());
+            //Run the Game
             executionThread = new Thread(this::run);
             executionThread.setName("Replay_Execution_Thread");
             executionThread.setUncaughtExceptionHandler(this::crashHandler);
             executionThread.start();
-    }
+        }
     }
 
-    private void run(){
+    private void run() {
         Iterator<ActionLog> actionLogs = replay.getActionLogs().iterator();
         while (!pendingShutdown && actionLogs.hasNext()) {
             synchronized (schedulingLock) {
@@ -71,9 +72,9 @@ public class ReplayGame extends Executable{
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                animationLogProcessor.animate(actionLogs.next());
-                animationLogProcessor.awaitNotification();
             }
+            animationLogProcessor.animate(actionLogs.next());
+            animationLogProcessor.awaitNotification();
 
         }
         setStatus(Status.COMPLETED);
@@ -82,7 +83,7 @@ public class ReplayGame extends Executable{
         }
     }
 
-    private String[][] getSkins(){
+    private String[][] getSkins() {
         return replay.getSkins();
     }
 
