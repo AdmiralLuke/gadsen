@@ -59,7 +59,7 @@ public class InGameScreen implements Screen, AnimationLogProcessor {
         animator = new Animator(gameViewport, runConfig.gameMode, runConfig.uiMessenger);
         //ToDo this should be happening in Menu
         run = manager.startRun(runConfig);
-        Game game = run.getGames().get(0);
+        Executable game = run.getGames().get(0);
     }
 
     //gets called when the screen becomes the main screen of GADS

@@ -201,7 +201,10 @@ public class GADSAssetManager {
 
         IngameAssets.mioSkin = new AtlasAnimation(1 / 10f, atlas.findRegions("skin/mioSkin"), Animation.PlayMode.LOOP);
 
+        IngameAssets.godseSkin = new AtlasAnimation(1f, atlas.findRegions("skin/godseSkin"), Animation.PlayMode.LOOP);
+
         IngameAssets.coolCat = new AtlasAnimation(1f, atlas.findRegions("cat/coolCat"), Animation.PlayMode.LOOP);
+
 
         IngameAssets.Cookie = new AtlasAnimation(1 / 8f, atlas.findRegions("projectile/cookieTumblingCroppedR"), Animation.PlayMode.LOOP);
 
@@ -353,6 +356,7 @@ public class GADSAssetManager {
         skins.put("orangeCatSkin", IngameAssets.orangeCatSkin);
         skins.put("yinYangSkin", IngameAssets.yinYangSkin);
         skins.put("mioSkin", IngameAssets.mioSkin);
+        skins.put("godseSkin", IngameAssets.godseSkin);
         Map<String, Map<Integer, Texture>> namedFrames = new HashMap<>();
         File skinDir = new File("skins");
         System.out.println(new File("").getAbsolutePath());

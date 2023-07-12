@@ -6,14 +6,16 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.lwjgl.Sys;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public class TestMultiGameRun {
 
-    private static final long GAME_COMPLETION_TIMEOUT = 500;
+    private static final long GAME_COMPLETION_TIMEOUT = 1000;
     private static final long COMPLETION_TIMEOUT = 10000;
 
     private final RunConfiguration runConfig;
@@ -23,8 +25,8 @@ public class TestMultiGameRun {
     private boolean completed = false;
     private final Object lock = new Object();
 
-    static class TestExample{
-        private RunConfiguration config;
+    static class TestExample {
+        private final RunConfiguration config;
 
         public TestExample(RunConfiguration config) {
             this.config = config;
@@ -36,8 +38,8 @@ public class TestMultiGameRun {
         this.runConfig = testSet.config;
         manager = Manager.getManager();
         run = manager.startRun(testSet.config);
-        synchronized (lock){
-            run.addCompletionListener(run ->{
+        synchronized (lock) {
+            run.addCompletionListener(run -> {
                 completed = true;
                 synchronized (lock) {
                     lock.notify();
@@ -54,7 +56,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -64,7 +66,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -75,7 +77,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -87,8 +89,44 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 2;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "christmasMap";
+        config.teamCount = 3;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "christmasMap";
+        config.teamCount = 3;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "christmasMap";
+        config.teamCount = 3;
         config.teamSize = 1;
         config.players = new ArrayList<>();
         config.players.add(IdleBot.class);
@@ -107,15 +145,6 @@ public class TestMultiGameRun {
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 3;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
@@ -123,34 +152,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 3;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
-        config.teamCount = 3;
-        config.teamSize = 1;
-        config.players = new ArrayList<>();
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        config.players.add(IdleBot.class);
-        samples.add(new TestExample(config));
-
-        config = new RunConfiguration();
-        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 4;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -162,7 +164,7 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 4;
         config.teamSize = 1;
         config.players = new ArrayList<>();
@@ -176,10 +178,26 @@ public class TestMultiGameRun {
 
         config = new RunConfiguration();
         config.gameMode = GameState.GameMode.Tournament_Phase_1;
-        config.mapName = "MangoMap";
+        config.mapName = "christmasMap";
         config.teamCount = 4;
         config.teamSize = 1;
         config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
+
+
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "christmasMap";
+        config.teamCount = 4;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
@@ -202,68 +220,57 @@ public class TestMultiGameRun {
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
         config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
         samples.add(new TestExample(config));
 
 
-//        config = new RunConfiguration();
-//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-//        config.mapName = "MangoMap";
-//        config.teamCount = 4;
-//        config.teamSize = 1;
-//        config.players = new ArrayList<>();
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        samples.add(new TestExample(config));
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "MangoMap";
+        config.teamCount = 4;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
 
 
-//        config = new RunConfiguration();
-//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-//        config.mapName = "MangoMap";
-//        config.teamCount = 4;
-//        config.teamSize = 1;
-//        config.players = new ArrayList<>();
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        samples.add(new TestExample(config));
-
-
-//        config = new RunConfiguration();
-//        config.gameMode = GameState.GameMode.Tournament_Phase_1;
-//        config.mapName = "MangoMap";
-//        config.teamCount = 4;
-//        config.teamSize = 1;
-//        config.players = new ArrayList<>();
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        config.players.add(IdleBot.class);
-//        samples.add(new TestExample(config));
+        config = new RunConfiguration();
+        config.gameMode = GameState.GameMode.Tournament_Phase_1;
+        config.mapName = "MangoMap";
+        config.teamCount = 4;
+        config.teamSize = 1;
+        config.players = new ArrayList<>();
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        config.players.add(IdleBot.class);
+        samples.add(new TestExample(config));
 
         return samples;
     }
 
     @Test
-    public void testStats(){
-        int expectedCount = binCoeff(run.getPlayers().size(), runConfig.teamCount);
+    public void testConfig() throws NoSuchFieldException, IllegalAccessException, InterruptedException {
+        testStats();
+        testCompletion();
+    }
+
+    public void testStats() {
+        long expectedCount = binCoeff(run.getPlayers().size(), runConfig.teamCount);
         expectedCount *= factorial(runConfig.teamCount);
         Assert.assertEquals("Run contains the wrong manager instance", manager, run.manager);
         Assert.assertEquals("Number of games doesn't equal to the calculated theoretical amount", expectedCount, run.getGames().size());
@@ -273,17 +280,41 @@ public class TestMultiGameRun {
     }
 
 
-    @Test
-    public void testCompletion(){
-        synchronized (lock){
-            try {
-                lock.wait(COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+    public void testCompletion() throws NoSuchFieldException, IllegalAccessException, InterruptedException {
+        long timeOut = COMPLETION_TIMEOUT + binCoeff(run.getPlayers().size(), runConfig.teamCount) * factorial(runConfig.teamCount) * GAME_COMPLETION_TIMEOUT;
+        System.out.printf("Waiting %d ms for Completion.%n", timeOut);
+        synchronized (lock) {
+            lock.wait(timeOut);
         }
         Assert.assertTrue(String.format("The run was not concluded within the timeout of %d ms.\n" +
-                "Var-Dump:%s", GAME_COMPLETION_TIMEOUT, this), completed);
+                "Var-Dump:%s", timeOut, this), completed);
+
+        synchronized (this) {
+            this.wait(10000);
+        }
+
+        Field activeGamesField
+                = Manager.class.getDeclaredField("activeGames");
+        Field scheduledGamesField
+                = Manager.class.getDeclaredField("scheduledGames");
+        Field pausedGamesField
+                = Manager.class.getDeclaredField("pausedGames");
+
+        activeGamesField.setAccessible(true);
+        scheduledGamesField.setAccessible(true);
+        pausedGamesField.setAccessible(true);
+
+        ArrayList<Game> scheduledGames = (ArrayList<Game>) scheduledGamesField.get(manager);
+
+        ArrayList<Game> activeGames = (ArrayList<Game>) activeGamesField.get(manager);
+
+        ArrayList<Game> pausedGames = (ArrayList<Game>) pausedGamesField.get(manager);
+
+        Assert.assertEquals("List of scheduled Games in Manager should be empty after run completed", 0, scheduledGames.size());
+
+        Assert.assertEquals("List of active Games in Manager should be empty after run completed", 0, activeGames.size());
+
+        Assert.assertEquals("List of paused Games in Manager should be empty after run completed", 0, pausedGames.size());
     }
 
     @Override
@@ -296,14 +327,19 @@ public class TestMultiGameRun {
                 '}';
     }
 
-    private int binCoeff(int n, int k){
-        return (factorial(n)/factorial(k)) / factorial(n-k);
+    private long binCoeff(int n, int k) {
+        long res = 1;
+        for (int i = 1; i <= k; i++) {
+            res = res * (n + 1 - i) / i;
+        }
+        return res;
     }
 
-    private int factorial(int n){
-        int res = 1;
+
+    private long factorial(int n) {
+        long res = 1;
         for (int i = 1; i <= n; i++) {
-            res*= i;
+            res *= i;
         }
         return res;
     }
